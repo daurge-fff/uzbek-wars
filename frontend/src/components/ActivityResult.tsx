@@ -29,7 +29,7 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
             onClick={onClose}
           />
           <motion.div
@@ -37,7 +37,7 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 50 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-x-4 top-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl z-50 p-6 max-w-sm mx-auto"
+            className="fixed inset-x-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-xl rounded-[32px] shadow-2xl z-50 p-6 max-w-sm mx-auto border border-gray-100"
           >
             {result.levelUp && (
               <div className="text-center mb-4">
@@ -49,7 +49,7 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
                 >
                   🎉
                 </motion.div>
-                <h2 className="text-2xl font-bold text-primary">
+                <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
                   {t('notifications.level_up', { level: result.newLevel })}
                 </h2>
               </div>
@@ -60,20 +60,20 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.1 }}
-                className="flex items-center justify-between bg-background-secondary rounded-lg p-3"
+                className="flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50 rounded-[20px] p-3 border border-green-200"
               >
-                <span className="text-text-secondary">Опыт</span>
-                <span className="text-xl font-bold text-success">+{result.experienceGained} XP</span>
+                <span className="text-gray-700 font-medium">Опыт</span>
+                <span className="text-xl font-black text-green-600">+{result.experienceGained} XP</span>
               </motion.div>
 
               <motion.div
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="flex items-center justify-between bg-background-secondary rounded-lg p-3"
+                className="flex items-center justify-between bg-gradient-to-r from-yellow-50 to-orange-50 rounded-[20px] p-3 border border-yellow-200"
               >
-                <span className="text-text-secondary">Сомы</span>
-                <span className="text-xl font-bold text-warning">
+                <span className="text-gray-700 font-medium">Сомы</span>
+                <span className="text-xl font-black text-yellow-600">
                   {result.somsGained > 0 ? '+' : ''}{result.somsGained} 💰
                 </span>
               </motion.div>
@@ -83,27 +83,27 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="bg-background-secondary rounded-lg p-3"
+                  className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-[20px] p-3 border border-purple-200"
                 >
-                  <div className="text-sm text-text-secondary mb-2">Изменения характеристик:</div>
-                  <div className="flex gap-3 justify-center">
+                  <div className="text-sm text-gray-700 mb-2 font-medium">Изменения характеристик:</div>
+                  <div className="flex gap-3 justify-center flex-wrap">
                     {result.statChanges.hunger && (
-                      <span className={result.statChanges.hunger > 0 ? 'text-success' : 'text-danger'}>
+                      <span className={`px-3 py-1 rounded-full font-black ${result.statChanges.hunger > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                         🍖 {result.statChanges.hunger > 0 ? '+' : ''}{result.statChanges.hunger}
                       </span>
                     )}
                     {result.statChanges.health && (
-                      <span className={result.statChanges.health > 0 ? 'text-success' : 'text-danger'}>
+                      <span className={`px-3 py-1 rounded-full font-black ${result.statChanges.health > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                         ❤️ {result.statChanges.health > 0 ? '+' : ''}{result.statChanges.health}
                       </span>
                     )}
                     {result.statChanges.mood && (
-                      <span className={result.statChanges.mood > 0 ? 'text-success' : 'text-danger'}>
+                      <span className={`px-3 py-1 rounded-full font-black ${result.statChanges.mood > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                         😊 {result.statChanges.mood > 0 ? '+' : ''}{result.statChanges.mood}
                       </span>
                     )}
                     {result.statChanges.energy && (
-                      <span className={result.statChanges.energy > 0 ? 'text-success' : 'text-danger'}>
+                      <span className={`px-3 py-1 rounded-full font-black ${result.statChanges.energy > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                         ⚡ {result.statChanges.energy > 0 ? '+' : ''}{result.statChanges.energy}
                       </span>
                     )}
@@ -112,12 +112,14 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
               )}
             </div>
 
-            <button
+            <motion.button
               onClick={onClose}
-              className="w-full min-h-touch bg-primary text-white font-semibold py-3 rounded-lg hover:bg-primary-dark transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full min-h-touch bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black py-3 rounded-[20px] hover:shadow-lg transition-all"
             >
               {t('ui.close')}
-            </button>
+            </motion.button>
           </motion.div>
         </>
       )}

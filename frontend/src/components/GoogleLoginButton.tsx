@@ -50,7 +50,7 @@ export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps
     <button
       onClick={handleGoogleLogin}
       disabled={loading}
-      className="min-h-touch min-w-full bg-white text-text-primary font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-shadow flex items-center justify-center gap-3 disabled:opacity-50"
+      className="min-h-touch min-w-full bg-white/95 backdrop-blur-xl text-gray-900 font-black py-4 px-6 rounded-[24px] shadow-2xl hover:shadow-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50 hover:scale-105 border border-gray-100"
     >
       <svg className="w-6 h-6" viewBox="0 0 24 24">
         <path

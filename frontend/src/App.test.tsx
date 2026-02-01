@@ -17,14 +17,14 @@ describe('App Component', () => {
   it('should render welcome message', () => {
     render(<App />);
     
-    const welcomeText = screen.getByText('Welcome to Uzbek Wars!');
+    const welcomeText = screen.getByText('Добро пожаловать');
     expect(welcomeText).toBeInTheDocument();
   });
 
   it('should render description', () => {
     render(<App />);
     
-    const description = screen.getByText(/Mobile-first PWA game/i);
+    const description = screen.getByText(/Выберите компонент для просмотра/i);
     expect(description).toBeInTheDocument();
   });
 });

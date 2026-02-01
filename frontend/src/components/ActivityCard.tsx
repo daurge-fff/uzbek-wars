@@ -67,38 +67,39 @@ export const ActivityCard = ({ activity, playerLevel, isAvailable, onExecute }: 
       onClick={onExecute}
       disabled={isDisabled}
       whileTap={!isDisabled ? { scale: 0.95 } : {}}
-      className={`min-h-touch w-full bg-white rounded-xl shadow-md p-4 transition-all ${
-        isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg'
+      whileHover={!isDisabled ? { scale: 1.02, y: -4 } : {}}
+      className={`min-h-touch w-full bg-white/90 backdrop-blur-xl rounded-[24px] shadow-lg p-4 transition-all border border-gray-100 ${
+        isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-2xl'
       }`}
     >
       <div className="text-4xl mb-2">{activity.icon}</div>
-      <h3 className="text-sm font-bold text-text-primary mb-1">{activity.name}</h3>
-      <p className="text-xs text-text-secondary mb-2">{activity.description}</p>
+      <h3 className="text-sm font-black text-gray-900 mb-1">{activity.name}</h3>
+      <p className="text-xs text-gray-600 mb-2 font-medium">{activity.description}</p>
 
       <div className="flex justify-between text-xs mb-2">
-        <span className="text-success">+{activity.rewards.experience} XP</span>
-        <span className="text-warning">+{activity.rewards.soms} 💰</span>
+        <span className="text-green-600 font-black">+{activity.rewards.experience} XP</span>
+        <span className="text-yellow-600 font-black">+{activity.rewards.soms} 💰</span>
       </div>
 
       {activity.statModifiers && (
-        <div className="flex gap-1 text-xs mb-2">
+        <div className="flex gap-1 text-xs mb-2 flex-wrap justify-center">
           {activity.statModifiers.hunger && (
-            <span className={activity.statModifiers.hunger > 0 ? 'text-success' : 'text-danger'}>
+            <span className={`px-2 py-1 rounded-full font-black ${activity.statModifiers.hunger > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
               🍖{activity.statModifiers.hunger > 0 ? '+' : ''}{activity.statModifiers.hunger}
             </span>
           )}
           {activity.statModifiers.health && (
-            <span className={activity.statModifiers.health > 0 ? 'text-success' : 'text-danger'}>
+            <span className={`px-2 py-1 rounded-full font-black ${activity.statModifiers.health > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
               ❤️{activity.statModifiers.health > 0 ? '+' : ''}{activity.statModifiers.health}
             </span>
           )}
           {activity.statModifiers.mood && (
-            <span className={activity.statModifiers.mood > 0 ? 'text-success' : 'text-danger'}>
+            <span className={`px-2 py-1 rounded-full font-black ${activity.statModifiers.mood > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
               😊{activity.statModifiers.mood > 0 ? '+' : ''}{activity.statModifiers.mood}
             </span>
           )}
           {activity.statModifiers.energy && (
-            <span className={activity.statModifiers.energy > 0 ? 'text-success' : 'text-danger'}>
+            <span className={`px-2 py-1 rounded-full font-black ${activity.statModifiers.energy > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
               ⚡{activity.statModifiers.energy > 0 ? '+' : ''}{activity.statModifiers.energy}
             </span>
           )}
@@ -106,13 +107,13 @@ export const ActivityCard = ({ activity, playerLevel, isAvailable, onExecute }: 
       )}
 
       {isLevelLocked && (
-        <div className="text-xs text-danger font-semibold">
+        <div className="text-xs text-red-600 font-black bg-red-50 px-2 py-1 rounded-full">
           {t('ui.level_required') || 'Требуется'} {activity.requiredLevel} {t('character.level')}
         </div>
       )}
 
       {isOnCooldown && (
-        <div className="text-xs text-warning font-semibold">
+        <div className="text-xs text-orange-600 font-black bg-orange-50 px-2 py-1 rounded-full">
           {formatCooldown(cooldownRemaining)}
         </div>
       )}
