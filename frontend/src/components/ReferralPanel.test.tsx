@@ -50,6 +50,6 @@ describe('ReferralPanel', () => {
       />
     );
 
-    expect(screen.getByText(/пригласи друзей/i)).toBeInTheDocument();
+    expect(screen.getByText(/invite friends/i)).toBeInTheDocument();
   });
 });

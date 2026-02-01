@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export const BackButton = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <motion.button
@@ -12,7 +14,7 @@ export const BackButton = () => {
       className="fixed top-4 left-4 z-[9999] px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-full shadow-lg border border-gray-200 dark:border-gray-700 flex items-center gap-2 font-bold text-gray-900 dark:text-white hover:shadow-xl transition-shadow"
     >
       <span className="text-xl">←</span>
-      <span className="hidden sm:inline">Назад</span>
+      <span className="hidden sm:inline">{t('back')}</span>
     </motion.button>
   );
 };

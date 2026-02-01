@@ -5,21 +5,21 @@ import { CharacterSelection } from './CharacterSelection';
 const mockCharacters = [
   {
     id: 'char1',
-    name: 'Персонаж 1',
+    name: 'Character 1',
     avatar: '/avatar1.png',
-    description: 'Описание 1'
+    description: 'Description 1'
   },
   {
     id: 'char2',
-    name: 'Персонаж 2',
+    name: 'Character 2',
     avatar: '/avatar2.png',
-    description: 'Описание 2'
+    description: 'Description 2'
   },
   {
     id: 'char3',
-    name: 'Персонаж 3',
+    name: 'Character 3',
     avatar: '/avatar3.png',
-    description: 'Описание 3'
+    description: 'Description 3'
   }
 ];
 
@@ -45,7 +45,7 @@ describe('CharacterSelection', () => {
     const onSelect = vi.fn();
     render(<CharacterSelection characters={mockCharacters} onSelect={onSelect} />);
     
-    expect(screen.getByText('Персонаж 1')).toBeDefined();
-    expect(screen.getByText('Описание 1')).toBeDefined();
+    expect(screen.getByText('Character 1')).toBeDefined();
+    expect(screen.getByText('Description 1')).toBeDefined();
   });
 });

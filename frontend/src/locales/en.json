@@ -39,12 +39,14 @@
     "confirm": "Confirm",
     "cancel": "Cancel",
     "close": "Close",
-    "save": "Save"
+    "save": "Save",
+    "level_required": "Required"
   },
   "auth": {
     "login": "Login",
     "logout": "Logout",
     "login_with_google": "Login with Google",
+    "logging_in": "Logging in...",
     "welcome": "Welcome"
   },
   "cities": {
@@ -63,21 +65,33 @@
     "rank": "Rank",
     "player": "Player",
     "level": "Level",
-    "soms": "Soms"
+    "soms": "Soms",
+    "you": "You"
   },
   "referral": {
     "title": "Invite Friends",
+    "description": "Get 50 crystals and 500 soms for each friend!",
     "code": "Your referral code",
+    "yourCode": "Your code",
     "link": "Referral link",
     "copy": "Copy",
     "copied": "Copied!",
-    "referred_players": "Referred players"
+    "copyError": "Copy error",
+    "referred_players": "Referred players",
+    "totalCrystals": "Total crystals",
+    "totalSoms": "Total soms",
+    "friends": "Your friends",
+    "noFriends": "No one joined yet",
+    "level": "Level"
   },
   "donation": {
     "title": "Support the Game",
+    "description": "Get crystals to buy cosmetics",
     "crystals": "crystals",
     "bonus": "Bonus {{percent}}%",
-    "donate": "Donate"
+    "popular": "Popular",
+    "donate": "Donate",
+    "info": "Crystals are used only for cosmetic items"
   },
   "cosmetics": {
     "title": "Cosmetics",
@@ -88,11 +102,93 @@
     "equipped": "Equipped",
     "not_enough_currency": "Not enough crystals"
   },
+  "cosmetic": {
+    "shop": "Cosmetic Shop",
+    "filter": {
+      "all": "All",
+      "clothing": "Clothing",
+      "background": "Backgrounds",
+      "accessory": "Accessories"
+    },
+    "rarity": {
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    },
+    "equip": "Equip",
+    "equipped": "Equipped"
+  },
+  "profile": {
+    "joined": "Joined",
+    "edit": "Edit",
+    "logout": "Logout",
+    "statistics": "Statistics",
+    "totalActivities": "Total activities",
+    "daysPlayed": "Days played",
+    "achievements": "Achievements",
+    "level": "Level",
+    "referralCode": "Your referral code",
+    "referralHint": "Invite friends and get bonuses!"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "appearance": "Appearance",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "audio": "Audio",
+    "soundEffects": "Sound effects",
+    "music": "Music",
+    "notifications": "Notifications",
+    "pushNotifications": "Push notifications",
+    "about": "About"
+  },
   "language": {
     "select": "Select Language",
     "ru": "Русский",
     "uz": "O'zbekcha",
     "uk": "Українська",
     "en": "English"
+  },
+  "health": {
+    "title": "Health Check",
+    "subtitle": "Status of all services and tests",
+    "overallStatus": "Overall Status",
+    "refresh": "Refresh",
+    "servicesRunning": "Services running",
+    "testsPassed": "Tests passed",
+    "codeCoverage": "Code coverage",
+    "avgResponse": "Avg response",
+    "serviceStatus": "Service Status",
+    "testResults": "Test Results",
+    "testsRunning": "Tests running...",
+    "loadingTests": "Loading test results...",
+    "testsAutoRun": "Tests run automatically every 5 minutes",
+    "coverage": "coverage",
+    "passed": "Passed",
+    "failed": "Failed",
+    "skipped": "Skipped",
+    "total": "Total",
+    "failedTests": "Failed tests:",
+    "lastRun": "Last run:",
+    "allSystemsOk": "All systems working great!",
+    "issuesDetected": "Issues detected",
+    "projectReady": "Project ready to work",
+    "needsAttention": "Needs developer attention",
+    "checking": "Checking..."
+  },
+  "activity": {
+    "experience": "Experience",
+    "soms": "Soms",
+    "statChanges": "Stat changes:"
+  },
+  "dashboard": {
+    "level": "Level"
+  },
+  "back": "Back",
+  "about": {
+    "codeQuality": "Code quality",
+    "fastWork": "Fast work"
   }
 }

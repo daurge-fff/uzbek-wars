@@ -130,5 +130,45 @@
     "uz": "O'zbekcha",
     "uk": "Українська",
     "en": "English"
+  },
+  "health": {
+    "title": "Health Check",
+    "subtitle": "Статус всех сервисов и тестов",
+    "overallStatus": "Общий статус",
+    "refresh": "Обновить",
+    "servicesRunning": "Сервисы работают",
+    "testsPassed": "Тесты пройдены",
+    "codeCoverage": "Покрытие кода",
+    "avgResponse": "Средний отклик",
+    "serviceStatus": "Статус сервисов",
+    "testResults": "Результаты тестов",
+    "testsRunning": "Тесты выполняются...",
+    "loadingTests": "Загрузка результатов тестов...",
+    "testsAutoRun": "Тесты запускаются автоматически каждые 5 минут",
+    "coverage": "покрытие",
+    "passed": "Пройдено",
+    "failed": "Провалено",
+    "skipped": "Пропущено",
+    "total": "Всего",
+    "failedTests": "Провалившиеся тесты:",
+    "lastRun": "Последний запуск:",
+    "allSystemsOk": "Все системы работают отлично!",
+    "issuesDetected": "Обнаружены проблемы",
+    "projectReady": "Проект готов к работе",
+    "needsAttention": "Требуется внимание разработчиков",
+    "checking": "Проверка..."
+  },
+  "activity": {
+    "experience": "Опыт",
+    "soms": "Сомы",
+    "statChanges": "Изменения характеристик:"
+  },
+  "dashboard": {
+    "level": "Уровень"
+  },
+  "back": "Назад",
+  "about": {
+    "codeQuality": "Качество кода",
+    "fastWork": "Быстрая работа"
   }
 }

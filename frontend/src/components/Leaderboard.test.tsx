@@ -4,9 +4,9 @@ import { Leaderboard } from './Leaderboard';
 import '../i18n';
 
 const mockPlayers = [
-  { rank: 1, userId: '1', username: 'Тимур', avatar: '👨‍💼', level: 50, soms: 100000, cityName: 'Бухара', isCurrentPlayer: false },
-  { rank: 2, userId: '2', username: 'Азиза', avatar: '👩‍🍳', level: 45, soms: 85000, cityName: 'Ташкент', isCurrentPlayer: false },
-  { rank: 3, userId: '3', username: 'Рустам', avatar: '👨‍🌾', level: 42, soms: 75000, cityName: 'Самарканд', isCurrentPlayer: true }
+  { rank: 1, userId: '1', username: 'Timur', avatar: '👨‍💼', level: 50, soms: 100000, cityName: 'Bukhara', isCurrentPlayer: false },
+  { rank: 2, userId: '2', username: 'Aziza', avatar: '👩‍🍳', level: 45, soms: 85000, cityName: 'Tashkent', isCurrentPlayer: false },
+  { rank: 3, userId: '3', username: 'Rustam', avatar: '👨‍🌾', level: 42, soms: 75000, cityName: 'Samarkand', isCurrentPlayer: true }
 ];
 
 describe('Leaderboard', () => {
@@ -20,9 +20,9 @@ describe('Leaderboard', () => {
       />
     );
 
-    expect(screen.getByText('Тимур')).toBeInTheDocument();
-    expect(screen.getByText('Азиза')).toBeInTheDocument();
-    expect(screen.getByText('Рустам')).toBeInTheDocument();
+    expect(screen.getByText('Timur')).toBeInTheDocument();
+    expect(screen.getByText('Aziza')).toBeInTheDocument();
+    expect(screen.getByText('Rustam')).toBeInTheDocument();
   });
 
   it('shows medals for top 3', () => {
@@ -50,7 +50,7 @@ describe('Leaderboard', () => {
       />
     );
 
-    const currentPlayerBadge = screen.getByText(/Вы/i);
+    const currentPlayerBadge = screen.getByText(/You/i);
     expect(currentPlayerBadge).toBeInTheDocument();
   });
 
@@ -81,7 +81,7 @@ describe('Leaderboard', () => {
       />
     );
 
-    expect(screen.getByText('Ур.50')).toBeInTheDocument();
-    expect(screen.getByText('Ур.45')).toBeInTheDocument();
+    expect(screen.getByText('Lvl.50')).toBeInTheDocument();
+    expect(screen.getByText('Lvl.45')).toBeInTheDocument();
   });
 });

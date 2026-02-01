@@ -5,8 +5,8 @@ import { PlayerProfile } from './PlayerProfile';
 const mockPlayerInfo = {
   username: 'TestPlayer',
   avatar: '👨‍🌾',
-  characterName: 'Фермер',
-  cityName: 'Самарканд',
+  characterName: 'Farmer',
+  cityName: 'Samarkand',
   joinedDate: '2024-01-01',
   referralCode: 'TEST1234'
 };
@@ -33,7 +33,7 @@ describe('PlayerProfile', () => {
     );
 
     expect(screen.getByText('TestPlayer')).toBeInTheDocument();
-    expect(screen.getByText('Фермер')).toBeInTheDocument();
+    expect(screen.getByText('Farmer')).toBeInTheDocument();
   });
 
   it('should show referral code', () => {
@@ -58,7 +58,7 @@ describe('PlayerProfile', () => {
       />
     );
 
-    expect(screen.getByText(/верифицировать/i)).toBeInTheDocument();
+    expect(screen.getByText(/verify/i)).toBeInTheDocument();
   });
 
   it('should show verified status when verified', () => {
@@ -71,6 +71,6 @@ describe('PlayerProfile', () => {
       />
     );
 
-    expect(screen.getByText(/верифицирован/i)).toBeInTheDocument();
+    expect(screen.getByText(/verified/i)).toBeInTheDocument();
   });
 });

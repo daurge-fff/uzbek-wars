@@ -56,7 +56,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect }: Gam
                 {playerState.level}
               </div>
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Уровень {playerState.level}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.level')} {playerState.level}</div>
                 <div className="text-xs text-gray-500 dark:text-gray-500">
                   {playerState.experience}/{playerState.experienceToNextLevel} XP
                 </div>

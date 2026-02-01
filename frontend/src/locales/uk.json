@@ -39,12 +39,14 @@
     "confirm": "Підтвердити",
     "cancel": "Скасувати",
     "close": "Закрити",
-    "save": "Зберегти"
+    "save": "Зберегти",
+    "level_required": "Потрібно"
   },
   "auth": {
     "login": "Увійти",
     "logout": "Вийти",
     "login_with_google": "Увійти через Google",
+    "logging_in": "Вхід...",
     "welcome": "Ласкаво просимо"
   },
   "cities": {
@@ -63,21 +65,33 @@
     "rank": "Місце",
     "player": "Гравець",
     "level": "Рівень",
-    "soms": "Соми"
+    "soms": "Соми",
+    "you": "Ви"
   },
   "referral": {
     "title": "Запросити друзів",
+    "description": "Отримуйте 50 кристалів і 500 сомів за кожного друга!",
     "code": "Ваш реферальний код",
+    "yourCode": "Ваш код",
     "link": "Реферальне посилання",
     "copy": "Копіювати",
     "copied": "Скопійовано!",
-    "referred_players": "Запрошені гравці"
+    "copyError": "Помилка копіювання",
+    "referred_players": "Запрошені гравці",
+    "totalCrystals": "Всього кристалів",
+    "totalSoms": "Всього сомів",
+    "friends": "Ваші друзі",
+    "noFriends": "Поки ніхто не приєднався",
+    "level": "Рівень"
   },
   "donation": {
     "title": "Підтримати гру",
+    "description": "Отримайте кристали для покупки косметики",
     "crystals": "кристалів",
     "bonus": "Бонус {{percent}}%",
-    "donate": "Донат"
+    "popular": "Популярне",
+    "donate": "Донат",
+    "info": "Кристали використовуються тільки для косметичних предметів"
   },
   "cosmetics": {
     "title": "Косметика",
@@ -88,11 +102,93 @@
     "equipped": "Одягнено",
     "not_enough_currency": "Недостатньо кристалів"
   },
+  "cosmetic": {
+    "shop": "Магазин косметики",
+    "filter": {
+      "all": "Всі",
+      "clothing": "Одяг",
+      "background": "Фони",
+      "accessory": "Аксесуари"
+    },
+    "rarity": {
+      "common": "Звичайний",
+      "rare": "Рідкісний",
+      "epic": "Епічний",
+      "legendary": "Легендарний"
+    },
+    "equip": "Одягнути",
+    "equipped": "Одягнено"
+  },
+  "profile": {
+    "joined": "У грі з",
+    "edit": "Редагувати",
+    "logout": "Вийти",
+    "statistics": "Статистика",
+    "totalActivities": "Всього активностей",
+    "daysPlayed": "Днів у грі",
+    "achievements": "Досягнень",
+    "level": "Рівень",
+    "referralCode": "Ваш реферальний код",
+    "referralHint": "Запросіть друзів і отримайте бонуси!"
+  },
+  "settings": {
+    "title": "Налаштування",
+    "language": "Мова",
+    "appearance": "Зовнішній вигляд",
+    "darkMode": "Темна тема",
+    "lightMode": "Світла тема",
+    "audio": "Звук",
+    "soundEffects": "Звукові ефекти",
+    "music": "Музика",
+    "notifications": "Сповіщення",
+    "pushNotifications": "Push-сповіщення",
+    "about": "Про додаток"
+  },
   "language": {
     "select": "Оберіть мову",
     "ru": "Русский",
     "uz": "O'zbekcha",
     "uk": "Українська",
     "en": "English"
+  },
+  "health": {
+    "title": "Health Check",
+    "subtitle": "Статус всіх сервісів і тестів",
+    "overallStatus": "Загальний статус",
+    "refresh": "Оновити",
+    "servicesRunning": "Сервіси працюють",
+    "testsPassed": "Тести пройдено",
+    "codeCoverage": "Покриття коду",
+    "avgResponse": "Середній відгук",
+    "serviceStatus": "Статус сервісів",
+    "testResults": "Результати тестів",
+    "testsRunning": "Тести виконуються...",
+    "loadingTests": "Завантаження результатів тестів...",
+    "testsAutoRun": "Тести запускаються автоматично кожні 5 хвилин",
+    "coverage": "покриття",
+    "passed": "Пройдено",
+    "failed": "Провалено",
+    "skipped": "Пропущено",
+    "total": "Всього",
+    "failedTests": "Провалені тести:",
+    "lastRun": "Останній запуск:",
+    "allSystemsOk": "Всі системи працюють чудово!",
+    "issuesDetected": "Виявлено проблеми",
+    "projectReady": "Проект готовий до роботи",
+    "needsAttention": "Потрібна увага розробників",
+    "checking": "Перевірка..."
+  },
+  "activity": {
+    "experience": "Досвід",
+    "soms": "Соми",
+    "statChanges": "Зміни характеристик:"
+  },
+  "dashboard": {
+    "level": "Рівень"
+  },
+  "back": "Назад",
+  "about": {
+    "codeQuality": "Якість коду",
+    "fastWork": "Швидка робота"
   }
 }

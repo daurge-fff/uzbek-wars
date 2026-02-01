@@ -4,9 +4,9 @@ import { CosmeticShop } from './CosmeticShop';
 import '../i18n';
 
 const mockItems = [
-  { id: '1', name: 'Тюбетейка', type: 'clothing' as const, rarity: 'common' as const, price: 50, icon: '🎩', owned: false, equipped: false },
-  { id: '2', name: 'Золотая корона', type: 'clothing' as const, rarity: 'legendary' as const, price: 500, icon: '👑', owned: false, equipped: false },
-  { id: '3', name: 'Регистан', type: 'background' as const, rarity: 'epic' as const, price: 200, icon: '🕌', owned: true, equipped: true }
+  { id: '1', name: 'Tubeteyka', type: 'clothing' as const, rarity: 'common' as const, price: 50, icon: '🎩', owned: false, equipped: false },
+  { id: '2', name: 'Golden Crown', type: 'clothing' as const, rarity: 'legendary' as const, price: 500, icon: '👑', owned: false, equipped: false },
+  { id: '3', name: 'Registan', type: 'background' as const, rarity: 'epic' as const, price: 200, icon: '🕌', owned: true, equipped: true }
 ];
 
 describe('CosmeticShop', () => {
@@ -20,9 +20,9 @@ describe('CosmeticShop', () => {
       />
     );
 
-    expect(screen.getByText('Тюбетейка')).toBeInTheDocument();
-    expect(screen.getByText('Золотая корона')).toBeInTheDocument();
-    expect(screen.getByText('Регистан')).toBeInTheDocument();
+    expect(screen.getByText('Tubeteyka')).toBeInTheDocument();
+    expect(screen.getByText('Golden Crown')).toBeInTheDocument();
+    expect(screen.getByText('Registan')).toBeInTheDocument();
   });
 
   it('shows player crystals', () => {
@@ -48,11 +48,11 @@ describe('CosmeticShop', () => {
       />
     );
 
-    const backgroundFilter = screen.getByText('Фоны');
+    const backgroundFilter = screen.getByText('Backgrounds');
     fireEvent.click(backgroundFilter);
 
-    expect(screen.getByText('Регистан')).toBeInTheDocument();
-    expect(screen.queryByText('Тюбетейка')).not.toBeInTheDocument();
+    expect(screen.getByText('Registan')).toBeInTheDocument();
+    expect(screen.queryByText('Tubeteyka')).not.toBeInTheDocument();
   });
 
   it('calls onPurchase when buying item', () => {
@@ -96,6 +96,6 @@ describe('CosmeticShop', () => {
       />
     );
 
-    expect(screen.getByText(/Надето/i)).toBeInTheDocument();
+    expect(screen.getByText(/Equipped/i)).toBeInTheDocument();
   });
 });

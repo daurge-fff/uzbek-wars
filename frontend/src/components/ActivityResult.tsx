@@ -63,7 +63,7 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
                 transition={{ delay: 0.1 }}
                 className="flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50 rounded-[20px] p-3 border border-green-200"
               >
-                <span className="text-gray-700 font-medium">Опыт</span>
+                <span className="text-gray-700 font-medium">{t('activity.experience')}</span>
                 <span className="text-xl font-black text-green-600">+{result.experienceGained} XP</span>
               </motion.div>
 
@@ -73,7 +73,7 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
                 transition={{ delay: 0.2 }}
                 className="flex items-center justify-between bg-gradient-to-r from-yellow-50 to-orange-50 rounded-[20px] p-3 border border-yellow-200"
               >
-                <span className="text-gray-700 font-medium">Сомы</span>
+                <span className="text-gray-700 font-medium">{t('activity.soms')}</span>
                 <span className="text-xl font-black text-yellow-600">
                   {result.somsGained > 0 ? '+' : ''}{result.somsGained} 💰
                 </span>
@@ -86,7 +86,7 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
                   transition={{ delay: 0.3 }}
                   className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-[20px] p-3 border border-purple-200"
                 >
-                  <div className="text-sm text-gray-700 mb-2 font-medium">Изменения характеристик:</div>
+                  <div className="text-sm text-gray-700 mb-2 font-medium">{t('activity.statChanges')}</div>
                   <div className="flex gap-3 justify-center flex-wrap">
                     {result.statChanges.hunger && (
                       <span className={`px-3 py-1 rounded-full font-black ${result.statChanges.hunger > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>

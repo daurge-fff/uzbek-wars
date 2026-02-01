@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ServiceStatus {
   name: string;
@@ -23,6 +24,7 @@ interface TestSuite {
 }
 
 export const HealthCheck = () => {
+  const { t } = useTranslation();
   const [services, setServices] = useState<ServiceStatus[]>([
     { name: 'Backend API', icon: '⚙️', status: 'healthy', responseTime: 0, lastCheck: new Date().toISOString() },
     { name: 'MongoDB', icon: '🗄️', status: 'healthy', responseTime: 0, lastCheck: new Date().toISOString() },
@@ -143,10 +145,10 @@ export const HealthCheck = () => {
           className="text-center mb-8"
         >
           <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2">
-            <span className="text-4xl">🏥</span> Health Check
+            <span className="text-4xl">🏥</span> {t('health.title')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Статус всех сервисов и тестов
+            {t('health.subtitle')}
           </p>
         </motion.div>
 
@@ -157,7 +159,7 @@ export const HealthCheck = () => {
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-black text-gray-900 dark:text-white">
-              Общий статус
+              {t('health.overallStatus')}
             </h2>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -166,7 +168,7 @@ export const HealthCheck = () => {
               disabled={refreshing}
               className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-full shadow-lg disabled:opacity-50"
             >
-              {refreshing ? '🔄' : '🔃'} Обновить
+              {refreshing ? '🔄' : '🔃'} {t('health.refresh')}
             </motion.button>
           </div>
 
@@ -179,7 +181,7 @@ export const HealthCheck = () => {
               <div className="text-2xl font-black text-gray-900 dark:text-white">
                 {services.filter(s => s.status === 'healthy').length}/{services.length}
               </div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Сервисы работают</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">{t('health.servicesRunning')}</div>
             </motion.div>
 
             <motion.div 
@@ -190,7 +192,7 @@ export const HealthCheck = () => {
               <div className="text-2xl font-black text-gray-900 dark:text-white">
                 {totalPassed}/{totalTests || '—'}
               </div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Тесты пройдены</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">{t('health.testsPassed')}</div>
             </motion.div>
 
             <motion.div 
@@ -201,7 +203,7 @@ export const HealthCheck = () => {
               <div className="text-2xl font-black text-gray-900 dark:text-white">
                 {avgCoverage}%
               </div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Покрытие кода</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">{t('health.codeCoverage')}</div>
             </motion.div>
 
             <motion.div 
@@ -212,7 +214,7 @@ export const HealthCheck = () => {
               <div className="text-2xl font-black text-gray-900 dark:text-white">
                 {Math.round(services.reduce((sum, s) => sum + (s.responseTime || 0), 0) / services.length)}ms
               </div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Средний отклик</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">{t('health.avgResponse')}</div>
             </motion.div>
           </div>
         </motion.div>
@@ -224,7 +226,7 @@ export const HealthCheck = () => {
           className="bg-white dark:bg-gray-800 rounded-[32px] shadow-2xl p-6"
         >
           <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
-            Статус сервисов
+            {t('health.serviceStatus')}
           </h2>
           <div className="space-y-3">
             {services.map((service, index) => (
@@ -245,7 +247,7 @@ export const HealthCheck = () => {
                         <span className="text-sm">{getStatusIcon(service.status)}</span>
                       </div>
                       <div className="text-sm opacity-90">
-                        {service.responseTime ? `${service.responseTime}ms` : service.details || 'Checking...'}
+                        {service.responseTime ? `${service.responseTime}ms` : service.details || t('health.checking')}
                       </div>
                     </div>
                   </div>
@@ -266,11 +268,11 @@ export const HealthCheck = () => {
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-black text-gray-900 dark:text-white">
-              Результаты тестов
+              {t('health.testResults')}
             </h2>
             {testsRunning && (
               <div className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold rounded-full shadow-lg">
-                ⏳ Тесты выполняются...
+                ⏳ {t('health.testsRunning')}
               </div>
             )}
           </div>
@@ -278,8 +280,8 @@ export const HealthCheck = () => {
           {testSuites.length === 0 ? (
             <div className="text-center py-12 text-gray-500 dark:text-gray-400">
               <div className="text-6xl mb-4">🧪</div>
-              <p>Загрузка результатов тестов...</p>
-              <p className="text-sm mt-2">Тесты запускаются автоматически каждые 5 минут</p>
+              <p>{t('health.loadingTests')}</p>
+              <p className="text-sm mt-2">{t('health.testsAutoRun')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -298,7 +300,7 @@ export const HealthCheck = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-bold">
-                        {suite.coverage}% покрытие
+                        {suite.coverage}% {t('health.coverage')}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">
                         {suite.duration}s
@@ -309,25 +311,25 @@ export const HealthCheck = () => {
                   <div className="grid grid-cols-4 gap-2 mb-3">
                     <motion.div whileHover={{ scale: 1.1 }} className="text-center">
                       <div className="text-2xl font-black text-green-600 dark:text-green-400">{suite.passed}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">Пройдено</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{t('health.passed')}</div>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.1 }} className="text-center">
                       <div className="text-2xl font-black text-red-600 dark:text-red-400">{suite.failed}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">Провалено</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{t('health.failed')}</div>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.1 }} className="text-center">
                       <div className="text-2xl font-black text-yellow-600 dark:text-yellow-400">{suite.skipped}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">Пропущено</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{t('health.skipped')}</div>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.1 }} className="text-center">
                       <div className="text-2xl font-black text-gray-900 dark:text-white">{suite.total}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">Всего</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{t('health.total')}</div>
                     </motion.div>
                   </div>
 
                   {suite.failedTests && suite.failedTests.length > 0 && (
                     <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-[12px] border border-red-200 dark:border-red-800 max-h-40 overflow-y-auto">
-                      <div className="text-xs font-bold text-red-700 dark:text-red-400 mb-2">❌ Провалившиеся тесты:</div>
+                      <div className="text-xs font-bold text-red-700 dark:text-red-400 mb-2">❌ {t('health.failedTests')}</div>
                       <ul className="space-y-1">
                         {suite.failedTests.map((test, i) => (
                           <li key={i} className="text-xs text-red-600 dark:text-red-400 pl-4">
@@ -340,7 +342,7 @@ export const HealthCheck = () => {
 
                   <div className="flex items-center justify-between mb-2">
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      Последний запуск: {new Date(suite.lastRun).toLocaleString('ru-RU')}
+                      {t('health.lastRun')} {new Date(suite.lastRun).toLocaleString()}
                     </div>
                   </div>
 
@@ -369,13 +371,13 @@ export const HealthCheck = () => {
           </div>
           <h3 className="text-2xl font-black mb-2">
             {services.every(s => s.status === 'healthy')
-              ? 'Все системы работают отлично!'
-              : 'Обнаружены проблемы'}
+              ? t('health.allSystemsOk')
+              : t('health.issuesDetected')}
           </h3>
           <p className="text-white/80">
             {services.every(s => s.status === 'healthy')
-              ? 'Проект готов к работе'
-              : 'Требуется внимание разработчиков'}
+              ? t('health.projectReady')
+              : t('health.needsAttention')}
           </p>
         </motion.div>
       </div>

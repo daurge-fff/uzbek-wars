@@ -22,17 +22,17 @@ describe('HealthCheck Component', () => {
 
   it('should display overall status section', () => {
     render(<HealthCheck />);
-    expect(screen.getByText(/Общий статус/i)).toBeInTheDocument();
+    expect(screen.getByText(/Overall Status/i)).toBeInTheDocument();
   });
 
   it('should display services status section', () => {
     render(<HealthCheck />);
-    expect(screen.getByText(/Статус сервисов/i)).toBeInTheDocument();
+    expect(screen.getByText(/Service Status/i)).toBeInTheDocument();
   });
 
   it('should display test results section', () => {
     render(<HealthCheck />);
-    expect(screen.getByText(/Результаты тестов/i)).toBeInTheDocument();
+    expect(screen.getByText(/Test Results/i)).toBeInTheDocument();
   });
 
   it('should show all service names', () => {
@@ -43,28 +43,54 @@ describe('HealthCheck Component', () => {
     expect(screen.getByText('Frontend')).toBeInTheDocument();
   });
 
-  it('should show all test suite names', () => {
+  it('should show all test suite names', async () => {
+    (global.fetch as any).mockImplementation((url: string) => {
+      if (url === '/api/health') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ status: 'healthy', services: {} })
+        });
+      }
+      if (url === '/api/tests/results') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            results: [
+              { name: 'Backend Tests', passed: 100, failed: 0, skipped: 0, total: 100, coverage: 90, duration: 5, lastRun: new Date().toISOString(), failedTests: [] },
+              { name: 'Frontend Tests', passed: 80, failed: 0, skipped: 0, total: 80, coverage: 92, duration: 3, lastRun: new Date().toISOString(), failedTests: [] },
+              { name: 'Integration Tests', passed: 50, failed: 0, skipped: 0, total: 50, coverage: 91, duration: 10, lastRun: new Date().toISOString(), failedTests: [] }
+            ]
+          })
+        });
+      }
+      return Promise.reject(new Error('Unknown URL'));
+    });
+
     render(<HealthCheck />);
-    expect(screen.getByText('Backend Tests')).toBeInTheDocument();
+    
+    await waitFor(() => {
+      expect(screen.getByText('Backend Tests')).toBeInTheDocument();
+    });
+    
     expect(screen.getByText('Frontend Tests')).toBeInTheDocument();
     expect(screen.getByText('Integration Tests')).toBeInTheDocument();
   });
 
   it('should display refresh button', () => {
     render(<HealthCheck />);
-    const refreshButton = screen.getByRole('button', { name: /Обновить/i });
+    const refreshButton = screen.getByRole('button', { name: /Refresh/i });
     expect(refreshButton).toBeInTheDocument();
   });
 
   it('should show test statistics', () => {
     render(<HealthCheck />);
-    const passedElements = screen.getAllByText(/Пройдено/i);
+    const passedElements = screen.getAllByText(/Passed/i);
     expect(passedElements.length).toBeGreaterThan(0);
   });
 
   it('should display coverage percentages', () => {
     render(<HealthCheck />);
-    expect(screen.getByText(/91% покрытие/i)).toBeInTheDocument();
+    expect(screen.getByText(/91% coverage/i)).toBeInTheDocument();
   });
 
   it('should render summary section at bottom', () => {

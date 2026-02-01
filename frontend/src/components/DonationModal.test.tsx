@@ -52,7 +52,7 @@ describe('DonationModal', () => {
       />
     );
 
-    expect(screen.getByText(/Популярное/i)).toBeInTheDocument();
+    expect(screen.getByText(/Popular/i)).toBeInTheDocument();
   });
 
   it('calls onDonate when option is clicked', () => {

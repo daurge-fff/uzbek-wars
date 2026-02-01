@@ -303,11 +303,11 @@ export const Settings = ({
                         <div className="grid grid-cols-2 gap-3">
                           <div className="p-3 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-[16px] text-center">
                             <div className="text-2xl mb-1">⭐</div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">Качество кода</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('about.codeQuality')}</div>
                           </div>
                           <div className="p-3 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-[16px] text-center">
                             <div className="text-2xl mb-1">🎯</div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">Быстрая работа</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('about.fastWork')}</div>
                           </div>
                         </div>
 

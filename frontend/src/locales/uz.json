@@ -39,12 +39,14 @@
     "confirm": "Tasdiqlash",
     "cancel": "Bekor qilish",
     "close": "Yopish",
-    "save": "Saqlash"
+    "save": "Saqlash",
+    "level_required": "Kerak"
   },
   "auth": {
     "login": "Kirish",
     "logout": "Chiqish",
     "login_with_google": "Google orqali kirish",
+    "logging_in": "Kirish...",
     "welcome": "Xush kelibsiz"
   },
   "cities": {
@@ -63,21 +65,33 @@
     "rank": "O'rin",
     "player": "O'yinchi",
     "level": "Daraja",
-    "soms": "So'mlar"
+    "soms": "So'mlar",
+    "you": "Siz"
   },
   "referral": {
     "title": "Do'stlarni taklif qilish",
+    "description": "Har bir do'st uchun 50 kristall va 500 so'm oling!",
     "code": "Sizning referal kodingiz",
+    "yourCode": "Sizning kodingiz",
     "link": "Referal havola",
     "copy": "Nusxalash",
     "copied": "Nusxalandi!",
-    "referred_players": "Taklif qilingan o'yinchilar"
+    "copyError": "Nusxalash xatosi",
+    "referred_players": "Taklif qilingan o'yinchilar",
+    "totalCrystals": "Jami kristallar",
+    "totalSoms": "Jami so'mlar",
+    "friends": "Sizning do'stlaringiz",
+    "noFriends": "Hali hech kim qo'shilmadi",
+    "level": "Daraja"
   },
   "donation": {
     "title": "O'yinni qo'llab-quvvatlash",
+    "description": "Kosmetika sotib olish uchun kristallar oling",
     "crystals": "kristallar",
     "bonus": "Bonus {{percent}}%",
-    "donate": "Donat"
+    "popular": "Mashhur",
+    "donate": "Donat",
+    "info": "Kristallar faqat kosmetik buyumlar uchun ishlatiladi"
   },
   "cosmetics": {
     "title": "Kosmetika",
@@ -88,11 +102,93 @@
     "equipped": "Kiyilgan",
     "not_enough_currency": "Kristallar yetarli emas"
   },
+  "cosmetic": {
+    "shop": "Kosmetika do'koni",
+    "filter": {
+      "all": "Hammasi",
+      "clothing": "Kiyim",
+      "background": "Fonlar",
+      "accessory": "Aksessuarlar"
+    },
+    "rarity": {
+      "common": "Oddiy",
+      "rare": "Kamyob",
+      "epic": "Epik",
+      "legendary": "Afsonaviy"
+    },
+    "equip": "Kiyish",
+    "equipped": "Kiyilgan"
+  },
+  "profile": {
+    "joined": "O'yinda",
+    "edit": "Tahrirlash",
+    "logout": "Chiqish",
+    "statistics": "Statistika",
+    "totalActivities": "Jami faoliyatlar",
+    "daysPlayed": "O'yinda kunlar",
+    "achievements": "Yutuqlar",
+    "level": "Daraja",
+    "referralCode": "Sizning referal kodingiz",
+    "referralHint": "Do'stlarni taklif qiling va bonuslar oling!"
+  },
+  "settings": {
+    "title": "Sozlamalar",
+    "language": "Til",
+    "appearance": "Ko'rinish",
+    "darkMode": "Qorong'i rejim",
+    "lightMode": "Yorug' rejim",
+    "audio": "Ovoz",
+    "soundEffects": "Ovoz effektlari",
+    "music": "Musiqa",
+    "notifications": "Bildirishnomalar",
+    "pushNotifications": "Push-bildirishnomalar",
+    "about": "Ilova haqida"
+  },
   "language": {
     "select": "Tilni tanlang",
     "ru": "Русский",
     "uz": "O'zbekcha",
     "uk": "Українська",
     "en": "English"
+  },
+  "health": {
+    "title": "Health Check",
+    "subtitle": "Barcha xizmatlar va testlar holati",
+    "overallStatus": "Umumiy holat",
+    "refresh": "Yangilash",
+    "servicesRunning": "Xizmatlar ishlayapti",
+    "testsPassed": "Testlar o'tdi",
+    "codeCoverage": "Kod qamrovi",
+    "avgResponse": "O'rtacha javob",
+    "serviceStatus": "Xizmatlar holati",
+    "testResults": "Test natijalari",
+    "testsRunning": "Testlar bajarilmoqda...",
+    "loadingTests": "Test natijalarini yuklash...",
+    "testsAutoRun": "Testlar har 5 daqiqada avtomatik ishga tushadi",
+    "coverage": "qamrov",
+    "passed": "O'tdi",
+    "failed": "Muvaffaqiyatsiz",
+    "skipped": "O'tkazib yuborildi",
+    "total": "Jami",
+    "failedTests": "Muvaffaqiyatsiz testlar:",
+    "lastRun": "Oxirgi ishga tushirish:",
+    "allSystemsOk": "Barcha tizimlar ajoyib ishlayapti!",
+    "issuesDetected": "Muammolar aniqlandi",
+    "projectReady": "Loyiha ishlashga tayyor",
+    "needsAttention": "Dasturchining e'tibori kerak",
+    "checking": "Tekshirilmoqda..."
+  },
+  "activity": {
+    "experience": "Tajriba",
+    "soms": "So'mlar",
+    "statChanges": "Xususiyatlar o'zgarishi:"
+  },
+  "dashboard": {
+    "level": "Daraja"
+  },
+  "back": "Orqaga",
+  "about": {
+    "codeQuality": "Kod sifati",
+    "fastWork": "Tez ish"
   }
 }
