@@ -17,6 +17,10 @@ import { CharacterSelection } from './components/CharacterSelection';
 import { CitySelection } from './components/CitySelection';
 import { GameDashboard } from './components/GameDashboard';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
+import { DonationModal } from './components/DonationModal';
+import { CosmeticShop } from './components/CosmeticShop';
+import { Leaderboard } from './components/Leaderboard';
+import { ReferralPanel } from './components/ReferralPanel';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -128,6 +132,26 @@ const mockActivities = [
   { id: 'trade', name: 'Торговать', icon: '🏪' }
 ];
 
+const mockCosmetics = [
+  { id: 'hat1', name: 'Тюбетейка', type: 'clothing' as const, rarity: 'common' as const, price: 50, icon: '🎩', owned: false, equipped: false },
+  { id: 'hat2', name: 'Золотая корона', type: 'clothing' as const, rarity: 'legendary' as const, price: 500, icon: '👑', owned: false, equipped: false },
+  { id: 'bg1', name: 'Регистан', type: 'background' as const, rarity: 'epic' as const, price: 200, icon: '🕌', owned: true, equipped: true },
+  { id: 'acc1', name: 'Золотые серьги', type: 'accessory' as const, rarity: 'rare' as const, price: 100, icon: '💍', owned: true, equipped: false }
+];
+
+const mockLeaderboard = [
+  { rank: 1, userId: '1', username: 'Тимур', avatar: '👨‍💼', level: 50, soms: 100000, cityName: 'Бухара', isCurrentPlayer: false },
+  { rank: 2, userId: '2', username: 'Азиза', avatar: '👩‍🍳', level: 45, soms: 85000, cityName: 'Ташкент', isCurrentPlayer: false },
+  { rank: 3, userId: '3', username: 'Рустам', avatar: '👨‍🌾', level: 42, soms: 75000, cityName: 'Самарканд', isCurrentPlayer: true },
+  { rank: 4, userId: '4', username: 'Малика', avatar: '👩‍🎨', level: 40, soms: 70000, cityName: 'Наманган', isCurrentPlayer: false },
+  { rank: 5, userId: '5', username: 'Жасур', avatar: '👨‍🔧', level: 38, soms: 65000, cityName: 'Андижан', isCurrentPlayer: false }
+];
+
+const mockReferrals = [
+  { username: 'Алишер', avatar: '👨‍💻', level: 15, registeredAt: '2024-01-15' },
+  { username: 'Дилноза', avatar: '👩‍🎓', level: 12, registeredAt: '2024-01-20' }
+];
+
 function MenuCard({ title, description, icon, to }: any) {
   const navigate = useNavigate();
   
@@ -182,41 +206,20 @@ function HomePage() {
             Добро пожаловать
           </h2>
           <p className="text-gray-600 dark:text-gray-300 text-lg transition-colors">
-            Выберите компонент для просмотра
+            Выберите раздел
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-          <MenuCard
-            title="Цветовая палитра"
-            description="Современный iOS-style дизайн"
-            icon="🎨"
-            to="/colors"
-          />
-          <MenuCard
-            title="Авторизация"
-            description="Google OAuth компонент"
-            icon="🔐"
-            to="/auth"
-          />
-          <MenuCard
-            title="Выбор персонажа"
-            description="Drag & физика анимаций"
-            icon="👤"
-            to="/characters"
-          />
-          <MenuCard
-            title="Выбор города"
-            description="Интеллектуальная балансировка"
-            icon="🏙️"
-            to="/cities"
-          />
-          <MenuCard
-            title="Игровой экран"
-            description="Dashboard с активностями"
-            icon="🎮"
-            to="/dashboard"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+          <MenuCard title="Цветовая палитра" description="iOS-style дизайн" icon="🎨" to="/colors" />
+          <MenuCard title="Авторизация" description="Google OAuth" icon="🔐" to="/auth" />
+          <MenuCard title="Выбор персонажа" description="Свайп анимации" icon="👤" to="/characters" />
+          <MenuCard title="Выбор города" description="Балансировка" icon="🏙️" to="/cities" />
+          <MenuCard title="Игровой экран" description="Dashboard" icon="🎮" to="/dashboard" />
+          <MenuCard title="Магазин косметики" description="Покупка предметов" icon="🛍️" to="/shop" />
+          <MenuCard title="Рейтинг" description="Топ игроков" icon="🏆" to="/leaderboard" />
+          <MenuCard title="Рефералы" description="Пригласи друзей" icon="👥" to="/referral" />
+          <MenuCard title="Донат" description="Поддержать игру" icon="💎" to="/donate" />
         </div>
       </main>
     </div>
@@ -303,6 +306,81 @@ function AnimatedRoutes() {
               playerState={mockPlayerState}
               activities={mockActivities}
               onActivitySelect={(id) => console.log('Selected activity:', id)}
+            />
+          </motion.div>
+        } />
+        <Route path="/shop" element={
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="relative"
+          >
+            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
+              <ThemeToggle />
+            </div>
+            <CosmeticShop
+              items={mockCosmetics}
+              playerCrystals={150}
+              onPurchase={async (id) => console.log('Purchase:', id)}
+              onEquip={async (id) => console.log('Equip:', id)}
+            />
+          </motion.div>
+        } />
+        <Route path="/leaderboard" element={
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="relative"
+          >
+            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
+              <ThemeToggle />
+            </div>
+            <Leaderboard
+              players={mockLeaderboard}
+              currentPlayerId="3"
+              type="global"
+              onTypeChange={(type) => console.log('Type:', type)}
+            />
+          </motion.div>
+        } />
+        <Route path="/referral" element={
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="relative"
+          >
+            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
+              <ThemeToggle />
+            </div>
+            <ReferralPanel
+              referralCode="RUSTAM2024"
+              referralLink="https://uzbekwars.com/ref/RUSTAM2024"
+              referredFriends={mockReferrals}
+              totalBonus={{ crystals: 100, soms: 1000 }}
+            />
+          </motion.div>
+        } />
+        <Route path="/donate" element={
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex items-center justify-center p-4"
+          >
+            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
+              <ThemeToggle />
+            </div>
+            <DonationModal
+              isOpen={true}
+              onClose={() => window.history.back()}
+              onDonate={async (id) => console.log('Donate:', id)}
             />
           </motion.div>
         } />

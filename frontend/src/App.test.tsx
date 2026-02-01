@@ -24,7 +24,7 @@ describe('App Component', () => {
   it('should render description', () => {
     render(<App />);
     
-    const description = screen.getByText(/Выберите компонент для просмотра/i);
+    const description = screen.getByText(/Выберите раздел/i);
     expect(description).toBeInTheDocument();
   });
 });
