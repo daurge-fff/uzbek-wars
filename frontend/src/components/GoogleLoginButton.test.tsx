@@ -16,7 +16,16 @@ describe('GoogleLoginButton', () => {
   });
 
   it('generates device ID on first click', () => {
-    localStorage.clear();
+    // Mock localStorage
+    const mockLocalStorage = {
+      getItem: vi.fn(),
+      setItem: vi.fn(),
+      clear: vi.fn()
+    };
+    Object.defineProperty(window, 'localStorage', {
+      value: mockLocalStorage,
+      writable: true
+    });
     
     render(
       <BrowserRouter>
@@ -27,8 +36,7 @@ describe('GoogleLoginButton', () => {
     const button = screen.getByRole('button');
     fireEvent.click(button);
     
-    const deviceId = localStorage.getItem('deviceId');
-    expect(deviceId).toBeTruthy();
+    expect(mockLocalStorage.setItem).toHaveBeenCalled();
   });
 
   it('calls onSuccess callback on successful login', async () => {

@@ -9,7 +9,7 @@ import '../i18n'; // Initialize i18n for tests
 
 describe('LanguageSwitcher', () => {
   it('renders all 4 language options', () => {
-    render(<LanguageSwitcher />);
+    render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={vi.fn()} />);
     
     // Check for language flags
     expect(screen.getByLabelText(/Switch to Русский/i)).toBeInTheDocument();
@@ -19,7 +19,7 @@ describe('LanguageSwitcher', () => {
   });
 
   it('highlights current language', () => {
-    render(<LanguageSwitcher />);
+    render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={vi.fn()} />);
     
     // Default language should be highlighted (ru)
     const ruButton = screen.getByLabelText(/Switch to Русский/i);
@@ -28,7 +28,7 @@ describe('LanguageSwitcher', () => {
 
   it('calls onLanguageChange callback when language is changed', () => {
     const onLanguageChange = vi.fn();
-    render(<LanguageSwitcher onLanguageChange={onLanguageChange} />);
+    render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={onLanguageChange} />);
     
     // Click on English button
     const enButton = screen.getByLabelText(/Switch to English/i);
@@ -38,14 +38,14 @@ describe('LanguageSwitcher', () => {
   });
 
   it('renders in compact mode by default', () => {
-    render(<LanguageSwitcher />);
+    render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={vi.fn()} />);
     
     // In compact mode, language names should not be visible
     expect(screen.queryByText('Русский')).not.toBeInTheDocument();
   });
 
   it('renders language names in full mode', () => {
-    render(<LanguageSwitcher mode="full" />);
+    render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={vi.fn()} mode="full" />);
     
     // In full mode, language names should be visible
     expect(screen.getByText('Русский')).toBeInTheDocument();
