@@ -1,10 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getCachedRates, convertCurrency } from '../utils/currencyConverter';
+
+type Currency = 'USD' | 'RUB' | 'UZS' | 'UAH';
 
 interface DonationOption {
   id: string;
-  amount: number;
+  amountUSD: number;
   crystals: number;
   bonus?: number;
   popular?: boolean;
@@ -17,15 +20,38 @@ interface DonationModalProps {
 }
 
 const donationOptions: DonationOption[] = [
-  { id: 'small', amount: 100, crystals: 50 },
-  { id: 'medium', amount: 500, crystals: 300, bonus: 50 },
-  { id: 'large', amount: 1000, crystals: 700, bonus: 200, popular: true },
-  { id: 'mega', amount: 5000, crystals: 4000, bonus: 1500 }
+  { id: 'small', amountUSD: 1, crystals: 50 },
+  { id: 'medium', amountUSD: 5, crystals: 300, bonus: 50 },
+  { id: 'large', amountUSD: 10, crystals: 700, bonus: 200, popular: true },
+  { id: 'mega', amountUSD: 50, crystals: 4000, bonus: 1500 }
 ];
+
+const currencySymbols: Record<Currency, string> = {
+  USD: '$',
+  RUB: '₽',
+  UZS: 'сўм',
+  UAH: '₴'
+};
+
+const currencyFlags: Record<Currency, string> = {
+  USD: '🇺🇸',
+  RUB: '🇷🇺',
+  UZS: '🇺🇿',
+  UAH: '🇺🇦'
+};
 
 export const DonationModal = ({ isOpen, onClose, onDonate }: DonationModalProps) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [currency, setCurrency] = useState<Currency>('USD');
+  const [rates, setRates] = useState({ USD: 1, RUB: 90, UZS: 12500, UAH: 41 });
+  const [showCurrencyMenu, setShowCurrencyMenu] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      getCachedRates().then(setRates);
+    }
+  }, [isOpen]);
 
   const handleDonate = async (optionId: string) => {
     setLoading(true);
@@ -34,6 +60,11 @@ export const DonationModal = ({ isOpen, onClose, onDonate }: DonationModalProps)
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatPrice = (amountUSD: number) => {
+    const converted = convertCurrency(amountUSD, currency, rates);
+    return `${currencySymbols[currency]}${converted.toLocaleString()}`;
   };
 
   return (
@@ -53,10 +84,10 @@ export const DonationModal = ({ isOpen, onClose, onDonate }: DonationModalProps)
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[500px] md:max-h-[80vh] bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-[32px] shadow-2xl z-50 overflow-hidden"
+            className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[500px] md:max-h-[80vh] bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl z-50 overflow-hidden"
           >
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
                   {t('donation.title', 'Поддержать игру')}
                 </h2>
@@ -69,12 +100,59 @@ export const DonationModal = ({ isOpen, onClose, onDonate }: DonationModalProps)
                   <span className="text-xl">✕</span>
                 </motion.button>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+              
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                 {t('donation.description', 'Получите кристаллы для покупки косметики')}
               </p>
+
+              <div className="relative">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowCurrencyMenu(!showCurrencyMenu)}
+                  className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full text-white font-bold shadow-lg"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="text-xl">{currencyFlags[currency]}</span>
+                    <span>{currency}</span>
+                  </span>
+                  <span className="text-xl">{showCurrencyMenu ? '▲' : '▼'}</span>
+                </motion.button>
+
+                <AnimatePresence>
+                  {showCurrencyMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-700 rounded-[20px] shadow-2xl overflow-hidden z-10"
+                    >
+                      {(['USD', 'RUB', 'UZS', 'UAH'] as Currency[]).map((curr) => (
+                        <motion.button
+                          key={curr}
+                          whileHover={{ backgroundColor: 'rgba(99, 102, 241, 0.1)' }}
+                          onClick={() => {
+                            setCurrency(curr);
+                            setShowCurrencyMenu(false);
+                          }}
+                          className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
+                            currency === curr
+                              ? 'bg-indigo-100 dark:bg-indigo-900/30'
+                              : 'hover:bg-gray-50 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          <span className="text-2xl">{currencyFlags[curr]}</span>
+                          <span className="font-bold text-gray-900 dark:text-white">{curr}</span>
+                          {currency === curr && <span className="ml-auto text-indigo-500">✓</span>}
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
-            <div className="p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
+            <div className="p-6 overflow-y-auto max-h-[calc(100vh-300px)]">
               <div className="grid gap-4">
                 {donationOptions.map((option, index) => (
                   <motion.button
@@ -89,7 +167,7 @@ export const DonationModal = ({ isOpen, onClose, onDonate }: DonationModalProps)
                     className={`relative p-6 rounded-[24px] border-2 transition-all ${
                       option.popular
                         ? 'bg-gradient-to-br from-indigo-500 to-purple-500 border-transparent text-white shadow-xl'
-                        : 'bg-white/80 dark:bg-gray-700/80 border-gray-200 dark:border-gray-600 hover:border-indigo-500 dark:hover:border-indigo-400'
+                        : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-indigo-500 dark:hover:border-indigo-400'
                     }`}
                   >
                     {option.popular && (
@@ -100,8 +178,8 @@ export const DonationModal = ({ isOpen, onClose, onDonate }: DonationModalProps)
                     
                     <div className="flex items-center justify-between">
                       <div className="text-left">
-                        <div className="text-3xl font-black mb-1">
-                          {option.amount} ₽
+                        <div className={`text-3xl font-black mb-1 ${option.popular ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
+                          {formatPrice(option.amountUSD)}
                         </div>
                         <div className={`text-lg font-bold ${option.popular ? 'text-white' : 'text-indigo-600 dark:text-indigo-400'}`}>
                           💎 {option.crystals} {t('donation.crystals', 'кристаллов')}
@@ -124,8 +202,8 @@ export const DonationModal = ({ isOpen, onClose, onDonate }: DonationModalProps)
                 ))}
               </div>
 
-              <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-[20px] border border-indigo-200 dark:border-indigo-800">
-                <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
+              <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-[20px] border border-indigo-200 dark:border-indigo-800">
+                <p className="text-xs text-gray-600 dark:text-gray-300 text-center">
                   {t('donation.info', 'Кристаллы используются только для покупки косметических предметов')}
                 </p>
               </div>

@@ -13,7 +13,7 @@ describe('DonationModal', () => {
       />
     );
 
-    expect(screen.getByText('100 ₽')).toBeInTheDocument();
+    expect(screen.getByText('$1')).toBeInTheDocument();
   });
 
   it('does not render when closed', () => {
@@ -37,10 +37,10 @@ describe('DonationModal', () => {
       />
     );
 
-    expect(screen.getByText('100 ₽')).toBeInTheDocument();
-    expect(screen.getByText('500 ₽')).toBeInTheDocument();
-    expect(screen.getByText('1000 ₽')).toBeInTheDocument();
-    expect(screen.getByText('5000 ₽')).toBeInTheDocument();
+    expect(screen.getByText('$1')).toBeInTheDocument();
+    expect(screen.getByText('$5')).toBeInTheDocument();
+    expect(screen.getByText('$10')).toBeInTheDocument();
+    expect(screen.getByText('$50')).toBeInTheDocument();
   });
 
   it('shows popular badge on featured option', () => {
@@ -65,7 +65,7 @@ describe('DonationModal', () => {
       />
     );
 
-    const option = screen.getByText('100 ₽').closest('button');
+    const option = screen.getByText('$1').closest('button');
     fireEvent.click(option!);
 
     expect(onDonate).toHaveBeenCalledWith('small');
