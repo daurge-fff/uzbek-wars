@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
@@ -12,6 +12,12 @@ interface SettingsProps {
   onMusicToggle: () => void;
   notificationsEnabled: boolean;
   onNotificationsToggle: () => void;
+  appStats?: {
+    uptime: number;
+    lastRestart: string;
+    totalSessions: number;
+    version: string;
+  };
 }
 
 const languageOptions = [
@@ -29,10 +35,18 @@ export const Settings = ({
   musicEnabled,
   onMusicToggle,
   notificationsEnabled,
-  onNotificationsToggle
+  onNotificationsToggle,
+  appStats
 }: SettingsProps) => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
+  const [showDeveloperModal, setShowDeveloperModal] = useState(false);
+
+  const formatUptime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}ч ${minutes}м`;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 p-4">
@@ -144,15 +158,107 @@ export const Settings = ({
           transition={{ delay: 0.1 }}
           className="bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl p-6"
         >
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
             {t('settings.about', 'О приложении')}
           </h2>
-          <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-            <p><strong>Версия:</strong> 1.0.0</p>
-            <p><strong>Разработчик:</strong> Uzbek Wars Team</p>
-            <p><strong>Лицензия:</strong> MIT</p>
+          
+          {appStats && (
+            <div className="space-y-3 mb-4">
+              <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-[16px]">
+                <span className="text-sm text-gray-600 dark:text-gray-400">⏱️ Время работы</span>
+                <span className="font-bold text-gray-900 dark:text-white">{formatUptime(appStats.uptime)}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-[16px]">
+                <span className="text-sm text-gray-600 dark:text-gray-400">🔄 Последний перезапуск</span>
+                <span className="font-bold text-gray-900 dark:text-white">{new Date(appStats.lastRestart).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-[16px]">
+                <span className="text-sm text-gray-600 dark:text-gray-400">📊 Всего сессий</span>
+                <span className="font-bold text-gray-900 dark:text-white">{appStats.totalSessions}</span>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <div className="flex justify-between">
+              <span>Версия:</span>
+              <span className="font-bold text-gray-900 dark:text-white">{appStats?.version || '1.0.0'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Лицензия:</span>
+              <span className="font-bold text-gray-900 dark:text-white">MIT</span>
+            </div>
           </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowDeveloperModal(true)}
+            className="w-full p-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-[20px] shadow-lg"
+          >
+            👨‍💻 Разработчик
+          </motion.button>
         </motion.div>
+
+        {/* Developer Modal */}
+        <AnimatePresence>
+          {showDeveloperModal && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowDeveloperModal(false)}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              />
+              
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[400px] bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl z-50 p-6"
+              >
+                <div className="text-center mb-6">
+                  <div className="text-6xl mb-4">👨‍💻</div>
+                  <h2 className="text-2xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-2">
+                    German Vitiaz
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    Full-Stack Developer
+                  </p>
+                </div>
+
+                <div className="space-y-3 mb-6">
+                  <a
+                    href="https://t.me/daurge"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-[20px] font-bold shadow-lg hover:shadow-xl transition-all"
+                  >
+                    <span className="text-2xl">✈️</span>
+                    <span>Telegram: @daurge</span>
+                  </a>
+                  
+                  <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-[20px]">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
+                      Спасибо за использование Узбек Варс! 🎮
+                    </p>
+                  </div>
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowDeveloperModal(false)}
+                  className="w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-full"
+                >
+                  Закрыть
+                </motion.button>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

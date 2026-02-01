@@ -447,6 +447,12 @@ function AnimatedRoutes() {
               onMusicToggle={() => console.log('Toggle music')}
               notificationsEnabled={false}
               onNotificationsToggle={() => console.log('Toggle notifications')}
+              appStats={{
+                uptime: 3600 * 2 + 1800, // 2.5 hours
+                lastRestart: new Date(Date.now() - 3600 * 2.5 * 1000).toISOString(),
+                totalSessions: 42,
+                version: '1.0.0'
+              }}
             />
           </motion.div>
         } />
