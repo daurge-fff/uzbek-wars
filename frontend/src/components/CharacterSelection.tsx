@@ -102,7 +102,7 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
       </motion.div>
 
       <div className="relative w-full max-w-sm h-[520px] mb-8" style={{ perspective: '1200px' }}>
-        <AnimatePresence initial={false} custom={direction} mode="wait">
+        <AnimatePresence initial={false} custom={direction}>
           <motion.div
             key={page}
             custom={direction}
@@ -111,10 +111,10 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
             animate="center"
             exit="exit"
             transition={{
-              x: { type: 'spring', stiffness: 400, damping: 35 },
-              opacity: { duration: 0.15 },
-              scale: { duration: 0.15 },
-              rotateY: { type: 'spring', stiffness: 400, damping: 35 }
+              x: { type: 'spring', stiffness: 500, damping: 40 },
+              opacity: { duration: 0.1 },
+              scale: { duration: 0.1 },
+              rotateY: { type: 'spring', stiffness: 500, damping: 40 }
             }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}

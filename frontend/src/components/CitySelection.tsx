@@ -93,7 +93,8 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
       samarkand: '🕌',
       tashkent: '🏙️',
       bukhara: '🏛️',
-      khiva: '🏰'
+      andijan: '🏰',
+      namangan: '🌆'
     };
     return emojis[cityId] || '🏙️';
   };
@@ -103,7 +104,8 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
       samarkand: 'from-blue-100 via-cyan-100 to-sky-100',
       tashkent: 'from-green-100 via-emerald-100 to-teal-100',
       bukhara: 'from-yellow-100 via-amber-100 to-orange-100',
-      khiva: 'from-red-100 via-rose-100 to-pink-100'
+      andijan: 'from-red-100 via-rose-100 to-pink-100',
+      namangan: 'from-purple-100 via-violet-100 to-fuchsia-100'
     };
     return gradients[cityId] || 'from-gray-100 via-slate-100 to-zinc-100';
   };
@@ -135,7 +137,7 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
       </motion.div>
 
       <div className="relative w-full max-w-sm h-[520px] mb-8" style={{ perspective: '1200px' }}>
-        <AnimatePresence initial={false} custom={direction} mode="wait">
+        <AnimatePresence initial={false} custom={direction}>
           <motion.div
             key={page}
             custom={direction}
@@ -144,10 +146,10 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
             animate="center"
             exit="exit"
             transition={{
-              x: { type: 'spring', stiffness: 400, damping: 35 },
-              opacity: { duration: 0.15 },
-              scale: { duration: 0.15 },
-              rotateY: { type: 'spring', stiffness: 400, damping: 35 }
+              x: { type: 'spring', stiffness: 500, damping: 40 },
+              opacity: { duration: 0.1 },
+              scale: { duration: 0.1 },
+              rotateY: { type: 'spring', stiffness: 500, damping: 40 }
             }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}

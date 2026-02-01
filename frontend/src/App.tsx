@@ -47,15 +47,15 @@ const mockCharacters = [
   },
   {
     id: 'char4',
-    name: 'Малика',
-    avatar: '👩‍🎨',
-    description: 'Художница из Хивы'
-  },
-  {
-    id: 'char5',
     name: 'Жасур',
     avatar: '👨‍🔧',
     description: 'Мастер на все руки из Андижана'
+  },
+  {
+    id: 'char5',
+    name: 'Малика',
+    avatar: '👩‍🎨',
+    description: 'Художница из Намангана'
   }
 ];
 
@@ -85,12 +85,20 @@ const mockCities = [
     theme: { primaryColor: '#DAA520', backgroundImage: '' }
   },
   {
-    cityId: 'khiva',
-    name: { ru: 'Хива', uz: 'Xiva', uk: 'Хіва', en: 'Khiva' },
+    cityId: 'andijan',
+    name: { ru: 'Андижан', uz: 'Andijon', uk: 'Андіжан', en: 'Andijan' },
     playerCount: 300,
     maxPlayers: 1000,
     isOpen: true,
     theme: { primaryColor: '#E24A4A', backgroundImage: '' }
+  },
+  {
+    cityId: 'namangan',
+    name: { ru: 'Наманган', uz: 'Namangan', uk: 'Наманган', en: 'Namangan' },
+    playerCount: 550,
+    maxPlayers: 1000,
+    isOpen: true,
+    theme: { primaryColor: '#9B59B6', backgroundImage: '' }
   }
 ];
 
@@ -113,7 +121,8 @@ const mockActivities = [
   { id: 'work', name: 'Работать в Связном', icon: '💼' },
   { id: 'rob', name: 'Грабить', icon: '🔫' },
   { id: 'cook', name: 'Готовить плов', icon: '🍲' },
-  { id: 'trade', name: 'Торговать', icon: '🏪' }
+  { id: 'trade', name: 'Торговать', icon: '🏪' },
+  { id: 'samsa', name: 'Печь самсу', icon: '🥟' }
 ];
 
 function MenuCard({ title, description, icon, to }: any) {

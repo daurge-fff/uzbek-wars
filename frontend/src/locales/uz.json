@@ -17,7 +17,8 @@
     "cook_plov": "Osh pishirish",
     "trade_bazaar": "Bozorda savdo qilish",
     "rest": "Dam olish",
-    "eat": "Ovqatlanish"
+    "eat": "Ovqatlanish",
+    "bake_samsa": "Somsa pishirish"
   },
   "notifications": {
     "level_up": "Tabriklaymiz! Siz {{level}} darajaga yetdingiz!",
