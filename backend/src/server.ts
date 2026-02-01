@@ -16,6 +16,9 @@ import citiesRoutes from './routes/cities';
 import characterRoutes from './routes/characters';
 import activitiesRoutes from './routes/activities';
 import referralRoutes from './routes/referral';
+import donationsRoutes from './routes/donations';
+import cosmeticsRoutes from './routes/cosmetics';
+import leaderboardRoutes from './routes/leaderboard';
 
 /**
  * Creates and configures Express application
@@ -67,6 +70,9 @@ export function createServer(): Application {
   app.use('/api', characterRoutes);
   app.use('/api', activitiesRoutes);
   app.use('/api/referral', referralRoutes);
+  app.use('/api/donations', donationsRoutes);
+  app.use('/api/cosmetics', cosmeticsRoutes);
+  app.use('/api/leaderboard', leaderboardRoutes);
   
   // Error handling must be last
   app.use(errorHandler);
