@@ -308,11 +308,11 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
                     <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                       Выбрать аватар
                     </label>
-                    <div className="grid grid-cols-5 gap-2">
-                      {['👨‍🌾', '👩‍🍳', '👨‍💼', '👨‍🔧', '👩‍🎨', '👨‍💻', '👩‍🎓', '👨‍🚀', '👩‍⚕️', '👨‍🎤'].map((emoji) => (
+                    <div className="grid grid-cols-6 gap-2 max-h-[300px] overflow-y-auto">
+                      {['👨‍🌾', '👩‍🍳', '👨‍💼', '👨‍🔧', '👩‍🎨', '👨‍💻', '👩‍🎓', '👨‍🚀', '👩‍⚕️', '👨‍🎤', '👨‍🏫', '👩‍🔬', '👨‍🎨', '👩‍💼', '👨‍🍳', '👩‍🌾', '👨‍⚕️', '👩‍🚀', '👨‍🏭', '👩‍🏫', '🧑‍💻', '🧑‍🎨', '🧑‍🍳', '🧑‍🔧', '🧑‍⚕️', '🧑‍🚀', '🧑‍🎓', '🧑‍💼', '🧑‍🏫', '🧑‍🔬'].map((emoji) => (
                         <button
                           key={emoji}
-                          className="text-4xl p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-[12px] transition-colors"
+                          className="text-3xl p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-[12px] transition-colors"
                         >
                           {emoji}
                         </button>

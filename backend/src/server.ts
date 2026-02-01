@@ -20,6 +20,7 @@ import donationsRoutes from './routes/donations';
 import cosmeticsRoutes from './routes/cosmetics';
 import leaderboardRoutes from './routes/leaderboard';
 import playerRoutes from './routes/player';
+import healthRoutes from './routes/health';
 
 /**
  * Creates and configures Express application
@@ -66,6 +67,7 @@ export function createServer(): Application {
   });
   
   // API routes
+  app.use('/api/health', healthRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/cities', citiesRoutes);
   app.use('/api', characterRoutes);

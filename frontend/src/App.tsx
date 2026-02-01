@@ -23,6 +23,7 @@ import { Leaderboard } from './components/Leaderboard';
 import { ReferralPanel } from './components/ReferralPanel';
 import { PlayerProfile } from './components/PlayerProfile';
 import { Settings } from './components/Settings';
+import { HealthCheck } from './components/HealthCheck';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -244,6 +245,7 @@ function HomePage() {
           <MenuCard title="Донат" description="Поддержать игру" icon="💎" to="/donate" />
           <MenuCard title="Профиль" description="Твой профиль" icon="👤" to="/profile" />
           <MenuCard title="Настройки" description="Параметры игры" icon="⚙️" to="/settings" />
+          <MenuCard title="Health Check" description="Статус систем" icon="🏥" to="/health" />
         </div>
       </main>
     </div>
@@ -406,6 +408,20 @@ function AnimatedRoutes() {
               onClose={() => window.history.back()}
               onDonate={async (id) => console.log('Donate:', id)}
             />
+          </motion.div>
+        } />
+        <Route path="/health" element={
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="relative"
+          >
+            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
+              <ThemeToggle />
+            </div>
+            <HealthCheck />
           </motion.div>
         } />
         <Route path="/profile" element={
