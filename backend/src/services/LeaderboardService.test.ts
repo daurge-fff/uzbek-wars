@@ -292,7 +292,7 @@ describe('LeaderboardService', () => {
     it('should return players sorted by soms (descending)', async () => {
       // Create players with different soms
       await createTestPlayer({
-        userId: '507f1f77bcf86cd799439011',
+        userId: '507f1f77bcf86cd799439021',
         displayName: 'Player1',
         level: 5,
         experience: 1000,
@@ -302,7 +302,7 @@ describe('LeaderboardService', () => {
       });
       
       await createTestPlayer({
-        userId: '507f1f77bcf86cd799439012',
+        userId: '507f1f77bcf86cd799439022',
         displayName: 'Player2',
         level: 3,
         experience: 300,
@@ -312,7 +312,7 @@ describe('LeaderboardService', () => {
       });
       
       await createTestPlayer({
-        userId: '507f1f77bcf86cd799439013',
+        userId: '507f1f77bcf86cd799439023',
         displayName: 'Player3',
         level: 10,
         experience: 5000,
@@ -332,7 +332,7 @@ describe('LeaderboardService', () => {
     it('should use level as tiebreaker for same soms', async () => {
       // Create players with same soms
       await createTestPlayer({
-        userId: '507f1f77bcf86cd799439011',
+        userId: '507f1f77bcf86cd799439031',
         displayName: 'Player1',
         level: 5,
         experience: 1000,
@@ -342,7 +342,7 @@ describe('LeaderboardService', () => {
       });
       
       await createTestPlayer({
-        userId: '507f1f77bcf86cd799439012',
+        userId: '507f1f77bcf86cd799439032',
         displayName: 'Player2',
         level: 8,
         experience: 3000,

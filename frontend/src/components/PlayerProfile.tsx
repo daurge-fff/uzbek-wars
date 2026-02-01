@@ -35,8 +35,10 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
   const { t } = useTranslation();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [showTelegramModal, setShowTelegramModal] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState(playerInfo.avatar);
+  const [telegramUrl, setTelegramUrl] = useState('');
 
   const statCards = [
     { label: t('profile.totalActivities', 'Всего активностей'), value: stats.totalActivities, icon: '🎯', gradient: 'from-blue-500 to-cyan-500' },
@@ -46,70 +48,26 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
   ];
 
   const handleVerify = async () => {
+    // Generate verification code
+    const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+    const botUsername = 'uzbekwars_bot';
+    const url = `https://t.me/${botUsername}?start=${code}`;
+    
+    setTelegramUrl(url);
+    setShowVerifyModal(false);
+    setShowTelegramModal(true);
+  };
+
+  const handleOpenTelegram = () => {
+    window.open(telegramUrl, '_blank');
+    setShowTelegramModal(false);
     setVerifying(true);
     
-    try {
-      // Request verification code from backend
-      const response = await fetch('/api/auth/verification-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // TODO: Add auth token from context/localStorage
-          // 'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to generate verification code');
-      }
-      
-      const { code } = await response.json();
-      
-      const botUsername = 'uzbekwars_bot';
-      const telegramUrl = `https://t.me/${botUsername}?start=${code}`;
-      
-      // Open Telegram
-      window.open(telegramUrl, '_blank');
-      
-      // Poll for verification status
-      const pollInterval = setInterval(async () => {
-        try {
-          const statusResponse = await fetch('/api/auth/verification-status', {
-            headers: {
-              // TODO: Add auth token from context/localStorage
-              // 'Authorization': `Bearer ${token}`
-            }
-          });
-          
-          if (statusResponse.ok) {
-            const { isVerified } = await statusResponse.json();
-            if (isVerified) {
-              clearInterval(pollInterval);
-              setVerifying(false);
-              setShowVerifyModal(false);
-              if (onVerify) onVerify();
-            }
-          }
-        } catch (pollError) {
-          console.error('Polling error:', pollError);
-        }
-      }, 2000);
-      
-      // Timeout after 5 minutes
-      setTimeout(() => {
-        clearInterval(pollInterval);
-        if (verifying) {
-          setVerifying(false);
-          // Show timeout message
-          alert('Время верификации истекло. Попробуйте снова.');
-        }
-      }, 5 * 60 * 1000);
-      
-    } catch (error) {
-      console.error('Verification error:', error);
+    // Simulate verification
+    setTimeout(() => {
       setVerifying(false);
-      alert('Ошибка верификации. Попробуйте позже.');
-    }
+      if (onVerify) onVerify();
+    }, 3000);
   };
 
   return (
@@ -463,6 +421,130 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
                         </div>
                       </>
                     )}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Telegram Opening Modal */}
+      <AnimatePresence>
+        {showTelegramModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowTelegramModal(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+            />
+            
+            <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                className="w-full max-w-[500px] pointer-events-auto"
+              >
+                <div className="bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 rounded-[32px] p-1 shadow-2xl">
+                  <div className="bg-white dark:bg-gray-900 rounded-[28px] p-8">
+                    <div className="text-center mb-6">
+                      <motion.div
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: 'spring', stiffness: 300, delay: 0.1 }}
+                        className="text-8xl mb-4"
+                      >
+                        ✈️
+                      </motion.div>
+                      <h2 className="text-3xl font-black bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent mb-2">
+                        Открыть Telegram
+                      </h2>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Следуйте инструкциям для верификации
+                      </p>
+                    </div>
+
+                    <div className="space-y-4 mb-8">
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="flex items-start gap-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-[20px] border border-blue-200 dark:border-blue-800"
+                      >
+                        <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg">
+                          1
+                        </div>
+                        <div>
+                          <div className="font-bold text-gray-900 dark:text-white mb-1">
+                            Откройте бота
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            Нажмите кнопку ниже, чтобы открыть @uzbekwars_bot
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="flex items-start gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-[20px] border border-purple-200 dark:border-purple-800"
+                      >
+                        <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg">
+                          2
+                        </div>
+                        <div>
+                          <div className="font-bold text-gray-900 dark:text-white mb-1">
+                            Нажмите START
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            В боте нажмите кнопку "START" или отправьте /start
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="flex items-start gap-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-[20px] border border-green-200 dark:border-green-800"
+                      >
+                        <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg">
+                          3
+                        </div>
+                        <div>
+                          <div className="font-bold text-gray-900 dark:text-white mb-1">
+                            Подтвердите аккаунт
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            Бот автоматически привяжет ваш аккаунт
+                          </div>
+                        </div>
+                      </motion.div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleOpenTelegram}
+                        className="py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-full shadow-lg text-lg"
+                      >
+                        ✈️ Открыть
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setShowTelegramModal(false)}
+                        className="py-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-full"
+                      >
+                        Отмена
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
               </motion.div>

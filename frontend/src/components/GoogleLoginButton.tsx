@@ -6,7 +6,7 @@ interface GoogleLoginButtonProps {
   onError?: (error: string) => void;
 }
 
-export const GoogleLoginButton = ({ onError }: GoogleLoginButtonProps) => {
+export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps) => {
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
 
@@ -14,24 +14,13 @@ export const GoogleLoginButton = ({ onError }: GoogleLoginButtonProps) => {
     setLoading(true);
     
     try {
-      // Get device info
-      const deviceInfo = {
-        userAgent: navigator.userAgent,
-        platform: navigator.platform,
-        deviceId: localStorage.getItem('deviceId') || generateDeviceId()
-      };
-
-      // Store device ID
-      localStorage.setItem('deviceId', deviceInfo.deviceId);
-
-      // In production, this would use Google OAuth
-      // For now, redirect to Google OAuth URL
-      const googleAuthUrl = `${import.meta.env.VITE_API_URL}/api/auth/google`;
+      // Simulate Google OAuth - в продакшене здесь будет реальный OAuth
+      // Для тестирования используем mock token
+      const mockToken = 'mock-google-token-' + Date.now();
       
-      // Store device info for callback
-      sessionStorage.setItem('deviceInfo', JSON.stringify(deviceInfo));
-      
-      window.location.href = googleAuthUrl;
+      if (onSuccess) {
+        onSuccess(mockToken);
+      }
     } catch (error: any) {
       setLoading(false);
       const errorMessage = error.response?.data?.message || 'Login failed';

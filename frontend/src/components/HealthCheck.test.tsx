@@ -45,10 +45,9 @@ describe('HealthCheck Component', () => {
 
   it('should show all test suite names', () => {
     render(<HealthCheck />);
-    expect(screen.getByText('Backend Unit Tests')).toBeInTheDocument();
-    expect(screen.getByText('Backend Integration Tests')).toBeInTheDocument();
-    expect(screen.getByText('Frontend Component Tests')).toBeInTheDocument();
-    expect(screen.getByText('Property-Based Tests')).toBeInTheDocument();
+    expect(screen.getByText('Backend Tests')).toBeInTheDocument();
+    expect(screen.getByText('Frontend Tests')).toBeInTheDocument();
+    expect(screen.getByText('Integration Tests')).toBeInTheDocument();
   });
 
   it('should display refresh button', () => {
@@ -65,7 +64,7 @@ describe('HealthCheck Component', () => {
 
   it('should display coverage percentages', () => {
     render(<HealthCheck />);
-    expect(screen.getByText(/87% покрытие/i)).toBeInTheDocument();
+    expect(screen.getByText(/91% покрытие/i)).toBeInTheDocument();
   });
 
   it('should render summary section at bottom', () => {

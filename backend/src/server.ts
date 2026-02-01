@@ -21,6 +21,7 @@ import cosmeticsRoutes from './routes/cosmetics';
 import leaderboardRoutes from './routes/leaderboard';
 import playerRoutes from './routes/player';
 import healthRoutes from './routes/health';
+import testsRoutes from './routes/tests';
 
 /**
  * Creates and configures Express application
@@ -68,6 +69,7 @@ export function createServer(): Application {
   
   // API routes
   app.use('/api/health', healthRoutes);
+  app.use('/api/tests', testsRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/cities', citiesRoutes);
   app.use('/api', characterRoutes);

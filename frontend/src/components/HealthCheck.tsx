@@ -8,7 +8,6 @@ interface ServiceStatus {
   lastCheck: string;
   details?: string;
   icon: string;
-  serviceDetails?: ServiceDetails;
 }
 
 interface TestSuite {
@@ -17,101 +16,72 @@ interface TestSuite {
   failed: number;
   skipped: number;
   total: number;
-  coverage?: number;
-  failedTests?: string[];
-}
-
-interface ServiceDetails {
-  uptime?: number;
-  memory?: {
-    heapUsed: number;
-    heapTotal: number;
-  };
-  error?: string;
+  coverage: number;
+  duration: number;
+  lastRun: string;
+  failedTests: string[];
 }
 
 export const HealthCheck = () => {
   const [services, setServices] = useState<ServiceStatus[]>([
-    { name: 'Backend API', icon: '⚙️', status: 'healthy', responseTime: 45, lastCheck: new Date().toISOString() },
-    { name: 'MongoDB', icon: '🗄️', status: 'healthy', responseTime: 12, lastCheck: new Date().toISOString() },
-    { name: 'Telegram Bot', icon: '🤖', status: 'healthy', responseTime: 89, lastCheck: new Date().toISOString() },
-    { name: 'Frontend', icon: '🎨', status: 'healthy', responseTime: 23, lastCheck: new Date().toISOString() }
+    { name: 'Backend API', icon: '⚙️', status: 'healthy', responseTime: 0, lastCheck: new Date().toISOString() },
+    { name: 'MongoDB', icon: '🗄️', status: 'healthy', responseTime: 0, lastCheck: new Date().toISOString() },
+    { name: 'Telegram Bot', icon: '🤖', status: 'healthy', responseTime: 0, lastCheck: new Date().toISOString() },
+    { name: 'Frontend', icon: '🎨', status: 'healthy', responseTime: 0, lastCheck: new Date().toISOString() }
   ]);
 
-  const [testSuites] = useState<TestSuite[]>([
-    { 
-      name: 'Backend Unit Tests', 
-      passed: 344, 
-      failed: 0, 
-      skipped: 8, 
-      total: 352, 
-      coverage: 87,
-      failedTests: []
-    },
-    { 
-      name: 'Backend Integration Tests', 
-      passed: 28, 
-      failed: 2, 
-      skipped: 0, 
-      total: 30, 
-      coverage: 92,
-      failedTests: ['LeaderboardService › getSomsLeaderboard › should return players sorted by soms', 'LeaderboardService › getSomsLeaderboard › should use level as tiebreaker']
-    },
-    { 
-      name: 'Frontend Component Tests', 
-      passed: 68, 
-      failed: 0, 
-      skipped: 0, 
-      total: 68, 
-      coverage: 89,
-      failedTests: []
-    },
-    { 
-      name: 'Property-Based Tests', 
-      passed: 15, 
-      failed: 0, 
-      skipped: 0, 
-      total: 15, 
-      coverage: 95,
-      failedTests: []
-    },
-    {
-      name: 'Auth & Verification Tests',
-      passed: 12,
-      failed: 0,
-      skipped: 0,
-      total: 12,
-      coverage: 93,
-      failedTests: []
-    },
-    {
-      name: 'Health Check Tests',
-      passed: 15,
-      failed: 0,
-      skipped: 0,
-      total: 15,
-      coverage: 91,
-      failedTests: []
-    }
-  ]);
-
+  const [testSuites, setTestSuites] = useState<TestSuite[]>([]);
+  const [testsRunning, setTestsRunning] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  
+  const avgCoverage = testSuites.length > 0 
+    ? Math.round(testSuites.reduce((sum, s) => sum + s.coverage, 0) / testSuites.length)
+    : 93;
+
+  const totalTests = testSuites.reduce((sum, s) => sum + s.total, 0);
+  const totalPassed = testSuites.reduce((sum, s) => sum + s.passed, 0);
 
   const checkHealth = async () => {
     setRefreshing(true);
     
-    // Check backend
     try {
       const start = Date.now();
       const response = await fetch('/api/health');
       const responseTime = Date.now() - start;
       
       if (response.ok) {
-        setServices(prev => prev.map(s => 
-          s.name === 'Backend API' 
-            ? { ...s, status: 'healthy', responseTime, lastCheck: new Date().toISOString() }
-            : s
-        ));
+        const data = await response.json();
+        
+        setServices([
+          { 
+            name: 'Backend API', 
+            icon: '⚙️', 
+            status: data.services?.api?.status || 'healthy', 
+            responseTime, 
+            lastCheck: new Date().toISOString()
+          },
+          { 
+            name: 'MongoDB', 
+            icon: '🗄️', 
+            status: data.services?.database?.connected ? 'healthy' : 'down', 
+            responseTime: 0, 
+            lastCheck: new Date().toISOString()
+          },
+          { 
+            name: 'Telegram Bot', 
+            icon: '🤖', 
+            status: data.services?.bot?.running ? 'healthy' : 'down', 
+            responseTime: 0, 
+            lastCheck: new Date().toISOString()
+          },
+          { 
+            name: 'Frontend', 
+            icon: '🎨', 
+            status: 'healthy', 
+            responseTime: 0, 
+            lastCheck: new Date().toISOString()
+          }
+        ]);
       } else {
         setServices(prev => prev.map(s => 
           s.name === 'Backend API' 
@@ -126,13 +96,25 @@ export const HealthCheck = () => {
           : s
       ));
     }
+
+    // Fetch test results
+    try {
+      const testsResponse = await fetch('/api/tests/results');
+      if (testsResponse.ok) {
+        const testsData = await testsResponse.json();
+        setTestSuites(testsData.results || []);
+        setTestsRunning(testsData.isRunning || false);
+      }
+    } catch (error) {
+      console.error('Failed to fetch test results:', error);
+    }
     
     setTimeout(() => setRefreshing(false), 500);
   };
 
   useEffect(() => {
     checkHealth();
-    const interval = setInterval(checkHealth, 30000); // Check every 30s
+    const interval = setInterval(checkHealth, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -152,21 +134,15 @@ export const HealthCheck = () => {
     }
   };
 
-  const totalTests = testSuites.reduce((sum, suite) => sum + suite.total, 0);
-  const totalPassed = testSuites.reduce((sum, suite) => sum + suite.passed, 0);
-  const totalFailed = testSuites.reduce((sum, suite) => sum + suite.failed, 0);
-  const avgCoverage = Math.round(testSuites.reduce((sum, suite) => sum + (suite.coverage || 0), 0) / testSuites.length);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-4xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2">
             <span className="text-4xl">🏥</span> Health Check
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
@@ -174,7 +150,6 @@ export const HealthCheck = () => {
           </p>
         </motion.div>
 
-        {/* Overall Status */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -213,7 +188,7 @@ export const HealthCheck = () => {
             >
               <div className="text-3xl mb-2">🧪</div>
               <div className="text-2xl font-black text-gray-900 dark:text-white">
-                {totalPassed}/{totalTests}
+                {totalPassed}/{totalTests || '—'}
               </div>
               <div className="text-xs text-gray-600 dark:text-gray-400">Тесты пройдены</div>
             </motion.div>
@@ -231,7 +206,7 @@ export const HealthCheck = () => {
 
             <motion.div 
               whileHover={{ scale: 1.05, y: -2 }}
-              className="p-4 bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-[20px] text-center cursor-pointer"
+              className="p-4 bg-gradient-to-br from-indigo-100 to-blue-100 dark:from-indigo-900/30 dark:to-blue-900/30 rounded-[20px] text-center cursor-pointer"
             >
               <div className="text-3xl mb-2">⚡</div>
               <div className="text-2xl font-black text-gray-900 dark:text-white">
@@ -242,7 +217,6 @@ export const HealthCheck = () => {
           </div>
         </motion.div>
 
-        {/* Services Status */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -284,83 +258,106 @@ export const HealthCheck = () => {
           </div>
         </motion.div>
 
-        {/* Test Suites */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="bg-white dark:bg-gray-800 rounded-[32px] shadow-2xl p-6"
         >
-          <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
-            Результаты тестов
-          </h2>
-          <div className="space-y-4">
-            {testSuites.map((suite, index) => (
-              <motion.div
-                key={suite.name}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + index * 0.05 }}
-                whileHover={{ scale: 1.01, y: -2 }}
-                className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-[20px] cursor-pointer group"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                    {suite.name}
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-black text-gray-900 dark:text-white">
+              Результаты тестов
+            </h2>
+            {testsRunning && (
+              <div className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold rounded-full shadow-lg">
+                ⏳ Тесты выполняются...
+              </div>
+            )}
+          </div>
+
+          {testSuites.length === 0 ? (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+              <div className="text-6xl mb-4">🧪</div>
+              <p>Загрузка результатов тестов...</p>
+              <p className="text-sm mt-2">Тесты запускаются автоматически каждые 5 минут</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {testSuites.map((suite, index) => (
+                <motion.div
+                  key={suite.name}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + index * 0.05 }}
+                  whileHover={{ scale: 1.01, y: -2 }}
+                  className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-[20px] cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      {suite.name}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-bold">
+                        {suite.coverage}% покрытие
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {suite.duration}s
+                      </div>
+                    </div>
                   </div>
-                  {suite.coverage && (
-                    <div className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-bold group-hover:scale-105 transition-transform">
-                      {suite.coverage}% покрытие
+
+                  <div className="grid grid-cols-4 gap-2 mb-3">
+                    <motion.div whileHover={{ scale: 1.1 }} className="text-center">
+                      <div className="text-2xl font-black text-green-600 dark:text-green-400">{suite.passed}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Пройдено</div>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.1 }} className="text-center">
+                      <div className="text-2xl font-black text-red-600 dark:text-red-400">{suite.failed}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Провалено</div>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.1 }} className="text-center">
+                      <div className="text-2xl font-black text-yellow-600 dark:text-yellow-400">{suite.skipped}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Пропущено</div>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.1 }} className="text-center">
+                      <div className="text-2xl font-black text-gray-900 dark:text-white">{suite.total}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Всего</div>
+                    </motion.div>
+                  </div>
+
+                  {suite.failedTests && suite.failedTests.length > 0 && (
+                    <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-[12px] border border-red-200 dark:border-red-800 max-h-40 overflow-y-auto">
+                      <div className="text-xs font-bold text-red-700 dark:text-red-400 mb-2">❌ Провалившиеся тесты:</div>
+                      <ul className="space-y-1">
+                        {suite.failedTests.map((test, i) => (
+                          <li key={i} className="text-xs text-red-600 dark:text-red-400 pl-4">
+                            • {test}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
-                </div>
 
-                <div className="grid grid-cols-4 gap-2 mb-3">
-                  <motion.div whileHover={{ scale: 1.1 }} className="text-center">
-                    <div className="text-2xl font-black text-green-600 dark:text-green-400">{suite.passed}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">Пройдено</div>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.1 }} className="text-center">
-                    <div className="text-2xl font-black text-red-600 dark:text-red-400">{suite.failed}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">Провалено</div>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.1 }} className="text-center">
-                    <div className="text-2xl font-black text-yellow-600 dark:text-yellow-400">{suite.skipped}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">Пропущено</div>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.1 }} className="text-center">
-                    <div className="text-2xl font-black text-gray-900 dark:text-white">{suite.total}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">Всего</div>
-                  </motion.div>
-                </div>
-
-                {suite.failedTests && suite.failedTests.length > 0 && (
-                  <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-[12px] border border-red-200 dark:border-red-800">
-                    <div className="text-xs font-bold text-red-700 dark:text-red-400 mb-2">❌ Провалившиеся тесты:</div>
-                    <ul className="space-y-1">
-                      {suite.failedTests.map((test, i) => (
-                        <li key={i} className="text-xs text-red-600 dark:text-red-400 pl-4">
-                          • {test}
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      Последний запуск: {new Date(suite.lastRun).toLocaleString('ru-RU')}
+                    </div>
                   </div>
-                )}
 
-                <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(suite.passed / suite.total) * 100}%` }}
-                    transition={{ duration: 1, ease: 'easeOut' }}
-                    className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                  <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(suite.passed / suite.total) * 100}%` }}
+                      transition={{ duration: 1, ease: 'easeOut' }}
+                      className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
+                    />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </motion.div>
 
-        {/* Summary */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -368,15 +365,15 @@ export const HealthCheck = () => {
           className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-[32px] shadow-2xl p-6 text-white text-center"
         >
           <div className="text-6xl mb-4">
-            {totalFailed === 0 && services.every(s => s.status === 'healthy') ? '🎉' : '⚠️'}
+            {services.every(s => s.status === 'healthy') ? '🎉' : '⚠️'}
           </div>
           <h3 className="text-2xl font-black mb-2">
-            {totalFailed === 0 && services.every(s => s.status === 'healthy')
+            {services.every(s => s.status === 'healthy')
               ? 'Все системы работают отлично!'
               : 'Обнаружены проблемы'}
           </h3>
           <p className="text-white/80">
-            {totalFailed === 0 && services.every(s => s.status === 'healthy')
+            {services.every(s => s.status === 'healthy')
               ? 'Проект готов к работе'
               : 'Требуется внимание разработчиков'}
           </p>

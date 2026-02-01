@@ -25,6 +25,9 @@ import { PlayerProfile } from './components/PlayerProfile';
 import { Settings } from './components/Settings';
 import { HealthCheck } from './components/HealthCheck';
 import { BackButton } from './components/BackButton';
+import { ReferralLanding } from './components/ReferralLanding';
+
+import { OnboardingFlow } from './components/OnboardingFlow';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -204,6 +207,7 @@ function MenuCard({ title, description, icon, to }: any) {
 
 function HomePage() {
   const [currentLang, setCurrentLang] = useState<'ru' | 'uz' | 'uk' | 'en'>('ru');
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
@@ -235,26 +239,31 @@ function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
+          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
             Добро пожаловать
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 text-lg transition-colors">
-            Выберите раздел
+          <p className="text-gray-600 dark:text-gray-300 text-xl mb-8 transition-colors">
+            Начни свое приключение в Узбекистане
           </p>
+          
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/start')}
+            className="px-12 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black text-xl rounded-full shadow-2xl mb-12"
+          >
+            🚀 Начать игру
+          </motion.button>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
-          <MenuCard title="Цветовая палитра" description="iOS-style дизайн" icon="🎨" to="/colors" />
-          <MenuCard title="Авторизация" description="Google OAuth" icon="🔐" to="/auth" />
-          <MenuCard title="Выбор персонажа" description="Свайп анимации" icon="👤" to="/characters" />
-          <MenuCard title="Выбор города" description="Балансировка" icon="🏙️" to="/cities" />
-          <MenuCard title="Игровой экран" description="Dashboard" icon="🎮" to="/dashboard" />
-          <MenuCard title="Магазин косметики" description="Покупка предметов" icon="🛍️" to="/shop" />
+          <MenuCard title="Игра" description="Начать приключение" icon="🎮" to="/start" />
           <MenuCard title="Рейтинг" description="Топ игроков" icon="🏆" to="/leaderboard" />
           <MenuCard title="Рефералы" description="Пригласи друзей" icon="👥" to="/referral" />
-          <MenuCard title="Донат" description="Поддержать игру" icon="💎" to="/donate" />
+          <MenuCard title="Магазин" description="Косметика" icon="🛍️" to="/shop" />
           <MenuCard title="Профиль" description="Твой профиль" icon="👤" to="/profile" />
-          <MenuCard title="Настройки" description="Параметры игры" icon="⚙️" to="/settings" />
+          <MenuCard title="Настройки" description="Параметры" icon="⚙️" to="/settings" />
+          <MenuCard title="Донат" description="Поддержать" icon="💎" to="/donate" />
           <MenuCard title="Health Check" description="Статус систем" icon="🏥" to="/health" />
         </div>
       </main>
@@ -282,6 +291,29 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/start" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+          >
+            <OnboardingFlow />
+          </motion.div>
+        } />
+        <Route path="/ref/:code" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex items-center justify-center p-4"
+          >
+            <ReferralLanding />
+          </motion.div>
+        } />
         <Route path="/colors" element={
           <motion.div
             variants={pageVariants}
