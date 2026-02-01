@@ -21,6 +21,8 @@ import { DonationModal } from './components/DonationModal';
 import { CosmeticShop } from './components/CosmeticShop';
 import { Leaderboard } from './components/Leaderboard';
 import { ReferralPanel } from './components/ReferralPanel';
+import { PlayerProfile } from './components/PlayerProfile';
+import { Settings } from './components/Settings';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -152,6 +154,26 @@ const mockReferrals = [
   { username: 'Дилноза', avatar: '👩‍🎓', level: 12, registeredAt: '2024-01-20' }
 ];
 
+const mockPlayerInfo = {
+  username: 'Рустам',
+  avatar: '👨‍🌾',
+  characterName: 'Трудолюбивый фермер',
+  cityName: 'Самарканд',
+  joinedDate: '2024-01-01',
+  referralCode: 'RUSTAM2024'
+};
+
+const mockPlayerStats = {
+  level: 5,
+  experience: 450,
+  experienceToNextLevel: 506,
+  soms: 1250,
+  crystals: 50,
+  totalActivities: 127,
+  daysPlayed: 15,
+  achievements: 8
+};
+
 function MenuCard({ title, description, icon, to }: any) {
   const navigate = useNavigate();
   
@@ -220,6 +242,8 @@ function HomePage() {
           <MenuCard title="Рейтинг" description="Топ игроков" icon="🏆" to="/leaderboard" />
           <MenuCard title="Рефералы" description="Пригласи друзей" icon="👥" to="/referral" />
           <MenuCard title="Донат" description="Поддержать игру" icon="💎" to="/donate" />
+          <MenuCard title="Профиль" description="Твой профиль" icon="👤" to="/profile" />
+          <MenuCard title="Настройки" description="Параметры игры" icon="⚙️" to="/settings" />
         </div>
       </main>
     </div>
@@ -381,6 +405,48 @@ function AnimatedRoutes() {
               isOpen={true}
               onClose={() => window.history.back()}
               onDonate={async (id) => console.log('Donate:', id)}
+            />
+          </motion.div>
+        } />
+        <Route path="/profile" element={
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="relative"
+          >
+            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
+              <ThemeToggle />
+            </div>
+            <PlayerProfile
+              playerInfo={mockPlayerInfo}
+              stats={mockPlayerStats}
+              onEditProfile={() => console.log('Edit profile')}
+              onLogout={() => console.log('Logout')}
+            />
+          </motion.div>
+        } />
+        <Route path="/settings" element={
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="relative"
+          >
+            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
+              <ThemeToggle />
+            </div>
+            <Settings
+              currentLanguage="ru"
+              onLanguageChange={(lang) => console.log('Language:', lang)}
+              soundEnabled={true}
+              onSoundToggle={() => console.log('Toggle sound')}
+              musicEnabled={true}
+              onMusicToggle={() => console.log('Toggle music')}
+              notificationsEnabled={false}
+              onNotificationsToggle={() => console.log('Toggle notifications')}
             />
           </motion.div>
         } />

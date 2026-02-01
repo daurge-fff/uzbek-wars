@@ -99,6 +99,31 @@
     "noFriends": "Пока никто не присоединился",
     "level": "Уровень"
   },
+  "profile": {
+    "joined": "В игре с",
+    "edit": "Редактировать",
+    "logout": "Выйти",
+    "statistics": "Статистика",
+    "totalActivities": "Всего активностей",
+    "daysPlayed": "Дней в игре",
+    "achievements": "Достижений",
+    "level": "Уровень",
+    "referralCode": "Твой реферальный код",
+    "referralHint": "Пригласи друзей и получи бонусы!"
+  },
+  "settings": {
+    "title": "Настройки",
+    "language": "Язык",
+    "appearance": "Внешний вид",
+    "darkMode": "Темная тема",
+    "lightMode": "Светлая тема",
+    "audio": "Звук",
+    "soundEffects": "Звуковые эффекты",
+    "music": "Музыка",
+    "notifications": "Уведомления",
+    "pushNotifications": "Push-уведомления",
+    "about": "О приложении"
+  },
   "language": {
     "select": "Выберите язык",
     "ru": "Русский",
