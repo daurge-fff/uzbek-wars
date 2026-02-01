@@ -30,7 +30,11 @@ export default {
         text: {
           primary: '#2C1810', // Dark brown
           secondary: '#5D4E37' // Medium brown
-        }
+        },
+        // Status colors
+        success: '#4CAF50', // Green
+        danger: '#F44336', // Red
+        warning: '#FF9800' // Orange
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
