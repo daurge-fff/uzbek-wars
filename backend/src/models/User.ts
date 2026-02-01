@@ -27,6 +27,10 @@ export interface IUser extends Document {
   language: Language;
   ipAddress: string;
   deviceInfo: IDeviceInfo;
+  telegramId?: string;
+  telegramUsername?: string;
+  isVerified: boolean;
+  username?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -71,6 +75,20 @@ const UserSchema = new Schema<IUser>(
         type: String,
         index: true, // Indexed for twin detection queries
       },
+    },
+    telegramId: {
+      type: String,
+      index: true,
+    },
+    telegramUsername: {
+      type: String,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    username: {
+      type: String,
     },
   },
   {

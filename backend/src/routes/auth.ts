@@ -11,6 +11,9 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { authenticateWithGoogle, authenticateDevLogin, detectTwinks } from '../services/AuthService';
 import { logger } from '../utils/logger';
+import { createVerificationSession } from '../bot/telegramBot';
+import { User } from '../models/User';
+import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
@@ -149,6 +152,79 @@ router.post(
         error: 'Authentication failed',
         code: 'AUTH_FAILED',
         message: error instanceof Error ? error.message : 'Invalid credentials'
+      });
+    }
+  }
+);
+
+/**
+ * POST /api/auth/verification-code
+ * 
+ * Generate verification code for Telegram bot
+ * 
+ * Response:
+ *   - code: Verification code to use in Telegram bot
+ *   - expiresIn: Seconds until code expires (300 = 5 minutes)
+ */
+router.post(
+  '/verification-code',
+  authenticate,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userId = (req as any).user.id;
+      
+      // Create verification session
+      const code = createVerificationSession(userId);
+      
+      res.status(200).json({
+        code,
+        expiresIn: 300 // 5 minutes
+      });
+    } catch (error) {
+      logger.error('Verification code generation error:', error);
+      res.status(500).json({
+        error: 'Failed to generate verification code',
+        code: 'VERIFICATION_CODE_FAILED'
+      });
+    }
+  }
+);
+
+/**
+ * GET /api/auth/verification-status
+ * 
+ * Check if user is verified
+ * 
+ * Response:
+ *   - isVerified: Boolean indicating verification status
+ *   - telegramUsername: Telegram username if verified
+ */
+router.get(
+  '/verification-status',
+  authenticate,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userId = (req as any).user.id;
+      
+      const user = await User.findById(userId);
+      
+      if (!user) {
+        res.status(404).json({
+          error: 'User not found',
+          code: 'USER_NOT_FOUND'
+        });
+        return;
+      }
+      
+      res.status(200).json({
+        isVerified: user.isVerified || false,
+        telegramUsername: user.telegramUsername || null
+      });
+    } catch (error) {
+      logger.error('Verification status check error:', error);
+      res.status(500).json({
+        error: 'Failed to check verification status',
+        code: 'VERIFICATION_STATUS_FAILED'
       });
     }
   }

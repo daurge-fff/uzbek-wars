@@ -61,7 +61,6 @@ export const initBot = () => {
     const chatId = msg.chat.id;
     const telegramUserId = msg.from?.id;
     const telegramUsername = msg.from?.username;
-    const telegramFirstName = msg.from?.first_name;
     const verificationCode = match?.[1];
 
     if (!verificationCode) {
@@ -97,7 +96,7 @@ export const initBot = () => {
       await bot.sendMessage(
         chatId,
         `✅ *Верификация успешна!*\n\n` +
-        `👤 Аккаунт: ${user.username}\n` +
+        `👤 Аккаунт: ${user.username || user.displayName}\n` +
         `✈️ Telegram: @${telegramUsername || 'не указан'}\n\n` +
         `Теперь у вас есть галочка верификации! 🎉`,
         { parse_mode: 'Markdown' }
