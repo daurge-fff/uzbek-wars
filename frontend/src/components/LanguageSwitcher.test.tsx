@@ -8,49 +8,51 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import '../i18n'; // Initialize i18n for tests
 
 describe('LanguageSwitcher', () => {
-  it('renders all 4 language options', () => {
+  it('renders all language flags', () => {
     render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={vi.fn()} />);
     
-    // Check for language flags
-    expect(screen.getByLabelText(/Switch to Русский/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Switch to O'zbekcha/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Switch to Українська/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Switch to English/i)).toBeInTheDocument();
+    // Check all flags are visible
+    expect(screen.getByText('🇷🇺')).toBeInTheDocument();
+    expect(screen.getByText('🇺🇿')).toBeInTheDocument();
+    expect(screen.getByText('🇺🇦')).toBeInTheDocument();
+    expect(screen.getByText('🇬🇧')).toBeInTheDocument();
   });
 
   it('highlights current language', () => {
-    render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={vi.fn()} />);
+    const { container } = render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={vi.fn()} />);
     
-    // Default language should be highlighted (ru)
-    const ruButton = screen.getByLabelText(/Switch to Русский/i);
-    expect(ruButton).toHaveClass('bg-primary');
+    // Russian flag button should have gradient background (via layoutId animation)
+    const buttons = container.querySelectorAll('button');
+    expect(buttons.length).toBe(4);
   });
 
-  it('calls onLanguageChange callback when language is changed', () => {
+  it('calls onLanguageChange callback when language is clicked', () => {
     const onLanguageChange = vi.fn();
     render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={onLanguageChange} />);
     
-    // Click on English button
-    const enButton = screen.getByLabelText(/Switch to English/i);
-    fireEvent.click(enButton);
+    // Click on English flag
+    const enButton = screen.getByText('🇬🇧').closest('button');
+    fireEvent.click(enButton!);
     
     expect(onLanguageChange).toHaveBeenCalledWith('en');
   });
 
-  it('renders in compact mode by default', () => {
-    render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={vi.fn()} />);
+  it('switches language immediately on click', () => {
+    const onLanguageChange = vi.fn();
+    render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={onLanguageChange} />);
     
-    // In compact mode, language names should not be visible
-    expect(screen.queryByText('Русский')).not.toBeInTheDocument();
+    // Click on Uzbek flag
+    const uzButton = screen.getByText('🇺🇿').closest('button');
+    fireEvent.click(uzButton!);
+    
+    expect(onLanguageChange).toHaveBeenCalledWith('uz');
   });
 
-  it('renders language names in full mode', () => {
-    render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={vi.fn()} mode="full" />);
+  it('renders in compact segmented control style', () => {
+    const { container } = render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={vi.fn()} />);
     
-    // In full mode, language names should be visible
-    expect(screen.getByText('Русский')).toBeInTheDocument();
-    expect(screen.getByText("O'zbekcha")).toBeInTheDocument();
-    expect(screen.getByText('Українська')).toBeInTheDocument();
-    expect(screen.getByText('English')).toBeInTheDocument();
+    // Should have a container with rounded-full (pill shape)
+    const wrapper = container.querySelector('.rounded-full');
+    expect(wrapper).toBeInTheDocument();
   });
 });

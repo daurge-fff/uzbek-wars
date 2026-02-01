@@ -32,12 +32,12 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect }: Gam
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 p-4 pb-20 transition-colors duration-300">
       {/* Player Card */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/95 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 mb-6 border border-gray-100"
+        className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 mb-6 border border-gray-100 dark:border-gray-700 transition-colors"
       >
         {/* Level Badge */}
         <div className="flex items-center gap-4 mb-4">
@@ -50,10 +50,10 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect }: Gam
           
           <div className="flex-1">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-black text-gray-700">Опыт</span>
-              <span className="text-xs font-black text-gray-900">{playerState.experience}/{playerState.experienceToNextLevel}</span>
+              <span className="text-sm font-black text-gray-700 dark:text-gray-300 transition-colors">Опыт</span>
+              <span className="text-xs font-black text-gray-900 dark:text-white transition-colors">{playerState.experience}/{playerState.experienceToNextLevel}</span>
             </div>
-            <div className="bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
+            <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden shadow-inner transition-colors">
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${(playerState.experience / playerState.experienceToNextLevel) * 100}%` }}
@@ -66,79 +66,79 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect }: Gam
 
         {/* Currency */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-[20px] p-4 border-2 border-yellow-200 shadow-md">
+          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-[20px] p-4 border-2 border-yellow-200 dark:border-yellow-700 shadow-md transition-colors">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-3xl">💰</span>
-              <span className="text-xs text-gray-600 font-medium">Сомы</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300 font-medium transition-colors">Сомы</span>
             </div>
-            <div className="text-2xl font-black text-gray-900">{playerState.soms}</div>
+            <div className="text-2xl font-black text-gray-900 dark:text-white transition-colors">{playerState.soms}</div>
           </div>
           
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-[20px] p-4 border-2 border-purple-200 shadow-md">
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-[20px] p-4 border-2 border-purple-200 dark:border-purple-700 shadow-md transition-colors">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-3xl">💎</span>
-              <span className="text-xs text-gray-600 font-medium">Кристаллы</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300 font-medium transition-colors">Кристаллы</span>
             </div>
-            <div className="text-2xl font-black text-gray-900">{playerState.donationCurrency}</div>
+            <div className="text-2xl font-black text-gray-900 dark:text-white transition-colors">{playerState.donationCurrency}</div>
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-[16px] p-3 border border-orange-200">
+          <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 rounded-[16px] p-3 border border-orange-200 dark:border-orange-700 transition-colors">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">🍖</span>
-              <span className="text-xs font-black text-gray-700">Голод</span>
+              <span className="text-xs font-black text-gray-700 dark:text-gray-300 transition-colors">Голод</span>
             </div>
-            <div className="bg-white/50 rounded-full h-2 overflow-hidden">
+            <div className="bg-white/50 dark:bg-gray-700/50 rounded-full h-2 overflow-hidden transition-colors">
               <div 
                 className="h-full bg-gradient-to-r from-orange-400 to-red-400 rounded-full"
                 style={{ width: `${playerState.stats.hunger}%` }}
               />
             </div>
-            <div className="text-right text-xs font-black text-gray-900 mt-1">{playerState.stats.hunger}%</div>
+            <div className="text-right text-xs font-black text-gray-900 dark:text-white mt-1 transition-colors">{playerState.stats.hunger}%</div>
           </div>
 
-          <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-[16px] p-3 border border-red-200">
+          <div className="bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-900/30 dark:to-pink-900/30 rounded-[16px] p-3 border border-red-200 dark:border-red-700 transition-colors">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">❤️</span>
-              <span className="text-xs font-black text-gray-700">Здоровье</span>
+              <span className="text-xs font-black text-gray-700 dark:text-gray-300 transition-colors">Здоровье</span>
             </div>
-            <div className="bg-white/50 rounded-full h-2 overflow-hidden">
+            <div className="bg-white/50 dark:bg-gray-700/50 rounded-full h-2 overflow-hidden transition-colors">
               <div 
                 className="h-full bg-gradient-to-r from-red-400 to-pink-400 rounded-full"
                 style={{ width: `${playerState.stats.health}%` }}
               />
             </div>
-            <div className="text-right text-xs font-black text-gray-900 mt-1">{playerState.stats.health}%</div>
+            <div className="text-right text-xs font-black text-gray-900 dark:text-white mt-1 transition-colors">{playerState.stats.health}%</div>
           </div>
 
-          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-[16px] p-3 border border-yellow-200">
+          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-[16px] p-3 border border-yellow-200 dark:border-yellow-700 transition-colors">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">😊</span>
-              <span className="text-xs font-black text-gray-700">Настроение</span>
+              <span className="text-xs font-black text-gray-700 dark:text-gray-300 transition-colors">Настроение</span>
             </div>
-            <div className="bg-white/50 rounded-full h-2 overflow-hidden">
+            <div className="bg-white/50 dark:bg-gray-700/50 rounded-full h-2 overflow-hidden transition-colors">
               <div 
                 className="h-full bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full"
                 style={{ width: `${playerState.stats.mood}%` }}
               />
             </div>
-            <div className="text-right text-xs font-black text-gray-900 mt-1">{playerState.stats.mood}%</div>
+            <div className="text-right text-xs font-black text-gray-900 dark:text-white mt-1 transition-colors">{playerState.stats.mood}%</div>
           </div>
 
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-[16px] p-3 border border-green-200">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 rounded-[16px] p-3 border border-green-200 dark:border-green-700 transition-colors">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">⚡</span>
-              <span className="text-xs font-black text-gray-700">Энергия</span>
+              <span className="text-xs font-black text-gray-700 dark:text-gray-300 transition-colors">Энергия</span>
             </div>
-            <div className="bg-white/50 rounded-full h-2 overflow-hidden">
+            <div className="bg-white/50 dark:bg-gray-700/50 rounded-full h-2 overflow-hidden transition-colors">
               <div 
                 className="h-full bg-gradient-to-r from-green-400 to-emerald-400 rounded-full"
                 style={{ width: `${playerState.stats.energy}%` }}
               />
             </div>
-            <div className="text-right text-xs font-black text-gray-900 mt-1">{playerState.stats.energy}%</div>
+            <div className="text-right text-xs font-black text-gray-900 dark:text-white mt-1 transition-colors">{playerState.stats.energy}%</div>
           </div>
         </div>
       </motion.div>
@@ -149,7 +149,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect }: Gam
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <h3 className="text-3xl font-black text-gray-900 mb-4 px-2">
+        <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-4 px-2 transition-colors">
           {t('activities.title')}
         </h3>
         <div className="grid grid-cols-2 gap-4">
@@ -162,10 +162,10 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect }: Gam
               onClick={() => onActivitySelect(activity.id)}
               whileHover={{ scale: 1.05, y: -4 }}
               whileTap={{ scale: 0.95 }}
-              className="min-h-touch bg-white/95 backdrop-blur-xl rounded-[24px] shadow-xl p-6 hover:shadow-2xl transition-all border border-gray-100"
+              className="min-h-touch bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-[24px] shadow-xl p-6 hover:shadow-2xl transition-all border border-gray-100 dark:border-gray-700"
             >
               <div className="text-5xl mb-3">{activity.icon}</div>
-              <div className="text-sm font-black text-gray-900">
+              <div className="text-sm font-black text-gray-900 dark:text-white transition-colors">
                 {activity.name}
               </div>
             </motion.button>

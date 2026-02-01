@@ -17,7 +17,7 @@
   }
   
   body {
-    @apply font-sans text-text-primary bg-background-primary;
+    @apply font-sans;
     /* Prevent text size adjustment on mobile */
     -webkit-text-size-adjust: 100%;
     /* Disable pull-to-refresh on mobile */

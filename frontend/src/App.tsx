@@ -9,6 +9,8 @@ import { Toaster } from 'react-hot-toast';
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeToggle } from './components/ThemeToggle';
 import { ColorPalette } from './components/ColorPalette';
 import { GoogleLoginButton } from './components/GoogleLoginButton';
 import { CharacterSelection } from './components/CharacterSelection';
@@ -120,9 +122,10 @@ const mockPlayerState = {
 const mockActivities = [
   { id: 'work', name: 'Работать в Связном', icon: '💼' },
   { id: 'rob', name: 'Грабить', icon: '🔫' },
+  { id: 'police', name: 'Ловить преступников', icon: '👮' },
   { id: 'cook', name: 'Готовить плов', icon: '🍲' },
-  { id: 'trade', name: 'Торговать', icon: '🏪' },
-  { id: 'samsa', name: 'Печь самсу', icon: '🥟' }
+  { id: 'samsa', name: 'Печь самсу', icon: '🥟' },
+  { id: 'trade', name: 'Торговать', icon: '🏪' }
 ];
 
 function MenuCard({ title, description, icon, to }: any) {
@@ -133,11 +136,11 @@ function MenuCard({ title, description, icon, to }: any) {
       onClick={() => navigate(to)}
       whileHover={{ scale: 1.02, y: -4 }}
       whileTap={{ scale: 0.98 }}
-      className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all text-left w-full border border-gray-100"
+      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all text-left w-full border border-gray-100 dark:border-gray-700"
     >
       <div className="text-4xl mb-3">{icon}</div>
-      <h2 className="text-xl font-bold text-text-primary mb-2">{title}</h2>
-      <p className="text-text-secondary text-sm">{description}</p>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 transition-colors">{title}</h2>
+      <p className="text-gray-600 dark:text-gray-300 text-sm transition-colors">{description}</p>
     </motion.button>
   );
 }
@@ -146,23 +149,26 @@ function HomePage() {
   const [currentLang, setCurrentLang] = useState<'ru' | 'uz' | 'uk' | 'en'>('ru');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background-primary via-white to-background-secondary">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
       <motion.header 
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="bg-white/70 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50"
+        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 transition-colors"
       >
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <motion.h1 
             whileHover={{ scale: 1.05 }}
-            className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"
+            className="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent"
           >
             Узбек Варс
           </motion.h1>
-          <LanguageSwitcher 
-            currentLanguage={currentLang} 
-            onLanguageChange={setCurrentLang}
-          />
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher 
+              currentLanguage={currentLang} 
+              onLanguageChange={setCurrentLang}
+            />
+            <ThemeToggle />
+          </div>
         </div>
       </motion.header>
       
@@ -172,10 +178,10 @@ function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl font-bold text-text-primary mb-4">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
             Добро пожаловать
           </h2>
-          <p className="text-text-secondary text-lg">
+          <p className="text-gray-600 dark:text-gray-300 text-lg transition-colors">
             Выберите компонент для просмотра
           </p>
         </motion.div>
@@ -254,7 +260,11 @@ function AnimatedRoutes() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
             transition={{ duration: 0.3 }}
+            className="relative"
           >
+            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
+              <ThemeToggle />
+            </div>
             <CharacterSelection 
               characters={mockCharacters}
               onSelect={(id) => console.log('Selected character:', id)}
@@ -267,7 +277,11 @@ function AnimatedRoutes() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3 }}
+            className="relative"
           >
+            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
+              <ThemeToggle />
+            </div>
             <CitySelection 
               cities={mockCities}
               onSelect={(id) => console.log('Selected city:', id)}
@@ -280,7 +294,11 @@ function AnimatedRoutes() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
+            className="relative"
           >
+            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
+              <ThemeToggle />
+            </div>
             <GameDashboard 
               playerState={mockPlayerState}
               activities={mockActivities}
@@ -295,26 +313,28 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AnimatedRoutes />
-      </BrowserRouter>
-      
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-            color: '#2C1810',
-            borderRadius: '16px',
-            border: '1px solid rgba(0,0,0,0.05)',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-          }
-        }}
-      />
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AnimatedRoutes />
+        </BrowserRouter>
+        
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              color: '#2C1810',
+              borderRadius: '16px',
+              border: '1px solid rgba(0,0,0,0.05)',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+            }
+          }}
+        />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 
