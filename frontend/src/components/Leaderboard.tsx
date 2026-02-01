@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type LeaderboardType = 'global' | 'city' | 'soms';
@@ -24,7 +23,7 @@ interface LeaderboardProps {
 
 const medals = ['🥇', '🥈', '🥉'];
 
-export const Leaderboard = ({ players, currentPlayerId, type, onTypeChange }: LeaderboardProps) => {
+export const Leaderboard = ({ players, type, onTypeChange }: LeaderboardProps) => {
   const { t } = useTranslation();
 
   return (

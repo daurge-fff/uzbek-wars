@@ -31,11 +31,12 @@ interface PlayerProfileProps {
   onVerify?: () => void;
 }
 
-export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = false, telegramUsername, onVerify }: PlayerProfileProps) => {
+export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = false, onVerify }: PlayerProfileProps) => {
   const { t } = useTranslation();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState(playerInfo.avatar);
 
   const statCards = [
     { label: t('profile.totalActivities', 'Всего активностей'), value: stats.totalActivities, icon: '🎯', gradient: 'from-blue-500 to-cyan-500' },
@@ -308,14 +309,21 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
                     <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                       Выбрать аватар
                     </label>
-                    <div className="grid grid-cols-6 gap-2 max-h-[300px] overflow-y-auto">
-                      {['👨‍🌾', '👩‍🍳', '👨‍💼', '👨‍🔧', '👩‍🎨', '👨‍💻', '👩‍🎓', '👨‍🚀', '👩‍⚕️', '👨‍🎤', '👨‍🏫', '👩‍🔬', '👨‍🎨', '👩‍💼', '👨‍🍳', '👩‍🌾', '👨‍⚕️', '👩‍🚀', '👨‍🏭', '👩‍🏫', '🧑‍💻', '🧑‍🎨', '🧑‍🍳', '🧑‍🔧', '🧑‍⚕️', '🧑‍🚀', '🧑‍🎓', '🧑‍💼', '🧑‍🏫', '🧑‍🔬'].map((emoji) => (
-                        <button
+                    <div className="grid grid-cols-6 gap-2 max-h-[300px] overflow-y-auto p-1">
+                      {['👨‍🌾', '👩‍🍳', '👨‍💼', '👨‍🔧', '👩‍🎨', '👨‍💻', '👩‍🎓', '👨‍🚀', '👩‍⚕️', '👨‍🎤', '👨‍🏫', '👩‍🔬', '🧑‍🎤', '🧑‍🚒', '👮‍♂️', '👮‍♀️', '🕵️‍♂️', '🕵️‍♀️', '💂‍♂️', '💂‍♀️', '👷‍♂️', '👷‍♀️', '🤴', '👸', '👳‍♂️', '👳‍♀️', '👲', '🧕', '🤵', '👰'].map((emoji) => (
+                        <motion.button
                           key={emoji}
-                          className="text-3xl p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-[12px] transition-colors"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setSelectedAvatar(emoji)}
+                          className={`text-3xl p-2 rounded-[12px] transition-all ${
+                            selectedAvatar === emoji
+                              ? 'bg-gradient-to-r from-indigo-500 to-purple-500 shadow-lg ring-2 ring-indigo-300 dark:ring-indigo-700'
+                              : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                          }`}
                         >
                           {emoji}
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
                   </div>

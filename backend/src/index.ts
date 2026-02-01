@@ -6,14 +6,15 @@
  */
 
 import dotenv from 'dotenv';
+import path from 'path';
 import { connectDatabase } from './config/database';
 import { createServer } from './server';
 import { logger } from './utils/logger';
 import { validateEnvironment } from './config/environment';
 
 // Load environment variables before anything else
-// Look for .env in parent directory (project root)
-dotenv.config({ path: '../.env' });
+// Look for .env in project root (two levels up from dist or one level up from src)
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 /**
  * Bootstrap the application

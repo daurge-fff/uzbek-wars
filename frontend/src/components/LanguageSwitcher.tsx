@@ -14,13 +14,6 @@ const languageFlags: Record<Language, string> = {
   en: '🇬🇧'
 };
 
-const languageNames: Record<Language, string> = {
-  ru: 'RU',
-  uz: 'UZ',
-  uk: 'UA',
-  en: 'EN'
-};
-
 export const LanguageSwitcher = ({ 
   currentLanguage, 
   onLanguageChange

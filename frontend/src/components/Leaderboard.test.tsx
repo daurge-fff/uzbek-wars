@@ -41,7 +41,7 @@ describe('Leaderboard', () => {
   });
 
   it('highlights current player', () => {
-    const { container } = render(
+    render(
       <Leaderboard
         players={mockPlayers}
         currentPlayerId="3"

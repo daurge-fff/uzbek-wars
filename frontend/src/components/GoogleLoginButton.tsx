@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 interface GoogleLoginButtonProps {
@@ -8,9 +6,8 @@ interface GoogleLoginButtonProps {
   onError?: (error: string) => void;
 }
 
-export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps) => {
+export const GoogleLoginButton = ({ onError }: GoogleLoginButtonProps) => {
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const handleGoogleLogin = async () => {

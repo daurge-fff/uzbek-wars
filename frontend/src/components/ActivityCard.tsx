@@ -48,6 +48,7 @@ export const ActivityCard = ({ activity, playerLevel, isAvailable, onExecute }: 
         return () => clearInterval(timer);
       }
     }
+    return undefined;
   }, [activity.lastExecuted, activity.cooldown]);
 
   const isLevelLocked = playerLevel < activity.requiredLevel;

@@ -24,6 +24,7 @@ import { ReferralPanel } from './components/ReferralPanel';
 import { PlayerProfile } from './components/PlayerProfile';
 import { Settings } from './components/Settings';
 import { HealthCheck } from './components/HealthCheck';
+import { BackButton } from './components/BackButton';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -181,13 +182,22 @@ function MenuCard({ title, description, icon, to }: any) {
   return (
     <motion.button
       onClick={() => navigate(to)}
-      whileHover={{ scale: 1.02, y: -4 }}
-      whileTap={{ scale: 0.98 }}
-      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all text-left w-full border border-gray-100 dark:border-gray-700"
+      whileHover={{ scale: 1.05, y: -8 }}
+      whileTap={{ scale: 0.95 }}
+      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-6 rounded-[24px] shadow-xl hover:shadow-2xl transition-all text-left w-full border border-gray-100 dark:border-gray-700 group overflow-hidden relative"
     >
-      <div className="text-4xl mb-3">{icon}</div>
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 transition-colors">{title}</h2>
-      <p className="text-gray-600 dark:text-gray-300 text-sm transition-colors">{description}</p>
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/10 group-hover:to-purple-500/10 transition-all duration-300" />
+      <div className="relative">
+        <motion.div 
+          className="text-5xl mb-3"
+          whileHover={{ scale: 1.2, rotate: 5 }}
+          transition={{ type: 'spring', stiffness: 400 }}
+        >
+          {icon}
+        </motion.div>
+        <h2 className="text-xl font-black text-gray-900 dark:text-white mb-2 transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">{title}</h2>
+        <p className="text-gray-600 dark:text-gray-300 text-sm transition-colors">{description}</p>
+      </div>
     </motion.button>
   );
 }
@@ -255,42 +265,68 @@ function HomePage() {
 function AnimatedRoutes() {
   const location = useLocation();
   
+  // Smooth page transitions
+  const pageVariants = {
+    initial: { opacity: 0, scale: 0.98, y: 10 },
+    animate: { opacity: 1, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 0.98, y: -10 }
+  };
+  
+  const pageTransition = {
+    type: 'tween',
+    ease: 'anticipate',
+    duration: 0.3
+  };
+  
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<HomePage />} />
         <Route path="/colors" element={
           <motion.div
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.3 }}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
           >
+            <BackButton />
             <ColorPalette />
           </motion.div>
         } />
         <Route path="/auth" element={
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
-            className="min-h-screen bg-gradient-to-br from-background-primary to-background-secondary flex items-center justify-center p-4"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex items-center justify-center p-4"
           >
+            <BackButton />
             <div className="max-w-md w-full">
-              <h1 className="text-3xl font-bold text-text-primary mb-8 text-center">Вход в игру</h1>
+              <motion.h1 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-3xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-8 text-center"
+              >
+                Вход в игру
+              </motion.h1>
               <GoogleLoginButton />
             </div>
           </motion.div>
         } />
         <Route path="/characters" element={
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.3 }}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
             className="relative"
           >
+            <BackButton />
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
@@ -302,12 +338,14 @@ function AnimatedRoutes() {
         } />
         <Route path="/cities" element={
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
             className="relative"
           >
+            <BackButton />
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
@@ -319,12 +357,14 @@ function AnimatedRoutes() {
         } />
         <Route path="/dashboard" element={
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
             className="relative"
           >
+            <BackButton />
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
@@ -337,12 +377,14 @@ function AnimatedRoutes() {
         } />
         <Route path="/shop" element={
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
             className="relative"
           >
+            <BackButton />
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
@@ -356,12 +398,14 @@ function AnimatedRoutes() {
         } />
         <Route path="/leaderboard" element={
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
             className="relative"
           >
+            <BackButton />
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
@@ -375,12 +419,14 @@ function AnimatedRoutes() {
         } />
         <Route path="/referral" element={
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
             className="relative"
           >
+            <BackButton />
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
@@ -394,12 +440,14 @@ function AnimatedRoutes() {
         } />
         <Route path="/donate" element={
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
             className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex items-center justify-center p-4"
           >
+            <BackButton />
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
@@ -412,12 +460,14 @@ function AnimatedRoutes() {
         } />
         <Route path="/health" element={
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
             className="relative"
           >
+            <BackButton />
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
@@ -426,12 +476,14 @@ function AnimatedRoutes() {
         } />
         <Route path="/profile" element={
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
             className="relative"
           >
+            <BackButton />
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
@@ -447,12 +499,14 @@ function AnimatedRoutes() {
         } />
         <Route path="/settings" element={
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
             className="relative"
           >
+            <BackButton />
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
