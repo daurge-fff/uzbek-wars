@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface PlayerStats {
@@ -25,11 +26,16 @@ interface PlayerProfileProps {
   playerInfo: PlayerInfo;
   stats: PlayerStats;
   onEditProfile: () => void;
-  onLogout: () => void;
+  isVerified?: boolean;
+  telegramUsername?: string;
+  onVerify?: () => void;
 }
 
-export const PlayerProfile = ({ playerInfo, stats, onEditProfile, onLogout }: PlayerProfileProps) => {
+export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = false, telegramUsername, onVerify }: PlayerProfileProps) => {
   const { t } = useTranslation();
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   const statCards = [
     { label: t('profile.totalActivities', 'Всего активностей'), value: stats.totalActivities, icon: '🎯', gradient: 'from-blue-500 to-cyan-500' },
@@ -37,6 +43,24 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, onLogout }: Pl
     { label: t('profile.achievements', 'Достижений'), value: stats.achievements, icon: '🏆', gradient: 'from-yellow-500 to-orange-500' },
     { label: t('profile.level', 'Уровень'), value: stats.level, icon: '⭐', gradient: 'from-purple-500 to-pink-500' }
   ];
+
+  const handleVerify = async () => {
+    setVerifying(true);
+    // Generate unique verification code
+    const verificationCode = Math.random().toString(36).substring(7).toUpperCase();
+    const botUsername = 'uzbekwars_bot';
+    const telegramUrl = `https://t.me/${botUsername}?start=${verificationCode}`;
+    
+    // Open Telegram
+    window.open(telegramUrl, '_blank');
+    
+    // Simulate waiting for verification
+    setTimeout(() => {
+      setVerifying(false);
+      setShowVerifyModal(false);
+      if (onVerify) onVerify();
+    }, 3000);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 p-4">
@@ -50,9 +74,15 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, onLogout }: Pl
           <div className="flex items-start gap-4 mb-6">
             <div className="relative">
               <div className="text-7xl">{playerInfo.avatar}</div>
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-4 border-white dark:border-gray-800 flex items-center justify-center">
-                <span className="text-xs">✓</span>
-              </div>
+              {isVerified && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-4 border-white dark:border-gray-800 flex items-center justify-center shadow-lg"
+                >
+                  <span className="text-sm">✓</span>
+                </motion.div>
+              )}
             </div>
             <div className="flex-1">
               <h1 className="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent mb-1">
@@ -119,7 +149,7 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, onLogout }: Pl
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={onEditProfile}
+              onClick={() => setShowEditModal(true)}
               className="py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-full shadow-lg"
             >
               ✏️ {t('profile.edit', 'Редактировать')}
@@ -127,10 +157,14 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, onLogout }: Pl
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={onLogout}
-              className="py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-full"
+              onClick={() => setShowVerifyModal(true)}
+              className={`py-3 font-bold rounded-full shadow-lg ${
+                isVerified
+                  ? 'bg-green-500 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+              }`}
             >
-              🚪 {t('profile.logout', 'Выйти')}
+              {isVerified ? '✓ Верифицирован' : '🔒 Верифицировать'}
             </motion.button>
           </div>
         </motion.div>
@@ -184,6 +218,195 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, onLogout }: Pl
           </p>
         </motion.div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <AnimatePresence>
+        {showEditModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowEditModal(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[450px] bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl z-50 p-6"
+            >
+              <h2 className="text-2xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-6">
+                Редактировать профиль
+              </h2>
+
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Имя пользователя
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue={playerInfo.username}
+                    className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-[16px] text-gray-900 dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Выбрать аватар
+                  </label>
+                  <div className="grid grid-cols-5 gap-2">
+                    {['👨‍🌾', '👩‍🍳', '👨‍💼', '👨‍🔧', '👩‍🎨', '👨‍💻', '👩‍🎓', '👨‍🚀', '👩‍⚕️', '👨‍🎤'].map((emoji) => (
+                      <button
+                        key={emoji}
+                        className="text-4xl p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-[12px] transition-colors"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    setShowEditModal(false);
+                    onEditProfile();
+                  }}
+                  className="py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-full shadow-lg"
+                >
+                  Сохранить
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowEditModal(false)}
+                  className="py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-full"
+                >
+                  Отмена
+                </motion.button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Verify Modal */}
+      <AnimatePresence>
+        {showVerifyModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !verifying && setShowVerifyModal(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[450px] bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 backdrop-blur-xl rounded-[32px] shadow-2xl z-50 p-1"
+            >
+              <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
+                {verifying ? (
+                  <div className="text-center py-8">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      className="text-6xl mb-4"
+                    >
+                      ⏳
+                    </motion.div>
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">
+                      Ожидание верификации...
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Подтвердите в Telegram боте
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-center mb-6">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 500 }}
+                        className="text-7xl mb-4"
+                      >
+                        🔒
+                      </motion.div>
+                      <h2 className="text-2xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-2">
+                        Верификация аккаунта
+                      </h2>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Привяжите Telegram для получения галочки
+                      </p>
+                    </div>
+
+                    <div className="space-y-4 mb-6">
+                      <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-[20px] border border-blue-200 dark:border-blue-800">
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl">✅</span>
+                          <div>
+                            <div className="font-bold text-gray-900 dark:text-white text-sm mb-1">
+                              Защита аккаунта
+                            </div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">
+                              Дополнительная безопасность через Telegram
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-[20px] border border-purple-200 dark:border-purple-800">
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl">⭐</span>
+                          <div>
+                            <div className="font-bold text-gray-900 dark:text-white text-sm mb-1">
+                              Эксклюзивные бонусы
+                            </div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">
+                              Специальные награды для верифицированных
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleVerify}
+                        className="py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-full shadow-lg"
+                      >
+                        ✈️ Открыть бота
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setShowVerifyModal(false)}
+                        className="py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-full"
+                      >
+                        Отмена
+                      </motion.button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

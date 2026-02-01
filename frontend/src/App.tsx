@@ -423,7 +423,9 @@ function AnimatedRoutes() {
               playerInfo={mockPlayerInfo}
               stats={mockPlayerStats}
               onEditProfile={() => console.log('Edit profile')}
-              onLogout={() => console.log('Logout')}
+              isVerified={false}
+              telegramUsername=""
+              onVerify={() => console.log('Verified!')}
             />
           </motion.div>
         } />
@@ -448,9 +450,11 @@ function AnimatedRoutes() {
               notificationsEnabled={false}
               onNotificationsToggle={() => console.log('Toggle notifications')}
               appStats={{
-                uptime: 3600 * 2 + 1800, // 2.5 hours
+                uptime: 3600 * 2 + 1800,
                 lastRestart: new Date(Date.now() - 3600 * 2.5 * 1000).toISOString(),
-                totalSessions: 42,
+                onlinePlayersTotal: 1247,
+                onlinePlayersCity: 342,
+                cityName: 'Самарканд',
                 version: '1.0.0'
               }}
             />
