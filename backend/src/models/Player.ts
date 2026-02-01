@@ -1,0 +1,142 @@
+import { Schema, model, Document, Types } from 'mongoose';
+
+/**
+ * Player statistics representing Tamagotchi-style characteristics
+ * All stats range from 0-100
+ */
+export interface IPlayerStats {
+  hunger: number;
+  health: number;
+  mood: number;
+  energy: number;
+}
+
+/**
+ * Cosmetic items owned and equipped by the player
+ * Purchased with donation currency (crystals)
+ */
+export interface IPlayerCosmetics {
+  clothing: string[];
+  backgrounds: string[];
+  activeClothing?: string;
+  activeBackground?: string;
+}
+
+/**
+ * Player document interface representing game progress
+ * Each user has exactly one player profile
+ */
+export interface IPlayer extends Document {
+  userId: Types.ObjectId;
+  characterId: string;
+  cityId: string;
+  level: number;
+  experience: number;
+  soms: number;
+  donationCurrency: number;
+  stats: IPlayerStats;
+  cosmetics: IPlayerCosmetics;
+  referralCode: string;
+  referredBy?: string;
+  lastActivityTime: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Player schema for MongoDB
+ * Stores all game progression data including stats, cosmetics, and referral info
+ */
+const PlayerSchema = new Schema<IPlayer>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      unique: true, // One player per user
+      index: true, // Indexed for fast user lookups
+    },
+    characterId: {
+      type: String,
+      required: true,
+    },
+    cityId: {
+      type: String,
+      required: true,
+      index: true, // Indexed for city-based queries (leaderboards, wars)
+    },
+    level: {
+      type: Number,
+      default: 1,
+      min: 1,
+      index: true, // Indexed for leaderboard queries
+    },
+    experience: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    soms: {
+      type: Number,
+      default: 100,
+      min: 0,
+      index: true, // Indexed for soms-based leaderboard queries
+    },
+    donationCurrency: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    stats: {
+      hunger: {
+        type: Number,
+        default: 100,
+        min: 0,
+        max: 100,
+      },
+      health: {
+        type: Number,
+        default: 100,
+        min: 0,
+        max: 100,
+      },
+      mood: {
+        type: Number,
+        default: 100,
+        min: 0,
+        max: 100,
+      },
+      energy: {
+        type: Number,
+        default: 100,
+        min: 0,
+        max: 100,
+      },
+    },
+    cosmetics: {
+      clothing: [{ type: String }],
+      backgrounds: [{ type: String }],
+      activeClothing: { type: String },
+      activeBackground: { type: String },
+    },
+    referralCode: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true, // Indexed for referral code lookups
+    },
+    referredBy: {
+      type: String,
+      index: true, // Indexed for referral tracking queries
+    },
+    lastActivityTime: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  {
+    timestamps: true, // Automatically manage createdAt and updatedAt
+  }
+);
+
+export const Player = model<IPlayer>('Player', PlayerSchema);
