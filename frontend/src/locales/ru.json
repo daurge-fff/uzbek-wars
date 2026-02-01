@@ -42,6 +42,7 @@
     "login": "Войти",
     "logout": "Выйти",
     "login_with_google": "Войти через Google",
+    "logging_in": "Вход...",
     "welcome": "Добро пожаловать"
   },
   "cities": {
