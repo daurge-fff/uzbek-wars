@@ -1,0 +1,95 @@
+{
+  "character": {
+    "select": "Select Character",
+    "level": "Level",
+    "experience": "Experience"
+  },
+  "currency": {
+    "soms": "soms",
+    "soms_short": "s.",
+    "crystals": "crystals",
+    "crystals_short": "cr."
+  },
+  "activities": {
+    "work_svyaznoy": "Work at Svyaznoy",
+    "rob": "Rob",
+    "cook_plov": "Cook Plov",
+    "trade_bazaar": "Trade at Bazaar",
+    "rest": "Rest",
+    "eat": "Eat"
+  },
+  "notifications": {
+    "level_up": "Congratulations! You reached level {{level}}!",
+    "activity_success": "Received: {{exp}} experience, {{soms}} soms",
+    "activity_penalty": "Failure! Lost {{soms}} soms"
+  },
+  "stats": {
+    "hunger": "Hunger",
+    "health": "Health",
+    "mood": "Mood",
+    "energy": "Energy"
+  },
+  "ui": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "login_with_google": "Login with Google",
+    "welcome": "Welcome"
+  },
+  "cities": {
+    "select": "Select City",
+    "samarkand": "Samarkand",
+    "shymkent": "Shymkent",
+    "tashkent": "Tashkent",
+    "bukhara": "Bukhara",
+    "players": "players",
+    "full": "Full"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "global": "Global",
+    "city": "City",
+    "rank": "Rank",
+    "player": "Player",
+    "level": "Level",
+    "soms": "Soms"
+  },
+  "referral": {
+    "title": "Invite Friends",
+    "code": "Your referral code",
+    "link": "Referral link",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "referred_players": "Referred players"
+  },
+  "donation": {
+    "title": "Support the Game",
+    "crystals": "crystals",
+    "bonus": "Bonus {{percent}}%",
+    "donate": "Donate"
+  },
+  "cosmetics": {
+    "title": "Cosmetics",
+    "clothing": "Clothing",
+    "backgrounds": "Backgrounds",
+    "purchase": "Purchase",
+    "equip": "Equip",
+    "equipped": "Equipped",
+    "not_enough_currency": "Not enough crystals"
+  },
+  "language": {
+    "select": "Select Language",
+    "ru": "Русский",
+    "uz": "O'zbekcha",
+    "uk": "Українська",
+    "en": "English"
+  }
+}

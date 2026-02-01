@@ -19,6 +19,7 @@ import referralRoutes from './routes/referral';
 import donationsRoutes from './routes/donations';
 import cosmeticsRoutes from './routes/cosmetics';
 import leaderboardRoutes from './routes/leaderboard';
+import playerRoutes from './routes/player';
 
 /**
  * Creates and configures Express application
@@ -73,6 +74,7 @@ export function createServer(): Application {
   app.use('/api/donations', donationsRoutes);
   app.use('/api/cosmetics', cosmeticsRoutes);
   app.use('/api/leaderboard', leaderboardRoutes);
+  app.use('/api/player', playerRoutes);
   
   // Error handling must be last
   app.use(errorHandler);

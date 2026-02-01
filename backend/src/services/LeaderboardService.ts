@@ -62,18 +62,20 @@ export async function getGlobalLeaderboard(
       .limit(limit)
       .populate('userId', 'displayName');
 
-    // Build leaderboard entries
-    const leaderboard: LeaderboardEntry[] = topPlayers.map((player, index) => ({
-      rank: index + 1,
-      player: {
-        id: player._id.toString(),
-        displayName: (player.userId as any).displayName || 'Unknown',
-        level: player.level,
-        soms: player.soms,
-        cityId: player.cityId,
-        characterId: player.characterId
-      }
-    }));
+    // Build leaderboard entries, filtering out players with missing users
+    const leaderboard: LeaderboardEntry[] = topPlayers
+      .filter(player => player.userId && (player.userId as any).displayName)
+      .map((player, index) => ({
+        rank: index + 1,
+        player: {
+          id: player._id.toString(),
+          displayName: (player.userId as any).displayName,
+          level: player.level,
+          soms: player.soms,
+          cityId: player.cityId,
+          characterId: player.characterId
+        }
+      }));
 
     // Calculate current player rank if provided
     let currentPlayerRank: number | undefined;
@@ -124,18 +126,20 @@ export async function getCityLeaderboard(
       .limit(limit)
       .populate('userId', 'displayName');
 
-    // Build leaderboard entries
-    const leaderboard: LeaderboardEntry[] = topPlayers.map((player, index) => ({
-      rank: index + 1,
-      player: {
-        id: player._id.toString(),
-        displayName: (player.userId as any).displayName || 'Unknown',
-        level: player.level,
-        soms: player.soms,
-        cityId: player.cityId,
-        characterId: player.characterId
-      }
-    }));
+    // Build leaderboard entries, filtering out players with missing users
+    const leaderboard: LeaderboardEntry[] = topPlayers
+      .filter(player => player.userId && (player.userId as any).displayName)
+      .map((player, index) => ({
+        rank: index + 1,
+        player: {
+          id: player._id.toString(),
+          displayName: (player.userId as any).displayName,
+          level: player.level,
+          soms: player.soms,
+          cityId: player.cityId,
+          characterId: player.characterId
+        }
+      }));
 
     // Calculate current player rank if provided
     let currentPlayerRank: number | undefined;
@@ -182,18 +186,20 @@ export async function getSomsLeaderboard(
       .limit(limit)
       .populate('userId', 'displayName');
 
-    // Build leaderboard entries
-    const leaderboard: LeaderboardEntry[] = topPlayers.map((player, index) => ({
-      rank: index + 1,
-      player: {
-        id: player._id.toString(),
-        displayName: (player.userId as any).displayName || 'Unknown',
-        level: player.level,
-        soms: player.soms,
-        cityId: player.cityId,
-        characterId: player.characterId
-      }
-    }));
+    // Build leaderboard entries, filtering out players with missing users
+    const leaderboard: LeaderboardEntry[] = topPlayers
+      .filter(player => player.userId && (player.userId as any).displayName)
+      .map((player, index) => ({
+        rank: index + 1,
+        player: {
+          id: player._id.toString(),
+          displayName: (player.userId as any).displayName,
+          level: player.level,
+          soms: player.soms,
+          cityId: player.cityId,
+          characterId: player.characterId
+        }
+      }));
 
     // Calculate current player rank if provided
     let currentPlayerRank: number | undefined;

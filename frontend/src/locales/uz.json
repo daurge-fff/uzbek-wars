@@ -1,0 +1,95 @@
+{
+  "character": {
+    "select": "Personajni tanlang",
+    "level": "Daraja",
+    "experience": "Tajriba"
+  },
+  "currency": {
+    "soms": "so'm",
+    "soms_short": "s.",
+    "crystals": "kristallar",
+    "crystals_short": "kr."
+  },
+  "activities": {
+    "work_svyaznoy": "Svyaznoida ishlash",
+    "rob": "O'g'irlash",
+    "cook_plov": "Osh pishirish",
+    "trade_bazaar": "Bozorda savdo qilish",
+    "rest": "Dam olish",
+    "eat": "Ovqatlanish"
+  },
+  "notifications": {
+    "level_up": "Tabriklaymiz! Siz {{level}} darajaga yetdingiz!",
+    "activity_success": "Olindi: {{exp}} tajriba, {{soms}} so'm",
+    "activity_penalty": "Muvaffaqiyatsizlik! Yo'qotildi {{soms}} so'm"
+  },
+  "stats": {
+    "hunger": "Ochlik",
+    "health": "Salomatlik",
+    "mood": "Kayfiyat",
+    "energy": "Energiya"
+  },
+  "ui": {
+    "loading": "Yuklanmoqda...",
+    "error": "Xato",
+    "success": "Muvaffaqiyat",
+    "confirm": "Tasdiqlash",
+    "cancel": "Bekor qilish",
+    "close": "Yopish",
+    "save": "Saqlash"
+  },
+  "auth": {
+    "login": "Kirish",
+    "logout": "Chiqish",
+    "login_with_google": "Google orqali kirish",
+    "welcome": "Xush kelibsiz"
+  },
+  "cities": {
+    "select": "Shaharni tanlang",
+    "samarkand": "Samarqand",
+    "shymkent": "Shymkent",
+    "tashkent": "Toshkent",
+    "bukhara": "Buxoro",
+    "players": "o'yinchilar",
+    "full": "To'lgan"
+  },
+  "leaderboard": {
+    "title": "Reyting",
+    "global": "Global",
+    "city": "Shahar",
+    "rank": "O'rin",
+    "player": "O'yinchi",
+    "level": "Daraja",
+    "soms": "So'mlar"
+  },
+  "referral": {
+    "title": "Do'stlarni taklif qilish",
+    "code": "Sizning referal kodingiz",
+    "link": "Referal havola",
+    "copy": "Nusxalash",
+    "copied": "Nusxalandi!",
+    "referred_players": "Taklif qilingan o'yinchilar"
+  },
+  "donation": {
+    "title": "O'yinni qo'llab-quvvatlash",
+    "crystals": "kristallar",
+    "bonus": "Bonus {{percent}}%",
+    "donate": "Donat"
+  },
+  "cosmetics": {
+    "title": "Kosmetika",
+    "clothing": "Kiyim",
+    "backgrounds": "Fonlar",
+    "purchase": "Sotib olish",
+    "equip": "Kiyish",
+    "equipped": "Kiyilgan",
+    "not_enough_currency": "Kristallar yetarli emas"
+  },
+  "language": {
+    "select": "Tilni tanlang",
+    "ru": "Русский",
+    "uz": "O'zbekcha",
+    "uk": "Українська",
+    "en": "English"
+  }
+}

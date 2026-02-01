@@ -10,7 +10,7 @@
  */
 
 import { Router, Response } from 'express';
-import { authenticate, AuthRequest, optionalAuth } from '../middleware/auth';
+import { AuthRequest, optionalAuth } from '../middleware/auth';
 import {
   getGlobalLeaderboard,
   getCityLeaderboard,
@@ -19,7 +19,6 @@ import {
   getPlayerCityRank,
   getPlayerSomsRank
 } from '../services/LeaderboardService';
-import { Player } from '../models/Player';
 import { logger } from '../utils/logger';
 
 const router = Router();
@@ -45,7 +44,7 @@ router.get('/global', optionalAuth, async (req: AuthRequest, res: Response): Pro
     const queryPlayerId = req.query.playerId as string;
     
     // Get leaderboard
-    const leaderboard = await getGlobalLeaderboard(limit);
+    const result = await getGlobalLeaderboard(limit);
     
     // Get player rank if authenticated or playerId provided
     let playerRank = null;
@@ -58,9 +57,9 @@ router.get('/global', optionalAuth, async (req: AuthRequest, res: Response): Pro
     res.json({
       success: true,
       data: {
-        leaderboard,
+        leaderboard: result.leaderboard,
         playerRank,
-        total: leaderboard.length
+        total: result.leaderboard.length
       }
     });
     
@@ -108,7 +107,7 @@ router.get('/city/:cityId', optionalAuth, async (req: AuthRequest, res: Response
     }
     
     // Get leaderboard
-    const leaderboard = await getCityLeaderboard(cityId, limit);
+    const result = await getCityLeaderboard(cityId, limit);
     
     // Get player rank if authenticated or playerId provided
     let playerRank = null;
@@ -122,9 +121,9 @@ router.get('/city/:cityId', optionalAuth, async (req: AuthRequest, res: Response
       success: true,
       data: {
         cityId,
-        leaderboard,
+        leaderboard: result.leaderboard,
         playerRank,
-        total: leaderboard.length
+        total: result.leaderboard.length
       }
     });
     
@@ -159,7 +158,7 @@ router.get('/soms', optionalAuth, async (req: AuthRequest, res: Response): Promi
     const queryPlayerId = req.query.playerId as string;
     
     // Get leaderboard
-    const leaderboard = await getSomsLeaderboard(limit);
+    const result = await getSomsLeaderboard(limit);
     
     // Get player rank if authenticated or playerId provided
     let playerRank = null;
@@ -172,9 +171,9 @@ router.get('/soms', optionalAuth, async (req: AuthRequest, res: Response): Promi
     res.json({
       success: true,
       data: {
-        leaderboard,
+        leaderboard: result.leaderboard,
         playerRank,
-        total: leaderboard.length
+        total: result.leaderboard.length
       }
     });
     

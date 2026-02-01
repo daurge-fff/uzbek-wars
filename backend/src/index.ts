@@ -5,7 +5,6 @@
  * Environment variables are validated on startup to fail fast if misconfigured.
  */
 
-import express from 'express';
 import dotenv from 'dotenv';
 import { connectDatabase } from './config/database';
 import { createServer } from './server';

@@ -1,0 +1,95 @@
+{
+  "character": {
+    "select": "Выберите персонажа",
+    "level": "Уровень",
+    "experience": "Опыт"
+  },
+  "currency": {
+    "soms": "сомов",
+    "soms_short": "с.",
+    "crystals": "кристаллов",
+    "crystals_short": "кр."
+  },
+  "activities": {
+    "work_svyaznoy": "Работать в Связном",
+    "rob": "Грабить",
+    "cook_plov": "Готовить плов",
+    "trade_bazaar": "Торговать на базаре",
+    "rest": "Отдохнуть",
+    "eat": "Поесть"
+  },
+  "notifications": {
+    "level_up": "Поздравляем! Вы достигли уровня {{level}}!",
+    "activity_success": "Получено: {{exp}} опыта, {{soms}} сомов",
+    "activity_penalty": "Неудача! Потеряно {{soms}} сомов"
+  },
+  "stats": {
+    "hunger": "Голод",
+    "health": "Здоровье",
+    "mood": "Настроение",
+    "energy": "Энергия"
+  },
+  "ui": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успех",
+    "confirm": "Подтвердить",
+    "cancel": "Отмена",
+    "close": "Закрыть",
+    "save": "Сохранить"
+  },
+  "auth": {
+    "login": "Войти",
+    "logout": "Выйти",
+    "login_with_google": "Войти через Google",
+    "welcome": "Добро пожаловать"
+  },
+  "cities": {
+    "select": "Выберите город",
+    "samarkand": "Самарканд",
+    "shymkent": "Шымкент",
+    "tashkent": "Ташкент",
+    "bukhara": "Бухара",
+    "players": "игроков",
+    "full": "Заполнен"
+  },
+  "leaderboard": {
+    "title": "Рейтинг",
+    "global": "Глобальный",
+    "city": "Городской",
+    "rank": "Место",
+    "player": "Игрок",
+    "level": "Уровень",
+    "soms": "Сомы"
+  },
+  "referral": {
+    "title": "Пригласить друзей",
+    "code": "Ваш реферальный код",
+    "link": "Реферальная ссылка",
+    "copy": "Копировать",
+    "copied": "Скопировано!",
+    "referred_players": "Приглашенные игроки"
+  },
+  "donation": {
+    "title": "Поддержать игру",
+    "crystals": "кристаллов",
+    "bonus": "Бонус {{percent}}%",
+    "donate": "Донат"
+  },
+  "cosmetics": {
+    "title": "Косметика",
+    "clothing": "Одежда",
+    "backgrounds": "Фоны",
+    "purchase": "Купить",
+    "equip": "Надеть",
+    "equipped": "Надето",
+    "not_enough_currency": "Недостаточно кристаллов"
+  },
+  "language": {
+    "select": "Выберите язык",
+    "ru": "Русский",
+    "uz": "O'zbekcha",
+    "uk": "Українська",
+    "en": "English"
+  }
+}

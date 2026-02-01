@@ -118,7 +118,11 @@ export async function purchaseCosmetic(
     }
 
     // Check if player already owns the item
-    const alreadyOwned = player.cosmeticItems.includes(itemId);
+    const ownedItems = cosmetic.type === 'clothing' 
+      ? player.cosmetics.clothing 
+      : player.cosmetics.backgrounds;
+    
+    const alreadyOwned = ownedItems.includes(itemId);
     if (alreadyOwned) {
       return {
         success: false,
@@ -140,7 +144,11 @@ export async function purchaseCosmetic(
     player.donationCurrency -= cosmetic.price;
 
     // Add item to collection
-    player.cosmeticItems.push(itemId);
+    if (cosmetic.type === 'clothing') {
+      player.cosmetics.clothing.push(itemId);
+    } else {
+      player.cosmetics.backgrounds.push(itemId);
+    }
 
     await player.save();
 
@@ -205,7 +213,11 @@ export async function equipCosmetic(
     }
 
     // Check if player owns the item
-    const ownsItem = player.cosmeticItems.includes(itemId);
+    const ownedItems = cosmetic.type === 'clothing' 
+      ? player.cosmetics.clothing 
+      : player.cosmetics.backgrounds;
+    
+    const ownsItem = ownedItems.includes(itemId);
     if (!ownsItem) {
       return {
         success: false,
@@ -215,9 +227,9 @@ export async function equipCosmetic(
 
     // Equip item based on type
     if (cosmetic.type === 'clothing') {
-      player.equippedCosmetics.clothing = itemId;
+      player.cosmetics.activeClothing = itemId;
     } else if (cosmetic.type === 'background') {
-      player.equippedCosmetics.background = itemId;
+      player.cosmetics.activeBackground = itemId;
     } else {
       return {
         success: false,
@@ -261,9 +273,9 @@ export async function unequipCosmetic(
     }
 
     if (type === 'clothing') {
-      player.equippedCosmetics.clothing = null;
+      player.cosmetics.activeClothing = undefined;
     } else if (type === 'background') {
-      player.equippedCosmetics.background = null;
+      player.cosmetics.activeBackground = undefined;
     } else {
       return {
         success: false,
@@ -313,20 +325,25 @@ export async function getPlayerCosmetics(playerId: string): Promise<{
     }
 
     // Get all owned cosmetics
+    const allOwnedIds = [
+      ...player.cosmetics.clothing,
+      ...player.cosmetics.backgrounds
+    ];
+    
     const ownedCosmetics = await CosmeticItem.find({
-      itemId: { $in: player.cosmeticItems }
+      itemId: { $in: allOwnedIds }
     });
 
     // Get equipped cosmetics
     let equippedClothing = null;
     let equippedBackground = null;
 
-    if (player.equippedCosmetics.clothing) {
-      equippedClothing = await getCosmeticById(player.equippedCosmetics.clothing);
+    if (player.cosmetics.activeClothing) {
+      equippedClothing = await getCosmeticById(player.cosmetics.activeClothing);
     }
 
-    if (player.equippedCosmetics.background) {
-      equippedBackground = await getCosmeticById(player.equippedCosmetics.background);
+    if (player.cosmetics.activeBackground) {
+      equippedBackground = await getCosmeticById(player.cosmetics.activeBackground);
     }
 
     return {

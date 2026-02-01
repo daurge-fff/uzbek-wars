@@ -1,0 +1,95 @@
+{
+  "character": {
+    "select": "Оберіть персонажа",
+    "level": "Рівень",
+    "experience": "Досвід"
+  },
+  "currency": {
+    "soms": "сомів",
+    "soms_short": "с.",
+    "crystals": "кристалів",
+    "crystals_short": "кр."
+  },
+  "activities": {
+    "work_svyaznoy": "Працювати в Зв'язному",
+    "rob": "Грабувати",
+    "cook_plov": "Готувати плов",
+    "trade_bazaar": "Торгувати на базарі",
+    "rest": "Відпочити",
+    "eat": "Поїсти"
+  },
+  "notifications": {
+    "level_up": "Вітаємо! Ви досягли рівня {{level}}!",
+    "activity_success": "Отримано: {{exp}} досвіду, {{soms}} сомів",
+    "activity_penalty": "Невдача! Втрачено {{soms}} сомів"
+  },
+  "stats": {
+    "hunger": "Голод",
+    "health": "Здоров'я",
+    "mood": "Настрій",
+    "energy": "Енергія"
+  },
+  "ui": {
+    "loading": "Завантаження...",
+    "error": "Помилка",
+    "success": "Успіх",
+    "confirm": "Підтвердити",
+    "cancel": "Скасувати",
+    "close": "Закрити",
+    "save": "Зберегти"
+  },
+  "auth": {
+    "login": "Увійти",
+    "logout": "Вийти",
+    "login_with_google": "Увійти через Google",
+    "welcome": "Ласкаво просимо"
+  },
+  "cities": {
+    "select": "Оберіть місто",
+    "samarkand": "Самарканд",
+    "shymkent": "Шимкент",
+    "tashkent": "Ташкент",
+    "bukhara": "Бухара",
+    "players": "гравців",
+    "full": "Заповнено"
+  },
+  "leaderboard": {
+    "title": "Рейтинг",
+    "global": "Глобальний",
+    "city": "Міський",
+    "rank": "Місце",
+    "player": "Гравець",
+    "level": "Рівень",
+    "soms": "Соми"
+  },
+  "referral": {
+    "title": "Запросити друзів",
+    "code": "Ваш реферальний код",
+    "link": "Реферальне посилання",
+    "copy": "Копіювати",
+    "copied": "Скопійовано!",
+    "referred_players": "Запрошені гравці"
+  },
+  "donation": {
+    "title": "Підтримати гру",
+    "crystals": "кристалів",
+    "bonus": "Бонус {{percent}}%",
+    "donate": "Донат"
+  },
+  "cosmetics": {
+    "title": "Косметика",
+    "clothing": "Одяг",
+    "backgrounds": "Фони",
+    "purchase": "Купити",
+    "equip": "Одягнути",
+    "equipped": "Одягнено",
+    "not_enough_currency": "Недостатньо кристалів"
+  },
+  "language": {
+    "select": "Оберіть мову",
+    "ru": "Русский",
+    "uz": "O'zbekcha",
+    "uk": "Українська",
+    "en": "English"
+  }
+}
