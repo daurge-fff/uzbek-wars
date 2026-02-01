@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { createPortal } from 'react-dom';
 
 interface PlayerStats {
   level: number;
@@ -228,8 +229,9 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
       </div>
 
       {/* Edit Profile Modal */}
-      <AnimatePresence>
-        {showEditModal && (
+      {createPortal(
+        <AnimatePresence>
+          {showEditModal && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
@@ -312,11 +314,14 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
             </div>
           </>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+    )}
 
       {/* Verify Modal */}
-      <AnimatePresence>
-        {showVerifyModal && (
+      {createPortal(
+        <AnimatePresence>
+          {showVerifyModal && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
@@ -427,11 +432,14 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
             </div>
           </>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+    )}
 
       {/* Telegram Opening Modal */}
-      <AnimatePresence>
-        {showTelegramModal && (
+      {createPortal(
+        <AnimatePresence>
+          {showTelegramModal && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
@@ -551,7 +559,9 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
             </div>
           </>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+    )}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { createPortal } from 'react-dom';
 
 interface ActivityResultProps {
   isOpen: boolean;
@@ -21,7 +22,7 @@ interface ActivityResultProps {
 export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps) => {
   const { t } = useTranslation();
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -123,6 +124,7 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

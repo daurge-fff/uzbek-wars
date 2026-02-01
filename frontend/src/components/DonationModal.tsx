@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getCachedRates, convertCurrency } from '../utils/currencyConverter';
+import { createPortal } from 'react-dom';
 
 type Currency = 'USD' | 'RUB' | 'UZS' | 'UAH';
 
@@ -67,7 +68,7 @@ export const DonationModal = ({ isOpen, onClose, onDonate }: DonationModalProps)
     return `${currencySymbols[currency]}${converted.toLocaleString()}`;
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -76,16 +77,17 @@ export const DonationModal = ({ isOpen, onClose, onDonate }: DonationModalProps)
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
           />
           
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[500px] md:max-h-[80vh] bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl z-50 overflow-hidden"
-          >
+          <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="w-full max-w-[500px] max-h-[80vh] bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl pointer-events-auto overflow-hidden"
+            >
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
@@ -208,9 +210,11 @@ export const DonationModal = ({ isOpen, onClose, onDonate }: DonationModalProps)
                 </p>
               </div>
             </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

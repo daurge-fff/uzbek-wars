@@ -5,6 +5,7 @@ import { GoogleLoginButton } from './GoogleLoginButton';
 import { CharacterSelection } from './CharacterSelection';
 import { CitySelection } from './CitySelection';
 import axios from 'axios';
+import { createPortal } from 'react-dom';
 
 type OnboardingStep = 'auth' | 'character' | 'city' | 'complete';
 
@@ -215,7 +216,7 @@ export const OnboardingFlow = () => {
         )}
       </AnimatePresence>
 
-      {loading && (
+      {loading && createPortal(
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <motion.div
             animate={{ rotate: 360 }}
@@ -224,7 +225,8 @@ export const OnboardingFlow = () => {
           >
             ⏳
           </motion.div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

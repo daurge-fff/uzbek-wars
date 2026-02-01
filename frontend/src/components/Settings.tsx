@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
+import { createPortal } from 'react-dom';
 
 interface SettingsProps {
   currentLanguage: 'ru' | 'uz' | 'uk' | 'en';
@@ -236,8 +237,9 @@ export const Settings = ({
         </motion.div>
 
         {/* Developer Modal */}
-        <AnimatePresence>
-          {showDeveloperModal && (
+        {createPortal(
+          <AnimatePresence>
+            {showDeveloperModal && (
             <>
               <motion.div
                 initial={{ opacity: 0 }}
@@ -331,7 +333,9 @@ export const Settings = ({
               </div>
             </>
           )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
       </div>
     </div>
   );
