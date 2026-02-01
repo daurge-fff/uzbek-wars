@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
 import { GoogleLoginButton } from './GoogleLoginButton';
 import { CharacterSelection } from './CharacterSelection';
 import { CitySelection } from './CitySelection';
@@ -27,12 +29,21 @@ interface City {
 
 export const OnboardingFlow = () => {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   const [step, setStep] = useState<OnboardingStep>('auth');
   const [token, setToken] = useState<string>('');
   const [characters, setCharacters] = useState<Character[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [selectedCharacter, setSelectedCharacter] = useState<string>('');
   const [loading, setLoading] = useState(false);
+
+  const languages = [
+    { code: 'ru', flag: '🇷🇺' },
+    { code: 'uz', flag: '🇺🇿' },
+    { code: 'uk', flag: '🇺🇦' },
+    { code: 'en', flag: '🇬🇧' }
+  ];
 
   const handleGoogleLogin = async (idToken: string) => {
     try {
@@ -129,6 +140,40 @@ export const OnboardingFlow = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
+      {/* Theme and Language Switchers - Fixed Position */}
+      {step !== 'character' && (
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+          {/* Theme Toggle */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={toggleTheme}
+            className="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-full shadow-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-2xl"
+          >
+            {theme === 'dark' ? '🌙' : '☀️'}
+          </motion.button>
+
+          {/* Language Switcher */}
+          <div className="flex gap-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-full shadow-lg border border-gray-200 dark:border-gray-700 p-1">
+            {languages.map((lang) => (
+              <motion.button
+                key={lang.code}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => i18n.changeLanguage(lang.code)}
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all ${
+                  i18n.language === lang.code
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 shadow-md'
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                {lang.flag}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
         {step === 'auth' && (
           <motion.div
@@ -146,10 +191,10 @@ export const OnboardingFlow = () => {
                 className="text-center mb-8"
               >
                 <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-4">
-                  Узбек Варс
+                  {t('app.logo')} {t('app.name')}
                 </h1>
                 <p className="text-gray-600 dark:text-gray-300 text-lg">
-                  Добро пожаловать в игру!
+                  {t('app.welcome')}
                 </p>
               </motion.div>
               <GoogleLoginButton onSuccess={handleGoogleLogin} />
@@ -206,10 +251,10 @@ export const OnboardingFlow = () => {
                 🎉
               </motion.div>
               <h2 className="text-4xl font-black bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent mb-4">
-                Регистрация завершена!
+                {t('app.registrationComplete')}
               </h2>
               <p className="text-gray-600 dark:text-gray-300 text-lg">
-                Перенаправление в игру...
+                {t('app.redirecting')}
               </p>
             </div>
           </motion.div>

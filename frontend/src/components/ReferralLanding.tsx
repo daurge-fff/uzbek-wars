@@ -1,10 +1,14 @@
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
 
 export const ReferralLanding = () => {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   const [referrerInfo, setReferrerInfo] = useState<any>(null);
 
   useEffect(() => {
@@ -26,8 +30,47 @@ export const ReferralLanding = () => {
     navigate('/auth');
   };
 
+  const languages = [
+    { code: 'ru', flag: '🇷🇺' },
+    { code: 'uz', flag: '🇺🇿' },
+    { code: 'uk', flag: '🇺🇦' },
+    { code: 'en', flag: '🇬🇧' }
+  ];
+
   return (
-    <div className="max-w-md w-full">
+    <div className="max-w-md w-full relative">
+      {/* Theme and Language Switchers */}
+      <div className="absolute -top-16 right-0 flex items-center gap-2">
+        {/* Theme Toggle */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={toggleTheme}
+          className="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-full shadow-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-2xl"
+        >
+          {theme === 'dark' ? '🌙' : '☀️'}
+        </motion.button>
+
+        {/* Language Switcher */}
+        <div className="flex gap-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-full shadow-lg border border-gray-200 dark:border-gray-700 p-1">
+          {languages.map((lang) => (
+            <motion.button
+              key={lang.code}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => i18n.changeLanguage(lang.code)}
+              className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all ${
+                i18n.language === lang.code
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 shadow-md'
+                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+            >
+              {lang.flag}
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -43,10 +86,10 @@ export const ReferralLanding = () => {
           >
             <div className="text-7xl mb-4">{referrerInfo.avatar}</div>
             <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">
-              {referrerInfo.username} пригласил вас!
+              {t('referral.invitedBy', { username: referrerInfo.username })}
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              Присоединяйтесь к Узбек Варс
+              {t('referral.joinGame')}
             </p>
           </motion.div>
         )}
@@ -63,10 +106,10 @@ export const ReferralLanding = () => {
               <span className="text-3xl">🎁</span>
               <div>
                 <div className="font-bold text-gray-900 dark:text-white text-sm">
-                  Бонус при регистрации
+                  {t('referral.signupBonus')}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">
-                  Получите стартовые ресурсы
+                  {t('referral.startResources')}
                 </div>
               </div>
             </div>
@@ -77,10 +120,10 @@ export const ReferralLanding = () => {
               <span className="text-3xl">👥</span>
               <div>
                 <div className="font-bold text-gray-900 dark:text-white text-sm">
-                  Играйте вместе
+                  {t('referral.playTogether')}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">
-                  Присоединитесь к городу друга
+                  {t('referral.joinFriendCity')}
                 </div>
               </div>
             </div>
@@ -91,10 +134,10 @@ export const ReferralLanding = () => {
               <span className="text-3xl">⭐</span>
               <div>
                 <div className="font-bold text-gray-900 dark:text-white text-sm">
-                  Эксклюзивные награды
+                  {t('referral.exclusiveRewards')}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">
-                  Специальные бонусы для рефералов
+                  {t('referral.specialBonuses')}
                 </div>
               </div>
             </div>
@@ -108,7 +151,7 @@ export const ReferralLanding = () => {
           onClick={handleLogin}
           className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black rounded-full shadow-lg text-lg"
         >
-          🚀 Начать играть
+          🚀 {t('referral.startPlaying')}
         </motion.button>
 
         {/* Referral Code Display */}
@@ -120,7 +163,7 @@ export const ReferralLanding = () => {
             className="mt-4 text-center"
           >
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Реферальный код: <span className="font-bold">{code}</span>
+              {t('referral.code')}: <span className="font-bold">{code}</span>
             </p>
           </motion.div>
         )}

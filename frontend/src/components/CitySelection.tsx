@@ -125,7 +125,7 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
         transition={{ delay: 0.1 }}
         className="text-gray-600 dark:text-gray-300 mb-2 font-medium transition-colors"
       >
-        Свайпните влево или вправо
+        {t('app.swipeHint')}
       </motion.p>
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}

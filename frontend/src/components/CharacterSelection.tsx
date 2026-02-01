@@ -22,9 +22,69 @@ const wrap = (min: number, max: number, v: number) => {
 export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionProps) => {
   const [[page, direction], setPage] = useState([0, 0]);
   const { t } = useTranslation();
+  const [username, setUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
 
   const characterIndex = wrap(0, characters.length, page);
   const currentCharacter = characters[characterIndex];
+
+  // Валидация имени пользователя
+  const validateUsername = (name: string): string => {
+    // Только русские, английские буквы, цифры, дефис и пробел
+    const validCharsRegex = /^[a-zA-Zа-яА-ЯёЁ0-9\s-]+$/;
+    
+    if (name.length < 6) {
+      return t('validation.usernameTooShort') || 'Минимум 6 символов';
+    }
+    
+    if (name.length > 20) {
+      return t('validation.usernameTooLong') || 'Максимум 20 символов';
+    }
+    
+    if (!validCharsRegex.test(name)) {
+      return t('validation.usernameInvalidChars') || 'Только русские/английские буквы, цифры, дефис и пробел';
+    }
+    
+    // Не может состоять только из цифр
+    if (/^\d+$/.test(name)) {
+      return t('validation.usernameOnlyNumbers') || 'Имя не может состоять только из цифр';
+    }
+    
+    // Не может состоять только из пробелов
+    if (/^\s+$/.test(name)) {
+      return t('validation.usernameOnlySpaces') || 'Имя не может состоять только из пробелов';
+    }
+    
+    // Не может содержать два пробела подряд
+    if (/\s{2,}/.test(name)) {
+      return t('validation.usernameDoubleSpaces') || 'Имя не может содержать два пробела подряд';
+    }
+    
+    return '';
+  };
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUsername(value);
+    
+    if (value) {
+      const error = validateUsername(value);
+      setUsernameError(error);
+    } else {
+      setUsernameError('');
+    }
+  };
+
+  const handleConfirm = () => {
+    const error = validateUsername(username);
+    if (error) {
+      setUsernameError(error);
+      return;
+    }
+    
+    // Передаем и ID персонажа и имя пользователя
+    onSelect(currentCharacter.id);
+  };
 
   const swipeConfidenceThreshold = 5000;
   const swipePower = (offset: number, velocity: number) => {
@@ -90,7 +150,7 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
         transition={{ delay: 0.1 }}
         className="text-gray-600 dark:text-gray-300 mb-2 font-medium transition-colors"
       >
-        Свайпните влево или вправо
+        {t('app.swipeHint')}
       </motion.p>
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
@@ -197,11 +257,51 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
         ))}
       </div>
 
+      {/* Username Input */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="w-full max-w-sm mb-6"
+      >
+        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+          {t('character.enterUsername') || 'Введите имя персонажа'}
+        </label>
+        <input
+          type="text"
+          value={username}
+          onChange={handleUsernameChange}
+          placeholder={t('character.usernamePlaceholder') || 'Ваше имя'}
+          className={`w-full px-4 py-3 rounded-[20px] border-2 font-medium transition-all ${
+            usernameError
+              ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+              : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+          } text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+        />
+        {usernameError && (
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-2 text-sm text-red-600 dark:text-red-400 font-medium"
+          >
+            ⚠️ {usernameError}
+          </motion.p>
+        )}
+        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+          {t('character.usernameHint') || '6-20 символов: русские/английские буквы, цифры, дефис'}
+        </p>
+      </motion.div>
+
       <motion.button
-        onClick={() => onSelect(currentCharacter.id)}
-        whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(99, 102, 241, 0.3)' }}
-        whileTap={{ scale: 0.95 }}
-        className="min-h-touch w-full max-w-sm bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-black py-4 px-8 rounded-[24px] shadow-2xl"
+        onClick={handleConfirm}
+        disabled={!username || !!usernameError}
+        whileHover={{ scale: username && !usernameError ? 1.05 : 1 }}
+        whileTap={{ scale: username && !usernameError ? 0.95 : 1 }}
+        className={`min-h-touch w-full max-w-sm font-black py-4 px-8 rounded-[24px] shadow-2xl transition-all ${
+          username && !usernameError
+            ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white cursor-pointer'
+            : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+        }`}
       >
         {t('ui.confirm')}
       </motion.button>

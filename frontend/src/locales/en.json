@@ -2,7 +2,10 @@
   "character": {
     "select": "Select Character",
     "level": "Level",
-    "experience": "Experience"
+    "experience": "Experience",
+    "enterUsername": "Enter character name",
+    "usernamePlaceholder": "Your name",
+    "usernameHint": "6-20 characters: Russian/English letters, numbers, hyphen, space"
   },
   "currency": {
     "soms": "soms",
@@ -82,7 +85,16 @@
     "totalSoms": "Total soms",
     "friends": "Your friends",
     "noFriends": "No one joined yet",
-    "level": "Level"
+    "level": "Level",
+    "invitedBy": "{{username}} invited you!",
+    "joinGame": "Join Uzbek Wars",
+    "signupBonus": "Signup bonus",
+    "startResources": "Get starting resources",
+    "playTogether": "Play together",
+    "joinFriendCity": "Join friend's city",
+    "exclusiveRewards": "Exclusive rewards",
+    "specialBonuses": "Special bonuses for referrals",
+    "startPlaying": "Start playing"
   },
   "donation": {
     "title": "Support the Game",
@@ -190,5 +202,23 @@
   "about": {
     "codeQuality": "Code quality",
     "fastWork": "Fast work"
+  },
+  "validation": {
+    "usernameTooShort": "Minimum 6 characters",
+    "usernameTooLong": "Maximum 20 characters",
+    "usernameInvalidChars": "Only Russian/English letters, numbers, hyphen and space",
+    "usernameOnlyNumbers": "Name cannot consist only of numbers",
+    "usernameOnlySpaces": "Name cannot consist only of spaces",
+    "usernameDoubleSpaces": "Name cannot contain two spaces in a row"
+  },
+  "app": {
+    "name": "Uzbek Wars",
+    "logo": "🏛️",
+    "welcome": "Welcome to the game!",
+    "swipeHint": "Swipe left or right",
+    "registrationComplete": "Registration complete!",
+    "redirecting": "Redirecting to game...",
+    "thankYou": "Thank you for using Uzbek Wars!",
+    "starOnGithub": "If you like the game - give us a ⭐ on GitHub"
   }
 }

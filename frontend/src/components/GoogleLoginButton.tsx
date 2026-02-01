@@ -28,10 +28,6 @@ export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps
     }
   };
 
-  const generateDeviceId = (): string => {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  };
-
   return (
     <button
       onClick={handleGoogleLogin}

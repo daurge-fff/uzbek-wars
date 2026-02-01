@@ -2,7 +2,10 @@
   "character": {
     "select": "Personajni tanlang",
     "level": "Daraja",
-    "experience": "Tajriba"
+    "experience": "Tajriba",
+    "enterUsername": "Personaj nomini kiriting",
+    "usernamePlaceholder": "Sizning ismingiz",
+    "usernameHint": "6-20 belgi: rus/ingliz harflari, raqamlar, defis, bo'sh joy"
   },
   "currency": {
     "soms": "so'm",
@@ -82,7 +85,16 @@
     "totalSoms": "Jami so'mlar",
     "friends": "Sizning do'stlaringiz",
     "noFriends": "Hali hech kim qo'shilmadi",
-    "level": "Daraja"
+    "level": "Daraja",
+    "invitedBy": "{{username}} sizni taklif qildi!",
+    "joinGame": "Uzbek Wars'ga qo'shiling",
+    "signupBonus": "Ro'yxatdan o'tish bonusi",
+    "startResources": "Boshlang'ich resurslarni oling",
+    "playTogether": "Birga o'ynang",
+    "joinFriendCity": "Do'stingizning shahriga qo'shiling",
+    "exclusiveRewards": "Eksklyuziv mukofotlar",
+    "specialBonuses": "Referallar uchun maxsus bonuslar",
+    "startPlaying": "O'ynashni boshlash"
   },
   "donation": {
     "title": "O'yinni qo'llab-quvvatlash",
@@ -190,5 +202,23 @@
   "about": {
     "codeQuality": "Kod sifati",
     "fastWork": "Tez ish"
+  },
+  "validation": {
+    "usernameTooShort": "Kamida 6 belgi",
+    "usernameTooLong": "Ko'pi bilan 20 belgi",
+    "usernameInvalidChars": "Faqat rus/ingliz harflari, raqamlar, defis va bo'sh joy",
+    "usernameOnlyNumbers": "Ism faqat raqamlardan iborat bo'lishi mumkin emas",
+    "usernameOnlySpaces": "Ism faqat bo'sh joylardan iborat bo'lishi mumkin emas",
+    "usernameDoubleSpaces": "Ism ketma-ket ikkita bo'sh joy bo'lishi mumkin emas"
+  },
+  "app": {
+    "name": "O'zbek Urushi",
+    "logo": "🏛️",
+    "welcome": "O'yinga xush kelibsiz!",
+    "swipeHint": "Chapga yoki o'ngga suring",
+    "registrationComplete": "Ro'yxatdan o'tish tugallandi!",
+    "redirecting": "O'yinga yo'naltirilmoqda...",
+    "thankYou": "O'zbek Urushi'dan foydalanganingiz uchun rahmat!",
+    "starOnGithub": "Agar o'yin yoqsa - GitHub'da ⭐ qo'ying"
   }
 }

@@ -2,7 +2,10 @@
   "character": {
     "select": "Оберіть персонажа",
     "level": "Рівень",
-    "experience": "Досвід"
+    "experience": "Досвід",
+    "enterUsername": "Введіть ім'я персонажа",
+    "usernamePlaceholder": "Ваше ім'я",
+    "usernameHint": "6-20 символів: російські/англійські літери, цифри, дефіс, пробіл"
   },
   "currency": {
     "soms": "сомів",
@@ -82,7 +85,16 @@
     "totalSoms": "Всього сомів",
     "friends": "Ваші друзі",
     "noFriends": "Поки ніхто не приєднався",
-    "level": "Рівень"
+    "level": "Рівень",
+    "invitedBy": "{{username}} запросив вас!",
+    "joinGame": "Приєднуйтесь до Uzbek Wars",
+    "signupBonus": "Бонус при реєстрації",
+    "startResources": "Отримайте стартові ресурси",
+    "playTogether": "Грайте разом",
+    "joinFriendCity": "Приєднайтесь до міста друга",
+    "exclusiveRewards": "Ексклюзивні нагороди",
+    "specialBonuses": "Спеціальні бонуси для рефералів",
+    "startPlaying": "Почати гру"
   },
   "donation": {
     "title": "Підтримати гру",
@@ -190,5 +202,23 @@
   "about": {
     "codeQuality": "Якість коду",
     "fastWork": "Швидка робота"
+  },
+  "validation": {
+    "usernameTooShort": "Мінімум 6 символів",
+    "usernameTooLong": "Максимум 20 символів",
+    "usernameInvalidChars": "Тільки російські/англійські літери, цифри, дефіс та пробіл",
+    "usernameOnlyNumbers": "Ім'я не може складатися тільки з цифр",
+    "usernameOnlySpaces": "Ім'я не може складатися тільки з пробілів",
+    "usernameDoubleSpaces": "Ім'я не може містити два пробіли підряд"
+  },
+  "app": {
+    "name": "Узбек Варс",
+    "logo": "🏛️",
+    "welcome": "Ласкаво просимо до гри!",
+    "swipeHint": "Свайпніть ліворуч або праворуч",
+    "registrationComplete": "Реєстрація завершена!",
+    "redirecting": "Перенаправлення в гру...",
+    "thankYou": "Дякуємо за використання Узбек Варс!",
+    "starOnGithub": "Якщо подобається гра - поставте ⭐ на GitHub"
   }
 }

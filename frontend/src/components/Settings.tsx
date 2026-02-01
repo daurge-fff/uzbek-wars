@@ -313,8 +313,8 @@ export const Settings = ({
 
                         <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-[20px] border border-yellow-200 dark:border-yellow-800">
                           <p className="text-xs text-gray-700 dark:text-gray-300 text-center">
-                            💝 Спасибо за использование Узбек Варс!<br/>
-                            Если нравится игра - поставь ⭐ на GitHub
+                            💝 {t('app.thankYou')}<br/>
+                            {t('app.starOnGithub')}
                           </p>
                         </div>
                       </div>
@@ -325,7 +325,7 @@ export const Settings = ({
                         onClick={() => setShowDeveloperModal(false)}
                         className="w-full py-3 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-white font-bold rounded-full shadow-lg"
                       >
-                        Закрыть
+                        {t('ui.close')}
                       </motion.button>
                     </div>
                   </div>
