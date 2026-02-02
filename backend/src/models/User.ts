@@ -23,6 +23,7 @@ export interface IUser extends Document {
   googleId: string;
   email: string;
   displayName: string;
+  googleName?: string; // Оригинальное имя из Google
   avatar?: string;
   language: Language;
   ipAddress: string;
@@ -55,6 +56,9 @@ const UserSchema = new Schema<IUser>(
     displayName: {
       type: String,
       required: true,
+    },
+    googleName: {
+      type: String,
     },
     avatar: {
       type: String,

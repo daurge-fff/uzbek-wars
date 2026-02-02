@@ -128,6 +128,7 @@ export async function authenticateWithGoogle(
         googleId: profile.id,
         email: profile.email,
         displayName: profile.displayName,
+        googleName: profile.displayName, // Сохраняем оригинальное имя из Google
         avatar: profile.avatar,
         ipAddress,
         deviceInfo,

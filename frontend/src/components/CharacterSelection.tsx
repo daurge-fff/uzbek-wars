@@ -4,9 +4,19 @@ import { useTranslation } from 'react-i18next';
 
 interface Character {
   id: string;
-  name: string;
+  name: {
+    ru: string;
+    uz: string;
+    uk: string;
+    en: string;
+  };
   avatar: string;
-  description: string;
+  description: {
+    ru: string;
+    uz: string;
+    uk: string;
+    en: string;
+  };
 }
 
 interface CharacterSelectionProps {
@@ -21,7 +31,7 @@ const wrap = (min: number, max: number, v: number) => {
 
 export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionProps) => {
   const [[page, direction], setPage] = useState([0, 0]);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
 
@@ -204,7 +214,7 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
                 transition={{ delay: 0.2 }}
                 className="text-3xl font-black text-gray-900 dark:text-white mb-3 text-center transition-colors"
               >
-                {currentCharacter.name}
+                {currentCharacter.name[i18n.language as keyof typeof currentCharacter.name] || currentCharacter.name.ru}
               </motion.h2>
               <motion.p 
                 initial={{ opacity: 0 }}
@@ -212,7 +222,7 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
                 transition={{ delay: 0.3 }}
                 className="text-gray-600 dark:text-gray-300 text-center leading-relaxed font-medium transition-colors"
               >
-                {currentCharacter.description}
+                {currentCharacter.description[i18n.language as keyof typeof currentCharacter.description] || currentCharacter.description.ru}
               </motion.p>
             </motion.div>
           </motion.div>

@@ -11,13 +11,23 @@ import axios from 'axios';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 
-type OnboardingStep = 'intro' | 'auth' | 'character' | 'city' | 'complete';
+type OnboardingStep = 'intro' | 'auth' | 'name' | 'character' | 'city' | 'complete';
 
 interface Character {
   id: string;
-  name: string;
+  name: {
+    ru: string;
+    uz: string;
+    uk: string;
+    en: string;
+  };
   avatar: string;
-  description: string;
+  description: {
+    ru: string;
+    uz: string;
+    uk: string;
+    en: string;
+  };
 }
 
 interface City {
@@ -66,20 +76,29 @@ export const OnboardingFlow = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, player } = useAuth();
   const [step, setStep] = useState<OnboardingStep>('intro');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [characters, setCharacters] = useState<Character[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [selectedCharacter, setSelectedCharacter] = useState<string>('');
+  const [selectedName, setSelectedName] = useState<string>('');
+  const [nameError, setNameError] = useState<string>('');
+  const [nameChecking, setNameChecking] = useState<boolean>(false);
+  const [googleUser, setGoogleUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated and has character/city
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
+    if (isAuthenticated && player) {
+      const hasCharacter = player.characterId && player.characterId !== 'default';
+      const hasCity = player.cityId && player.cityId !== 'default';
+      
+      if (hasCharacter && hasCity) {
+        navigate('/dashboard');
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, player, navigate]);
 
   const languages = [
     { code: 'ru', flag: '🇷🇺' },
@@ -122,18 +141,19 @@ export const OnboardingFlow = () => {
       
       // Save to auth context
       login(token, user, player);
+      setGoogleUser(user);
+
+      console.log('Player after login:', player);
 
       // Проверяем нужно ли выбрать персонажа и город
       const needsCharacter = !player.characterId || player.characterId === 'default';
       const needsCity = !player.cityId || player.cityId === 'default';
 
       if (needsCharacter || needsCity) {
-        // Load characters for selection
-        const charsResponse = await axios.get(`${API_URL}/api/characters`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setCharacters(charsResponse.data);
-        setStep('character');
+        // Подставляем имя из Google аккаунта
+        const suggestedName = user.displayName || '';
+        setSelectedName(suggestedName);
+        setStep('name');
       } else {
         // User already has character and city, go to dashboard
         toast.success(t('auth.welcome', 'Добро пожаловать') + ', ' + user.displayName + '!');
@@ -144,6 +164,108 @@ export const OnboardingFlow = () => {
       toast.error(error.response?.data?.message || t('auth.loginError', 'Ошибка входа. Попробуйте снова.'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const validateName = (name: string): boolean => {
+    // Обрезаем пробелы в начале и конце
+    const trimmedName = name.trim();
+    
+    // Минимум 3 символа, максимум 20
+    if (trimmedName.length < 3) {
+      setNameError(t('name.tooShort', 'Имя должно быть не менее 3 символов'));
+      return false;
+    }
+    if (trimmedName.length > 20) {
+      setNameError(t('name.tooLong', 'Имя должно быть не более 20 символов'));
+      return false;
+    }
+    
+    // Проверка на два и более пробелов подряд
+    if (/\s{2,}/.test(trimmedName)) {
+      setNameError(t('name.multipleSpaces', 'Имя не может содержать несколько пробелов подряд'));
+      return false;
+    }
+    
+    // Проверка что не только из цифр
+    if (/^\d+$/.test(trimmedName)) {
+      setNameError(t('name.onlyNumbers', 'Имя не может состоять только из цифр'));
+      return false;
+    }
+    
+    // Только буквы, цифры, пробелы и дефисы
+    const nameRegex = /^[a-zA-Zа-яА-ЯёЁ0-9\s\-]+$/;
+    if (!nameRegex.test(trimmedName)) {
+      setNameError(t('name.invalidChars', 'Имя может содержать только буквы, цифры, пробелы и дефисы'));
+      return false;
+    }
+    
+    setNameError('');
+    return true;
+  };
+
+  const handleNameSubmit = async () => {
+    // Обрезаем и нормализуем имя
+    const normalizedName = selectedName.trim().replace(/\s+/g, ' ');
+    setSelectedName(normalizedName);
+    
+    if (!validateName(normalizedName)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      
+      // Check if username is available
+      console.log('Checking username availability...');
+      setNameChecking(true);
+      
+      try {
+        const checkResponse = await axios.post(`${API_URL}/api/auth/check-username`, {
+          username: normalizedName
+        });
+        
+        if (!checkResponse.data.available) {
+          setNameError(t('name.taken', 'Это имя уже занято'));
+          setNameChecking(false);
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to check username:', error);
+        // Continue anyway if check fails
+      }
+      
+      setNameChecking(false);
+      
+      console.log('Loading characters from API...');
+      
+      // Load characters for selection
+      const charsResponse = await axios.get(`${API_URL}/api/characters`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }
+      });
+      
+      console.log('Characters response:', charsResponse.data);
+      
+      // API возвращает { characters: [...], count: N }
+      const charactersData = charsResponse.data.characters || charsResponse.data;
+      
+      if (!charactersData || charactersData.length === 0) {
+        console.error('No characters returned from API');
+        toast.error(t('character.loadError', 'Не удалось загрузить персонажей'));
+        return;
+      }
+      
+      setCharacters(charactersData);
+      console.log('Characters set:', charactersData.length, 'characters');
+      setStep('character');
+    } catch (error: any) {
+      console.error('Failed to load characters:', error);
+      toast.error(error.response?.data?.message || t('character.loadError', 'Ошибка загрузки персонажей'));
+    } finally {
+      setLoading(false);
+      setNameChecking(false);
     }
   };
 
@@ -177,13 +299,14 @@ export const OnboardingFlow = () => {
         {
           characterId: selectedCharacter,
           cityId,
+          displayName: selectedName, // Передаем выбранное имя
           referralCode: referralCode || undefined
         }
       );
 
       // Update player in auth context
-      const { player } = response.data;
-      login(localStorage.getItem('auth_token')!, JSON.parse(localStorage.getItem('auth_user')!), player);
+      const { player, user } = response.data;
+      login(localStorage.getItem('auth_token')!, user, player);
 
       localStorage.removeItem('referralCode');
       setStep('complete');
@@ -365,7 +488,80 @@ export const OnboardingFlow = () => {
           </motion.div>
         )}
 
-        {step === 'character' && (
+        {step === 'name' && (
+          <motion.div
+            key="name"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="min-h-screen flex items-center justify-center p-4"
+          >
+            <div className="max-w-md w-full">
+              <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 border border-gray-200 dark:border-gray-700"
+              >
+                <div className="text-center mb-6">
+                  <div className="text-6xl mb-4">👤</div>
+                  <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
+                    {t('name.title', 'Как вас зовут?')}
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {t('name.subtitle', 'Выберите имя для вашего персонажа')}
+                  </p>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    {t('name.label', 'Ваше имя')}
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedName}
+                    onChange={(e) => {
+                      setSelectedName(e.target.value);
+                      if (nameError) validateName(e.target.value);
+                    }}
+                    onBlur={() => validateName(selectedName)}
+                    maxLength={20}
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${
+                      nameError
+                        ? 'border-red-500 focus:border-red-600'
+                        : 'border-gray-300 dark:border-gray-600 focus:border-indigo-500'
+                    } bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-bold text-lg focus:outline-none transition-colors`}
+                    placeholder={t('name.placeholder', 'Введите имя')}
+                  />
+                  {nameError && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-red-500 text-sm mt-2 font-semibold"
+                    >
+                      {nameError}
+                    </motion.p>
+                  )}
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
+                    {t('name.hint', '3-20 символов, буквы, цифры, пробелы и дефисы')}
+                  </p>
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleNameSubmit}
+                  disabled={loading || nameChecking || !selectedName || !!nameError}
+                  className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-black rounded-xl shadow-lg text-lg transition-all disabled:cursor-not-allowed"
+                >
+                  {nameChecking ? t('name.checking', 'Проверка...') : loading ? t('common.loading', 'Загрузка...') : t('common.continue', 'Продолжить')} →
+                </motion.button>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 'character' && characters.length > 0 && (
           <motion.div
             key="character"
             variants={pageVariants}
@@ -373,10 +569,36 @@ export const OnboardingFlow = () => {
             animate="animate"
             exit="exit"
           >
+            {console.log('Rendering CharacterSelection with', characters.length, 'characters')}
             <CharacterSelection
               characters={characters}
               onSelect={handleCharacterSelect}
             />
+          </motion.div>
+        )}
+
+        {step === 'character' && characters.length === 0 && (
+          <motion.div
+            key="character-loading"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900"
+          >
+            {console.log('Showing character loading screen')}
+            <div className="text-center">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                className="text-6xl mb-4"
+              >
+                ⏳
+              </motion.div>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
+                {t('character.loading', 'Загрузка персонажей...')}
+              </p>
+            </div>
           </motion.div>
         )}
 

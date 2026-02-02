@@ -64,7 +64,27 @@
     "logout": "Logout",
     "login_with_google": "Login with Google",
     "logging_in": "Logging in...",
-    "welcome": "Welcome"
+    "welcome": "Welcome",
+    "loginError": "Login error. Try again.",
+    "loginRequired": "Please login, uzbek! 👆",
+    "loginToPlay": "Login to start playing",
+    "loggingOut": "Logging out...",
+    "redirectingHome": "Redirecting to home...",
+    "loadingGoogle": "Loading Google...",
+    "clickToLogin": "Click the button to login",
+    "googleScriptError": "Failed to load Google. Check your internet connection.",
+    "googleNotLoaded": "Google not loaded. Refresh the page.",
+    "googleNotConfigured": "Google OAuth not configured. Add VITE_GOOGLE_CLIENT_ID to .env",
+    "userInfoError": "Failed to get user information",
+    "tokenError": "Token error",
+    "oauthError": "OAuth error",
+    "loggingOut": "Logging out...",
+    "redirectingHome": "Redirecting to home..."
+  },
+  "character": {
+    "loading": "Loading characters...",
+    "loadError": "Failed to load characters",
+    "selectError": "Registration error"
   },
   "cities": {
     "select": "Select City",
@@ -179,6 +199,7 @@
     "unequip": "Unequip"
   },
   "menu": {
+    "title": "Game Sections",
     "game": "Game",
     "gameDesc": "Start playing",
     "leaderboard": "Leaderboard",
@@ -199,7 +220,23 @@
     "healthDesc": "Server status"
   },
   "common": {
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "loading": "Loading..."
+  },
+  "name": {
+    "title": "What's your name?",
+    "subtitle": "Choose a name for your character",
+    "label": "Your name",
+    "placeholder": "Enter name",
+    "hint": "3-20 characters, letters, numbers, spaces and hyphens",
+    "tooShort": "Name must be at least 3 characters",
+    "tooLong": "Name must be no more than 20 characters",
+    "invalidChars": "Name can only contain letters, numbers, spaces and hyphens",
+    "multipleSpaces": "Name cannot contain multiple spaces in a row",
+    "onlyNumbers": "Name cannot consist only of numbers",
+    "taken": "This name is already taken",
+    "checking": "Checking..."
   },
   "profile": {
     "joined": "Joined",
@@ -340,7 +377,7 @@
     "usernameDoubleSpaces": "Name cannot contain two spaces in a row"
   },
   "app": {
-    "name": "Uzbek Wars",
+    "name": "UZBEK WARS",
     "logo": "🏛️",
     "welcome": "Welcome to the game!",
     "swipeHint": "Swipe left or right",
@@ -377,6 +414,9 @@
     "feature3Desc": "Trade, fight, develop",
     "feature4": "Compete",
     "feature4Desc": "Become the best in the ranking",
-    "explore": "Explore the World"
+    "explore": "Explore the World",
+    "yourProgress": "Your Progress",
+    "madeWith": "Made with",
+    "inUzbekistan": "in Uzbekistan"
   }
 }

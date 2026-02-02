@@ -199,7 +199,23 @@
     "healthDesc": "Server holati"
   },
   "common": {
-    "cancel": "Bekor qilish"
+    "cancel": "Bekor qilish",
+    "continue": "Davom etish",
+    "loading": "Yuklanmoqda..."
+  },
+  "name": {
+    "title": "Ismingiz nima?",
+    "subtitle": "Personajingiz uchun ism tanlang",
+    "label": "Sizning ismingiz",
+    "placeholder": "Ismni kiriting",
+    "hint": "3-20 belgi, harflar, raqamlar, bo'sh joylar va defislar",
+    "tooShort": "Ism kamida 3 belgidan iborat bo'lishi kerak",
+    "tooLong": "Ism 20 belgidan oshmasligi kerak",
+    "invalidChars": "Ism faqat harflar, raqamlar, bo'sh joylar va defislardan iborat bo'lishi mumkin",
+    "multipleSpaces": "Ism ketma-ket bir nechta bo'sh joylarni o'z ichiga olmaydi",
+    "onlyNumbers": "Ism faqat raqamlardan iborat bo'lishi mumkin emas",
+    "taken": "Bu ism allaqachon band",
+    "checking": "Tekshirilmoqda..."
   },
   "profile": {
     "joined": "O'yinda",
@@ -340,7 +356,7 @@
     "usernameDoubleSpaces": "Ism ketma-ket ikkita bo'sh joy bo'lishi mumkin emas"
   },
   "app": {
-    "name": "O'zbek Urushi",
+    "name": "UZBEK WARS",
     "logo": "🏛️",
     "welcome": "O'yinga xush kelibsiz!",
     "swipeHint": "Chapga yoki o'ngga suring",

@@ -123,7 +123,7 @@ router.post(
       }
       
       // Validate request body
-      const { characterId, cityId, referralCode } = req.body as ISelectCharacterRequest;
+      const { characterId, cityId, referralCode, displayName } = req.body as ISelectCharacterRequest;
       
       if (!characterId || !cityId) {
         res.status(400).json({
@@ -139,9 +139,20 @@ router.post(
         cityId,
         referralCode
       });
+
+      // Update user displayName if provided
+      if (displayName && displayName.trim()) {
+        const User = (await import('../models/User')).User;
+        await User.findByIdAndUpdate(userId, { displayName: displayName.trim() });
+      }
+
+      // Get updated user
+      const User = (await import('../models/User')).User;
+      const user = await User.findById(userId).select('-password');
       
       res.status(201).json({
         player,
+        user,
         message: 'Character selected successfully'
       });
     } catch (error) {

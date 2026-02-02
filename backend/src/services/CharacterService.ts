@@ -40,6 +40,7 @@ export interface ISelectCharacterRequest {
   characterId: string;
   cityId: string;
   referralCode?: string;
+  displayName?: string;
 }
 
 /**

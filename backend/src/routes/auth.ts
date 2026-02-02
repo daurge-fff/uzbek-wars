@@ -318,4 +318,47 @@ async function verifyGoogleToken(idToken: string): Promise<{
   }
 }
 
+/**
+ * POST /api/auth/check-username
+ * Check if username is available
+ */
+router.post('/check-username', async (req: Request, res: Response) => {
+  try {
+    const { username } = req.body;
+
+    if (!username || typeof username !== 'string') {
+      return res.status(400).json({ 
+        available: false, 
+        error: 'Username is required' 
+      });
+    }
+
+    // Normalize username
+    const normalizedUsername = username.trim().toLowerCase();
+
+    if (normalizedUsername.length < 3 || normalizedUsername.length > 20) {
+      return res.status(400).json({ 
+        available: false, 
+        error: 'Username must be 3-20 characters' 
+      });
+    }
+
+    // Check if username exists (case-insensitive)
+    const existingUser = await User.findOne({ 
+      displayName: { $regex: new RegExp(`^${normalizedUsername}$`, 'i') }
+    });
+
+    res.json({ 
+      available: !existingUser,
+      message: existingUser ? 'Username already taken' : 'Username available'
+    });
+  } catch (error) {
+    logger.error('Check username error:', error);
+    res.status(500).json({ 
+      available: false, 
+      error: 'Failed to check username' 
+    });
+  }
+});
+
 export default router;

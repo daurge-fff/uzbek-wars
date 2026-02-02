@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth';
 import { Player } from '../models/Player';
 
 const router = Router();
@@ -76,7 +76,7 @@ const COSMETIC_ITEMS = [
  * GET /api/cosmetics
  * Get all cosmetic items with ownership status
  */
-router.get('/', authenticateToken, async (req: Request, res: Response) => {
+router.get('/', authenticate, async (req: Request, res: Response) => {
   try {
     const player = await Player.findOne({ userId: req.user!.userId });
     
@@ -108,7 +108,7 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
  * POST /api/cosmetics/purchase
  * Purchase a cosmetic item
  */
-router.post('/purchase', authenticateToken, async (req: Request, res: Response) => {
+router.post('/purchase', authenticate, async (req: Request, res: Response) => {
   try {
     const { itemId, currency } = req.body;
 
@@ -185,7 +185,7 @@ router.post('/purchase', authenticateToken, async (req: Request, res: Response) 
  * POST /api/cosmetics/equip
  * Equip a cosmetic item
  */
-router.post('/equip', authenticateToken, async (req: Request, res: Response) => {
+router.post('/equip', authenticate, async (req: Request, res: Response) => {
   try {
     const { itemId } = req.body;
 
@@ -243,7 +243,7 @@ router.post('/equip', authenticateToken, async (req: Request, res: Response) => 
  * POST /api/cosmetics/unequip
  * Unequip a cosmetic item
  */
-router.post('/unequip', authenticateToken, async (req: Request, res: Response) => {
+router.post('/unequip', authenticate, async (req: Request, res: Response) => {
   try {
     const { itemId } = req.body;
 
