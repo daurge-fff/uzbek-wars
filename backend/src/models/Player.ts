@@ -13,13 +13,15 @@ export interface IPlayerStats {
 
 /**
  * Cosmetic items owned and equipped by the player
- * Purchased with donation currency (crystals)
+ * Purchased with soms or donation currency (crystals)
  */
 export interface IPlayerCosmetics {
   clothing: string[];
   backgrounds: string[];
+  accessories: string[];
   activeClothing?: string;
   activeBackground?: string;
+  activeAccessory?: string;
 }
 
 /**
@@ -120,8 +122,10 @@ const PlayerSchema = new Schema<IPlayer>(
     cosmetics: {
       clothing: [{ type: String }],
       backgrounds: [{ type: String }],
+      accessories: [{ type: String }],
       activeClothing: { type: String },
       activeBackground: { type: String },
+      activeAccessory: { type: String },
     },
     referralCode: {
       type: String,

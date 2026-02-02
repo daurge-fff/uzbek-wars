@@ -157,7 +157,14 @@
       "legendary": "Legendary"
     },
     "equip": "Equip",
-    "equipped": "Equipped"
+    "equipped": "Equipped",
+    "buy": "Buy",
+    "owned": "Owned",
+    "notEnoughSoms": "Not enough soms",
+    "notEnoughCrystals": "Not enough crystals",
+    "purchaseSuccess": "Purchase successful!",
+    "equipSuccess": "Equipped!",
+    "noItems": "Items coming soon"
   },
   "profile": {
     "joined": "Joined",

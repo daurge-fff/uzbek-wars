@@ -157,7 +157,14 @@
       "legendary": "Afsonaviy"
     },
     "equip": "Kiyish",
-    "equipped": "Kiyilgan"
+    "equipped": "Kiyilgan",
+    "buy": "Sotib olish",
+    "owned": "Sotib olingan",
+    "notEnoughSoms": "So'm yetarli emas",
+    "notEnoughCrystals": "Kristallar yetarli emas",
+    "purchaseSuccess": "Sotib olish muvaffaqiyatli!",
+    "equipSuccess": "Kiyildi!",
+    "noItems": "Buyumlar tez orada"
   },
   "profile": {
     "joined": "O'yinda",

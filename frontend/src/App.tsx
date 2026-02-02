@@ -8,6 +8,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,122 +42,6 @@ const queryClient = new QueryClient({
     }
   }
 });
-
-const mockCharacters = [
-  {
-    id: 'char1',
-    name: 'Рустам',
-    avatar: '👨‍🌾',
-    description: 'Трудолюбивый фермер из Самарканда'
-  },
-  {
-    id: 'char2',
-    name: 'Азиза',
-    avatar: '👩‍🍳',
-    description: 'Мастер плова из Ташкента'
-  },
-  {
-    id: 'char3',
-    name: 'Тимур',
-    avatar: '👨‍💼',
-    description: 'Предприниматель из Бухары'
-  },
-  {
-    id: 'char4',
-    name: 'Жасур',
-    avatar: '👨‍🔧',
-    description: 'Мастер на все руки из Андижана'
-  },
-  {
-    id: 'char5',
-    name: 'Малика',
-    avatar: '👩‍🎨',
-    description: 'Художница из Намангана'
-  }
-];
-
-const mockCities = [
-  {
-    cityId: 'samarkand',
-    name: { ru: 'Самарканд', uz: 'Samarqand', uk: 'Самарканд', en: 'Samarkand' },
-    playerCount: 450,
-    maxPlayers: 1000,
-    isOpen: true,
-    theme: { primaryColor: '#4A90E2', backgroundImage: '' }
-  },
-  {
-    cityId: 'tashkent',
-    name: { ru: 'Ташкент', uz: 'Toshkent', uk: 'Ташкент', en: 'Tashkent' },
-    playerCount: 850,
-    maxPlayers: 1000,
-    isOpen: true,
-    theme: { primaryColor: '#50C878', backgroundImage: '' }
-  },
-  {
-    cityId: 'bukhara',
-    name: { ru: 'Бухара', uz: 'Buxoro', uk: 'Бухара', en: 'Bukhara' },
-    playerCount: 1000,
-    maxPlayers: 1000,
-    isOpen: false,
-    theme: { primaryColor: '#DAA520', backgroundImage: '' }
-  },
-  {
-    cityId: 'andijan',
-    name: { ru: 'Андижан', uz: 'Andijon', uk: 'Андіжан', en: 'Andijan' },
-    playerCount: 300,
-    maxPlayers: 1000,
-    isOpen: true,
-    theme: { primaryColor: '#E24A4A', backgroundImage: '' }
-  },
-  {
-    cityId: 'namangan',
-    name: { ru: 'Наманган', uz: 'Namangan', uk: 'Наманган', en: 'Namangan' },
-    playerCount: 550,
-    maxPlayers: 1000,
-    isOpen: true,
-    theme: { primaryColor: '#9B59B6', backgroundImage: '' }
-  }
-];
-
-const mockCosmetics = [
-  { id: 'hat1', name: 'Тюбетейка', type: 'clothing' as const, rarity: 'common' as const, price: 50, icon: '🎩', owned: false, equipped: false },
-  { id: 'hat2', name: 'Золотая корона', type: 'clothing' as const, rarity: 'legendary' as const, price: 500, icon: '👑', owned: false, equipped: false },
-  { id: 'bg1', name: 'Регистан', type: 'background' as const, rarity: 'epic' as const, price: 200, icon: '🕌', owned: true, equipped: true },
-  { id: 'acc1', name: 'Золотые серьги', type: 'accessory' as const, rarity: 'rare' as const, price: 100, icon: '💍', owned: true, equipped: false }
-];
-
-const mockLeaderboard = [
-  { rank: 1, userId: '1', username: 'Тимур', avatar: '👨‍💼', level: 50, soms: 100000, cityName: 'Бухара', isCurrentPlayer: false },
-  { rank: 2, userId: '2', username: 'Азиза', avatar: '👩‍🍳', level: 45, soms: 85000, cityName: 'Ташкент', isCurrentPlayer: false },
-  { rank: 3, userId: '3', username: 'Рустам', avatar: '👨‍🌾', level: 42, soms: 75000, cityName: 'Самарканд', isCurrentPlayer: true },
-  { rank: 4, userId: '4', username: 'Малика', avatar: '👩‍🎨', level: 40, soms: 70000, cityName: 'Наманган', isCurrentPlayer: false },
-  { rank: 5, userId: '5', username: 'Жасур', avatar: '👨‍🔧', level: 38, soms: 65000, cityName: 'Андижан', isCurrentPlayer: false }
-];
-
-const mockReferrals = [
-  { username: 'Алишер', avatar: '👨‍💻', level: 15, registeredAt: '2024-01-15' },
-  { username: 'Дилноза', avatar: '👩‍🎓', level: 12, registeredAt: '2024-01-20' }
-];
-
-const mockPlayerInfo = {
-  username: 'Рустам',
-  avatar: '👨‍🌾',
-  characterName: 'Трудолюбивый фермер',
-  cityName: 'Самарканд',
-  joinedDate: '2024-01-01',
-  referralCode: 'RUSTAM2024'
-};
-
-const mockPlayerStats = {
-  level: 5,
-  experience: 450,
-  experienceToNextLevel: 506,
-  soms: 1250,
-  crystals: 50,
-  totalActivities: 127,
-  daysPlayed: 15,
-  achievements: 8
-};
 
 function MenuCard({ title, description, icon, to, onClick }: any) {
   const navigate = useNavigate();
@@ -224,10 +109,13 @@ function LogoutPage() {
 }
 
 function HomePage() {
-  const [currentLang, setCurrentLang] = useState<'ru' | 'uz' | 'uk' | 'en'>('ru');
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const handleLanguageChange = (lang: 'ru' | 'uz' | 'uk' | 'en') => {
+    i18n.changeLanguage(lang);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
@@ -316,7 +204,7 @@ function HomePage() {
             </motion.button>
           )}
 
-          {/* Language Switcher */}
+          {/* Language Switcher - компактный */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -324,8 +212,8 @@ function HomePage() {
             className="mb-12"
           >
             <LanguageSwitcher 
-              currentLanguage={currentLang} 
-              onLanguageChange={setCurrentLang}
+              currentLanguage={i18n.language as 'ru' | 'uz' | 'uk' | 'en'} 
+              onLanguageChange={handleLanguageChange}
             />
           </motion.div>
         </motion.div>
@@ -489,10 +377,7 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <CharacterSelection 
-              characters={mockCharacters}
-              onSelect={(id) => console.log('Selected character:', id)}
-            />
+            <CharacterSelectionWithData />
           </motion.div>
         } />
         <Route path="/cities" element={
@@ -504,10 +389,7 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <CitySelection 
-              cities={mockCities}
-              onSelect={(id) => console.log('Selected city:', id)}
-            />
+            <CitySelectionWithData />
           </motion.div>
         } />
         <Route path="/dashboard" element={
@@ -531,12 +413,7 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <CosmeticShop
-              items={mockCosmetics}
-              playerCrystals={150}
-              onPurchase={async (id) => console.log('Purchase:', id)}
-              onEquip={async (id) => console.log('Equip:', id)}
-            />
+            <CosmeticShopWithData />
           </motion.div>
         } />
         <Route path="/leaderboard" element={
@@ -548,11 +425,7 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <Leaderboard
-              players={mockLeaderboard}
-              type="global"
-              onTypeChange={(type) => console.log('Type:', type)}
-            />
+            <LeaderboardWithData />
           </motion.div>
         } />
         <Route path="/referral" element={
@@ -564,12 +437,7 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <ReferralPanel
-              referralCode="RUSTAM2024"
-              referralLink="https://uzbekwars.com/ref/RUSTAM2024"
-              referredFriends={mockReferrals}
-              totalBonus={{ crystals: 100, soms: 1000 }}
-            />
+            <ReferralPanelWithData />
           </motion.div>
         } />
         <Route path="/donate" element={
@@ -609,14 +477,7 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <PlayerProfile
-              playerInfo={mockPlayerInfo}
-              stats={mockPlayerStats}
-              onEditProfile={() => console.log('Edit profile')}
-              isVerified={false}
-              telegramUsername=""
-              onVerify={() => console.log('Verified!')}
-            />
+            <PlayerProfileWithData />
           </motion.div>
         } />
         <Route path="/settings" element={
@@ -635,6 +496,215 @@ function AnimatedRoutes() {
     </AnimatePresence>
   );
 }
+
+import { cosmeticItems } from './data/cosmeticItems';
+
+// Wrapper components with real data
+const CharacterSelectionWithData = () => {
+  const navigate = useNavigate();
+  // TODO: Fetch from API when endpoint is ready
+  const characters = [
+    { id: 'char1', name: 'Farmer', avatar: '👨‍🌾', description: 'Hardworking farmer' },
+    { id: 'char2', name: 'Chef', avatar: '👩‍🍳', description: 'Master chef' },
+    { id: 'char3', name: 'Businessman', avatar: '👨‍💼', description: 'Entrepreneur' },
+    { id: 'char4', name: 'Student', avatar: '👨‍🎓', description: 'Ambitious student' }
+  ];
+  
+  return <CharacterSelection characters={characters} onSelect={(id) => navigate('/cities')} />;
+};
+
+const CitySelectionWithData = () => {
+  const navigate = useNavigate();
+  // TODO: Fetch from API when endpoint is ready
+  const cities = [
+    { cityId: 'tashkent', name: { ru: 'Ташкент', uz: 'Toshkent', uk: 'Ташкент', en: 'Tashkent' }, playerCount: 0, maxPlayers: 1000, isOpen: true, theme: { primaryColor: '#50C878', backgroundImage: '' } },
+    { cityId: 'samarkand', name: { ru: 'Самарканд', uz: 'Samarqand', uk: 'Самарканд', en: 'Samarkand' }, playerCount: 0, maxPlayers: 1000, isOpen: true, theme: { primaryColor: '#4A90E2', backgroundImage: '' } },
+    { cityId: 'bukhara', name: { ru: 'Бухара', uz: 'Buxoro', uk: 'Бухара', en: 'Bukhara' }, playerCount: 0, maxPlayers: 1000, isOpen: true, theme: { primaryColor: '#DAA520', backgroundImage: '' } }
+  ];
+  
+  return <CitySelection cities={cities} onSelect={(id) => navigate('/dashboard')} />;
+};
+
+const CosmeticShopWithData = () => {
+  const { player, updatePlayer } = useAuth();
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    // TODO: Fetch from /api/cosmetics and merge with owned/equipped status
+    // For now, use imported cosmeticItems
+    setItems(cosmeticItems);
+    setLoading(false);
+  }, []);
+  
+  const handlePurchase = async (id: string, currency: 'soms' | 'crystals') => {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    
+    const price = currency === 'soms' ? item.priceSoms : item.priceCrystals;
+    const currentBalance = currency === 'soms' ? (player?.soms || 0) : (player?.donationCurrency || 0);
+    
+    if (currentBalance < price) {
+      throw new Error('Insufficient funds');
+    }
+    
+    // TODO: POST /api/cosmetics/purchase
+    // For now, update locally
+    
+    // Update balance
+    if (currency === 'soms') {
+      updatePlayer({ soms: (player?.soms || 0) - price });
+    } else {
+      updatePlayer({ donationCurrency: (player?.donationCurrency || 0) - price });
+    }
+    
+    // Mark item as owned
+    setItems(prev => prev.map(i => 
+      i.id === id ? { ...i, owned: true } : i
+    ));
+  };
+  
+  const handleEquip = async (id: string) => {
+    // TODO: POST /api/cosmetics/equip
+    // For now, update locally
+    
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    
+    // Unequip all items of the same type, equip selected
+    setItems(prev => prev.map(i => ({
+      ...i,
+      equipped: i.id === id ? true : (i.type === item.type ? false : i.equipped)
+    })));
+  };
+  
+  return (
+    <CosmeticShop
+      items={items}
+      playerCrystals={player?.donationCurrency || 0}
+      playerSoms={player?.soms || 0}
+      onPurchase={handlePurchase}
+      onEquip={handleEquip}
+    />
+  );
+};
+
+const LeaderboardWithData = () => {
+  const [players, setPlayers] = useState<any[]>([]);
+  const [type, setType] = useState<'global' | 'city'>('global');
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        setLoading(true);
+        // TODO: GET /api/leaderboard?type=${type}
+        setPlayers([]);
+      } catch (error) {
+        console.error('Failed to fetch leaderboard:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchLeaderboard();
+  }, [type]);
+  
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  
+  return <Leaderboard players={players} type={type} onTypeChange={setType} />;
+};
+
+const ReferralPanelWithData = () => {
+  const { user } = useAuth();
+  const [referrals, setReferrals] = useState<any[]>([]);
+  const [bonus, setBonus] = useState({ crystals: 0, soms: 0 });
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchReferrals = async () => {
+      try {
+        setLoading(true);
+        // TODO: GET /api/referrals
+        setReferrals([]);
+        setBonus({ crystals: 0, soms: 0 });
+      } catch (error) {
+        console.error('Failed to fetch referrals:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchReferrals();
+  }, []);
+  
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  
+  const referralCode = user?.referralCode || 'LOADING';
+  const referralLink = `${window.location.origin}/ref/${referralCode}`;
+  
+  return (
+    <ReferralPanel
+      referralCode={referralCode}
+      referralLink={referralLink}
+      referredFriends={referrals}
+      totalBonus={bonus}
+    />
+  );
+};
+
+const PlayerProfileWithData = () => {
+  const { user } = useAuth();
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        // TODO: GET /api/player/profile
+        setStats({
+          level: user?.level || 1,
+          experience: user?.experience || 0,
+          experienceToNextLevel: user?.experienceToNextLevel || 100,
+          soms: user?.soms || 0,
+          crystals: user?.donationCurrency || 0,
+          totalActivities: 0,
+          daysPlayed: 0,
+          achievements: 0
+        });
+      } catch (error) {
+        console.error('Failed to fetch profile:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProfile();
+  }, [user]);
+  
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  
+  const playerInfo = {
+    username: user?.displayName || 'Player',
+    avatar: user?.avatar || '👤',
+    characterName: user?.characterId || 'Newbie',
+    cityName: user?.cityId || 'No city',
+    joinedDate: user?.createdAt || new Date().toISOString(),
+    referralCode: user?.referralCode || ''
+  };
+  
+  return (
+    <PlayerProfile
+      playerInfo={playerInfo}
+      stats={stats}
+      onEditProfile={() => console.log('Edit profile')}
+      isVerified={false}
+      telegramUsername=""
+      onVerify={() => console.log('Verified!')}
+    />
+  );
+};
 
 function App() {
   return (

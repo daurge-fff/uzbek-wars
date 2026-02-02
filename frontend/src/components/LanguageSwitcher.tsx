@@ -21,14 +21,14 @@ export const LanguageSwitcher = ({
   const languages: Language[] = ['ru', 'uz', 'uk', 'en'];
 
   return (
-    <div className="flex items-center gap-1 p-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-full shadow-lg border border-gray-200 dark:border-gray-700">
+    <div className="inline-flex items-center gap-0.5 p-0.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-full shadow-lg border border-gray-200 dark:border-gray-700">
       {languages.map((lang) => (
         <motion.button
           key={lang}
           onClick={() => onLanguageChange(lang)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className={`relative px-2 py-1.5 rounded-full transition-all ${
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className={`relative px-2 py-1 rounded-full transition-all ${
             currentLanguage === lang
               ? 'text-white'
               : 'text-gray-600 dark:text-gray-400'
@@ -41,7 +41,7 @@ export const LanguageSwitcher = ({
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             />
           )}
-          <span className="relative text-lg">{languageFlags[lang]}</span>
+          <span className="relative text-base">{languageFlags[lang]}</span>
         </motion.button>
       ))}
     </div>

@@ -123,7 +123,14 @@
       "legendary": "Легендарный"
     },
     "equip": "Надеть",
-    "equipped": "Надето"
+    "equipped": "Надето",
+    "buy": "Купить",
+    "owned": "Куплено",
+    "notEnoughSoms": "Недостаточно сомов",
+    "notEnoughCrystals": "Недостаточно кристаллов",
+    "purchaseSuccess": "Покупка успешна!",
+    "equipSuccess": "Экипировано!",
+    "noItems": "Предметы скоро появятся"
   },
   "referral": {
     "title": "Пригласи друзей",

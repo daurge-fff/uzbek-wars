@@ -158,7 +158,14 @@
       "legendary": "Легендарний"
     },
     "equip": "Одягнути",
-    "equipped": "Одягнено"
+    "equipped": "Одягнено",
+    "buy": "Купити",
+    "owned": "Куплено",
+    "notEnoughSoms": "Недостатньо сомів",
+    "notEnoughCrystals": "Недостатньо кристалів",
+    "purchaseSuccess": "Покупка успішна!",
+    "equipSuccess": "Екіпіровано!",
+    "noItems": "Предмети скоро з'являться"
   },
   "profile": {
     "joined": "У грі з",
