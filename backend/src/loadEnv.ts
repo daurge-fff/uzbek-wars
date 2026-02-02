@@ -7,16 +7,14 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 
-// Try local .env first, then parent directory
-const localEnvPath = path.join(__dirname, '../.env');
-const parentEnvPath = path.join(process.cwd(), '../.env');
+// Load from project root .env
+const rootEnvPath = path.join(__dirname, '../../.env');
 
-if (fs.existsSync(localEnvPath)) {
-  dotenv.config({ path: localEnvPath });
-  console.log(`✅ Loaded .env from: ${localEnvPath}`);
+if (fs.existsSync(rootEnvPath)) {
+  dotenv.config({ path: rootEnvPath });
+  console.log(`✅ Loaded .env from: ${rootEnvPath}`);
 } else {
-  dotenv.config({ path: parentEnvPath });
-  console.log(`✅ Loaded .env from: ${parentEnvPath}`);
+  console.error(`❌ .env file not found at: ${rootEnvPath}`);
 }
 
 // Log JWT_SECRET status

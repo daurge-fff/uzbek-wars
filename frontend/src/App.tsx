@@ -19,7 +19,7 @@ import { ColorPalette } from './components/ColorPalette';
 import { GoogleLoginButton } from './components/GoogleLoginButton';
 import { CharacterSelection } from './components/CharacterSelection';
 import { CitySelection } from './components/CitySelection';
-import { GameDashboard } from './components/GameDashboard';
+import { GameDashboardContainer } from './components/GameDashboardContainer';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { DonationModal } from './components/DonationModal';
 import { CosmeticShop } from './components/CosmeticShop';
@@ -500,11 +500,7 @@ function AnimatedRoutes() {
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
-            <GameDashboard 
-              playerState={mockPlayerState}
-              activities={mockActivities}
-              onActivitySelect={(id) => console.log('Selected activity:', id)}
-            />
+            <GameDashboardContainer />
           </motion.div>
         } />
         <Route path="/shop" element={

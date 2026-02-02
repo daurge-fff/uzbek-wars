@@ -123,7 +123,11 @@ export const OnboardingFlow = () => {
       // Save to auth context
       login(token, user, player);
 
-      if (isNewUser || !player.characterId || player.characterId === 'default') {
+      // Проверяем нужно ли выбрать персонажа и город
+      const needsCharacter = !player.characterId || player.characterId === 'default';
+      const needsCity = !player.cityId || player.cityId === 'default';
+
+      if (needsCharacter || needsCity) {
         // Load characters for selection
         const charsResponse = await axios.get(`${API_URL}/api/characters`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -131,7 +135,7 @@ export const OnboardingFlow = () => {
         setCharacters(charsResponse.data);
         setStep('character');
       } else {
-        // User already has character, go to dashboard
+        // User already has character and city, go to dashboard
         toast.success(t('auth.welcome', 'Добро пожаловать') + ', ' + user.displayName + '!');
         navigate('/dashboard');
       }
