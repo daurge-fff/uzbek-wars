@@ -165,7 +165,42 @@
     "notEnoughCrystals": "Недостатньо кристалів",
     "purchaseSuccess": "Покупка успішна!",
     "equipSuccess": "Екіпіровано!",
-    "noItems": "Предмети скоро з'являться"
+    "noItems": "Предмети скоро з'являться",
+    "bonus": "Бонус",
+    "yourBalance": "Ваш баланс",
+    "buyWithSoms": "Купити за соми",
+    "buyWithCrystals": "Купити за кристали"
+  },
+  "inventory": {
+    "title": "Інвентар",
+    "equipped": "Одягнено",
+    "empty": "Інвентар порожній",
+    "emptyHint": "Купіть предмети в магазині",
+    "equip": "Одягнути",
+    "unequip": "Зняти"
+  },
+  "menu": {
+    "game": "Гра",
+    "gameDesc": "Почати гру",
+    "leaderboard": "Рейтинг",
+    "leaderboardDesc": "Кращі гравці",
+    "referral": "Реферали",
+    "referralDesc": "Запросіть друзів",
+    "shop": "Магазин",
+    "shopDesc": "Купити предмети",
+    "inventory": "Інвентар",
+    "inventoryDesc": "Ваші предмети",
+    "profile": "Профіль",
+    "profileDesc": "Ваш профіль",
+    "settings": "Налаштування",
+    "settingsDesc": "Налаштування гри",
+    "donate": "Донат",
+    "donateDesc": "Підтримати проект",
+    "health": "Здоров'я",
+    "healthDesc": "Статус сервера"
+  },
+  "common": {
+    "cancel": "Скасувати"
   },
   "profile": {
     "joined": "У грі з",

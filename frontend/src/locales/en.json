@@ -164,7 +164,42 @@
     "notEnoughCrystals": "Not enough crystals",
     "purchaseSuccess": "Purchase successful!",
     "equipSuccess": "Equipped!",
-    "noItems": "Items coming soon"
+    "noItems": "Items coming soon",
+    "bonus": "Bonus",
+    "yourBalance": "Your balance",
+    "buyWithSoms": "Buy with soms",
+    "buyWithCrystals": "Buy with crystals"
+  },
+  "inventory": {
+    "title": "Inventory",
+    "equipped": "Equipped",
+    "empty": "Inventory is empty",
+    "emptyHint": "Buy items in the shop",
+    "equip": "Equip",
+    "unequip": "Unequip"
+  },
+  "menu": {
+    "game": "Game",
+    "gameDesc": "Start playing",
+    "leaderboard": "Leaderboard",
+    "leaderboardDesc": "Top players",
+    "referral": "Referrals",
+    "referralDesc": "Invite friends",
+    "shop": "Shop",
+    "shopDesc": "Buy items",
+    "inventory": "Inventory",
+    "inventoryDesc": "Your items",
+    "profile": "Profile",
+    "profileDesc": "Your profile",
+    "settings": "Settings",
+    "settingsDesc": "Game settings",
+    "donate": "Donate",
+    "donateDesc": "Support project",
+    "health": "Health",
+    "healthDesc": "Server status"
+  },
+  "common": {
+    "cancel": "Cancel"
   },
   "profile": {
     "joined": "Joined",

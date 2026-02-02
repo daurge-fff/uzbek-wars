@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import { PurchaseConfirmModal } from './PurchaseConfirmModal';
 
 type CosmeticType = 'clothing' | 'background' | 'accessory';
 type CosmeticRarity = 'common' | 'rare' | 'epic' | 'legendary';
@@ -62,10 +63,14 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
   const { t, i18n } = useTranslation();
   const [filter, setFilter] = useState<CosmeticType | 'all'>('all');
   const [loading, setLoading] = useState<string | null>(null);
+  const [purchaseModal, setPurchaseModal] = useState<{
+    isOpen: boolean;
+    item: CosmeticItem | null;
+  }>({ isOpen: false, item: null });
 
-  const filteredItems = filter === 'all' 
+  const filteredItems = items ? (filter === 'all' 
     ? items 
-    : items.filter(item => item.type === filter);
+    : items.filter(item => item.type === filter)) : [];
 
   const getItemName = (item: CosmeticItem): string => {
     if (typeof item.name === 'object') {
@@ -87,6 +92,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
     try {
       await onPurchase(itemId, currency);
       toast.success(t('cosmetic.purchaseSuccess'));
+      setPurchaseModal({ isOpen: false, item: null });
     } catch (error) {
       toast.error(currency === 'soms' ? t('cosmetic.notEnoughSoms') : t('cosmetic.notEnoughCrystals'));
     } finally {
@@ -102,6 +108,10 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
     } finally {
       setLoading(null);
     }
+  };
+
+  const openPurchaseModal = (item: CosmeticItem) => {
+    setPurchaseModal({ isOpen: true, item });
   };
 
   return (
@@ -156,129 +166,129 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredItems.map((item, index) => {
-              const canAffordSoms = item.priceSoms ? playerSoms >= item.priceSoms : false;
-              const canAffordCrystals = item.priceCrystals ? playerCrystals >= item.priceCrystals : false;
-              
-              return (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 ${rarityBorders[item.rarity]} relative overflow-hidden`}
-                >
-                  {/* Rarity Badge - в правом верхнем углу */}
-                  <div className="absolute top-2 right-2 z-10">
-                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r ${rarityColors[item.rarity]} text-white shadow-lg uppercase tracking-wide`}>
-                      {t(`cosmetic.rarity.${item.rarity}`)}
-                    </span>
-                  </div>
+          <div className="grid gap-4" style={{
+            gridTemplateColumns: filteredItems.length === 1 ? '1fr' : filteredItems.length === 2 ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(280px, 1fr))',
+            maxWidth: filteredItems.length <= 2 ? '900px' : '100%',
+            margin: filteredItems.length <= 2 ? '0 auto' : '0'
+          }}>
+            {filteredItems.map((item, index) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.05 }}
+                className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 ${rarityBorders[item.rarity]} relative overflow-hidden`}
+              >
+                {/* Rarity Badge */}
+                <div className="absolute top-2 right-2 z-10">
+                  <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r ${rarityColors[item.rarity]} text-white shadow-lg uppercase tracking-wide`}>
+                    {t(`cosmetic.rarity.${item.rarity}`)}
+                  </span>
+                </div>
 
-                  {/* Type Emoji с кружком - в левом верхнем углу */}
-                  <div className="absolute top-2 left-2 z-10">
-                    <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center">
-                      <span className="text-lg">
-                        {typeEmojis[item.type]}
-                      </span>
+                {/* Type Emoji */}
+                <div className="absolute top-2 left-2 z-10">
+                  <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center">
+                    <span className="text-lg">{typeEmojis[item.type]}</span>
+                  </div>
+                </div>
+
+                {/* Owned Badge */}
+                {item.owned && (
+                  <div className="absolute top-11 left-2 z-10">
+                    <div className="w-6 h-6 rounded-full bg-green-500 shadow-lg flex items-center justify-center">
+                      <span className="text-white text-xs font-black">✓</span>
                     </div>
                   </div>
+                )}
 
-                  {/* Owned Badge - под type emoji */}
-                  {item.owned && (
-                    <div className="absolute top-11 left-2 z-10">
-                      <div className="w-6 h-6 rounded-full bg-green-500 shadow-lg flex items-center justify-center">
-                        <span className="text-white text-xs font-black">✓</span>
-                      </div>
-                    </div>
+                {/* Item Icon */}
+                <div className={`w-full aspect-square rounded-2xl bg-gradient-to-br ${rarityColors[item.rarity]} flex items-center justify-center text-6xl mb-3 shadow-inner relative overflow-hidden`}>
+                  <motion.div
+                    animate={{ rotate: item.equipped ? [0, 5, -5, 0] : 0 }}
+                    transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
+                  >
+                    {item.icon}
+                  </motion.div>
+                  {item.equipped && (
+                    <div className="absolute inset-0 bg-gradient-to-t from-green-500/30 to-transparent" />
                   )}
+                </div>
 
-                  {/* Item Icon */}
-                  <div className={`w-full aspect-square rounded-2xl bg-gradient-to-br ${rarityColors[item.rarity]} flex items-center justify-center text-6xl mb-3 shadow-inner relative overflow-hidden`}>
-                    <motion.div
-                      animate={{ rotate: item.equipped ? [0, 5, -5, 0] : 0 }}
-                      transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
-                    >
-                      {item.icon}
-                    </motion.div>
-                    {item.equipped && (
-                      <div className="absolute inset-0 bg-gradient-to-t from-green-500/30 to-transparent" />
+                {/* Item Name */}
+                <h3 className="font-black text-gray-900 dark:text-white text-base mb-3 text-center line-clamp-2 min-h-[2.5rem]">
+                  {getItemName(item)}
+                </h3>
+
+                {/* Price Display */}
+                {!item.owned && (
+                  <div className="mb-3 flex gap-2 justify-center">
+                    {item.priceSoms && (
+                      <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-black text-sm shadow-lg">
+                        <span className="text-lg">💰</span>
+                        <span>{item.priceSoms.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {item.priceCrystals && (
+                      <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl text-white font-black text-sm shadow-lg">
+                        <span className="text-lg">💎</span>
+                        <span>{item.priceCrystals}</span>
+                      </div>
                     )}
                   </div>
+                )}
 
-                  {/* Item Name */}
-                  <h3 className="font-black text-gray-900 dark:text-white text-sm mb-2 text-center line-clamp-2 min-h-[2.5rem]">
-                    {getItemName(item)}
-                  </h3>
-
-                  {/* Bonus Badge */}
-                  {item.bonus && (
-                    <div className="mb-3 px-2 py-1 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg">
-                      <div className="text-[10px] font-black text-white text-center">
-                        {getBonusDescription(item)}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Action Buttons */}
-                  {item.owned ? (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleEquip(item.id)}
-                      disabled={item.equipped || loading === item.id}
-                      className={`w-full py-2.5 rounded-xl font-black text-sm transition-all ${
-                        item.equipped
-                          ? 'bg-green-500 text-white shadow-lg'
-                          : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg'
-                      }`}
-                    >
-                      {item.equipped ? '✓ ' + t('cosmetic.equipped') : t('cosmetic.equip')}
-                    </motion.button>
-                  ) : (
-                    <div className="space-y-2">
-                      {/* Buy with Soms */}
-                      {item.priceSoms && (
-                        <motion.button
-                          whileHover={canAffordSoms ? { scale: 1.05 } : {}}
-                          whileTap={canAffordSoms ? { scale: 0.95 } : {}}
-                          onClick={() => handlePurchase(item.id, 'soms')}
-                          disabled={!canAffordSoms || loading === item.id}
-                          className={`w-full py-2 rounded-xl font-black text-sm transition-all flex items-center justify-center gap-1 ${
-                            canAffordSoms
-                              ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg hover:shadow-xl'
-                              : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-500 cursor-not-allowed'
-                          }`}
-                        >
-                          <span>💰</span>
-                          <span>{item.priceSoms.toLocaleString()}</span>
-                        </motion.button>
-                      )}
-                      
-                      {/* Buy with Crystals */}
-                      {item.priceCrystals && (
-                        <motion.button
-                          whileHover={canAffordCrystals ? { scale: 1.05 } : {}}
-                          whileTap={canAffordCrystals ? { scale: 0.95 } : {}}
-                          onClick={() => handlePurchase(item.id, 'crystals')}
-                          disabled={!canAffordCrystals || loading === item.id}
-                          className={`w-full py-2 rounded-xl font-black text-sm transition-all flex items-center justify-center gap-1 ${
-                            canAffordCrystals
-                              ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-lg hover:shadow-xl'
-                              : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-500 cursor-not-allowed'
-                          }`}
-                        >
-                          <span>💎</span>
-                          <span>{item.priceCrystals}</span>
-                        </motion.button>
-                      )}
-                    </div>
-                  )}
-                </motion.div>
-              );
-            })}
+                {/* Action Button */}
+                {item.owned ? (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleEquip(item.id)}
+                    disabled={item.equipped || loading === item.id}
+                    className={`w-full py-3 rounded-xl font-black text-sm transition-all ${
+                      item.equipped
+                        ? 'bg-green-500 text-white shadow-lg'
+                        : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg'
+                    }`}
+                  >
+                    {item.equipped ? '✓ ' + t('cosmetic.equipped') : t('cosmetic.equip')}
+                  </motion.button>
+                ) : (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => openPurchaseModal(item)}
+                    disabled={loading === item.id}
+                    className="w-full py-3 rounded-xl font-black text-sm transition-all bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg"
+                  >
+                    {t('cosmetic.buy', 'Купить')}
+                  </motion.button>
+                )}
+              </motion.div>
+            ))}
           </div>
+        )}
+
+        {/* Purchase Confirmation Modal */}
+        {purchaseModal.item && (
+          <PurchaseConfirmModal
+            isOpen={purchaseModal.isOpen}
+            itemName={getItemName(purchaseModal.item)}
+            itemIcon={purchaseModal.item.icon}
+            itemRarity={purchaseModal.item.rarity}
+            priceSoms={purchaseModal.item.priceSoms}
+            priceCrystals={purchaseModal.item.priceCrystals}
+            playerSoms={playerSoms}
+            playerCrystals={playerCrystals}
+            bonus={purchaseModal.item.bonus ? {
+              type: purchaseModal.item.bonus.type,
+              value: purchaseModal.item.bonus.value,
+              description: getBonusDescription(purchaseModal.item)
+            } : undefined}
+            onConfirm={(currency) => handlePurchase(purchaseModal.item!.id, currency)}
+            onCancel={() => setPurchaseModal({ isOpen: false, item: null })}
+            loading={loading === purchaseModal.item.id}
+          />
         )}
       </div>
     </div>

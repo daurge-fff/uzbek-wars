@@ -24,6 +24,7 @@ import { GameDashboardContainer } from './components/GameDashboardContainer';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { DonationModal } from './components/DonationModal';
 import { CosmeticShop } from './components/CosmeticShop';
+import { Inventory } from './components/Inventory';
 import { Leaderboard } from './components/Leaderboard';
 import { ReferralPanel } from './components/ReferralPanel';
 import { PlayerProfile } from './components/PlayerProfile';
@@ -250,6 +251,12 @@ function HomePage() {
               to="/shop" 
             />
             <MenuCard 
+              title={t('menu.inventory')} 
+              description={t('menu.inventoryDesc')} 
+              icon="📦" 
+              to="/inventory" 
+            />
+            <MenuCard 
               title={t('menu.profile')} 
               description={t('menu.profileDesc')} 
               icon="👤" 
@@ -266,12 +273,6 @@ function HomePage() {
               description={t('menu.donateDesc')} 
               icon="💎" 
               to="/donate" 
-            />
-            <MenuCard 
-              title={t('menu.health')} 
-              description={t('menu.healthDesc')} 
-              icon="🏥" 
-              to="/health" 
             />
           </div>
         </motion.div>
@@ -416,6 +417,18 @@ function AnimatedRoutes() {
             <CosmeticShopWithData />
           </motion.div>
         } />
+        <Route path="/inventory" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="relative"
+          >
+            <InventoryWithData />
+          </motion.div>
+        } />
         <Route path="/leaderboard" element={
           <motion.div
             variants={pageVariants}
@@ -498,6 +511,9 @@ function AnimatedRoutes() {
 }
 
 import { cosmeticItems } from './data/cosmeticItems';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 // Wrapper components with real data
 const CharacterSelectionWithData = () => {
@@ -526,57 +542,88 @@ const CitySelectionWithData = () => {
 };
 
 const CosmeticShopWithData = () => {
-  const { player, updatePlayer } = useAuth();
+  const { player, updatePlayer, token, refreshPlayer } = useAuth();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // TODO: Fetch from /api/cosmetics and merge with owned/equipped status
-    // For now, use imported cosmeticItems
-    setItems(cosmeticItems);
-    setLoading(false);
-  }, []);
+    const fetchCosmetics = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/cosmetics`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setItems(response.data.items);
+      } catch (error) {
+        console.error('Failed to fetch cosmetics:', error);
+        // Fallback to local data
+        setItems(cosmeticItems);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (token) {
+      fetchCosmetics();
+    } else {
+      setItems(cosmeticItems);
+      setLoading(false);
+    }
+  }, [token]);
   
   const handlePurchase = async (id: string, currency: 'soms' | 'crystals') => {
-    const item = items.find(i => i.id === id);
-    if (!item) return;
-    
-    const price = currency === 'soms' ? item.priceSoms : item.priceCrystals;
-    const currentBalance = currency === 'soms' ? (player?.soms || 0) : (player?.donationCurrency || 0);
-    
-    if (currentBalance < price) {
-      throw new Error('Insufficient funds');
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/cosmetics/purchase`,
+        { itemId: id, currency },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      // Update player balance
+      updatePlayer({
+        soms: response.data.player.soms,
+        donationCurrency: response.data.player.donationCurrency
+      });
+      
+      // Update items to mark as owned
+      setItems(prev => prev.map(item => 
+        item.id === id ? { ...item, owned: true } : item
+      ));
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Purchase failed');
     }
-    
-    // TODO: POST /api/cosmetics/purchase
-    // For now, update locally
-    
-    // Update balance
-    if (currency === 'soms') {
-      updatePlayer({ soms: (player?.soms || 0) - price });
-    } else {
-      updatePlayer({ donationCurrency: (player?.donationCurrency || 0) - price });
-    }
-    
-    // Mark item as owned
-    setItems(prev => prev.map(i => 
-      i.id === id ? { ...i, owned: true } : i
-    ));
   };
   
   const handleEquip = async (id: string) => {
-    // TODO: POST /api/cosmetics/equip
-    // For now, update locally
-    
-    const item = items.find(i => i.id === id);
-    if (!item) return;
-    
-    // Unequip all items of the same type, equip selected
-    setItems(prev => prev.map(i => ({
-      ...i,
-      equipped: i.id === id ? true : (i.type === item.type ? false : i.equipped)
-    })));
+    try {
+      await axios.post(
+        `${API_URL}/api/cosmetics/equip`,
+        { itemId: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      // Update items to mark as equipped
+      const item = items.find(i => i.id === id);
+      if (item) {
+        setItems(prev => prev.map(i => ({
+          ...i,
+          equipped: i.id === id ? true : (i.type === item.type ? false : i.equipped)
+        })));
+      }
+      
+      // Refresh player data to get updated cosmetics
+      await refreshPlayer();
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Equip failed');
+    }
   };
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
+        <div className="text-6xl animate-bounce">🛍️</div>
+      </div>
+    );
+  }
   
   return (
     <CosmeticShop
@@ -585,6 +632,91 @@ const CosmeticShopWithData = () => {
       playerSoms={player?.soms || 0}
       onPurchase={handlePurchase}
       onEquip={handleEquip}
+    />
+  );
+};
+
+const InventoryWithData = () => {
+  const { token, refreshPlayer } = useAuth();
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchCosmetics = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/cosmetics`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setItems(response.data.items);
+      } catch (error) {
+        console.error('Failed to fetch cosmetics:', error);
+        setItems(cosmeticItems);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (token) {
+      fetchCosmetics();
+    } else {
+      setItems(cosmeticItems);
+      setLoading(false);
+    }
+  }, [token]);
+  
+  const handleEquip = async (id: string) => {
+    try {
+      await axios.post(
+        `${API_URL}/api/cosmetics/equip`,
+        { itemId: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      const item = items.find(i => i.id === id);
+      if (item) {
+        setItems(prev => prev.map(i => ({
+          ...i,
+          equipped: i.id === id ? true : (i.type === item.type ? false : i.equipped)
+        })));
+      }
+      
+      await refreshPlayer();
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Equip failed');
+    }
+  };
+  
+  const handleUnequip = async (id: string) => {
+    try {
+      await axios.post(
+        `${API_URL}/api/cosmetics/unequip`,
+        { itemId: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setItems(prev => prev.map(i => 
+        i.id === id ? { ...i, equipped: false } : i
+      ));
+      
+      await refreshPlayer();
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Unequip failed');
+    }
+  };
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
+        <div className="text-6xl animate-bounce">📦</div>
+      </div>
+    );
+  }
+  
+  return (
+    <Inventory
+      items={items}
+      onEquip={handleEquip}
+      onUnequip={handleUnequip}
     />
   );
 };

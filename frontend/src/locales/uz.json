@@ -164,7 +164,42 @@
     "notEnoughCrystals": "Kristallar yetarli emas",
     "purchaseSuccess": "Sotib olish muvaffaqiyatli!",
     "equipSuccess": "Kiyildi!",
-    "noItems": "Buyumlar tez orada"
+    "noItems": "Buyumlar tez orada",
+    "bonus": "Bonus",
+    "yourBalance": "Sizning balansingiz",
+    "buyWithSoms": "So'm uchun sotib olish",
+    "buyWithCrystals": "Kristallar uchun sotib olish"
+  },
+  "inventory": {
+    "title": "Inventar",
+    "equipped": "Kiyilgan",
+    "empty": "Inventar bo'sh",
+    "emptyHint": "Do'konda buyumlar sotib oling",
+    "equip": "Kiyish",
+    "unequip": "Yechish"
+  },
+  "menu": {
+    "game": "O'yin",
+    "gameDesc": "O'ynashni boshlash",
+    "leaderboard": "Reyting",
+    "leaderboardDesc": "Eng yaxshi o'yinchilar",
+    "referral": "Referallar",
+    "referralDesc": "Do'stlarni taklif qiling",
+    "shop": "Do'kon",
+    "shopDesc": "Buyumlar sotib olish",
+    "inventory": "Inventar",
+    "inventoryDesc": "Sizning buyumlaringiz",
+    "profile": "Profil",
+    "profileDesc": "Sizning profilingiz",
+    "settings": "Sozlamalar",
+    "settingsDesc": "O'yin sozlamalari",
+    "donate": "Donat",
+    "donateDesc": "Loyihani qo'llab-quvvatlash",
+    "health": "Salomatlik",
+    "healthDesc": "Server holati"
+  },
+  "common": {
+    "cancel": "Bekor qilish"
   },
   "profile": {
     "joined": "O'yinda",

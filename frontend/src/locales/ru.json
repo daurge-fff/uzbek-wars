@@ -130,7 +130,42 @@
     "notEnoughCrystals": "Недостаточно кристаллов",
     "purchaseSuccess": "Покупка успешна!",
     "equipSuccess": "Экипировано!",
-    "noItems": "Предметы скоро появятся"
+    "noItems": "Предметы скоро появятся",
+    "bonus": "Бонус",
+    "yourBalance": "Ваш баланс",
+    "buyWithSoms": "Купить за сомы",
+    "buyWithCrystals": "Купить за кристаллы"
+  },
+  "inventory": {
+    "title": "Инвентарь",
+    "equipped": "Надето",
+    "empty": "Инвентарь пуст",
+    "emptyHint": "Купите предметы в магазине",
+    "equip": "Надеть",
+    "unequip": "Снять"
+  },
+  "menu": {
+    "game": "Игра",
+    "gameDesc": "Начать играть",
+    "leaderboard": "Рейтинг",
+    "leaderboardDesc": "Лучшие игроки",
+    "referral": "Рефералы",
+    "referralDesc": "Пригласи друзей",
+    "shop": "Магазин",
+    "shopDesc": "Купить предметы",
+    "inventory": "Инвентарь",
+    "inventoryDesc": "Ваши предметы",
+    "profile": "Профиль",
+    "profileDesc": "Ваш профиль",
+    "settings": "Настройки",
+    "settingsDesc": "Настройки игры",
+    "donate": "Донат",
+    "donateDesc": "Поддержать проект",
+    "health": "Здоровье",
+    "healthDesc": "Статус сервера"
+  },
+  "common": {
+    "cancel": "Отмена"
   },
   "referral": {
     "title": "Пригласи друзей",
@@ -310,26 +345,6 @@
     "subtitle": "Начни свое приключение в Узбекистане",
     "startGame": "Начать игру",
     "continuePlaying": "Продолжить игру"
-  },
-  "menu": {
-    "game": "Игра",
-    "gameDesc": "Начать приключение",
-    "leaderboard": "Рейтинг",
-    "leaderboardDesc": "Топ игроков",
-    "referral": "Рефералы",
-    "referralDesc": "Пригласи друзей",
-    "shop": "Магазин",
-    "shopDesc": "Косметика",
-    "profile": "Профиль",
-    "profileDesc": "Твой профиль",
-    "settings": "Настройки",
-    "settingsDesc": "Параметры",
-    "donate": "Донат",
-    "donateDesc": "Поддержать",
-    "health": "Health Check",
-    "healthDesc": "Статус систем",
-    "logout": "Выход",
-    "logoutDesc": "Выйти из аккаунта"
   },
   "leaderboard": {
     "title": "Рейтинг",
