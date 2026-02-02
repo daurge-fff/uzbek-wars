@@ -11,6 +11,9 @@ import { Player } from '../models/Player';
 import { env } from '../config/environment';
 import { logger } from '../utils/logger';
 
+// Debug: Log JWT_SECRET status at module load time
+logger.info(`[AuthService] Module loaded - JWT_SECRET type: ${typeof env.JWT_SECRET}, exists: ${!!env.JWT_SECRET}, length: ${env.JWT_SECRET ? env.JWT_SECRET.length : 0}`);
+
 interface GoogleProfile {
   id: string;
   email: string;
@@ -42,10 +45,17 @@ function generateToken(userId: string): string {
   
   logger.debug(`Generating JWT token for user: ${userId}`);
   logger.debug(`JWT_SECRET exists: ${!!secret}`);
+  logger.debug(`JWT_SECRET type: ${typeof secret}`);
+  logger.debug(`JWT_SECRET length: ${secret ? secret.length : 0}`);
+  logger.debug(`JWT_SECRET value: ${secret ? '[REDACTED]' : 'EMPTY/UNDEFINED'}`);
+  logger.debug(`process.env.JWT_SECRET type: ${typeof process.env.JWT_SECRET}`);
+  logger.debug(`process.env.JWT_SECRET length: ${process.env.JWT_SECRET ? process.env.JWT_SECRET.length : 0}`);
+  logger.debug(`process.env.JWT_SECRET: ${process.env.JWT_SECRET ? '[REDACTED]' : 'EMPTY/UNDEFINED'}`);
   logger.debug(`JWT_EXPIRES_IN: ${env.JWT_EXPIRES_IN}`);
   
   if (!secret) {
     logger.error('JWT_SECRET not configured! Check .env file');
+    logger.error(`All env keys: ${Object.keys(process.env).filter(k => k.includes('JWT')).join(', ')}`);
     throw new Error('JWT_SECRET not configured');
   }
 

@@ -18,14 +18,20 @@ export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps
   const { t } = useTranslation();
 
   useEffect(() => {
+    console.log('🔄 Loading Google Identity Services script...');
+    
     // Load Google Identity Services script
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.defer = true;
     script.onload = () => {
+      console.log('✅ Google script loaded successfully');
       setGoogleLoaded(true);
-      initializeGoogleSignIn();
+    };
+    script.onerror = (error) => {
+      console.error('❌ Failed to load Google script:', error);
+      onError?.(t('auth.googleScriptError', 'Не удалось загрузить Google. Проверьте интернет-соединение.'));
     };
     document.body.appendChild(script);
 
@@ -36,95 +42,90 @@ export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps
     };
   }, []);
 
-  const initializeGoogleSignIn = () => {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    
-    if (!clientId) {
-      console.error('VITE_GOOGLE_CLIENT_ID not configured');
-      onError?.(t('auth.googleNotConfigured', 'Google OAuth не настроен'));
-      return;
-    }
-
-    console.log('Initializing Google Sign-In with Client ID:', clientId);
-
-    if (window.google) {
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: handleCredentialResponse,
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
-    }
-  };
-
-  const handleCredentialResponse = (response: any) => {
-    setLoading(false);
-    if (response.credential) {
-      console.log('Google login successful, got credential');
-      onSuccess?.(response.credential);
-    } else {
-      console.error('No credential in response');
-      onError?.(t('auth.loginError', 'Ошибка входа'));
-    }
-  };
-
   const handleGoogleLogin = () => {
     if (!googleLoaded || !window.google) {
+      console.error('❌ Google not loaded');
       onError?.(t('auth.googleNotLoaded', 'Google не загружен. Обновите страницу.'));
       return;
     }
 
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     if (!clientId) {
+      console.error('❌ Client ID not configured');
       onError?.(t('auth.googleNotConfigured', 'Google OAuth не настроен. Добавьте VITE_GOOGLE_CLIENT_ID в .env'));
       return;
     }
 
     setLoading(true);
+    console.log('🚀 Opening Google account selection popup...');
     
     try {
-      console.log('Attempting Google login...');
+      // Используем OAuth 2.0 Token Flow - открывает popup окно и возвращает ID token напрямую
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'email profile openid',
+        callback: (response: any) => {
+          console.log('📩 Received token response:', response);
+          setLoading(false);
+          
+          if (response.access_token) {
+            console.log('✅ Got access token, fetching user info...');
+            
+            // Получаем информацию о пользователе с помощью access token
+            fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: {
+                'Authorization': `Bearer ${response.access_token}`
+              }
+            })
+            .then(res => res.json())
+            .then(userInfo => {
+              console.log('✅ Got user info:', userInfo);
+              
+              // Создаем простой JWT-подобный токен с информацией о пользователе
+              const idToken = btoa(JSON.stringify({
+                sub: userInfo.sub,
+                email: userInfo.email,
+                name: userInfo.name,
+                picture: userInfo.picture,
+                email_verified: userInfo.email_verified
+              }));
+              
+              onSuccess?.(idToken);
+            })
+            .catch(error => {
+              console.error('❌ Failed to fetch user info:', error);
+              onError?.(t('auth.userInfoError', 'Не удалось получить информацию о пользователе'));
+            });
+          } else if (response.error) {
+            console.error('❌ Token error:', response.error);
+            onError?.(t('auth.tokenError', 'Ошибка получения токена'));
+          }
+        },
+        error_callback: (error: any) => {
+          console.error('❌ OAuth error:', error);
+          setLoading(false);
+          
+          if (error.type === 'popup_closed') {
+            console.log('ℹ️ User closed the popup');
+            // Не показываем ошибку, если пользователь просто закрыл окно
+          } else {
+            onError?.(t('auth.oauthError', 'Ошибка OAuth'));
+          }
+        }
+      });
       
-      // Use renderButton instead of prompt for better compatibility
-      const buttonContainer = document.getElementById('google-signin-button');
-      if (buttonContainer) {
-        buttonContainer.innerHTML = ''; // Clear previous button
-        window.google.accounts.id.renderButton(
-          buttonContainer,
-          {
-            theme: 'filled_blue',
-            size: 'large',
-            width: buttonContainer.offsetWidth,
-            text: 'signin_with',
-            shape: 'pill'
-          }
-        );
-        setLoading(false);
-      } else {
-        // Fallback to prompt
-        window.google.accounts.id.prompt((notification: any) => {
-          if (notification.isNotDisplayed()) {
-            console.log('One Tap not displayed, reason:', notification.getNotDisplayedReason());
-            setLoading(false);
-            onError?.(t('auth.googleBlocked', 'Google вход заблокирован. Попробуйте обновить страницу.'));
-          } else if (notification.isSkippedMoment()) {
-            console.log('One Tap skipped');
-            setLoading(false);
-          }
-        });
-      }
+      // Открываем popup окно с выбором аккаунта Google
+      client.requestAccessToken({ prompt: 'select_account' });
+      
     } catch (error: any) {
       setLoading(false);
-      console.error('Google login error:', error);
+      console.error('❌ Google login error:', error);
       onError?.(error.message || t('auth.loginError', 'Ошибка входа'));
     }
   };
 
   return (
     <div className="w-full">
-      {/* Hidden container for Google's native button */}
-      <div id="google-signin-button" className="hidden"></div>
-      
       <button
         onClick={handleGoogleLogin}
         disabled={loading || !googleLoaded}

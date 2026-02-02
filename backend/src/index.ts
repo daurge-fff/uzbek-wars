@@ -5,24 +5,14 @@
  * Environment variables are validated on startup to fail fast if misconfigured.
  */
 
-import dotenv from 'dotenv';
-import path from 'path';
+// IMPORTANT: Load environment variables FIRST, before any other imports
+import './loadEnv';
+
 import { connectDatabase } from './config/database';
 import { createServer } from './server';
 import { logger } from './utils/logger';
 import { validateEnvironment } from './config/environment';
 import { initBot } from './bot/telegramBot';
-
-// Load environment variables before anything else
-// Look for .env in project root
-dotenv.config({ path: path.join(process.cwd(), '../.env') });
-
-// Log JWT_SECRET status (without exposing the actual secret)
-if (process.env.JWT_SECRET) {
-  logger.info('JWT_SECRET loaded successfully');
-} else {
-  logger.error('JWT_SECRET not found in environment!');
-}
 
 /**
  * Bootstrap the application
