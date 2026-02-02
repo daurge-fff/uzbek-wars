@@ -236,6 +236,11 @@
   },
   "dashboard": {
     "level": "Daraja",
+    "xp": "tajriba",
+    "soms": "So'm",
+    "crystals": "Kristallar",
+    "character": "Personaj",
+    "city": "Shahar",
     "currentActivity": "Hozir siz:",
     "timeLeft": "Qolgan vaqt:",
     "keepGoing": "Davom eting! Tez orada mukofot olasiz",
@@ -314,5 +319,22 @@
     "soms": "So'mlar bo'yicha",
     "you": "Siz",
     "noPlayers": "Reytingda hali o'yinchilar yo'q"
+  },
+  "home": {
+    "title": "O'zbek Urushi",
+    "subtitle": "Buyuk Ipak yo'lining afsonasiga aylaning",
+    "description": "Qadimgi O'zbekiston dunyosiga sho'ng'ing. Personajingizni tanlang, ko'nikmalarni rivojlantiring, savdo qiling, jang qiling va eng buyuk hukmdor bo'ling!",
+    "startGame": "O'yinni boshlash",
+    "continuePlaying": "Davom etish",
+    "features": "O'yin imkoniyatlari",
+    "feature1": "Noyob personajlar",
+    "feature1Desc": "Maxsus qobiliyatlarga ega qahramonni tanlang",
+    "feature2": "Afsonaviy shaharlar",
+    "feature2Desc": "Samarqand, Buxoro va boshqalarni kashf eting",
+    "feature3": "Qiziqarli faoliyatlar",
+    "feature3Desc": "Savdo qiling, jang qiling, rivojlaning",
+    "feature4": "Raqobatlashing",
+    "feature4Desc": "Reytingda eng yaxshi bo'ling",
+    "explore": "Dunyoni kashf eting"
   }
 }

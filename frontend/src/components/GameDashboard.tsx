@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 
 interface PlayerState {
   characterId: string;
+  cityId: string;
   level: number;
   experience: number;
   experienceToNextLevel: number;
@@ -26,6 +27,7 @@ interface Activity {
   cooldown?: number;
   requiredLevel?: number;
   image?: string;
+  duration?: number;
   rewards?: {
     experience: number;
     soms: number;
@@ -243,87 +245,159 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
     return activity.description;
   };
 
+  const getCharacterName = (characterId: string): string => {
+    const characters: Record<string, Record<string, string>> = {
+      'char1': { ru: 'Фермер', en: 'Farmer', uz: 'Fermer', uk: 'Фермер' },
+      'char2': { ru: 'Повар', en: 'Chef', uz: 'Oshpaz', uk: 'Кухар' },
+      'char3': { ru: 'Бизнесмен', en: 'Businessman', uz: 'Biznesmen', uk: 'Бізнесмен' },
+      'char4': { ru: 'Студент', en: 'Student', uz: 'Talaba', uk: 'Студент' },
+      'default': { ru: 'Новичок', en: 'Newbie', uz: 'Yangi', uk: 'Новачок' }
+    };
+    const lang = i18n.language as 'ru' | 'en' | 'uz' | 'uk';
+    return characters[characterId]?.[lang] || characters['default'][lang];
+  };
+
+  const getCityName = (cityId: string): string => {
+    const cities: Record<string, Record<string, string>> = {
+      'tashkent': { ru: 'Ташкент', en: 'Tashkent', uz: 'Toshkent', uk: 'Ташкент' },
+      'samarkand': { ru: 'Самарканд', en: 'Samarkand', uz: 'Samarqand', uk: 'Самарканд' },
+      'bukhara': { ru: 'Бухара', en: 'Bukhara', uz: 'Buxoro', uk: 'Бухара' },
+      'khiva': { ru: 'Хива', en: 'Khiva', uz: 'Xiva', uk: 'Хіва' },
+      'fergana': { ru: 'Фергана', en: 'Fergana', uz: "Farg'ona", uk: 'Фергана' },
+      'default': { ru: 'Без города', en: 'No city', uz: 'Shahar yo\'q', uk: 'Без міста' }
+    };
+    const lang = i18n.language as 'ru' | 'en' | 'uz' | 'uk';
+    return cities[cityId]?.[lang] || cities['default'][lang];
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 pb-20">
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         
-        {/* Карточка профиля - компактная */}
+        {/* Карточка профиля - компактная с крутым дизайном */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 rounded-2xl p-4 shadow-xl text-white relative overflow-hidden"
+          className="relative rounded-3xl p-4 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden"
         >
-          {/* Animated background circles */}
-          <motion.div
-            animate={{ 
-              scale: [1, 1.2, 1],
-              rotate: [0, 180, 360]
-            }}
-            transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-            className="absolute -top-20 -right-20 w-60 h-60 bg-white/10 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ 
-              scale: [1.2, 1, 1.2],
-              rotate: [360, 180, 0]
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            className="absolute -bottom-16 -left-16 w-48 h-48 bg-white/10 rounded-full blur-3xl"
-          />
-          
-          <div className="relative z-10">
-            <div className="flex items-center gap-4 mb-3">
-              {/* Avatar */}
-              <div className="relative flex-shrink-0">
+          {/* Animated background blobs */}
+          <div className="absolute inset-0 opacity-30 dark:opacity-20">
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-2xl animate-blob" />
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-2xl animate-blob animation-delay-2000" />
+            <div className="absolute -bottom-10 left-1/2 w-40 h-40 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-2xl animate-blob animation-delay-4000" />
+          </div>
+
+          <div className="relative z-10 flex items-center gap-4">
+            {/* Avatar с круговой полоской опыта */}
+            <div className="relative flex-shrink-0">
+              {/* Круговая полоска опыта - большая и толстая */}
+              <svg className="absolute -inset-2 w-20 h-20 -rotate-90">
+                {/* Фон круга */}
+                <circle
+                  cx="40"
+                  cy="40"
+                  r="36"
+                  stroke="currentColor"
+                  strokeWidth="5"
+                  fill="none"
+                  className="text-gray-300/50 dark:text-gray-600/50"
+                />
+                {/* Прогресс */}
+                <motion.circle
+                  cx="40"
+                  cy="40"
+                  r="36"
+                  stroke="url(#xpGradient)"
+                  strokeWidth="5"
+                  fill="none"
+                  strokeDasharray={`${2 * Math.PI * 36}`}
+                  initial={{ strokeDashoffset: 2 * Math.PI * 36 }}
+                  animate={{ 
+                    strokeDashoffset: 2 * Math.PI * 36 * (1 - playerState.experience / playerState.experienceToNextLevel)
+                  }}
+                  transition={{ duration: 1, ease: 'easeOut' }}
+                  strokeLinecap="round"
+                  className="drop-shadow-lg"
+                />
+                <defs>
+                  <linearGradient id="xpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#3b82f6" />
+                    <stop offset="50%" stopColor="#a855f7" />
+                    <stop offset="100%" stopColor="#ec4899" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              
+              {/* Аватар */}
+              <div className="w-16 h-16 rounded-full overflow-hidden shadow-xl ring-2 ring-white dark:ring-gray-800">
                 <img 
                   src={userAvatar} 
                   alt="Avatar" 
-                  className="w-16 h-16 rounded-xl shadow-lg border-2 border-white/40"
+                  className="w-full h-full object-cover"
                 />
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute -bottom-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-sm shadow-lg border-2 border-white"
-                >
-                  ⭐
-                </motion.div>
-              </div>
-
-              {/* Level & XP */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-2xl font-black">LVL {playerState.level}</div>
-                  <div className="text-xs opacity-90 font-semibold">
-                    {playerState.experience}/{playerState.experienceToNextLevel} XP
-                  </div>
-                </div>
-                
-                {/* XP Progress Bar */}
-                <div className="h-2 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm shadow-inner">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(playerState.experience / playerState.experienceToNextLevel) * 100}%` }}
-                    transition={{ duration: 1.5, ease: 'easeOut' }}
-                    className="h-full bg-gradient-to-r from-yellow-300 via-yellow-200 to-yellow-100 rounded-full"
-                  />
-                </div>
               </div>
             </div>
 
-            {/* Currency Display */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-xl px-3 py-2 border border-white/30">
-                <span className="text-xl">💰</span>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[10px] opacity-75 font-semibold">Сомы</div>
-                  <div className="text-base font-black truncate">{playerState.soms.toLocaleString()}</div>
+            {/* Основная инфа - компактно */}
+            <div className="flex-1 min-w-0">
+              {/* Уровень и XP */}
+              <div className="mb-2">
+                <div className="flex items-center justify-between mb-1">
+                  <h2 className="text-xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+                    {t('dashboard.level')} {playerState.level}
+                  </h2>
+                  <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 px-2 py-0.5 rounded-lg">
+                    {Math.round((playerState.experience / playerState.experienceToNextLevel) * 100)}%
+                  </span>
+                </div>
+                
+                {/* XP bar - компактный без анимации */}
+                <div className="relative h-2 bg-gray-300/60 dark:bg-gray-600/60 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(playerState.experience / playerState.experienceToNextLevel) * 100}%` }}
+                    transition={{ duration: 1, ease: 'easeOut' }}
+                    className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+                  />
+                </div>
+                <div className="flex justify-between mt-0.5">
+                  <span className="text-[9px] font-bold text-gray-600 dark:text-gray-400">
+                    {playerState.experience}
+                  </span>
+                  <span className="text-[9px] font-bold text-gray-600 dark:text-gray-400">
+                    {playerState.experienceToNextLevel}
+                  </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-xl px-3 py-2 border border-white/30">
-                <span className="text-xl">💎</span>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[10px] opacity-75 font-semibold">Кристаллы</div>
-                  <div className="text-base font-black truncate">{playerState.donationCurrency}</div>
+
+              {/* Персонаж и город - одна строка */}
+              <div className="flex items-center gap-1.5 mb-2">
+                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-[10px] font-bold text-gray-700 dark:text-gray-300">
+                  <span>👤</span>
+                  <span>{getCharacterName(playerState.characterId)}</span>
+                </div>
+                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-[10px] font-bold text-gray-700 dark:text-gray-300">
+                  <span>🏙️</span>
+                  <span>{getCityName(playerState.cityId)}</span>
+                </div>
+              </div>
+
+              {/* Валюта - компактно в одну строку */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-yellow-400/30 to-orange-500/30 backdrop-blur-sm border border-yellow-400/40 flex-1">
+                  <span className="text-lg">💰</span>
+                  <div className="flex flex-col leading-none">
+                    <span className="text-[8px] font-bold text-yellow-900 dark:text-yellow-200 uppercase">{t('dashboard.soms')}</span>
+                    <span className="text-sm font-black text-yellow-800 dark:text-yellow-100">{playerState.soms.toLocaleString()}</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400/30 to-blue-500/30 backdrop-blur-sm border border-cyan-400/40 flex-1">
+                  <span className="text-lg">💎</span>
+                  <div className="flex flex-col leading-none">
+                    <span className="text-[8px] font-bold text-cyan-900 dark:text-cyan-200 uppercase">{t('dashboard.crystals')}</span>
+                    <span className="text-sm font-black text-cyan-800 dark:text-cyan-100">{playerState.donationCurrency}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -335,17 +409,9 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
           {currentActivity && timeLeft > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -20 }}
-              animate={{ 
-                opacity: 1, 
-                y: 0,
-                scale: timeLeft <= 5 ? [1, 1.015, 1] : 1
-              }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={
-                timeLeft <= 5 
-                  ? { scale: { duration: 0.6, repeat: Infinity, ease: 'easeInOut' } }
-                  : { duration: 0.3, ease: 'easeOut' }
-              }
+              transition={{ duration: 0.3, ease: 'easeOut' }}
               className={`bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 rounded-2xl p-4 shadow-xl text-white relative overflow-hidden ${
                 timeLeft <= 5 ? 'ring-2 ring-yellow-300 ring-opacity-60' : ''
               }`}
@@ -450,8 +516,8 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     <CircularProgress 
                       value={value} 
                       max={100} 
-                      size={80} 
-                      strokeWidth={7}
+                      size={70} 
+                      strokeWidth={6}
                       color={
                         value >= 70 ? '#10b981' : 
                         value >= 40 ? '#f59e0b' : '#ef4444'
@@ -461,7 +527,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       <motion.span 
                         animate={isLow ? { rotate: [0, -10, 10, -10, 0] } : {}}
                         transition={{ duration: 0.5, repeat: isLow ? Infinity : 0, repeatDelay: 2 }}
-                        className="text-4xl"
+                        className="text-3xl"
                       >
                         {config.icon}
                       </motion.span>
@@ -482,18 +548,22 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   </div>
                 </div>
                 
-                {/* Tooltip - фиксированный, не убегает */}
+                {/* Tooltip - фиксированный, для последних двух карточек слева */}
                 <AnimatePresence>
                   {hoveredStat === key && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.9 }}
-                      className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-xl shadow-2xl z-[200] max-w-[200px] text-center whitespace-normal pointer-events-none"
+                      className={`absolute bottom-full mb-3 px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-xl shadow-2xl z-[200] max-w-[200px] text-center whitespace-normal pointer-events-none ${
+                        index >= 2 ? 'right-0' : 'left-1/2 transform -translate-x-1/2'
+                      }`}
                     >
                       <div className="font-bold mb-1">{t(config.descKey)}</div>
                       {isLow && <div className="text-red-400 font-bold">{t(config.lowWarningKey)}</div>}
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-[6px] border-transparent border-t-gray-900 dark:border-t-gray-700" />
+                      <div className={`absolute top-full border-[6px] border-transparent border-t-gray-900 dark:border-t-gray-700 ${
+                        index >= 2 ? 'right-4' : 'left-1/2 transform -translate-x-1/2'
+                      }`} />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -545,10 +615,22 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       : 'bg-white dark:bg-gray-800 border-green-200 dark:border-green-700 hover:shadow-lg hover:border-green-300 dark:hover:border-green-600'
                   } overflow-hidden`}
                 >
+                  {/* Duration badge - top left */}
+                  {activity.duration && (
+                    <div className={`absolute top-2 left-2 px-2 py-1 rounded-lg font-bold text-xs flex items-center gap-1 shadow-sm ${
+                      !isAvailable 
+                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
+                        : 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
+                    }`}>
+                      <span>⏱️</span>
+                      <span>{activity.duration < 60 ? `${activity.duration}с` : `${Math.floor(activity.duration / 60)}м`}</span>
+                    </div>
+                  )}
+
                   {isLocked && (
                     <div className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-lg shadow-md z-10 flex items-center gap-1">
                       <span>🔒</span>
-                      <span>{activity.requiredLevel}</span>
+                      <span>LVL {activity.requiredLevel}</span>
                     </div>
                   )}
 
@@ -576,60 +658,64 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                         {activityDesc}
                       </div>
                     )}
-                    
+
                     {/* Rewards */}
-                    <div className="flex flex-wrap gap-1.5 justify-center mb-3">
-                      {activity.rewards && (
-                        <>
-                          <div className={`px-2 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${
+                    {activity.rewards && (
+                      <div className="mb-2">
+                        <div className="text-[9px] text-gray-500 dark:text-gray-400 mb-1 text-center font-semibold uppercase tracking-wide">Награды</div>
+                        <div className="flex flex-wrap gap-1.5 justify-center">
+                          <div className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${
                             !isAvailable 
                               ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
                               : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
                           }`}>
                             <span>⭐</span>
-                            <span>+{activity.rewards.experience}</span>
+                            <span>{activity.rewards.experience}</span>
                           </div>
-                          <div className={`px-2 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${
+                          <div className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${
                             !isAvailable 
                               ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
                               : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
                           }`}>
                             <span>💰</span>
-                            <span>+{activity.rewards.soms}</span>
+                            <span>{activity.rewards.soms}</span>
                           </div>
-                        </>
-                      )}
-
-                      {activity.cost && (
-                        <div className={`px-2 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${
-                          !canAfford 
-                            ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-                            : !isAvailable
-                            ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
-                            : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
-                        }`}>
-                          <span>💸</span>
-                          <span>-{activity.cost}</span>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
 
-                    {/* Stat Changes */}
-                    {activity.statModifiers && Object.keys(activity.statModifiers).length > 0 && (
+                    {/* Effects (stat changes + cost) */}
+                    {((activity.statModifiers && Object.keys(activity.statModifiers).length > 0) || activity.cost) && (
                       <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                        <div className="text-[9px] text-gray-500 dark:text-gray-400 mb-1.5 text-center font-semibold uppercase tracking-wide">Эффекты</div>
                         <div className="flex flex-wrap gap-1.5 justify-center">
-                          {Object.entries(activity.statModifiers).map(([stat, value]) => {
+                          {/* Cost as negative effect */}
+                          {activity.cost && (
+                            <div className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 ${
+                              !canAfford 
+                                ? 'bg-red-500 dark:bg-red-600 text-white ring-2 ring-red-300 dark:ring-red-400'
+                                : !isAvailable
+                                ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
+                                : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-200 ring-1 ring-red-300 dark:ring-red-500'
+                            }`}>
+                              <span>💸</span>
+                              <span>-{activity.cost}</span>
+                            </div>
+                          )}
+                          
+                          {/* Stat modifiers */}
+                          {activity.statModifiers && Object.entries(activity.statModifiers).map(([stat, value]) => {
                             const statConf = statConfig[stat as keyof typeof statConfig];
                             if (!statConf) return null;
                             return (
                               <div 
                                 key={stat}
-                                className={`text-xs font-bold flex items-center gap-0.5 ${
+                                className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 ${
                                   !isAvailable 
-                                    ? 'text-gray-400 dark:text-gray-600'
+                                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
                                     : value > 0 
-                                    ? 'text-green-600 dark:text-green-400' 
-                                    : 'text-red-600 dark:text-red-400'
+                                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' 
+                                    : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-200 ring-1 ring-red-300 dark:ring-red-500'
                                 }`}
                                 title={t(statConf.labelKey)}
                               >

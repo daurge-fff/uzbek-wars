@@ -276,7 +276,7 @@ function HomePage() {
             transition={{ delay: 0.2 }}
             className="text-6xl md:text-7xl font-black mb-6 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent"
           >
-            {t('home.title', 'Узбек Варс')}
+            {t('home.title')}
           </motion.h1>
 
           {/* Subtitle */}
@@ -284,45 +284,35 @@ function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="text-2xl md:text-3xl text-gray-700 dark:text-gray-300 mb-4 font-bold"
+            className="text-2xl md:text-3xl text-gray-700 dark:text-gray-300 mb-8 font-bold"
           >
-            {t('home.subtitle', 'Стань легендой Великого Шелкового пути')}
+            {t('home.subtitle')}
           </motion.p>
 
-          {/* Description */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed"
-          >
-            {t('home.description', 'Погрузись в мир древнего Узбекистана. Выбери своего персонажа, развивай навыки, торгуй, сражайся и стань величайшим правителем!')}
-          </motion.p>
-
-          {/* CTA Button */}
-          {!isAuthenticated ? (
+          {/* CTA Button - компактная */}
+          {isAuthenticated ? (
             <motion.button
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5, type: 'spring' }}
-              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ delay: 0.4, type: 'spring' }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/start')}
-              className="px-12 py-5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-black text-2xl rounded-full shadow-2xl hover:shadow-3xl transition-all mb-8"
+              onClick={() => navigate('/dashboard')}
+              className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-black text-lg rounded-full shadow-xl hover:shadow-2xl transition-all mb-8"
             >
-              🚀 {t('home.startGame', 'Начать игру')}
+              🎮 {t('home.continuePlaying')}
             </motion.button>
           ) : (
             <motion.button
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5, type: 'spring' }}
-              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ delay: 0.4, type: 'spring' }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/dashboard')}
-              className="px-12 py-5 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-black text-2xl rounded-full shadow-2xl hover:shadow-3xl transition-all mb-8"
+              onClick={() => navigate('/start')}
+              className="px-8 py-3 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-black text-lg rounded-full shadow-xl hover:shadow-2xl transition-all mb-8"
             >
-              🎮 {t('home.continuePlaying', 'Продолжить игру')}
+              🚀 {t('home.startGame')}
             </motion.button>
           )}
 
@@ -330,7 +320,7 @@ function HomePage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
+            transition={{ delay: 0.5 }}
             className="mb-12"
           >
             <LanguageSwitcher 
@@ -340,85 +330,65 @@ function HomePage() {
           </motion.div>
         </motion.div>
 
-        {/* Features Grid */}
+        {/* Navigation Menu - простая сетка */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="mb-16"
+          transition={{ delay: 0.6 }}
         >
-          <h2 className="text-3xl font-black text-center text-gray-900 dark:text-white mb-8">
-            {t('home.features', 'Возможности игры')}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            <FeatureCard 
-              icon="👥" 
-              title={t('home.feature1', 'Уникальные персонажи')}
-              description={t('home.feature1Desc', 'Выбери героя с особыми способностями')}
-            />
-            <FeatureCard 
-              icon="🏙️" 
-              title={t('home.feature2', 'Легендарные города')}
-              description={t('home.feature2Desc', 'Исследуй Самарканд, Бухару и другие')}
-            />
-            <FeatureCard 
-              icon="⚔️" 
-              title={t('home.feature3', 'Захватывающие активности')}
-              description={t('home.feature3Desc', 'Торгуй, сражайся, развивайся')}
-            />
-            <FeatureCard 
-              icon="🏆" 
-              title={t('home.feature4', 'Соревнуйся')}
-              description={t('home.feature4Desc', 'Стань лучшим в рейтинге')}
-            />
-          </div>
-        </motion.div>
-
-        {/* Menu Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-        >
-          <h2 className="text-3xl font-black text-center text-gray-900 dark:text-white mb-8">
-            {t('home.explore', 'Исследуй мир')}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
             <MenuCard 
-              title={t('menu.leaderboard', 'Рейтинг')} 
-              description={t('menu.leaderboardDesc', 'Топ игроков')} 
+              title={t('menu.game')} 
+              description={t('menu.gameDesc')} 
+              icon="🎮" 
+              to="/dashboard" 
+            />
+            <MenuCard 
+              title={t('menu.leaderboard')} 
+              description={t('menu.leaderboardDesc')} 
               icon="🏆" 
               to="/leaderboard" 
             />
             <MenuCard 
-              title={t('menu.referral', 'Рефералы')} 
-              description={t('menu.referralDesc', 'Пригласи друзей')} 
+              title={t('menu.referral')} 
+              description={t('menu.referralDesc')} 
               icon="👥" 
               to="/referral" 
             />
             <MenuCard 
-              title={t('menu.shop', 'Магазин')} 
-              description={t('menu.shopDesc', 'Косметика')} 
+              title={t('menu.shop')} 
+              description={t('menu.shopDesc')} 
               icon="🛍️" 
               to="/shop" 
+            />
+            <MenuCard 
+              title={t('menu.profile')} 
+              description={t('menu.profileDesc')} 
+              icon="👤" 
+              to="/profile" 
+            />
+            <MenuCard 
+              title={t('menu.settings')} 
+              description={t('menu.settingsDesc')} 
+              icon="⚙️" 
+              to="/settings" 
+            />
+            <MenuCard 
+              title={t('menu.donate')} 
+              description={t('menu.donateDesc')} 
+              icon="💎" 
+              to="/donate" 
+            />
+            <MenuCard 
+              title={t('menu.health')} 
+              description={t('menu.healthDesc')} 
+              icon="🏥" 
+              to="/health" 
             />
           </div>
         </motion.div>
       </main>
     </div>
-  );
-}
-
-function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.05, y: -5 }}
-      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-6 rounded-[24px] shadow-xl text-center border border-gray-100 dark:border-gray-700"
-    >
-      <div className="text-5xl mb-3">{icon}</div>
-      <h3 className="text-lg font-black text-gray-900 dark:text-white mb-2">{title}</h3>
-      <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
-    </motion.div>
   );
 }
 
@@ -485,7 +455,6 @@ function AnimatedRoutes() {
             exit="exit"
             transition={pageTransition}
           >
-            <BackButton />
             <ColorPalette />
           </motion.div>
         } />
@@ -498,7 +467,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex items-center justify-center p-4"
           >
-            <BackButton />
             <div className="max-w-md w-full">
               <motion.h1 
                 initial={{ opacity: 0, y: -20 }}
@@ -521,10 +489,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <BackButton />
-            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
-              <ThemeToggle />
-            </div>
             <CharacterSelection 
               characters={mockCharacters}
               onSelect={(id) => console.log('Selected character:', id)}
@@ -540,10 +504,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <BackButton />
-            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
-              <ThemeToggle />
-            </div>
             <CitySelection 
               cities={mockCities}
               onSelect={(id) => console.log('Selected city:', id)}
@@ -559,10 +519,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <BackButton />
-            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
-              <ThemeToggle />
-            </div>
             <GameDashboardContainer />
           </motion.div>
         } />
@@ -575,10 +531,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <BackButton />
-            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
-              <ThemeToggle />
-            </div>
             <CosmeticShop
               items={mockCosmetics}
               playerCrystals={150}
@@ -596,10 +548,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <BackButton />
-            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
-              <ThemeToggle />
-            </div>
             <Leaderboard
               players={mockLeaderboard}
               type="global"
@@ -616,10 +564,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <BackButton />
-            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
-              <ThemeToggle />
-            </div>
             <ReferralPanel
               referralCode="RUSTAM2024"
               referralLink="https://uzbekwars.com/ref/RUSTAM2024"
@@ -637,10 +581,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900"
           >
-            <BackButton />
-            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
-              <ThemeToggle />
-            </div>
             <DonationModal
               isOpen={true}
               onClose={() => window.history.back()}
@@ -657,10 +597,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <BackButton />
-            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
-              <ThemeToggle />
-            </div>
             <HealthCheck />
           </motion.div>
         } />
@@ -673,10 +609,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <BackButton />
-            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
-              <ThemeToggle />
-            </div>
             <PlayerProfile
               playerInfo={mockPlayerInfo}
               stats={mockPlayerStats}
@@ -696,10 +628,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <BackButton />
-            <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
-              <ThemeToggle />
-            </div>
             <SettingsWithI18n />
           </motion.div>
         } />

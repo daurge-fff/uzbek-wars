@@ -200,6 +200,9 @@ export const GameDashboardContainer = () => {
         endTime
       });
       
+      // Прокручиваем страницу наверх чтобы было видно карточку активности
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
       // Перезагружаем активности
       loadActivities();
     } catch (error: any) {
@@ -245,6 +248,7 @@ export const GameDashboardContainer = () => {
   // Если статов нет, используем дефолтные значения
   const playerState = {
     characterId: player.characterId,
+    cityId: player.cityId,
     level: player.level,
     experience: player.experience,
     experienceToNextLevel: calculateExpToNextLevel(player.level),

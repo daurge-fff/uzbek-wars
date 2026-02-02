@@ -236,6 +236,11 @@
   },
   "dashboard": {
     "level": "Level",
+    "xp": "XP",
+    "soms": "Soms",
+    "crystals": "Crystals",
+    "character": "Character",
+    "city": "City",
     "currentActivity": "Currently you are:",
     "timeLeft": "Time left:",
     "keepGoing": "Keep going! You'll get rewards soon",
@@ -314,5 +319,22 @@
     "soms": "By Soms",
     "you": "You",
     "noPlayers": "No players in leaderboard yet"
+  },
+  "home": {
+    "title": "Uzbek Wars",
+    "subtitle": "Become a legend of the Great Silk Road",
+    "description": "Immerse yourself in the world of ancient Uzbekistan. Choose your character, develop skills, trade, fight and become the greatest ruler!",
+    "startGame": "Start Game",
+    "continuePlaying": "Continue Playing",
+    "features": "Game Features",
+    "feature1": "Unique Characters",
+    "feature1Desc": "Choose a hero with special abilities",
+    "feature2": "Legendary Cities",
+    "feature2Desc": "Explore Samarkand, Bukhara and others",
+    "feature3": "Exciting Activities",
+    "feature3Desc": "Trade, fight, develop",
+    "feature4": "Compete",
+    "feature4Desc": "Become the best in the ranking",
+    "explore": "Explore the World"
   }
 }
