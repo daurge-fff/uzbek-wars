@@ -141,13 +141,19 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
       id: 'tutorial', 
       icon: '🎓', 
       label: t('menu.tutorial', 'Обучение'),
-      action: () => setShowTutorialModal(true)
+      action: () => toast('🚧 ' + t('donation.inDevelopment', 'В разработке'), { 
+        icon: '🎓',
+        duration: 2000 
+      })
     },
     { 
       id: 'changelog', 
       icon: '📋', 
       label: t('menu.changelog', 'История версий'),
-      action: () => setShowChangelogModal(true)
+      action: () => toast('🚧 ' + t('donation.inDevelopment', 'В разработке'), { 
+        icon: '📋',
+        duration: 2000 
+      })
     },
     { 
       id: 'developer', 
@@ -446,59 +452,6 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
             </motion.div>
           </div>
         </>
-      )}
-
-      {/* Модалка "История версий" */}
-      {showChangelogModal && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowChangelogModal(false)}>
-          <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-md w-full shadow-2xl max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="text-center mb-4">
-              <div className="text-6xl mb-3">📋</div>
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">{t('menu.changelog', 'История версий')}</h2>
-            </div>
-            <div className="space-y-4 mb-6">
-              <div className="border-l-4 border-indigo-500 pl-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="font-black text-lg text-gray-900 dark:text-white">v1.1.2</span>
-                  <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded-full">Текущая</span>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">03.02.2026</p>
-                <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                  <li>✨ Добавлена система косметики</li>
-                  <li>🎨 Улучшен дизайн главной страницы</li>
-                  <li>🐛 Исправлены мелкие баги</li>
-                </ul>
-              </div>
-              
-              <div className="border-l-4 border-purple-500 pl-4">
-                <div className="font-black text-lg text-gray-900 dark:text-white mb-2">v1.1.0</div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">01.02.2026</p>
-                <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                  <li>🎮 Добавлены новые активности</li>
-                  <li>🏆 Система рейтингов</li>
-                  <li>👥 Реферальная система</li>
-                </ul>
-              </div>
-              
-              <div className="border-l-4 border-blue-500 pl-4">
-                <div className="font-black text-lg text-gray-900 dark:text-white mb-2">v1.0.0</div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">25.01.2026</p>
-                <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                  <li>🚀 Первый релиз игры</li>
-                  <li>🏛️ Система городов</li>
-                  <li>⚔️ Базовые активности</li>
-                  <li>🌍 Поддержка 4 языков</li>
-                </ul>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowChangelogModal(false)}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors"
-            >
-              {t('ui.close', 'Закрыть')}
-            </button>
-          </div>
-        </div>
       )}
     </div>
   );

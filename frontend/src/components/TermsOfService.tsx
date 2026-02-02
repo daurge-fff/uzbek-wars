@@ -68,6 +68,8 @@ export const TermsOfService = () => {
                 <li><strong>{t('legal.terms.donations.item3')}</strong></li>
                 <li><strong>{t('legal.terms.donations.item4')}</strong></li>
                 <li><strong>{t('legal.terms.donations.item5')}</strong></li>
+                <li><strong>{t('legal.terms.donations.item6')}</strong></li>
+                <li><strong>{t('legal.terms.donations.item7')}</strong></li>
               </ul>
             </section>
 
@@ -80,6 +82,7 @@ export const TermsOfService = () => {
                 <li>{t('legal.terms.userAccount.item2')}</li>
                 <li>{t('legal.terms.userAccount.item3')}</li>
                 <li>{t('legal.terms.userAccount.item4')}</li>
+                <li>{t('legal.terms.userAccount.item5')}</li>
               </ul>
             </section>
 
@@ -99,9 +102,18 @@ export const TermsOfService = () => {
 
             <section>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                {t('legal.terms.userContent.title')}
+              </h2>
+              <p className="leading-relaxed">
+                {t('legal.terms.userContent.text')}
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                 {t('legal.terms.intellectualProperty.title')}
               </h2>
-              <p className="leading-relaxed mb-3">
+              <p className="leading-relaxed">
                 {t('legal.terms.intellectualProperty.text')}
               </p>
             </section>
@@ -118,6 +130,10 @@ export const TermsOfService = () => {
                 <li><strong>{t('legal.terms.disclaimer.item2')}</strong></li>
                 <li><strong>{t('legal.terms.disclaimer.item3')}</strong></li>
                 <li><strong>{t('legal.terms.disclaimer.item4')}</strong></li>
+                <li><strong>{t('legal.terms.disclaimer.item5')}</strong></li>
+                <li><strong>{t('legal.terms.disclaimer.item6')}</strong></li>
+                <li><strong>{t('legal.terms.disclaimer.item7')}</strong></li>
+                <li><strong>{t('legal.terms.disclaimer.item8')}</strong></li>
               </ul>
             </section>
 
@@ -127,15 +143,6 @@ export const TermsOfService = () => {
               </h2>
               <p className="leading-relaxed mb-3 font-semibold">
                 {t('legal.terms.limitationLiability.text')}
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                {t('legal.terms.modifications.title')}
-              </h2>
-              <p className="leading-relaxed">
-                {t('legal.terms.modifications.text')}
               </p>
             </section>
 
@@ -163,6 +170,42 @@ export const TermsOfService = () => {
               </h2>
               <p className="leading-relaxed">
                 {t('legal.terms.severability.text')}
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                {t('legal.terms.minors.title')}
+              </h2>
+              <p className="leading-relaxed">
+                {t('legal.terms.minors.text')}
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                {t('legal.terms.thirdPartyServices.title')}
+              </h2>
+              <p className="leading-relaxed">
+                {t('legal.terms.thirdPartyServices.text')}
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                {t('legal.terms.dataRights.title')}
+              </h2>
+              <p className="leading-relaxed">
+                {t('legal.terms.dataRights.text')}
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                {t('legal.terms.modifications.title')}
+              </h2>
+              <p className="leading-relaxed">
+                {t('legal.terms.modifications.text')}
               </p>
             </section>
 

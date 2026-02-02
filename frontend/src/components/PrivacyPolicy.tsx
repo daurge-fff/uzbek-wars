@@ -58,6 +58,7 @@ export const PrivacyPolicy = () => {
                 <li>{t('legal.privacy.dataCollection.item3')}</li>
                 <li>{t('legal.privacy.dataCollection.item4')}</li>
                 <li>{t('legal.privacy.dataCollection.item5')}</li>
+                <li>{t('legal.privacy.dataCollection.item6')}</li>
               </ul>
             </section>
 
@@ -70,7 +71,17 @@ export const PrivacyPolicy = () => {
                 <li>{t('legal.privacy.dataUsage.item2')}</li>
                 <li>{t('legal.privacy.dataUsage.item3')}</li>
                 <li>{t('legal.privacy.dataUsage.item4')}</li>
+                <li>{t('legal.privacy.dataUsage.item5')}</li>
               </ul>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                {t('legal.privacy.dataSharing.title')}
+              </h2>
+              <p className="leading-relaxed">
+                {t('legal.privacy.dataSharing.text')}
+              </p>
             </section>
 
             <section>

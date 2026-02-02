@@ -496,12 +496,8 @@
         "title": "15. Kontent huquqlari va foydalanish",
         "text": "Xizmatdan foydalanish orqali siz bizga xizmat orqali yuborgan, e'lon qilgan yoki uzatgan har qanday kontentni ishlatish, ko'paytirish, o'zgartirish, moslash, nashr qilish, tarjima qilish, hosilaviy ishlar yaratish, tarqatish, ijro etish va ko'rsatish uchun muddatsiz, qaytarib olinmaydigan, dunyo bo'ylab, bepul, eksklyuziv bo'lmagan litsenziya berasiz. Ushbu litsenziya bu huquqlarni uchinchi shaxslarga sublitsenziya qilish huquqini o'z ichiga oladi. Siz bunday kontent bo'yicha ega bo'lishingiz mumkin bo'lgan har qanday ma'naviy huquqlar yoki mualliflik huquqlaridan voz kechasiz. Biz sizning kontentingizni har qanday maqsadlar uchun, shu jumladan tijorat maqsadlari uchun sizga kompensatsiya bermasdan ishlatishimiz mumkin. Siz ushbu litsenziyani berish uchun zarur huquqlarga ega ekanligingizni yoki ega ekanligingizni bildirasz va kafolat berasiz va sizning kontentingiz uchinchi shaxslarning hech qanday huquqlarini yoki qo'llaniladigan qonunlarni buzmaydi."
       },
-      "indemnification": {
-        "title": "17. Zararni qoplash",
-        "text": "Siz ishlab chiquvchi, uning sherik tashkilotlari, litsenziyalari va xizmat ko'rsatuvchilar, shuningdek ularning tegishli mansabdor shaxslari, direktorlari, xodimlari, pudratchilar, agentlar, litsenziyalar, ta'minotchilar, huquq vorislari va huquq vorislarini quyidagilardan kelib chiqadigan yoki ular bilan bog'liq har qanday da'volar, majburiyatlar, zararlar, sud qarorlari, mukofotlar, yo'qotishlar, xarajatlar, chiqimlar yoki to'lovlardan (shu jumladan oqilona advokat to'lovlari) himoya qilish, zararni qoplash va himoya qilishga rozilik bildirasiz: (a) ushbu shartlarni buzishingiz; (b) xizmatdan foydalanishingiz; (c) boshqa shaxsning har qanday huquqlarini buzishingiz; (d) sizning kontentingiz; yoki (e) hisobingiz bilan bog'liq har qanday faoliyat, siz yoki hisobingizdan foydalanib xizmatga kiradigan boshqa har qanday shaxs. Ushbu zararni qoplash majburiyati ushbu shartlar va xizmatdan foydalanishingiz to'xtatilgandan keyin ham saqlanadi."
-      },
       "contact": {
-        "title": "18. Aloqa va bildirishnomalar",
+        "title": "17. Aloqa va bildirishnomalar",
         "text": "Ushbu Foydalanish shartlari bilan bog'liq savollar bo'yicha quyidagi ma'lumotlar orqali biz bilan bog'lanishingiz mumkin. Biz so'rovlarga javob berish majburiyatiga ega emasmiz. Siz uchun barcha bildirishnomalar o'z ixtiyorimizga ko'ra xizmat orqali yoki elektron pochta orqali taqdim etiladi:"
       }
     }
@@ -519,8 +515,7 @@
       "item2": "Sizning o'yin taraqqiyotingiz va yutuqlaringiz, shunda siz to'xtagan joydan davom etishingiz mumkin.",
       "item3": "Qurilmangiz uchun ishlashni optimallashtirish va foydalanish modellarini o'rganishga yordam beradigan texnik ma'lumotlar.",
       "item4": "Qanday o'ynashni yoqtirishingizni eslab qolish uchun afzalliklar va sozlamalar.",
-      "item5": "Do'stlarni taklif qilganingizda referal aloqalar, shunda ikkalangizni ham mukofotlashimiz mumkin.",
-      "item6": "Loyihani yaxshilash uchun standart veb-analitika."
+      "item5": "Do'stlarni taklif qilganingizda referal aloqalar, shunda ikkalangizni ham mukofotlashimiz mumkin."
     },
     "dataUsage": {
       "title": "2. Ma'lumotlaringizni qanday ishlatamiz",
@@ -528,8 +523,7 @@
       "item2": "Hisobingiz xavfsizligini ta'minlash va taraqqiyotingizni saqlash.",
       "item3": "Odamlar qanday o'ynashiga asoslanib loyihani qanday yaxshilashni tushunish.",
       "item4": "O'rganish jarayoni doirasida ishlashni doimiy yaxshilash va xususiyatlar qo'shish.",
-      "item5": "Ta'lim maqsadlari va loyihani rivojlantirish uchun foydalanish modellarini tahlil qilish.",
-      "item6": "Ushbu notijorat hobbi loyihasining joriy ishlab chiqilishi va xizmat ko'rsatilishini qo'llab-quvvatlash."
+      "item5": "Ta'lim maqsadlari va loyihani rivojlantirish uchun foydalanish modellarini tahlil qilish."
     },
     "dataSharing": {
       "title": "3. Ma'lumotlar almashish va uchinchi tomonlar",
