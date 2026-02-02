@@ -39,6 +39,10 @@ export interface IPlayer extends Document {
   referralCode: string;
   referredBy?: string;
   lastActivityTime: Date;
+  currentActivity?: string;
+  currentActivityName?: string;
+  currentActivityStartTime?: Date;
+  currentActivityEndTime?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -132,6 +136,18 @@ const PlayerSchema = new Schema<IPlayer>(
     lastActivityTime: {
       type: Date,
       default: Date.now,
+    },
+    currentActivity: {
+      type: String,
+    },
+    currentActivityName: {
+      type: String,
+    },
+    currentActivityStartTime: {
+      type: Date,
+    },
+    currentActivityEndTime: {
+      type: Date,
     },
   },
   {

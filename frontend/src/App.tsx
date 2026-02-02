@@ -8,7 +8,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -118,30 +118,6 @@ const mockCities = [
   }
 ];
 
-const mockPlayerState = {
-  characterId: 'char1',
-  level: 5,
-  experience: 450,
-  experienceToNextLevel: 506,
-  soms: 1250,
-  donationCurrency: 50,
-  stats: {
-    hunger: 75,
-    health: 90,
-    mood: 60,
-    energy: 80
-  }
-};
-
-const mockActivities = [
-  { id: 'work', name: 'Работать в Связном', icon: '💼' },
-  { id: 'rob', name: 'Грабить', icon: '🔫' },
-  { id: 'police', name: 'Ловить преступников', icon: '👮' },
-  { id: 'cook', name: 'Готовить плов', icon: '🍲' },
-  { id: 'samsa', name: 'Печь самсу', icon: '🥟' },
-  { id: 'trade', name: 'Торговать', icon: '🏪' }
-];
-
 const mockCosmetics = [
   { id: 'hat1', name: 'Тюбетейка', type: 'clothing' as const, rarity: 'common' as const, price: 50, icon: '🎩', owned: false, equipped: false },
   { id: 'hat2', name: 'Золотая корона', type: 'clothing' as const, rarity: 'legendary' as const, price: 500, icon: '👑', owned: false, equipped: false },
@@ -216,158 +192,233 @@ function MenuCard({ title, description, icon, to, onClick }: any) {
   );
 }
 
+function LogoutPage() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    logout();
+    setTimeout(() => {
+      navigate('/');
+    }, 2000);
+  }, []);
+
+  return (
+    <div className="text-center">
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        className="text-8xl mb-6"
+      >
+        👋
+      </motion.div>
+      <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-4">
+        {t('auth.loggingOut', 'Выход из системы...')}
+      </h2>
+      <p className="text-gray-600 dark:text-gray-300">
+        {t('auth.redirectingHome', 'Перенаправление на главную...')}
+      </p>
+    </div>
+  );
+}
+
 function HomePage() {
   const [currentLang, setCurrentLang] = useState<'ru' | 'uz' | 'uk' | 'en'>('ru');
   const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { t } = useTranslation();
-
-  const handleLogout = () => {
-    if (confirm(t('auth.confirmLogout', 'Вы уверены, что хотите выйти?'))) {
-      logout();
-      navigate('/');
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
-      <motion.header 
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50 transition-colors"
-      >
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <motion.h1 
-            whileHover={{ scale: 1.05 }}
-            className="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent"
+      {/* Top Right Controls */}
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
+        {isAuthenticated && user && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700"
           >
-            🏛️ Узбек Варс
-          </motion.h1>
-          <div className="flex items-center gap-3">
-            {isAuthenticated && user && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700"
-              >
-                <span className="text-2xl">{user.avatar || '👤'}</span>
-                <span className="font-semibold text-gray-900 dark:text-white hidden sm:inline">
-                  {user.displayName}
-                </span>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={handleLogout}
-                  className="text-red-500 hover:text-red-600 font-semibold text-sm"
-                  title={t('auth.logout', 'Выйти')}
-                >
-                  🚪
-                </motion.button>
-              </motion.div>
+            {user.avatar && user.avatar.startsWith('http') ? (
+              <img src={user.avatar} alt={user.displayName} className="w-8 h-8 rounded-full" />
+            ) : (
+              <span className="text-2xl">{user.avatar || '👤'}</span>
             )}
-            <LanguageSwitcher 
-              currentLanguage={currentLang} 
-              onLanguageChange={setCurrentLang}
-            />
-            <ThemeToggle />
-          </div>
-        </div>
-      </motion.header>
+            <span className="font-semibold text-gray-900 dark:text-white hidden sm:inline">
+              {user.displayName}
+            </span>
+          </motion.div>
+        )}
+        <ThemeToggle />
+      </div>
       
       <main className="container mx-auto px-4 py-12">
+        {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-16 max-w-4xl mx-auto"
         >
-          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
-            {t('home.welcome', 'Добро пожаловать')}
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300 text-xl mb-8 transition-colors">
-            {t('home.subtitle', 'Начни свое приключение в Узбекистане')}
-          </p>
-          
+          {/* Logo */}
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200 }}
+            className="text-8xl mb-6"
+          >
+            🏛️
+          </motion.div>
+
+          {/* Title */}
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-6xl md:text-7xl font-black mb-6 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent"
+          >
+            {t('home.title', 'Узбек Варс')}
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-2xl md:text-3xl text-gray-700 dark:text-gray-300 mb-4 font-bold"
+          >
+            {t('home.subtitle', 'Стань легендой Великого Шелкового пути')}
+          </motion.p>
+
+          {/* Description */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed"
+          >
+            {t('home.description', 'Погрузись в мир древнего Узбекистана. Выбери своего персонажа, развивай навыки, торгуй, сражайся и стань величайшим правителем!')}
+          </motion.p>
+
+          {/* CTA Button */}
           {!isAuthenticated ? (
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, type: 'spring' }}
+              whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/start')}
-              className="px-12 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black text-xl rounded-full shadow-2xl mb-12"
+              className="px-12 py-5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-black text-2xl rounded-full shadow-2xl hover:shadow-3xl transition-all mb-8"
             >
               🚀 {t('home.startGame', 'Начать игру')}
             </motion.button>
           ) : (
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, type: 'spring' }}
+              whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/dashboard')}
-              className="px-12 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-black text-xl rounded-full shadow-2xl mb-12"
+              className="px-12 py-5 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-black text-2xl rounded-full shadow-2xl hover:shadow-3xl transition-all mb-8"
             >
               🎮 {t('home.continuePlaying', 'Продолжить игру')}
             </motion.button>
           )}
+
+          {/* Language Switcher */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mb-12"
+          >
+            <LanguageSwitcher 
+              currentLanguage={currentLang} 
+              onLanguageChange={setCurrentLang}
+            />
+          </motion.div>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
-          <MenuCard 
-            title={t('menu.game', 'Игра')} 
-            description={t('menu.gameDesc', 'Начать приключение')} 
-            icon="🎮" 
-            to={isAuthenticated ? "/dashboard" : "/start"} 
-          />
-          <MenuCard 
-            title={t('menu.leaderboard', 'Рейтинг')} 
-            description={t('menu.leaderboardDesc', 'Топ игроков')} 
-            icon="🏆" 
-            to="/leaderboard" 
-          />
-          <MenuCard 
-            title={t('menu.referral', 'Рефералы')} 
-            description={t('menu.referralDesc', 'Пригласи друзей')} 
-            icon="👥" 
-            to="/referral" 
-          />
-          <MenuCard 
-            title={t('menu.shop', 'Магазин')} 
-            description={t('menu.shopDesc', 'Косметика')} 
-            icon="🛍️" 
-            to="/shop" 
-          />
-          <MenuCard 
-            title={t('menu.profile', 'Профиль')} 
-            description={t('menu.profileDesc', 'Твой профиль')} 
-            icon="👤" 
-            to="/profile" 
-          />
-          <MenuCard 
-            title={t('menu.settings', 'Настройки')} 
-            description={t('menu.settingsDesc', 'Параметры')} 
-            icon="⚙️" 
-            to="/settings" 
-          />
-          <MenuCard 
-            title={t('menu.donate', 'Донат')} 
-            description={t('menu.donateDesc', 'Поддержать')} 
-            icon="💎" 
-            to="/donate" 
-          />
-          <MenuCard 
-            title={t('menu.health', 'Health Check')} 
-            description={t('menu.healthDesc', 'Статус систем')} 
-            icon="🏥" 
-            to="/health" 
-          />
-          {isAuthenticated && (
-            <MenuCard 
-              title={t('menu.logout', 'Выход')} 
-              description={t('menu.logoutDesc', 'Выйти из аккаунта')} 
-              icon="🚪" 
-              onClick={handleLogout}
+        {/* Features Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="mb-16"
+        >
+          <h2 className="text-3xl font-black text-center text-gray-900 dark:text-white mb-8">
+            {t('home.features', 'Возможности игры')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            <FeatureCard 
+              icon="👥" 
+              title={t('home.feature1', 'Уникальные персонажи')}
+              description={t('home.feature1Desc', 'Выбери героя с особыми способностями')}
             />
-          )}
-        </div>
+            <FeatureCard 
+              icon="🏙️" 
+              title={t('home.feature2', 'Легендарные города')}
+              description={t('home.feature2Desc', 'Исследуй Самарканд, Бухару и другие')}
+            />
+            <FeatureCard 
+              icon="⚔️" 
+              title={t('home.feature3', 'Захватывающие активности')}
+              description={t('home.feature3Desc', 'Торгуй, сражайся, развивайся')}
+            />
+            <FeatureCard 
+              icon="🏆" 
+              title={t('home.feature4', 'Соревнуйся')}
+              description={t('home.feature4Desc', 'Стань лучшим в рейтинге')}
+            />
+          </div>
+        </motion.div>
+
+        {/* Menu Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+        >
+          <h2 className="text-3xl font-black text-center text-gray-900 dark:text-white mb-8">
+            {t('home.explore', 'Исследуй мир')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+            <MenuCard 
+              title={t('menu.leaderboard', 'Рейтинг')} 
+              description={t('menu.leaderboardDesc', 'Топ игроков')} 
+              icon="🏆" 
+              to="/leaderboard" 
+            />
+            <MenuCard 
+              title={t('menu.referral', 'Рефералы')} 
+              description={t('menu.referralDesc', 'Пригласи друзей')} 
+              icon="👥" 
+              to="/referral" 
+            />
+            <MenuCard 
+              title={t('menu.shop', 'Магазин')} 
+              description={t('menu.shopDesc', 'Косметика')} 
+              icon="🛍️" 
+              to="/shop" 
+            />
+          </div>
+        </motion.div>
       </main>
     </div>
+  );
+}
+
+function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+  return (
+    <motion.div
+      whileHover={{ scale: 1.05, y: -5 }}
+      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-6 rounded-[24px] shadow-xl text-center border border-gray-100 dark:border-gray-700"
+    >
+      <div className="text-5xl mb-3">{icon}</div>
+      <h3 className="text-lg font-black text-gray-900 dark:text-white mb-2">{title}</h3>
+      <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
+    </motion.div>
   );
 }
 
@@ -391,6 +442,18 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/logout" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex items-center justify-center"
+          >
+            <LogoutPage />
+          </motion.div>
+        } />
         <Route path="/start" element={
           <motion.div
             variants={pageVariants}

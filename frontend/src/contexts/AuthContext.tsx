@@ -24,6 +24,12 @@ interface Player {
   characterId: string;
   cityId: string;
   donationCurrency: number;
+  stats?: {
+    hunger: number;
+    health: number;
+    mood: number;
+    energy: number;
+  };
 }
 
 interface AuthContextType {
@@ -35,11 +41,12 @@ interface AuthContextType {
   login: (token: string, user: User, player: Player) => void;
   logout: () => void;
   updatePlayer: (player: Partial<Player>) => void;
+  refreshPlayer: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -101,6 +108,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const refreshPlayer = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await axios.get(`${API_URL}/api/profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.player) {
+        const updatedPlayer = response.data.player;
+        setPlayer(updatedPlayer);
+        localStorage.setItem('auth_player', JSON.stringify(updatedPlayer));
+      }
+    } catch (error) {
+      console.error('Failed to refresh player:', error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -111,7 +136,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         login,
         logout,
-        updatePlayer
+        updatePlayer,
+        refreshPlayer
       }}
     >
       {children}

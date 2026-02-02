@@ -118,7 +118,7 @@ export const OnboardingFlow = () => {
         }
       });
 
-      const { token, user, player, isNewUser } = response.data;
+      const { token, user, player } = response.data;
       
       // Save to auth context
       login(token, user, player);

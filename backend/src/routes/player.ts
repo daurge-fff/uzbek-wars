@@ -8,6 +8,7 @@
 import { Router, Response } from 'express';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { User, Language } from '../models/User';
+import { Player } from '../models/Player';
 import { logger } from '../utils/logger';
 
 const router = Router();
@@ -95,6 +96,264 @@ router.patch(
         code: 'INTERNAL_ERROR',
         message: 'Failed to update language',
       });
+    }
+  }
+);
+
+/**
+ * GET /api/player/current-activity
+ * 
+ * Gets the player's current active activity
+ */
+router.get(
+  '/current-activity',
+  authenticate,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+      
+      const player = await Player.findOne({ userId });
+      if (!player) {
+        res.status(404).json({ error: 'Player not found' });
+        return;
+      }
+
+      // Проверяем есть ли активная активность
+      if (player.currentActivity && player.currentActivityEndTime) {
+        const now = new Date();
+        const endTime = new Date(player.currentActivityEndTime);
+        
+        if (endTime > now) {
+          // Активность еще идет
+          res.status(200).json({
+            activity: {
+              activityId: player.currentActivity,
+              activityName: player.currentActivityName || 'Активность',
+              startTime: player.currentActivityStartTime?.getTime() || Date.now(),
+              endTime: endTime.getTime()
+            }
+          });
+          return;
+        } else {
+          // Активность завершена, очищаем
+          player.currentActivity = undefined;
+          player.currentActivityName = undefined;
+          player.currentActivityStartTime = undefined;
+          player.currentActivityEndTime = undefined;
+          await player.save();
+        }
+      }
+
+      res.status(200).json({ activity: null });
+    } catch (error) {
+      logger.error('Error getting current activity:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+);
+
+/**
+ * POST /api/player/perform-activity
+ * 
+ * Starts a new activity for the player
+ */
+router.post(
+  '/perform-activity',
+  authenticate,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const { activityId } = req.body;
+      const userId = req.user?.id;
+
+      if (!activityId) {
+        res.status(400).json({ error: 'Activity ID required' });
+        return;
+      }
+
+      const player = await Player.findOne({ userId });
+      if (!player) {
+        res.status(404).json({ error: 'Player not found' });
+        return;
+      }
+
+      // Проверяем есть ли уже активная активность
+      if (player.currentActivity && player.currentActivityEndTime) {
+        const now = new Date();
+        const endTime = new Date(player.currentActivityEndTime);
+        
+        if (endTime > now) {
+          res.status(400).json({ 
+            error: 'Already performing an activity',
+            message: 'Дождись завершения текущей активности'
+          });
+          return;
+        }
+      }
+
+      // Импортируем ActivityService для получения информации об активности
+      const { getActivityById } = await import('../services/ActivityService');
+      const activity = getActivityById(activityId);
+      
+      if (!activity) {
+        res.status(404).json({ error: 'Activity not found' });
+        return;
+      }
+
+      // Проверяем уровень
+      if (player.level < activity.requiredLevel) {
+        res.status(400).json({ 
+          error: 'Level too low',
+          message: `Требуется ${activity.requiredLevel} уровень`
+        });
+        return;
+      }
+
+      // Устанавливаем cooldown 5-10 минут (рандомно)
+      const cooldownMinutes = Math.floor(Math.random() * 6) + 5; // 5-10 минут
+      const startTime = new Date();
+      const endTime = new Date(startTime.getTime() + cooldownMinutes * 60 * 1000);
+
+      // Получаем название активности на русском
+      const activityName = activity.name.ru;
+
+      // Сохраняем активность
+      player.currentActivity = activityId;
+      player.currentActivityName = activityName;
+      player.currentActivityStartTime = startTime;
+      player.currentActivityEndTime = endTime;
+      await player.save();
+
+      logger.info(`Player ${userId} started activity ${activityId} for ${cooldownMinutes} minutes`);
+
+      res.status(200).json({
+        message: 'Activity started',
+        cooldownMinutes,
+        endTime: endTime.getTime(),
+        activityName
+      });
+    } catch (error) {
+      logger.error('Error performing activity:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+);
+
+/**
+ * POST /api/player/complete-activity
+ * 
+ * Completes the current activity and gives rewards
+ */
+router.post(
+  '/complete-activity',
+  authenticate,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+
+      const player = await Player.findOne({ userId });
+      if (!player) {
+        res.status(404).json({ error: 'Player not found' });
+        return;
+      }
+
+      // Проверяем есть ли активная активность
+      if (!player.currentActivity || !player.currentActivityEndTime) {
+        res.status(400).json({ error: 'No active activity' });
+        return;
+      }
+
+      const now = new Date();
+      const endTime = new Date(player.currentActivityEndTime);
+
+      // Проверяем завершилась ли активность
+      if (endTime > now) {
+        res.status(400).json({ 
+          error: 'Activity not finished',
+          message: 'Активность еще не завершена'
+        });
+        return;
+      }
+
+      // Импортируем ActivityService для получения наград
+      const { getActivityById } = await import('../services/ActivityService');
+      const { processLevelUp } = await import('../services/ProgressionService');
+      const { updatePlayerStats } = await import('../services/StatsService');
+      
+      const activity = getActivityById(player.currentActivity);
+      
+      if (!activity) {
+        // Активность не найдена, просто очищаем
+        player.currentActivity = undefined;
+        player.currentActivityName = undefined;
+        player.currentActivityStartTime = undefined;
+        player.currentActivityEndTime = undefined;
+        await player.save();
+        
+        res.status(404).json({ error: 'Activity not found' });
+        return;
+      }
+
+      // Применяем награды
+      let experienceGained = activity.rewards.experience;
+      let somsGained = activity.rewards.soms;
+      let penaltyApplied = false;
+
+      // Проверяем риски
+      if (activity.risks && Math.random() < activity.risks.probability) {
+        somsGained -= activity.risks.penalty;
+        penaltyApplied = true;
+      }
+
+      // Применяем изменения статов
+      updatePlayerStats(player, activity.statModifiers);
+
+      // Добавляем награды
+      player.experience += experienceGained;
+      player.soms = Math.max(0, player.soms + somsGained);
+
+      // Вычитаем стоимость если есть
+      if (activity.cost) {
+        player.soms = Math.max(0, player.soms - activity.cost);
+      }
+
+      // Проверяем повышение уровня
+      const levelsGained = processLevelUp(player);
+      const leveledUp = levelsGained > 0;
+
+      // Очищаем текущую активность
+      player.currentActivity = undefined;
+      player.currentActivityName = undefined;
+      player.currentActivityStartTime = undefined;
+      player.currentActivityEndTime = undefined;
+      player.lastActivityTime = new Date();
+
+      await player.save();
+
+      logger.info(
+        `Player ${userId} completed activity ${activity.id}: ` +
+        `+${experienceGained} XP, ${somsGained >= 0 ? '+' : ''}${somsGained} soms` +
+        (leveledUp ? `, leveled up to ${player.level}` : '')
+      );
+
+      res.status(200).json({
+        success: true,
+        experienceGained,
+        somsGained,
+        leveledUp,
+        newLevel: leveledUp ? player.level : undefined,
+        levelsGained: leveledUp ? levelsGained : undefined,
+        penaltyApplied,
+        statChanges: activity.statModifiers,
+        player: {
+          level: player.level,
+          experience: player.experience,
+          soms: player.soms,
+          stats: player.stats
+        }
+      });
+    } catch (error) {
+      logger.error('Error completing activity:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 );

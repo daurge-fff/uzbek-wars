@@ -301,21 +301,27 @@ function parseVitestOutput(output: string): any {
   }
 }
 
-// Auto-run tests every 5 minutes
-setInterval(() => {
-  if (!isRunning) {
-    logger.info('Auto-running tests...');
-    runTests().catch(error => {
-      logger.error('Auto test run failed:', error);
-    });
-  }
-}, 5 * 60 * 1000);
+// Auto-run tests every 5 minutes (only in production)
+if (process.env.NODE_ENV === 'production') {
+  setInterval(() => {
+    if (!isRunning) {
+      logger.info('Auto-running tests...');
+      runTests().catch(error => {
+        logger.error('Auto test run failed:', error);
+      });
+    }
+  }, 5 * 60 * 1000);
+}
 
-// Run tests on startup
-setTimeout(() => {
-  runTests().catch(error => {
-    logger.error('Initial test run failed:', error);
-  });
-}, 5000);
+// Run tests on startup (only in production)
+if (process.env.NODE_ENV === 'production') {
+  setTimeout(() => {
+    runTests().catch(error => {
+      logger.error('Initial test run failed:', error);
+    });
+  }, 5000);
+} else {
+  logger.info('Tests disabled in development mode. Use POST /api/tests/run to run manually.');
+}
 
 export default router;
