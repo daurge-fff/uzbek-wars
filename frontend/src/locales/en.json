@@ -261,6 +261,7 @@
     "music": "Music",
     "notifications": "Notifications",
     "pushNotifications": "Push notifications",
+    "resetApp": "Reset settings",
     "about": "About",
     "onlineTotal": "Online total",
     "onlineTotalHint": "Players online right now in all cities",
@@ -418,5 +419,18 @@
     "yourProgress": "Your Progress",
     "madeWith": "Made with",
     "inUzbekistan": "in Uzbekistan"
+  },
+  "welcome": {
+    "title": "Welcome!",
+    "subtitle": "Configure the app before starting",
+    "selectLanguage": "Select language",
+    "theme": "Theme",
+    "darkMode": "Dark theme",
+    "lightMode": "Light theme",
+    "dataLoading": "Loading data",
+    "dataLoadingDesc": "~40 MB of necessary resources will be downloaded for the app to work correctly",
+    "continue": "Continue",
+    "loading": "Loading...",
+    "preparing": "Preparing the app"
   }
 }

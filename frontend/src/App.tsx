@@ -27,6 +27,7 @@ import { PlayerProfile } from './components/PlayerProfile';
 import { Settings } from './components/Settings';
 import { HealthCheck } from './components/HealthCheck';
 import { ReferralLanding } from './components/ReferralLanding';
+import { FontLoader } from './components/FontLoader';
 import { cosmeticItems } from './data/cosmeticItems';
 
 const queryClient = new QueryClient({
@@ -554,6 +555,29 @@ const PlayerProfileWithData = () => {
 };
 
 function App() {
+  const [appReady, setAppReady] = useState(false);
+
+  // Проверяем localStorage - был ли пользователь уже на сайте
+  useEffect(() => {
+    const hasVisitedBefore = localStorage.getItem('appInitialized');
+    if (hasVisitedBefore === 'true') {
+      setAppReady(true);
+    }
+  }, []);
+
+  const handleAppReady = () => {
+    localStorage.setItem('appInitialized', 'true');
+    setAppReady(true);
+  };
+
+  if (!appReady) {
+    return (
+      <ThemeProvider>
+        <FontLoader onLoaded={handleAppReady} />
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider>
       <AuthProvider>

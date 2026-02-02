@@ -141,7 +141,7 @@ export const Settings = ({
           </div>
 
           {/* Notifications Section */}
-          <div>
+          <div className="mb-6">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
               {t('settings.notifications', 'Уведомления')}
             </h2>
@@ -151,6 +151,30 @@ export const Settings = ({
               enabled={notificationsEnabled}
               onToggle={onNotificationsToggle}
             />
+          </div>
+
+          {/* Font Section */}
+          <div>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+              ⚙️ Приложение
+            </h2>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                localStorage.removeItem('appInitialized');
+                window.location.reload();
+              }}
+              className="w-full p-4 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-[20px] flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🔄</span>
+                <span className="font-bold text-gray-900 dark:text-white">
+                  {t('settings.resetApp', 'Сбросить настройки')}
+                </span>
+              </div>
+              <span className="text-xs text-gray-500 dark:text-gray-400">~40 MB</span>
+            </motion.button>
           </div>
         </motion.div>
 

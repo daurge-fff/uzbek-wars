@@ -240,6 +240,7 @@
     "music": "Musiqa",
     "notifications": "Bildirishnomalar",
     "pushNotifications": "Push-bildirishnomalar",
+    "resetApp": "Sozlamalarni tiklash",
     "about": "Ilova haqida",
     "onlineTotal": "Jami onlayn",
     "onlineTotalHint": "Hozir barcha shaharlarda onlayn o'yinchilar",
@@ -394,5 +395,18 @@
     "feature4": "Raqobatlashing",
     "feature4Desc": "Reytingda eng yaxshi bo'ling",
     "explore": "Dunyoni kashf eting"
+  },
+  "welcome": {
+    "title": "Xush kelibsiz!",
+    "subtitle": "Boshlashdan oldin ilovani sozlang",
+    "selectLanguage": "Tilni tanlang",
+    "theme": "Dizayn mavzusi",
+    "darkMode": "Qorong'i mavzu",
+    "lightMode": "Yorug' mavzu",
+    "dataLoading": "Ma'lumotlar yuklanmoqda",
+    "dataLoadingDesc": "Ilova to'g'ri ishlashi uchun ~40 MB zarur resurslar yuklanadi",
+    "continue": "Davom etish",
+    "loading": "Yuklanmoqda...",
+    "preparing": "Ilova tayyorlanmoqda"
   }
 }
