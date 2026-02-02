@@ -250,14 +250,35 @@ export const Settings = ({
             </div>
           </div>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setShowDeveloperModal(true)}
-            className="w-full p-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-[20px] shadow-lg"
-          >
-            👨‍💻 {t('settings.developer')}
-          </motion.button>
+          <div className="space-y-3">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowDeveloperModal(true)}
+              className="w-full p-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-[20px] shadow-lg"
+            >
+              👨‍💻 {t('settings.developer')}
+            </motion.button>
+
+            <div className="grid grid-cols-2 gap-3">
+              <motion.a
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                href="/privacy"
+                className="p-3 bg-gray-100 dark:bg-gray-700 rounded-[16px] text-center font-semibold text-gray-900 dark:text-white text-sm"
+              >
+                🔒 Privacy
+              </motion.a>
+              <motion.a
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                href="/terms"
+                className="p-3 bg-gray-100 dark:bg-gray-700 rounded-[16px] text-center font-semibold text-gray-900 dark:text-white text-sm"
+              >
+                📜 Terms
+              </motion.a>
+            </div>
+          </div>
         </motion.div>
 
         {/* Developer Modal */}

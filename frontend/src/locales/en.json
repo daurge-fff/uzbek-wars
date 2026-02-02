@@ -43,12 +43,6 @@
     "level": "Level {{level}}",
     "closeButton": "Awesome!"
   },
-  "stats": {
-    "hunger": "Hunger",
-    "health": "Health",
-    "mood": "Mood",
-    "energy": "Energy"
-  },
   "ui": {
     "loading": "Loading...",
     "error": "Error",
@@ -66,7 +60,7 @@
     "logging_in": "Logging in...",
     "welcome": "Welcome",
     "loginError": "Login error. Try again.",
-    "loginRequired": "Please login, uzbek! 👆",
+    "loginRequired": "Please login",
     "loginToPlay": "Login to start playing",
     "loggingOut": "Logging out...",
     "redirectingHome": "Redirecting to home...",
@@ -77,14 +71,7 @@
     "googleNotConfigured": "Google OAuth not configured. Add VITE_GOOGLE_CLIENT_ID to .env",
     "userInfoError": "Failed to get user information",
     "tokenError": "Token error",
-    "oauthError": "OAuth error",
-    "loggingOut": "Logging out...",
-    "redirectingHome": "Redirecting to home..."
-  },
-  "character": {
-    "loading": "Loading characters...",
-    "loadError": "Failed to load characters",
-    "selectError": "Registration error"
+    "oauthError": "OAuth error"
   },
   "cities": {
     "select": "Select City",
@@ -200,24 +187,19 @@
   },
   "menu": {
     "title": "Game Sections",
-    "game": "Game",
-    "gameDesc": "Start playing",
+    "home": "Home",
     "leaderboard": "Leaderboard",
     "leaderboardDesc": "Top players",
-    "referral": "Referrals",
-    "referralDesc": "Invite friends",
+    "referral": "Friends",
+    "referralDesc": "Invite friend",
     "shop": "Shop",
-    "shopDesc": "Buy items",
+    "shopDesc": "Cosmetics",
     "inventory": "Inventory",
     "inventoryDesc": "Your items",
-    "profile": "Profile",
-    "profileDesc": "Your profile",
     "settings": "Settings",
-    "settingsDesc": "Game settings",
+    "settingsDesc": "Parameters",
     "donate": "Donate",
-    "donateDesc": "Support project",
-    "health": "Health",
-    "healthDesc": "Server status"
+    "donateDesc": "Support"
   },
   "common": {
     "cancel": "Cancel",
@@ -432,5 +414,171 @@
     "continue": "Continue",
     "loading": "Loading...",
     "preparing": "Preparing the app"
+  },
+  "legal": {
+    "lastUpdated": "Last updated",
+    "effectiveDate": "Effective date",
+    "terms": {
+      "title": "Terms of Service",
+      "acceptance": {
+        "title": "1. Agreement to Terms",
+        "text": "By accessing or using Uzbek Wars, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any part of these terms, you must not use the service. Your continued use of the service constitutes acceptance of any modifications to these terms. These terms constitute the entire agreement between you and us regarding the service and supersede any prior agreements. You represent that you are of legal age to form a binding contract and are not prohibited from using the service under applicable law."
+      },
+      "serviceDescription": {
+        "title": "2. About Our Service",
+        "text": "Uzbek Wars is provided on an \"as is\" and \"as available\" basis for entertainment purposes. This is a personal project maintained independently. The service, including all content, features, and functionality, is provided without warranties of any kind, either express or implied. We make no representations about the suitability, reliability, availability, or accuracy of the service for any purpose. All use is at your sole risk and discretion."
+      },
+      "donations": {
+        "title": "3. Virtual Currency and Voluntary Contributions",
+        "intro": "The service may offer virtual currency (crystals) for voluntary contributions:",
+        "item1": "Virtual currency has no monetary value and cannot be redeemed for real currency or items of value outside the service.",
+        "item2": "All contributions are voluntary, final, and non-refundable under any circumstances, including account termination, service discontinuation, or dissatisfaction.",
+        "item3": "We have no obligation to provide any specific features, items, or services in exchange for contributions.",
+        "item4": "Virtual items may be modified, removed, or made unavailable at any time without notice or compensation.",
+        "item5": "Payment processing is handled by third-party services, and we are not responsible for their actions or failures.",
+        "item6": "Initiating chargebacks or payment disputes may result in immediate account termination and forfeiture of all virtual items.",
+        "item7": "Contributions support operational costs and development but create no contractual obligations or guarantees of service continuation."
+      },
+      "userAccount": {
+        "title": "4. Account Responsibilities",
+        "item1": "You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.",
+        "item2": "You agree to immediately notify us of any unauthorized use of your account or any other breach of security.",
+        "item3": "We are not liable for any loss or damage arising from your failure to protect your account information.",
+        "item4": "You may not transfer, sell, or otherwise provide access to your account to third parties.",
+        "item5": "We reserve the right to refuse service, terminate accounts, or remove content at our sole discretion."
+      },
+      "prohibitedConduct": {
+        "title": "5. User Conduct and Content",
+        "item1": "You are solely responsible for your conduct and any content you create, transmit, or display while using the service.",
+        "item2": "You agree not to use unauthorized software, automation tools, or methods that may interfere with the service's operation.",
+        "item3": "You agree to interact respectfully with other users and not engage in harassment, threats, or abusive behavior.",
+        "item4": "You may not impersonate others or misrepresent your affiliation with any person or entity.",
+        "item5": "You agree not to interfere with or disrupt the service, servers, or networks connected to the service.",
+        "item6": "You are responsible for complying with all applicable local, state, national, and international laws and regulations."
+      },
+      "userContent": {
+        "title": "6. User-Generated Content and Moderation",
+        "text": "If the service allows user-generated content (including but not limited to chat messages, usernames, or other communications), you acknowledge and agree that: (a) you retain ownership of your content but grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, and display such content in connection with the service; (b) we have no obligation to monitor content but reserve the right to review, modify, or remove any content at our sole discretion without notice; (c) we may employ automated and manual moderation tools, but make no guarantee of effectiveness; (d) you waive any claims arising from moderation decisions, including removal of content or account restrictions; (e) content does not represent our views and we disclaim all liability for user-generated content; (f) any perceived offensive, inappropriate, or harmful content is the sole responsibility of the user who posted it; (g) we have the absolute right to ban, suspend, or restrict any user for any reason or no reason at our sole discretion; (h) moderation decisions are final and not subject to appeal. You agree that any content you encounter is at your own risk and we are not responsible for any harm, offense, or damages resulting from user-generated content."
+      },
+      "intellectualProperty": {
+        "title": "7. Intellectual Property and License",
+        "text": "All content, features, functionality, and materials available through the service, including but not limited to text, graphics, logos, icons, images, audio clips, video clips, data compilations, and software, are the exclusive property of the developer and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws. You are granted a limited, non-exclusive, non-transferable, revocable license to access and use the service for personal, non-commercial purposes only. This license does not include any right to: (a) resell or commercial use of the service or its contents; (b) collection and use of any product listings, descriptions, or prices; (c) derivative use of the service or its contents; (d) downloading or copying of account information; or (e) use of data mining, robots, or similar data gathering tools. Any unauthorized use terminates the license granted herein. You may not frame or utilize framing techniques to enclose any trademark, logo, or other proprietary information without express written consent."
+      },
+      "disclaimer": {
+        "title": "8. Disclaimers and Assumption of Risk",
+        "intro": "Your use of the service is entirely at your own risk. We provide this platform for entertainment:",
+        "item1": "The service is provided \"as is\" without warranty of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement.",
+        "item2": "We make no warranty that the service will meet your requirements, be uninterrupted, timely, secure, or error-free.",
+        "item3": "Any material obtained through the service is accessed at your own discretion and risk. You are solely responsible for any damage to your device or loss of data.",
+        "item4": "We do not warrant, endorse, guarantee, or assume responsibility for any third-party services, products, or content.",
+        "item5": "No advice or information obtained from us or through the service creates any warranty not expressly stated herein.",
+        "item6": "You acknowledge that we have no obligation to monitor access to or use of the service, but have the right to do so.",
+        "item7": "We reserve the right to modify, suspend, or discontinue the service (or any part thereof) at any time without notice.",
+        "item8": "Technical support is provided on a best-effort basis without any guarantees or service level commitments."
+      },
+      "limitationLiability": {
+        "title": "9. Limitation of Liability and Indemnification",
+        "text": "To the fullest extent permitted by applicable law, in no event shall the developer be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits, revenue, data, use, goodwill, or other intangible losses resulting from: (a) your access to or use of or inability to access or use the service; (b) any conduct or content of any third party on the service; (c) any content obtained from the service; or (d) unauthorized access, use, or alteration of your transmissions or content. This limitation applies regardless of the legal theory (contract, tort, strict liability, or otherwise) and even if we have been advised of the possibility of such damages. Some jurisdictions do not allow the exclusion of certain warranties or limitation of liability, so these limitations may not apply to you. You agree to indemnify, defend, and hold harmless the developer from any claims, liabilities, damages, losses, and expenses arising from your use of the service or violation of these terms."
+      },
+      "termination": {
+        "title": "10. Termination and Account Suspension",
+        "text": "We reserve the right, in our sole discretion, to terminate or suspend your account and access to the service immediately, without prior notice or liability, for any reason or no reason, including but not limited to breach of these terms, suspected fraudulent activity, or at our discretion for operational reasons. Upon termination, your right to use the service ceases immediately, and any data associated with your account may be deleted without the possibility of recovery. We are not obligated to provide explanations for termination decisions. All provisions of these terms which by their nature should survive termination shall survive, including ownership provisions, warranty disclaimers, indemnity, and limitations of liability. We may also terminate or suspend the entire service at any time without notice, and you acknowledge that we have no obligation to maintain or support the service indefinitely."
+      },
+      "governingLaw": {
+        "title": "11. Dispute Resolution and Governing Law",
+        "text": "These terms shall be governed by and construed in accordance with applicable international law principles. Any dispute arising from these terms or your use of the service shall be resolved through binding arbitration in accordance with international arbitration rules, with the arbitration to take place in a neutral jurisdiction selected by us. You waive any right to participate in class actions or class arbitrations. You agree that any claim must be brought in your individual capacity and not as part of any collective proceeding. To the extent arbitration is unavailable, you agree to submit to the personal jurisdiction of courts in our chosen jurisdiction and waive any objections based on venue or forum non conveniens. You agree that regardless of any statute or law to the contrary, any claim must be filed within one year after such claim arose or be forever barred."
+      },
+      "severability": {
+        "title": "12. Severability and Waiver",
+        "text": "If any provision of these terms is found to be unenforceable or invalid, that provision will be limited or eliminated to the minimum extent necessary so that these terms otherwise remain in full force and effect. Our failure to enforce any right or provision of these terms will not be deemed a waiver of such right or provision."
+      },
+      "minors": {
+        "title": "13. Minors and Parental Responsibility",
+        "text": "The service is intended for users aged 13 and older. If you are under 18 (or the age of majority in your jurisdiction), you represent that you have obtained parental or guardian consent to use the service. Parents and guardians are solely responsible for monitoring and supervising their children's use of the service. We are not responsible for determining whether users have obtained appropriate parental consent. Parents and guardians assume all risks and liabilities associated with their children's use of the service, including but not limited to exposure to user-generated content, interactions with other users, and any voluntary contributions made. By allowing a minor to use the service, parents and guardians agree to be bound by these terms on behalf of the minor and accept full responsibility for the minor's conduct. We disclaim all liability for any harm, damages, or consequences arising from a minor's use of the service."
+      },
+      "thirdPartyServices": {
+        "title": "14. Third-Party Services and Links",
+        "text": "The service may integrate with or contain links to third-party services, websites, or content not owned or controlled by us. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party services. You acknowledge and agree that we shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such third-party content, goods, or services. We strongly advise you to read the terms and conditions and privacy policies of any third-party services you access. Your interactions with third-party services are solely between you and the third party."
+      },
+      "dataRights": {
+        "title": "15. Content Rights and Usage",
+        "text": "By using the service, you grant us a perpetual, irrevocable, worldwide, royalty-free, non-exclusive license to use, reproduce, modify, adapt, publish, translate, create derivative works from, distribute, perform, and display any content you submit, post, or transmit through the service. This license includes the right to sublicense these rights to third parties. You waive any moral rights or rights of attribution you may have in such content. We may use your content for any purpose, including commercial purposes, without compensation to you. You represent and warrant that you own or have the necessary rights to grant this license and that your content does not violate any third-party rights or applicable laws."
+      },
+      "modifications": {
+        "title": "16. Changes to Terms and Service",
+        "text": "We reserve the right to modify, suspend, or discontinue any aspect of the service at any time without notice. We may also modify these terms at any time by posting the revised terms on the service. Your continued use of the service after such changes constitutes your acceptance of the new terms. It is your responsibility to review these terms periodically. We are not obligated to provide notice of changes, though we may do so at our discretion. If you do not agree to the modified terms, your sole remedy is to discontinue use of the service."
+      },
+      "contact": {
+        "title": "17. Contact and Notices",
+        "text": "For questions about these Terms of Service, you may contact us at the information below. We are not obligated to respond to inquiries. All notices to you will be provided via the service or email at our discretion."
+      }
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": {
+        "title": "Introduction",
+        "text": "Welcome! We care about your privacy and want you to understand how we handle your information in this non-commercial educational project. This policy explains everything in simple terms. By playing Uzbek Wars, you're trusting us with your data, and we take that seriously. As a personal learning initiative and portfolio project, we follow standard practices for educational platforms while being transparent about our data handling."
+      },
+      "dataCollection": {
+        "title": "1. Information We Collect",
+        "intro": "To provide you with a personalized gaming experience in this educational project, we collect:",
+        "item1": "Basic account information when you sign in, helping us recognize you and keep your progress safe.",
+        "item2": "Your game progress and achievements, so you can pick up right where you left off.",
+        "item3": "Technical information that helps us optimize performance for your device and learn about usage patterns.",
+        "item4": "Preferences and settings to remember how you like to play.",
+        "item5": "Referral connections when you invite friends, so we can reward you both.",
+        "item6": "Standard web analytics to help improve this educational project."
+      },
+      "dataUsage": {
+        "title": "2. How We Use Your Information",
+        "item1": "Delivering a smooth and enjoyable gaming experience tailored to you.",
+        "item2": "Keeping your account secure and your progress saved.",
+        "item3": "Understanding how to make this educational project better based on how people play.",
+        "item4": "Continuously improving performance and adding features as part of the learning process.",
+        "item5": "Analyzing usage patterns for educational purposes and project development.",
+        "item6": "Supporting the ongoing development and maintenance of this non-commercial hobby project."
+      },
+      "dataSharing": {
+        "title": "3. Data Sharing and Third Parties",
+        "text": "As a non-commercial educational project, we work with various third-party service providers to deliver features (authentication, hosting, analytics, payment processing, etc.). These partners operate independently with their own policies. We may share necessary data with these services to provide functionality. We may also analyze aggregated, anonymized data for educational purposes and project improvement. As with any online platform, we may need to comply with legal requirements if necessary."
+      },
+      "thirdParty": {
+        "title": "4. Our Trusted Partners",
+        "intro": "To provide you with a seamless experience in this educational project, we work with various technology partners:",
+        "google": "For secure and convenient authentication, making it easy for you to access your account.",
+        "telegram": "For optional community communication and support when you need us. We may use other services as needed for this non-commercial project."
+      },
+      "dataSecurity": {
+        "title": "5. Keeping Your Data Safe",
+        "text": "Your security is important to us. As a personal educational project, we use industry-standard practices and trusted service providers to protect your information. While we implement robust security measures and work with reputable partners, we want you to be aware that no online service can guarantee 100% security - this is true for all internet services, especially personal non-commercial projects. We continuously monitor and update our security practices within the scope of this educational initiative to keep your data as safe as possible."
+      },
+      "cookies": {
+        "title": "6. Cookies and Storage",
+        "text": "We use standard web technologies like cookies and local storage to remember your preferences and keep you logged in. This is how most modern websites work and helps provide you with a seamless experience. You can adjust your browser settings if you prefer, though some features may not work as smoothly without them. This is standard practice for web applications and educational projects."
+      },
+      "userRights": {
+        "title": "7. Your Control",
+        "item1": "You can view your game data anytime through your profile.",
+        "item2": "If you ever want to leave, you can request account deletion by contacting us.",
+        "item3": "Update your character name and preferences whenever you like.",
+        "item4": "Request a copy of your game data if you need it. As a non-commercial project, we'll do our best to accommodate requests."
+      },
+      "dataRetention": {
+        "title": "8. Data Storage",
+        "text": "We keep your data as long as you're actively playing to preserve your progress and achievements. If an account hasn't been used for an extended period (around 12 months), we may archive or remove it to keep our systems running efficiently. This is standard practice for online gaming platforms and helps maintain this personal educational project sustainably."
+      },
+      "children": {
+        "title": "9. Age-Appropriate Gaming",
+        "text": "Our service is designed for players aged 13 and older. We don't knowingly collect information from younger children. If you're a parent and have concerns, please reach out to us."
+      },
+      "changes": {
+        "title": "10. Policy Updates",
+        "text": "As this educational project grows and evolves, we may update this policy to reflect new features, learning experiences, or practices. We'll post any changes here, and your continued use means you're comfortable with the updates. We're committed to transparency about how we handle your information in this non-commercial learning initiative."
+      },
+      "contact": {
+        "title": "11. Questions?",
+        "text": "We're here to help! If you have any questions about privacy or how we handle your data in this educational project:"
+      }
+    }
   }
 }

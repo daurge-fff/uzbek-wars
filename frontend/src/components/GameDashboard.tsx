@@ -329,12 +329,23 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               </svg>
               
               {/* Аватар */}
-              <div className="w-16 h-16 rounded-full overflow-hidden shadow-xl ring-2 ring-white dark:ring-gray-800">
-                <img 
-                  src={userAvatar} 
-                  alt="Avatar" 
-                  className="w-full h-full object-cover"
-                />
+              <div className="w-16 h-16 rounded-full overflow-hidden shadow-xl ring-2 ring-white dark:ring-gray-800 bg-gray-200 dark:bg-gray-700">
+                {userAvatar && userAvatar.startsWith('http') ? (
+                  <img 
+                    src={userAvatar} 
+                    alt="Avatar" 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-3xl">👤</div>';
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-3xl">
+                    {userAvatar || '👤'}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -731,6 +742,46 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 </motion.button>
               );
             })}
+          </div>
+        </motion.div>
+
+        {/* Navigation Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-6"
+        >
+          <div className="grid grid-cols-3 gap-3">
+            <motion.a
+              href="/"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center"
+            >
+              <div className="text-3xl mb-1">🏠</div>
+              <div className="text-sm font-bold text-gray-900 dark:text-white">{t('menu.home', 'Главная')}</div>
+            </motion.a>
+            
+            <motion.a
+              href="/shop"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center"
+            >
+              <div className="text-3xl mb-1">🛍️</div>
+              <div className="text-sm font-bold text-gray-900 dark:text-white">{t('menu.shop', 'Магазин')}</div>
+            </motion.a>
+            
+            <motion.a
+              href="/settings"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center"
+            >
+              <div className="text-3xl mb-1">⚙️</div>
+              <div className="text-sm font-bold text-gray-900 dark:text-white">{t('menu.settings', 'Настройки')}</div>
+            </motion.a>
           </div>
         </motion.div>
       </div>

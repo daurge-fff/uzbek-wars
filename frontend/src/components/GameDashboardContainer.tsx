@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { GameDashboard } from './GameDashboard';
-import { OnboardingFlow } from './OnboardingFlow';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,23 +14,6 @@ export const GameDashboardContainer = () => {
   const [loading, setLoading] = useState(true);
   const [currentActivity, setCurrentActivity] = useState<any>(null);
   const [cooldownInfo, setCooldownInfo] = useState<{activityName: string; seconds: number} | null>(null);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
-  // Проверяем нужен ли онбординг
-  useEffect(() => {
-    if (isAuthenticated && player) {
-      const needsCharacter = !player.characterId || player.characterId === 'default';
-      const needsCity = !player.cityId || player.cityId === 'default';
-      if (needsCharacter || needsCity) {
-        setShowOnboarding(true);
-      }
-    }
-  }, [isAuthenticated, player]);
-
-  // Если нужен онбординг - показываем его
-  if (showOnboarding) {
-    return <OnboardingFlow />;
-  }
 
   // Логируем изменения статов для отладки
   useEffect(() => {
@@ -55,7 +37,7 @@ export const GameDashboardContainer = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/start');
+      navigate('/');
       return;
     }
 

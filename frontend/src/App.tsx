@@ -28,6 +28,8 @@ import { Settings } from './components/Settings';
 import { HealthCheck } from './components/HealthCheck';
 import { ReferralLanding } from './components/ReferralLanding';
 import { FontLoader } from './components/FontLoader';
+import { TermsOfService } from './components/TermsOfService';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { cosmeticItems } from './data/cosmeticItems';
 
 const queryClient = new QueryClient({
@@ -93,6 +95,18 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/dashboard" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="relative"
+          >
+            <GameDashboardContainer />
+          </motion.div>
+        } />
         <Route path="/logout" element={
           <motion.div
             variants={pageVariants}
@@ -126,18 +140,6 @@ function AnimatedRoutes() {
             transition={pageTransition}
           >
             <AuthRedirect />
-          </motion.div>
-        } />
-        <Route path="/dashboard" element={
-          <motion.div
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={pageTransition}
-            className="relative"
-          >
-            <GameDashboardContainer />
           </motion.div>
         } />
         <Route path="/shop" element={
@@ -238,6 +240,30 @@ function AnimatedRoutes() {
             className="relative"
           >
             <SettingsWithI18n />
+          </motion.div>
+        } />
+        <Route path="/terms" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="relative"
+          >
+            <TermsOfService />
+          </motion.div>
+        } />
+        <Route path="/privacy" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="relative"
+          >
+            <PrivacyPolicy />
           </motion.div>
         } />
       </Routes>

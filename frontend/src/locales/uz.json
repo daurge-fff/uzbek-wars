@@ -47,7 +47,15 @@
     "hunger": "Ochlik",
     "health": "Salomatlik",
     "mood": "Kayfiyat",
-    "energy": "Energiya"
+    "energy": "Energiya",
+    "hungerDesc": "Ochlikni tiklash uchun ovqatlaning",
+    "healthDesc": "Salomatlikni tiklash uchun dam oling va ovqatlaning",
+    "moodDesc": "Kayfiyatni yaxshilash uchun dam oling va osh pishiring",
+    "energyDesc": "Energiyani tiklash uchun dam oling",
+    "hungerLow": "Zudlik bilan ovqatlanish kerak!",
+    "healthLow": "Salomatlik tugayapti!",
+    "moodLow": "Yomon kayfiyat!",
+    "energyLow": "Dam olish kerak!"
   },
   "ui": {
     "loading": "Yuklanmoqda...",
@@ -64,7 +72,12 @@
     "logout": "Chiqish",
     "login_with_google": "Google orqali kirish",
     "logging_in": "Kirish...",
-    "welcome": "Xush kelibsiz"
+    "welcome": "Xush kelibsiz",
+    "clickToLogin": "Kirish uchun tugmani bosing",
+    "loadingGoogle": "Google yuklanmoqda...",
+    "loginRequired": "Iltimos, tizimga kiring",
+    "loginToPlay": "O'ynashni boshlash uchun kiring",
+    "loginError": "Kirish xatosi"
   },
   "cities": {
     "select": "Shaharni tanlang",
@@ -179,24 +192,19 @@
     "unequip": "Yechish"
   },
   "menu": {
-    "game": "O'yin",
-    "gameDesc": "O'ynashni boshlash",
+    "home": "Bosh sahifa",
     "leaderboard": "Reyting",
-    "leaderboardDesc": "Eng yaxshi o'yinchilar",
-    "referral": "Referallar",
-    "referralDesc": "Do'stlarni taklif qiling",
+    "leaderboardDesc": "Top o'yinchilar",
+    "referral": "Do'stlar",
+    "referralDesc": "Do'st taklif qil",
     "shop": "Do'kon",
-    "shopDesc": "Buyumlar sotib olish",
+    "shopDesc": "Kosmetika",
     "inventory": "Inventar",
-    "inventoryDesc": "Sizning buyumlaringiz",
-    "profile": "Profil",
-    "profileDesc": "Sizning profilingiz",
+    "inventoryDesc": "Narsalaringiz",
     "settings": "Sozlamalar",
-    "settingsDesc": "O'yin sozlamalari",
+    "settingsDesc": "Parametrlar",
     "donate": "Donat",
-    "donateDesc": "Loyihani qo'llab-quvvatlash",
-    "health": "Salomatlik",
-    "healthDesc": "Server holati"
+    "donateDesc": "Qo'llab-quvvatlash"
   },
   "common": {
     "cancel": "Bekor qilish",
@@ -329,20 +337,6 @@
     "somsLabel": "So'm - o'yin valyutasi",
     "crystalsLabel": "Kristallar - donat valyutasi"
   },
-  "stats": {
-    "hunger": "Ochlik",
-    "health": "Salomatlik",
-    "mood": "Kayfiyat",
-    "energy": "Energiya",
-    "hungerDesc": "Ochlikni tiklash uchun ovqatlaning",
-    "healthDesc": "Salomatlikni tiklash uchun dam oling va ovqatlaning",
-    "moodDesc": "Kayfiyatni yaxshilash uchun dam oling va osh pishiring",
-    "energyDesc": "Energiyani tiklash uchun dam oling",
-    "hungerLow": "Zudlik bilan ovqatlanish kerak!",
-    "healthLow": "Salomatlik tugayapti!",
-    "moodLow": "Yomon kayfiyat!",
-    "energyLow": "Dam olish kerak!"
-  },
   "back": "Orqaga",
   "about": {
     "codeQuality": "Kod sifati",
@@ -408,5 +402,175 @@
     "continue": "Davom etish",
     "loading": "Yuklanmoqda...",
     "preparing": "Ilova tayyorlanmoqda"
+  },
+  "legal": {
+    "lastUpdated": "Oxirgi yangilanish",
+    "effectiveDate": "Kuchga kirish sanasi",
+    "terms": {
+      "title": "Foydalanish shartlari",
+      "acceptance": {
+        "title": "1. Shartlarga rozilik",
+        "text": "Uzbek Wars'ga kirish yoki undan foydalanish orqali siz ushbu Foydalanish shartlari va barcha qo'llaniladigan qonunlar va qoidalarga rioya qilishga rozilik bildirasiz. Agar siz ushbu shartlarning biron bir qismiga rozi bo'lmasangiz, xizmatdan foydalanmasligingiz kerak. Xizmatdan davom etib foydalanishingiz ushbu shartlardagi har qanday o'zgarishlarni qabul qilishingizni anglatadi. Ushbu shartlar siz va biz o'rtamizda xizmat bo'yicha to'liq kelishuvni tashkil qiladi va oldingi barcha kelishuvlarni bekor qiladi. Siz majburiy shartnoma tuzish uchun qonuniy yoshga yetganligingizni va qo'llaniladigan qonunga muvofiq xizmatdan foydalanish taqiqlanmaganligingizni bildirasz."
+      },
+      "serviceDescription": {
+        "title": "2. Bizning xizmatimiz haqida",
+        "text": "Uzbek Wars ko'ngil ochar maqsadlarda «bor holda» va «mavjud holda» taqdim etiladi. Bu mustaqil ravishda qo'llab-quvvatlanadigan shaxsiy loyiha. Xizmat, shu jumladan barcha kontent, xususiyatlar va funksionallik hech qanday kafolatlar, aniq yoki nazarda tutilgan holda taqdim etiladi. Biz xizmatning har qanday maqsad uchun mosligi, ishonchliligi, mavjudligi yoki aniqligi haqida hech qanday bayonot bermaymiz. Barcha foydalanish faqat sizning xavfingiz va ixtiyoringiz bilan amalga oshiriladi."
+      },
+      "donations": {
+        "title": "3. Virtual valyuta va ixtiyoriy hissalar",
+        "intro": "Xizmat ixtiyoriy hissalar uchun virtual valyuta (kristallar) taklif qilishi mumkin:",
+        "item1": "Virtual valyuta pul qiymatiga ega emas va xizmatdan tashqarida haqiqiy valyuta yoki qimmatli narsalarga almashtirilishi mumkin emas.",
+        "item2": "Barcha hissalar ixtiyoriy, yakuniy va har qanday holatda, shu jumladan hisob tugatilishi, xizmat to'xtatilishi yoki norozilik holatida qaytarilmaydi.",
+        "item3": "Bizda hissalar evaziga biron bir aniq xususiyatlar, narsalar yoki xizmatlarni taqdim etish majburiyati yo'q.",
+        "item4": "Virtual narsalar istalgan vaqtda ogohlantirish yoki kompensatsiya bermasdan o'zgartirilishi, o'chirilishi yoki mavjud bo'lmasligi mumkin.",
+        "item5": "To'lovlarni qayta ishlash uchinchi tomon xizmatlari tomonidan amalga oshiriladi va biz ularning harakatlari yoki muvaffaqiyatsizliklari uchun javobgar emasmiz.",
+        "item6": "To'lovlarni qaytarish yoki to'lov bo'yicha nizolarni boshlash darhol hisobni tugatish va barcha virtual narsalarni yo'qotishga olib kelishi mumkin.",
+        "item7": "Hissalar operatsion xarajatlar va ishlab chiqishni qo'llab-quvvatlaydi, lekin hech qanday shartnoma majburiyatlari yoki xizmatni davom ettirish kafolatlari yaratmaydi."
+      },
+      "userAccount": {
+        "title": "4. Hisob mas'uliyati",
+        "item1": "Siz hisob ma'lumotlaringizning maxfiyligini saqlash va hisobingiz ostidagi barcha harakatlar uchun javobgarsiz.",
+        "item2": "Siz hisobingizdan ruxsatsiz foydalanish yoki boshqa xavfsizlik buzilishi haqida darhol bizga xabar berishga rozilik bildirasiz.",
+        "item3": "Biz hisob ma'lumotlaringizni himoya qilmasligingiz natijasida yuzaga keladigan har qanday yo'qotish yoki zarar uchun javobgar emasmiz.",
+        "item4": "Siz hisobingizni uchinchi shaxslarga o'tkaza olmaysiz, sota olmaysiz yoki boshqa yo'l bilan kirish huquqini bera olmaysiz.",
+        "item5": "Biz o'z ixtiyorimizga ko'ra xizmatni rad etish, hisoblarni tugatish yoki kontentni o'chirish huquqini o'zimizda saqlaymiz."
+      },
+      "prohibitedConduct": {
+        "title": "5. Foydalanuvchi xulq-atvori va kontent",
+        "item1": "Siz xizmatdan foydalanish paytida o'z xulq-atvoringiz va yaratgan, uzatgan yoki ko'rsatgan har qanday kontent uchun yagona javobgarsiz.",
+        "item2": "Siz xizmat ishlashiga xalaqit berishi mumkin bo'lgan ruxsatsiz dasturiy ta'minot, avtomatlashtirish vositalari yoki usullardan foydalanmaslikka rozilik bildirasiz.",
+        "item3": "Siz boshqa foydalanuvchilar bilan hurmat bilan munosabatda bo'lishga va ta'qib qilish, tahdid qilish yoki haqoratli xatti-harakatlarda qatnashmaslikka rozilik bildirasiz.",
+        "item4": "Siz boshqalar sifatida o'zingizni ko'rsata olmaysiz yoki biron bir shaxs yoki tashkilotga tegishliligingizni noto'g'ri ko'rsata olmaysiz.",
+        "item5": "Siz xizmat, serverlar yoki xizmatga ulangan tarmoqlarning ishlashiga aralashmaslik va ularni buzmaslikka rozilik bildirasiz.",
+        "item6": "Siz barcha qo'llaniladigan mahalliy, davlat, milliy va xalqaro qonunlar va qoidalarga rioya qilish uchun javobgarsiz."
+      },
+      "userContent": {
+        "title": "6. Foydalanuvchi yaratgan kontent va moderatsiya",
+        "text": "Agar xizmat foydalanuvchi yaratgan kontentga (shu jumladan, lekin cheklanmagan holda, chat xabarlari, foydalanuvchi nomlari yoki boshqa aloqalarga) ruxsat bersa, siz tan olasiz va rozilik bildirasizki: (a) siz o'z kontentingizga egalik huquqini saqlab qolasiz, lekin bizga xizmat bilan bog'liq holda bunday kontentni ishlatish, ko'paytirish, o'zgartirish va ko'rsatish uchun dunyo bo'ylab, eksklyuziv bo'lmagan, bepul litsenziya berasiz; (b) bizda kontentni kuzatish majburiyati yo'q, lekin ogohlantirmasdan o'z ixtiyorimizga ko'ra har qanday kontentni ko'rib chiqish, o'zgartirish yoki o'chirish huquqini o'zimizda saqlaymiz; (c) biz avtomatlashtirilgan va qo'lda moderatsiya vositalaridan foydalanishimiz mumkin, lekin samaradorlikka kafolat bermaymiz; (d) siz moderatsiya qarorlari, shu jumladan kontentni o'chirish yoki hisob cheklovlaridan kelib chiqadigan har qanday da'volardan voz kechasiz; (e) kontent bizning fikrlarimizni ifodalamaydi va biz foydalanuvchi yaratgan kontent uchun barcha javobgarlikdan voz kechamiz; (f) har qanday haqoratli, nomaqbul yoki zararli deb qabul qilingan kontent uni joylashtirgan foydalanuvchining yagona javobgarligi hisoblanadi; (g) bizda o'z ixtiyorimizga ko'ra har qanday sabab yoki sabab bo'lmagan holda har qanday foydalanuvchini bloklash, to'xtatib turish yoki cheklash mutlaq huquqi bor; (h) moderatsiya qarorlari yakuniy va shikoyat qilinmaydi. Siz duch keladigan har qanday kontent o'z xavfingizda ekanligiga rozilik bildirasiz va biz foydalanuvchi yaratgan kontentdan kelib chiqadigan har qanday zarar, haqorat yoki zararlar uchun javobgar emasmiz."
+      },
+      "intellectualProperty": {
+        "title": "7. Intellektual mulk va litsenziya",
+        "text": "Xizmat orqali mavjud bo'lgan barcha kontent, xususiyatlar, funksionallik va materiallar, shu jumladan, lekin cheklanmagan holda, matn, grafika, logotiplar, belgilar, rasmlar, audio kliplar, video kliplar, ma'lumotlar to'plamlari va dasturiy ta'minot ishlab chiquvchining eksklyuziv mulki hisoblanadi va xalqaro mualliflik huquqi, savdo belgilari, patentlar, tijorat sirlari va boshqa intellektual mulk qonunlari bilan himoyalangan. Sizga faqat shaxsiy, notijorat maqsadlarda xizmatga kirish va undan foydalanish uchun cheklangan, eksklyuziv bo'lmagan, o'tkazib bo'lmaydigan, bekor qilinadigan litsenziya beriladi. Ushbu litsenziya quyidagilarga hech qanday huquqni o'z ichiga olmaydi: (a) xizmat yoki uning tarkibini qayta sotish yoki tijorat maqsadida foydalanish; (b) mahsulot ro'yxatlari, tavsiflar yoki narxlarni to'plash va ulardan foydalanish; (c) xizmat yoki uning tarkibidan hosilaviy foydalanish; (d) hisob ma'lumotlarini yuklab olish yoki nusxalash; yoki (e) ma'lumotlarni qazib olish, robotlar yoki shunga o'xshash ma'lumot to'plash vositalaridan foydalanish. Har qanday ruxsatsiz foydalanish shu yerda berilgan litsenziyani tugatadi. Siz aniq yozma rozilik olmasdan har qanday savdo belgisi, logotip yoki boshqa mulkiy ma'lumotni o'rab olish uchun freymlar yoki freymlash usullaridan foydalana olmaysiz."
+      },
+      "disclaimer": {
+        "title": "8. Javobgarlikdan voz kechish va xavfni qabul qilish",
+        "intro": "Siz xizmatdan foydalanish to'liq o'z xavfingizda. Biz ushbu platformani ko'ngil ochar uchun taqdim etamiz:",
+        "item1": "Xizmat hech qanday kafolat, aniq yoki nazarda tutilgan, shu jumladan, lekin cheklanmagan holda, sotuvga yaroqlilik, ma'lum bir maqsad uchun yaroqlilik yoki huquqlarni buzmaslik kafolatlari bilan «bor holda» taqdim etiladi.",
+        "item2": "Biz xizmat sizning talablaringizga javob berishi, uzluksiz, o'z vaqtida, xavfsiz yoki xatosiz bo'lishiga kafolat bermaymiz.",
+        "item3": "Xizmat orqali olingan har qanday material sizning ixtiyoringiz va xavfingizda olinadi. Siz qurilmangizga zarar yoki ma'lumotlarni yo'qotish uchun yagona javobgarsiz.",
+        "item4": "Biz uchinchi tomon xizmatlari, mahsulotlari yoki kontenti uchun kafolat bermaymiz, ma'qullamaymiz, kafolat bermaymiz yoki javobgarlikni o'z zimmamizga olmaymiz.",
+        "item5": "Bizdan yoki xizmat orqali olingan hech qanday maslahat yoki ma'lumot bu yerda aniq ko'rsatilmagan hech qanday kafolatni yaratmaydi.",
+        "item6": "Siz bizda xizmatga kirishni yoki undan foydalanishni kuzatish majburiyati yo'qligini, lekin buni qilish huquqiga ega ekanligimizni tan olasiz.",
+        "item7": "Biz ogohlantirmasdan istalgan vaqtda xizmatni (yoki uning biron bir qismini) o'zgartirish, to'xtatib turish yoki to'xtatish huquqini o'zimizda saqlaymiz.",
+        "item8": "Texnik yordam hech qanday kafolatlar yoki xizmat darajasi majburiyatlari bo'lmagan holda eng yaxshi sa'y-harakatlar asosida taqdim etiladi."
+      },
+      "limitationLiability": {
+        "title": "9. Javobgarlikni cheklash va zararni qoplash",
+        "text": "Qo'llaniladigan qonun tomonidan ruxsat berilgan eng katta darajada, hech qanday holatda ishlab chiquvchi quyidagilardan kelib chiqadigan har qanday bilvosita, tasodifiy, maxsus, keyingi yoki jazo zararlari yoki foyda, daromad, ma'lumotlar, foydalanish, yaxshi niyat yoki boshqa nomoddiy yo'qotishlar uchun javobgar bo'lmaydi: (a) xizmatga kirishingiz yoki undan foydalanishingiz yoki xizmatga kira olmasligingiz yoki undan foydalana olmasligingiz; (b) xizmatdagi uchinchi tomonning har qanday xatti-harakati yoki kontenti; (c) xizmatdan olingan har qanday kontent; yoki (d) sizning uzatmalaringiz yoki kontentingizga ruxsatsiz kirish, foydalanish yoki o'zgartirish. Ushbu cheklash huquqiy nazariyadan (shartnoma, huquqbuzarlik, qat'iy javobgarlik yoki boshqa) qat'i nazar qo'llaniladi va hatto bizga bunday zararlar ehtimoli haqida xabar berilgan bo'lsa ham. Ba'zi yurisdiktsiyalar ma'lum kafolatlarni istisno qilish yoki javobgarlikni cheklashga ruxsat bermaydi, shuning uchun bu cheklovlar sizga taalluqli bo'lmasligi mumkin. Siz xizmatdan foydalanishingiz yoki ushbu shartlarni buzishingiz natijasida kelib chiqadigan har qanday da'volar, majburiyatlar, zararlar, yo'qotishlar va xarajatlardan ishlab chiquvchini himoya qilish, zararni qoplash va himoya qilishga rozilik bildirasiz."
+      },
+      "modifications": {
+        "title": "16. Shartlar va xizmatni o'zgartirish",
+        "text": "Biz ogohlantirishsiz istalgan vaqtda xizmatning har qanday jihatini o'zgartirish, to'xtatib turish yoki to'xtatish huquqini o'zimizda saqlaymiz. Biz shuningdek, xizmatda qayta ko'rib chiqilgan shartlarni e'lon qilish orqali istalgan vaqtda ushbu shartlarni o'zgartirishimiz mumkin. Bunday o'zgarishlardan keyin xizmatdan davom etib foydalanishingiz yangi shartlarni qabul qilishingizni anglatadi. Siz vaqti-vaqti bilan ushbu shartlarni ko'rib chiqish majburiyatiga egasiz. Biz o'zgarishlar haqida xabar berish majburiyatiga ega emasmiz, garchi o'z ixtiyorimizga ko'ra buni qilishimiz mumkin. Agar siz o'zgartirilgan shartlarga rozi bo'lmasangiz, sizning yagona huquqiy himoya vositangiz xizmatdan foydalanishni to'xtatishdir."
+      },
+      "termination": {
+        "title": "10. Hisobni to'xtatish va to'xtatib turish",
+        "text": "Biz o'z ixtiyorimizga ko'ra, oldindan ogohlantirmasdan yoki javobgarliksiz, har qanday sabab yoki sabab bo'lmagan holda, shu jumladan, lekin cheklanmagan holda, ushbu shartlarni buzish, firibgarlik faoliyatidan shubhalanish yoki operatsion sabablarga ko'ra hisobingizni va xizmatga kirishni darhol to'xtatish yoki to'xtatib turish huquqini o'zimizda saqlaymiz. To'xtatilgandan keyin xizmatdan foydalanish huquqingiz darhol tugaydi va hisobingiz bilan bog'liq har qanday ma'lumotlar qayta tiklanmasdan o'chirilishi mumkin. Biz to'xtatish qarorlari haqida tushuntirish berish majburiyatiga ega emasmiz. Ushbu shartlarning o'z tabiati bo'yicha to'xtatilgandan keyin saqlanishi kerak bo'lgan barcha qoidalari, shu jumladan mulkchilik huquqi, kafolatlardan voz kechish, zararni qoplash va javobgarlikni cheklash qoidalari saqlanadi. Biz shuningdek, istalgan vaqtda ogohlantirishsiz butun xizmatni to'xtatish yoki to'xtatib turish huquqiga egamiz va siz biz xizmatni abadiy qo'llab-quvvatlash yoki saqlash majburiyatiga ega emasligimizni tan olasiz."
+      },
+      "governingLaw": {
+        "title": "11. Nizolarni hal qilish va qo'llaniladigan qonun",
+        "text": "Ushbu shartlar xalqaro huquqning qo'llaniladigan tamoyillariga muvofiq tartibga solinadi va talqin qilinadi. Ushbu shartlardan yoki xizmatdan foydalanishingizdan kelib chiqadigan har qanday nizo xalqaro arbitraj qoidalariga muvofiq majburiy arbitraj orqali hal qilinishi kerak, bunda arbitraj biz tanlagan neytral yurisdiktsiyada o'tkazilishi kerak. Siz jamoaviy da'volar yoki jamoaviy arbitrajlarda qatnashish huquqidan voz kechasiz. Siz har qanday da'vo jamoaviy ko'rib chiqishning bir qismi sifatida emas, balki shaxsiy sifatda berilishi kerakligiga rozilik bildirasiz. Arbitraj mavjud bo'lmagan darajada, siz biz tanlagan yurisdiktsiyada sudlarning shaxsiy yurisdiktsiyasiga bo'ysunishga rozilik bildirasiz va joy yoki forum non conveniens asosidagi har qanday e'tirozlardan voz kechasiz. Siz har qanday qonun yoki aksincha qonundan qat'i nazar, har qanday da'vo bunday da'vo paydo bo'lganidan keyin bir yil ichida berilishi kerakligiga, aks holda abadiy taqiqlanishiga rozilik bildirasiz."
+      },
+      "severability": {
+        "title": "12. Bo'linish va huquqlardan voz kechish",
+        "text": "Agar ushbu shartlarning biron bir qoidasi kuchga ega emas yoki haqiqiy emas deb topilsa, bu qoida minimal zarur darajada cheklangan yoki chiqarib tashlanadi, shunda ushbu shartlar qolgan qismida to'liq kuchda va amalda qoladi. Ushbu shartlarning biron bir huquqi yoki qoidasini ta'minlashga qodir emasligimiz bunday huquq yoki qoidadan voz kechish hisoblanmaydi."
+      },
+      "minors": {
+        "title": "13. Voyaga yetmaganlar va ota-onalar mas'uliyati",
+        "text": "Xizmat 13 yosh va undan katta foydalanuvchilar uchun mo'ljallangan. Agar siz 18 yoshdan kichik bo'lsangiz (yoki yurisdiktsiyangizda voyaga yetish yoshidan kichik bo'lsangiz), siz xizmatdan foydalanish uchun ota-onalar yoki vasiylarning roziligini olganligingizni bildirasz. Ota-onalar va vasiylar o'z farzandlarining xizmatdan foydalanishini kuzatish va nazorat qilish uchun yagona javobgardirlar. Biz foydalanuvchilar tegishli ota-onalar roziligini olgan yoki olmaganligini aniqlash uchun javobgar emasmiz. Ota-onalar va vasiylar o'z farzandlarining xizmatdan foydalanishi bilan bog'liq barcha xavf va majburiyatlarni o'z zimmalariga oladilar, shu jumladan, lekin cheklanmagan holda, foydalanuvchi yaratgan kontentga ta'sir qilish, boshqa foydalanuvchilar bilan o'zaro munosabatlar va har qanday ixtiyoriy hissalar. Voyaga yetmaganga xizmatdan foydalanishga ruxsat berish orqali ota-onalar va vasiylar voyaga yetmagan nomidan ushbu shartlarga rioya qilishga rozilik bildiradilar va voyaga yetmaganning xulq-atvori uchun to'liq javobgarlikni o'z zimmalariga oladilar. Biz voyaga yetmaganning xizmatdan foydalanishi natijasida yuzaga keladigan har qanday zarar, shikast yoki oqibatlar uchun har qanday javobgarlikdan voz kechamiz."
+      },
+      "thirdPartyServices": {
+        "title": "14. Uchinchi tomon xizmatlari va havolalar",
+        "text": "Xizmat uchinchi tomon xizmatlariga integratsiya qilinishi yoki havolalar o'z ichiga olishi mumkin. Biz bunday uchinchi tomon xizmatlari, mahsulotlari yoki kontenti uchun javobgar emasmiz va ularni ma'qullamaymiz, kafolat bermaymiz yoki javobgarlikni o'z zimmamizga olmaymiz. Uchinchi tomon xizmatlari o'z shartlari va maxfiylik siyosatlari bilan boshqariladi. Siz uchinchi tomon xizmatlaridan foydalanish o'z xavfingizda ekanligini tan olasiz. Biz uchinchi tomon xizmatlari bilan o'zaro munosabatlaringizdan kelib chiqadigan har qanday yo'qotish yoki zarar uchun javobgar emasmiz."
+      },
+      "dataRights": {
+        "title": "15. Kontent huquqlari va foydalanish",
+        "text": "Xizmatdan foydalanish orqali siz bizga xizmat orqali yuborgan, e'lon qilgan yoki uzatgan har qanday kontentni ishlatish, ko'paytirish, o'zgartirish, moslash, nashr qilish, tarjima qilish, hosilaviy ishlar yaratish, tarqatish, ijro etish va ko'rsatish uchun muddatsiz, qaytarib olinmaydigan, dunyo bo'ylab, bepul, eksklyuziv bo'lmagan litsenziya berasiz. Ushbu litsenziya bu huquqlarni uchinchi shaxslarga sublitsenziya qilish huquqini o'z ichiga oladi. Siz bunday kontent bo'yicha ega bo'lishingiz mumkin bo'lgan har qanday ma'naviy huquqlar yoki mualliflik huquqlaridan voz kechasiz. Biz sizning kontentingizni har qanday maqsadlar uchun, shu jumladan tijorat maqsadlari uchun sizga kompensatsiya bermasdan ishlatishimiz mumkin. Siz ushbu litsenziyani berish uchun zarur huquqlarga ega ekanligingizni yoki ega ekanligingizni bildirasz va kafolat berasiz va sizning kontentingiz uchinchi shaxslarning hech qanday huquqlarini yoki qo'llaniladigan qonunlarni buzmaydi."
+      },
+      "indemnification": {
+        "title": "17. Zararni qoplash",
+        "text": "Siz ishlab chiquvchi, uning sherik tashkilotlari, litsenziyalari va xizmat ko'rsatuvchilar, shuningdek ularning tegishli mansabdor shaxslari, direktorlari, xodimlari, pudratchilar, agentlar, litsenziyalar, ta'minotchilar, huquq vorislari va huquq vorislarini quyidagilardan kelib chiqadigan yoki ular bilan bog'liq har qanday da'volar, majburiyatlar, zararlar, sud qarorlari, mukofotlar, yo'qotishlar, xarajatlar, chiqimlar yoki to'lovlardan (shu jumladan oqilona advokat to'lovlari) himoya qilish, zararni qoplash va himoya qilishga rozilik bildirasiz: (a) ushbu shartlarni buzishingiz; (b) xizmatdan foydalanishingiz; (c) boshqa shaxsning har qanday huquqlarini buzishingiz; (d) sizning kontentingiz; yoki (e) hisobingiz bilan bog'liq har qanday faoliyat, siz yoki hisobingizdan foydalanib xizmatga kiradigan boshqa har qanday shaxs. Ushbu zararni qoplash majburiyati ushbu shartlar va xizmatdan foydalanishingiz to'xtatilgandan keyin ham saqlanadi."
+      },
+      "contact": {
+        "title": "18. Aloqa va bildirishnomalar",
+        "text": "Ushbu Foydalanish shartlari bilan bog'liq savollar bo'yicha quyidagi ma'lumotlar orqali biz bilan bog'lanishingiz mumkin. Biz so'rovlarga javob berish majburiyatiga ega emasmiz. Siz uchun barcha bildirishnomalar o'z ixtiyorimizga ko'ra xizmat orqali yoki elektron pochta orqali taqdim etiladi:"
+      }
+    }
+  },
+  "privacy": {
+    "title": "Maxfiylik siyosati",
+    "intro": {
+      "title": "Kirish",
+      "text": "Xush kelibsiz! Biz sizning maxfiyligingiz haqida g'amxo'rlik qilamiz va ma'lumotlaringizni qanday qayta ishlashimizni tushunishingizni xohlaymiz. Ushbu siyosat hamma narsani oddiy so'zlar bilan tushuntiradi. Uzbek Wars'dan foydalanish orqali siz bizga ma'lumotlaringizni ishonib topshirasiz va biz buni jiddiy qabul qilamiz. Shaxsiy loyiha sifatida biz standart amaliyotlarga amal qilamiz va ma'lumotlarni qayta ishlashda shaffof bo'lamiz."
+    },
+    "dataCollection": {
+      "title": "1. Biz to'playdigan ma'lumotlar",
+      "intro": "Sizga shaxsiylashtirilgan o'yin tajribasini taqdim etish uchun biz quyidagilarni to'playmiz:",
+      "item1": "Kirish paytida hisob haqida asosiy ma'lumotlar, bu bizga sizni tanishga va taraqqiyotingizni xavfsiz saqlashga yordam beradi.",
+      "item2": "Sizning o'yin taraqqiyotingiz va yutuqlaringiz, shunda siz to'xtagan joydan davom etishingiz mumkin.",
+      "item3": "Qurilmangiz uchun ishlashni optimallashtirish va foydalanish modellarini o'rganishga yordam beradigan texnik ma'lumotlar.",
+      "item4": "Qanday o'ynashni yoqtirishingizni eslab qolish uchun afzalliklar va sozlamalar.",
+      "item5": "Do'stlarni taklif qilganingizda referal aloqalar, shunda ikkalangizni ham mukofotlashimiz mumkin.",
+      "item6": "Loyihani yaxshilash uchun standart veb-analitika."
+    },
+    "dataUsage": {
+      "title": "2. Ma'lumotlaringizni qanday ishlatamiz",
+      "item1": "Siz uchun moslashtirilgan silliq va yoqimli o'yin tajribasini taqdim etish.",
+      "item2": "Hisobingiz xavfsizligini ta'minlash va taraqqiyotingizni saqlash.",
+      "item3": "Odamlar qanday o'ynashiga asoslanib loyihani qanday yaxshilashni tushunish.",
+      "item4": "O'rganish jarayoni doirasida ishlashni doimiy yaxshilash va xususiyatlar qo'shish.",
+      "item5": "Ta'lim maqsadlari va loyihani rivojlantirish uchun foydalanish modellarini tahlil qilish.",
+      "item6": "Ushbu notijorat hobbi loyihasining joriy ishlab chiqilishi va xizmat ko'rsatilishini qo'llab-quvvatlash."
+    },
+    "dataSharing": {
+      "title": "3. Ma'lumotlar almashish va uchinchi tomonlar",
+      "text": "Notijorat loyiha sifatida biz xususiyatlarni taqdim etish uchun turli uchinchi tomon xizmat ko'rsatuvchilar bilan ishlaymiz (autentifikatsiya, hosting, analitika, to'lovlarni qayta ishlash va boshqalar). Ushbu hamkorlar o'z siyosatlari bilan mustaqil ishlaydilar. Biz funksionallikni ta'minlash uchun ushbu xizmatlar bilan zarur ma'lumotlarni almashishimiz mumkin. Biz shuningdek, ta'lim maqsadlari va loyihani yaxshilash uchun yig'ilgan, anonim ma'lumotlarni tahlil qilishimiz mumkin. Har qanday onlayn platforma kabi, zarurat tug'ilganda biz huquqiy talablarga rioya qilishimiz kerak bo'lishi mumkin."
+    },
+    "thirdParty": {
+      "title": "4. Bizning ishonchli hamkorlarimiz",
+      "intro": "Sizga uzluksiz tajriba taqdim etish uchun biz turli texnologik hamkorlar bilan ishlaymiz:",
+      "google": "Hisobingizga kirishni osonlashtiradigan xavfsiz va qulay autentifikatsiya uchun.",
+      "telegram": "Kerak bo'lganda jamiyat bilan aloqa va qo'llab-quvvatlash uchun ixtiyoriy aloqa. Biz ushbu notijorat loyiha uchun zarurat bo'yicha boshqa xizmatlardan foydalanishimiz mumkin."
+    },
+    "dataSecurity": {
+      "title": "5. Ma'lumotlaringiz xavfsizligini ta'minlash",
+      "text": "Sizning xavfsizligingiz biz uchun muhim. Shaxsiy loyiha sifatida biz ma'lumotlaringizni himoya qilish uchun sanoat standartlari amaliyotlari va ishonchli xizmat ko'rsatuvchilardan foydalanamiz. Biz mustahkam xavfsizlik choralarini joriy qilsak va obro'li hamkorlar bilan ishlasak ham, hech bir onlayn xizmat 100% xavfsizlikka kafolat bera olmasligini bilishingizni xohlaymiz - bu barcha internet xizmatlari, ayniqsa shaxsiy notijorat loyihalar uchun to'g'ri. Biz ma'lumotlaringizni maksimal darajada himoya qilish uchun ushbu ta'lim tashabbusi doirasida xavfsizlik amaliyotlarimizni doimiy kuzatib boramiz va yangilaymiz."
+    },
+    "cookies": {
+      "title": "6. Cookies va saqlash",
+      "text": "Biz afzalliklaringizni eslab qolish va sizni tizimda saqlash uchun cookies va mahalliy saqlash kabi standart veb-texnologiyalardan foydalanamiz. Ko'pgina zamonaviy veb-saytlar shunday ishlaydi va bu uzluksiz tajribani ta'minlashga yordam beradi. Agar xohlasangiz, brauzer sozlamalarini sozlashingiz mumkin, garchi ba'zi xususiyatlar ularsiz unchalik silliq ishlamasligi mumkin. Bu veb-ilovalar va ta'lim loyihalari uchun standart amaliyot."
+    },
+    "userRights": {
+      "title": "7. Sizning nazorat huquqingiz",
+      "item1": "Siz istalgan vaqtda profilingiz orqali o'yin ma'lumotlaringizni ko'rishingiz mumkin.",
+      "item2": "Agar ketmoqchi bo'lsangiz, biz bilan bog'lanib hisob o'chirishni so'rashingiz mumkin.",
+      "item3": "Xohlagan vaqtingizda personaj nomini va afzalliklarni yangilang.",
+      "item4": "Agar kerak bo'lsa, o'yin ma'lumotlaringizning nusxasini so'rang. Notijorat loyiha sifatida biz so'rovlarni qondirish uchun qo'limizdan kelganini qilamiz."
+    },
+    "dataRetention": {
+      "title": "8. Ma'lumotlarni saqlash",
+      "text": "Biz taraqqiyotingiz va yutuqlaringizni saqlash uchun siz faol o'ynayotgan vaqtingizda ma'lumotlaringizni saqlaymiz. Agar hisob uzoq vaqt (taxminan 12 oy) ishlatilmasa, biz tizimlarimizning samarali ishlashi uchun uni arxivlashimiz yoki o'chirishimiz mumkin. Bu onlayn o'yin platformalari uchun standart amaliyot va ushbu shaxsiy ta'lim loyihasini barqaror saqlashga yordam beradi."
+    },
+    "children": {
+      "title": "9. Yoshga mos o'yinlar",
+      "text": "Bizning xizmatimiz 13 yosh va undan katta o'yinchilar uchun mo'ljallangan. Biz ongli ravishda yosh bolalardan ma'lumot to'plamaymiz. Agar siz ota-ona bo'lsangiz va xavotirlaringiz bo'lsa, iltimos biz bilan bog'laning."
+    },
+    "changes": {
+      "title": "10. Siyosatni yangilash",
+      "text": "Ushbu ta'lim loyihasi o'sib, rivojlanib borar ekan, biz yangi xususiyatlar, o'rganish tajribasi yoki amaliyotlarni aks ettirish uchun ushbu siyosatni yangilashimiz mumkin. Biz har qanday o'zgarishlarni bu yerda e'lon qilamiz va davom etib foydalanishingiz yangilanishlar bilan rozi ekanligingizni anglatadi. Biz ushbu notijorat ta'lim tashabbusida ma'lumotlaringizni qanday qayta ishlashimiz haqida shaffof bo'lishga intilamiz."
+    },
+    "contact": {
+      "title": "11. Savollar?",
+      "text": "Biz yordam berish uchun shu yerdamiz! Agar maxfiylik yoki ushbu ta'lim loyihasida ma'lumotlaringizni qanday qayta ishlashimiz haqida savollaringiz bo'lsa:"
+    }
   }
 }

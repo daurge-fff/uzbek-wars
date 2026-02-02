@@ -17,7 +17,7 @@ describe('ReferralPanel', () => {
     render(
       <ReferralPanel
         referralCode="TEST1234"
-        referralLink="https://uzbekwars.com/ref/TEST1234"
+        referralLink="https://uzbekwars.top/ref/TEST1234"
         referredFriends={[]}
         totalBonus={{ crystals: 0, soms: 0 }}
       />
@@ -30,7 +30,7 @@ describe('ReferralPanel', () => {
     render(
       <ReferralPanel
         referralCode="TEST1234"
-        referralLink="https://uzbekwars.com/ref/TEST1234"
+        referralLink="https://uzbekwars.top/ref/TEST1234"
         referredFriends={mockReferrals}
         totalBonus={mockBonus}
       />
@@ -44,7 +44,7 @@ describe('ReferralPanel', () => {
     render(
       <ReferralPanel
         referralCode="TEST1234"
-        referralLink="https://uzbekwars.com/ref/TEST1234"
+        referralLink="https://uzbekwars.top/ref/TEST1234"
         referredFriends={[]}
         totalBonus={{ crystals: 0, soms: 0 }}
       />
@@ -53,3 +53,4 @@ describe('ReferralPanel', () => {
     expect(screen.getByText(/invite friends/i)).toBeInTheDocument();
   });
 });
+

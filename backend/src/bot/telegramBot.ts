@@ -126,7 +126,7 @@ export const initBot = () => {
       '2. Перейдите в профиль\n' +
       '3. Нажмите "Верифицировать"\n' +
       '4. Вы будете перенаправлены сюда\n\n' +
-      '🎮 Играть: https://uzbekwars.com',
+      '🎮 Играть: https://uzbekwars.top',
       { parse_mode: 'Markdown' }
     );
   });
@@ -141,7 +141,7 @@ export const initBot = () => {
       '/start - Начать верификацию\n' +
       '/help - Показать эту справку\n' +
       '/stats - Статистика игры\n\n' +
-      '🎮 Сайт: https://uzbekwars.com\n' +
+      '🎮 Сайт: https://uzbekwars.top\n' +
       '💬 Поддержка: @daurge',
       { parse_mode: 'Markdown' }
     );
