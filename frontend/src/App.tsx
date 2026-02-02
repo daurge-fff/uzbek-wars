@@ -1,7 +1,9 @@
 /**
  * Root application component
  * 
- * iOS-style modern design with smooth transitions
+ * Production-ready iOS-style modern design with smooth transitions
+ * Full authentication flow with Google OAuth
+ * Multi-language support (RU, UZ, UK, EN)
  */
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -11,6 +13,7 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-ro
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeToggle } from './components/ThemeToggle';
 import { ColorPalette } from './components/ColorPalette';
 import { GoogleLoginButton } from './components/GoogleLoginButton';
@@ -27,7 +30,6 @@ import { Settings } from './components/Settings';
 import { HealthCheck } from './components/HealthCheck';
 import { BackButton } from './components/BackButton';
 import { ReferralLanding } from './components/ReferralLanding';
-
 import { OnboardingFlow } from './components/OnboardingFlow';
 
 const queryClient = new QueryClient({
@@ -180,12 +182,20 @@ const mockPlayerStats = {
   achievements: 8
 };
 
-function MenuCard({ title, description, icon, to }: any) {
+function MenuCard({ title, description, icon, to, onClick }: any) {
   const navigate = useNavigate();
+  
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(to);
+    }
+  };
   
   return (
     <motion.button
-      onClick={() => navigate(to)}
+      onClick={handleClick}
       whileHover={{ scale: 1.05, y: -8 }}
       whileTap={{ scale: 0.95 }}
       className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-6 rounded-[24px] shadow-xl hover:shadow-2xl transition-all text-left w-full border border-gray-100 dark:border-gray-700 group overflow-hidden relative"
@@ -209,6 +219,15 @@ function MenuCard({ title, description, icon, to }: any) {
 function HomePage() {
   const [currentLang, setCurrentLang] = useState<'ru' | 'uz' | 'uk' | 'en'>('ru');
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
+  const { t } = useTranslation();
+
+  const handleLogout = () => {
+    if (confirm(t('auth.confirmLogout', 'Вы уверены, что хотите выйти?'))) {
+      logout();
+      navigate('/');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
@@ -222,9 +241,30 @@ function HomePage() {
             whileHover={{ scale: 1.05 }}
             className="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent"
           >
-            Узбек Варс
+            🏛️ Узбек Варс
           </motion.h1>
           <div className="flex items-center gap-3">
+            {isAuthenticated && user && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700"
+              >
+                <span className="text-2xl">{user.avatar || '👤'}</span>
+                <span className="font-semibold text-gray-900 dark:text-white hidden sm:inline">
+                  {user.displayName}
+                </span>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleLogout}
+                  className="text-red-500 hover:text-red-600 font-semibold text-sm"
+                  title={t('auth.logout', 'Выйти')}
+                >
+                  🚪
+                </motion.button>
+              </motion.div>
+            )}
             <LanguageSwitcher 
               currentLanguage={currentLang} 
               onLanguageChange={setCurrentLang}
@@ -241,31 +281,90 @@ function HomePage() {
           className="text-center mb-12"
         >
           <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
-            Добро пожаловать
+            {t('home.welcome', 'Добро пожаловать')}
           </h2>
           <p className="text-gray-600 dark:text-gray-300 text-xl mb-8 transition-colors">
-            Начни свое приключение в Узбекистане
+            {t('home.subtitle', 'Начни свое приключение в Узбекистане')}
           </p>
           
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/start')}
-            className="px-12 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black text-xl rounded-full shadow-2xl mb-12"
-          >
-            🚀 Начать игру
-          </motion.button>
+          {!isAuthenticated ? (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/start')}
+              className="px-12 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black text-xl rounded-full shadow-2xl mb-12"
+            >
+              🚀 {t('home.startGame', 'Начать игру')}
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/dashboard')}
+              className="px-12 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-black text-xl rounded-full shadow-2xl mb-12"
+            >
+              🎮 {t('home.continuePlaying', 'Продолжить игру')}
+            </motion.button>
+          )}
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
-          <MenuCard title="Игра" description="Начать приключение" icon="🎮" to="/start" />
-          <MenuCard title="Рейтинг" description="Топ игроков" icon="🏆" to="/leaderboard" />
-          <MenuCard title="Рефералы" description="Пригласи друзей" icon="👥" to="/referral" />
-          <MenuCard title="Магазин" description="Косметика" icon="🛍️" to="/shop" />
-          <MenuCard title="Профиль" description="Твой профиль" icon="👤" to="/profile" />
-          <MenuCard title="Настройки" description="Параметры" icon="⚙️" to="/settings" />
-          <MenuCard title="Донат" description="Поддержать" icon="💎" to="/donate" />
-          <MenuCard title="Health Check" description="Статус систем" icon="🏥" to="/health" />
+          <MenuCard 
+            title={t('menu.game', 'Игра')} 
+            description={t('menu.gameDesc', 'Начать приключение')} 
+            icon="🎮" 
+            to={isAuthenticated ? "/dashboard" : "/start"} 
+          />
+          <MenuCard 
+            title={t('menu.leaderboard', 'Рейтинг')} 
+            description={t('menu.leaderboardDesc', 'Топ игроков')} 
+            icon="🏆" 
+            to="/leaderboard" 
+          />
+          <MenuCard 
+            title={t('menu.referral', 'Рефералы')} 
+            description={t('menu.referralDesc', 'Пригласи друзей')} 
+            icon="👥" 
+            to="/referral" 
+          />
+          <MenuCard 
+            title={t('menu.shop', 'Магазин')} 
+            description={t('menu.shopDesc', 'Косметика')} 
+            icon="🛍️" 
+            to="/shop" 
+          />
+          <MenuCard 
+            title={t('menu.profile', 'Профиль')} 
+            description={t('menu.profileDesc', 'Твой профиль')} 
+            icon="👤" 
+            to="/profile" 
+          />
+          <MenuCard 
+            title={t('menu.settings', 'Настройки')} 
+            description={t('menu.settingsDesc', 'Параметры')} 
+            icon="⚙️" 
+            to="/settings" 
+          />
+          <MenuCard 
+            title={t('menu.donate', 'Донат')} 
+            description={t('menu.donateDesc', 'Поддержать')} 
+            icon="💎" 
+            to="/donate" 
+          />
+          <MenuCard 
+            title={t('menu.health', 'Health Check')} 
+            description={t('menu.healthDesc', 'Статус систем')} 
+            icon="🏥" 
+            to="/health" 
+          />
+          {isAuthenticated && (
+            <MenuCard 
+              title={t('menu.logout', 'Выход')} 
+              description={t('menu.logoutDesc', 'Выйти из аккаунта')} 
+              icon="🚪" 
+              onClick={handleLogout}
+            />
+          )}
         </div>
       </main>
     </div>
@@ -553,26 +652,28 @@ function AnimatedRoutes() {
 function App() {
   return (
     <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AnimatedRoutes />
-        </BrowserRouter>
-        
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            duration: 3000,
-            style: {
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              color: '#2C1810',
-              borderRadius: '16px',
-              border: '1px solid rgba(0,0,0,0.05)',
-              boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-            }
-          }}
-        />
-      </QueryClientProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <AnimatedRoutes />
+          </BrowserRouter>
+          
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(10px)',
+                color: '#2C1810',
+                borderRadius: '16px',
+                border: '1px solid rgba(0,0,0,0.05)',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+              }
+            }}
+          />
+        </QueryClientProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

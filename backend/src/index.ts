@@ -17,6 +17,13 @@ import { initBot } from './bot/telegramBot';
 // Look for .env in project root
 dotenv.config({ path: path.join(process.cwd(), '../.env') });
 
+// Log JWT_SECRET status (without exposing the actual secret)
+if (process.env.JWT_SECRET) {
+  logger.info('JWT_SECRET loaded successfully');
+} else {
+  logger.error('JWT_SECRET not found in environment!');
+}
+
 /**
  * Bootstrap the application
  * 

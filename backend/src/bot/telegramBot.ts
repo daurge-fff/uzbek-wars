@@ -13,6 +13,8 @@ import { logger } from '../utils/logger';
 
 let bot: TelegramBot | null = null;
 
+export { bot };
+
 interface VerificationSession {
   userId: string;
   code: string;

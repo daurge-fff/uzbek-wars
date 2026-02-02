@@ -9,13 +9,18 @@
 
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
+import { OAuth2Client } from 'google-auth-library';
 import { authenticateWithGoogle, authenticateDevLogin, detectTwinks } from '../services/AuthService';
 import { logger } from '../utils/logger';
 import { createVerificationSession } from '../bot/telegramBot';
 import { User } from '../models/User';
 import { authenticate } from '../middleware/auth';
+import { env } from '../config/environment';
 
 const router = Router();
+
+// Initialize Google OAuth2 Client
+const googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID);
 
 /**
  * POST /api/auth/google
@@ -231,16 +236,10 @@ router.get(
 );
 
 /**
- * Verifies Google ID token
+ * Verifies Google ID token using google-auth-library
  * 
- * TODO: Implement actual Google token verification using google-auth-library
- * For now, this is a mock implementation for development.
- * 
- * In production, use:
- *   const { OAuth2Client } = require('google-auth-library');
- *   const client = new OAuth2Client(GOOGLE_CLIENT_ID);
- *   const ticket = await client.verifyIdToken({ idToken, audience: GOOGLE_CLIENT_ID });
- *   const payload = ticket.getPayload();
+ * Validates the token signature and extracts user profile information.
+ * Ensures the token is issued by Google and intended for our application.
  */
 async function verifyGoogleToken(idToken: string): Promise<{
   id: string;
@@ -248,26 +247,73 @@ async function verifyGoogleToken(idToken: string): Promise<{
   displayName: string;
   avatar?: string;
 }> {
-  // Mock implementation for development
-  // Replace with actual Google verification in production
-  
   try {
-    // Decode JWT without verification (UNSAFE - only for development)
-    const parts = idToken.split('.');
-    if (parts.length !== 3) {
-      throw new Error('Invalid token format');
+    // In development, check if it's a base64 encoded token first
+    if (env.NODE_ENV === 'development') {
+      try {
+        const decoded = JSON.parse(Buffer.from(idToken, 'base64').toString('utf-8'));
+        if (decoded.sub && decoded.email) {
+          logger.info(`Development mode: Using base64 token for user: ${decoded.email}`);
+          return {
+            id: decoded.sub,
+            email: decoded.email,
+            displayName: decoded.name || decoded.email,
+            avatar: decoded.picture
+          };
+        }
+      } catch (e) {
+        // Not base64, continue to Google verification
+        logger.debug('Not base64 format, trying Google verification');
+      }
     }
 
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+    // Verify token with Google
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+    
+    if (!payload) {
+      throw new Error('Invalid token payload');
+    }
+
+    if (!payload.sub || !payload.email) {
+      throw new Error('Missing required fields in token');
+    }
+
+    logger.info(`Google token verified for user: ${payload.email}`);
 
     return {
-      id: payload.sub || payload.user_id || 'mock-google-id',
-      email: payload.email || 'user@example.com',
-      displayName: payload.name || 'Test User',
+      id: payload.sub,
+      email: payload.email,
+      displayName: payload.name || payload.email,
       avatar: payload.picture
     };
   } catch (error) {
-    logger.error('Token verification error:', error);
+    logger.error('Google token verification failed:', error);
+    
+    // Fallback for development: try to decode JWT without verification
+    if (env.NODE_ENV === 'development') {
+      logger.warn('Using fallback JWT decoding (development only)');
+      try {
+        const parts = idToken.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+          logger.info(`Fallback: decoded token for ${payload.email || 'unknown'}`);
+          return {
+            id: payload.sub || 'dev-user-' + Date.now(),
+            email: payload.email || 'dev@uzbekwars.local',
+            displayName: payload.name || 'Dev User',
+            avatar: payload.picture
+          };
+        }
+      } catch (fallbackError) {
+        logger.error('Fallback decoding also failed:', fallbackError);
+      }
+    }
+    
     throw new Error('Invalid Google token');
   }
 }

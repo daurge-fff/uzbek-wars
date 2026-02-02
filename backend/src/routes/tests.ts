@@ -8,7 +8,7 @@ import { Router, Request, Response } from 'express';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { logger } from '../utils/logger';
-import fs from 'fs/promises';
+// import fs from 'fs/promises';
 import path from 'path';
 
 const execAsync = promisify(exec);
@@ -35,7 +35,7 @@ let isRunning = false;
  * 
  * Returns cached test results
  */
-router.get('/results', async (req: Request, res: Response): Promise<void> => {
+router.get('/results', async (_req: Request, res: Response): Promise<void> => {
   try {
     res.json({
       results: cachedResults,
@@ -53,7 +53,7 @@ router.get('/results', async (req: Request, res: Response): Promise<void> => {
  * 
  * Triggers test execution
  */
-router.post('/run', async (req: Request, res: Response): Promise<void> => {
+router.post('/run', async (_req: Request, res: Response): Promise<void> => {
   if (isRunning) {
     res.status(409).json({ error: 'Tests are already running' });
     return;
@@ -138,7 +138,7 @@ async function runTests() {
         failedTests: testOutput.failedTests || []
       });
     } catch (error: any) {
-      const testOutput = parseJestOutput(error.stdout || '');
+      // const testOutput = parseJestOutput(error.stdout || '');
       results.push({
         name: 'Backend Integration Tests',
         passed: 0,

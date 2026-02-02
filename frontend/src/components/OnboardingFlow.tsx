@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import { GoogleLoginButton } from './GoogleLoginButton';
 import { CharacterSelection } from './CharacterSelection';
 import { CitySelection } from './CitySelection';
 import axios from 'axios';
 import { createPortal } from 'react-dom';
+import toast from 'react-hot-toast';
 
 type OnboardingStep = 'intro' | 'auth' | 'character' | 'city' | 'complete';
 
@@ -64,13 +66,20 @@ export const OnboardingFlow = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
+  const { login, isAuthenticated } = useAuth();
   const [step, setStep] = useState<OnboardingStep>('intro');
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [token, setToken] = useState<string>('');
   const [characters, setCharacters] = useState<Character[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [selectedCharacter, setSelectedCharacter] = useState<string>('');
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const languages = [
     { code: 'ru', flag: '🇷🇺' },
@@ -87,6 +96,7 @@ export const OnboardingFlow = () => {
       }, 5000);
       return () => clearInterval(timer);
     }
+    return undefined;
   }, [step]);
 
   const handleSkipIntro = () => {
@@ -96,9 +106,11 @@ export const OnboardingFlow = () => {
   const handleGoogleLogin = async (idToken: string) => {
     try {
       setLoading(true);
-      const response = await axios.post('/api/auth/google', {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      
+      const response = await axios.post(`${API_URL}/api/auth/google`, {
         idToken,
-        ipAddress: '127.0.0.1', // В продакшене получать реальный IP
+        ipAddress: '127.0.0.1',
         deviceInfo: {
           userAgent: navigator.userAgent,
           platform: navigator.platform,
@@ -106,18 +118,26 @@ export const OnboardingFlow = () => {
         }
       });
 
-      const { token: jwtToken } = response.data;
-      setToken(jwtToken);
-      localStorage.setItem('token', jwtToken);
+      const { token, user, player, isNewUser } = response.data;
+      
+      // Save to auth context
+      login(token, user, player);
 
-      // Загрузить персонажей
-      const charsResponse = await axios.get('/api/characters');
-      setCharacters(charsResponse.data);
-
-      setStep('character');
-    } catch (error) {
+      if (isNewUser || !player.characterId || player.characterId === 'default') {
+        // Load characters for selection
+        const charsResponse = await axios.get(`${API_URL}/api/characters`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setCharacters(charsResponse.data);
+        setStep('character');
+      } else {
+        // User already has character, go to dashboard
+        toast.success(t('auth.welcome', 'Добро пожаловать') + ', ' + user.displayName + '!');
+        navigate('/dashboard');
+      }
+    } catch (error: any) {
       console.error('Login failed:', error);
-      alert('Ошибка входа. Попробуйте снова.');
+      toast.error(error.response?.data?.message || t('auth.loginError', 'Ошибка входа. Попробуйте снова.'));
     } finally {
       setLoading(false);
     }
@@ -128,14 +148,14 @@ export const OnboardingFlow = () => {
       setLoading(true);
       setSelectedCharacter(characterId);
 
-      // Загрузить города
-      const citiesResponse = await axios.get('/api/cities');
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const citiesResponse = await axios.get(`${API_URL}/api/cities`);
       setCities(citiesResponse.data);
 
       setStep('city');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load cities:', error);
-      alert('Ошибка загрузки городов');
+      toast.error(error.response?.data?.message || t('cities.loadError', 'Ошибка загрузки городов'));
     } finally {
       setLoading(false);
     }
@@ -145,30 +165,33 @@ export const OnboardingFlow = () => {
     try {
       setLoading(true);
 
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const referralCode = localStorage.getItem('referralCode');
 
-      await axios.post(
-        '/api/player/select-character',
+      const response = await axios.post(
+        `${API_URL}/api/player/select-character`,
         {
           characterId: selectedCharacter,
           cityId,
           referralCode: referralCode || undefined
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
         }
       );
+
+      // Update player in auth context
+      const { player } = response.data;
+      login(localStorage.getItem('auth_token')!, JSON.parse(localStorage.getItem('auth_user')!), player);
 
       localStorage.removeItem('referralCode');
       setStep('complete');
 
-      // Перенаправить на dashboard через 2 секунды
+      toast.success(t('app.registrationComplete', 'Регистрация завершена!'));
+
       setTimeout(() => {
         navigate('/dashboard');
       }, 2000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to complete registration:', error);
-      alert('Ошибка регистрации');
+      toast.error(error.response?.data?.message || t('character.selectError', 'Ошибка регистрации'));
     } finally {
       setLoading(false);
     }

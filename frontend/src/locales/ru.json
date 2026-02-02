@@ -49,7 +49,8 @@
     "logout": "Выйти",
     "login_with_google": "Войти через Google",
     "logging_in": "Вход...",
-    "welcome": "Добро пожаловать"
+    "welcome": "Добро пожаловать",
+    "confirmLogout": "Вы уверены, что хотите выйти?"
   },
   "cities": {
     "select": "Выберите город",
@@ -235,6 +236,32 @@
     "starOnGithub": "Если нравится игра - поставь ⭐ на GitHub",
     "tagline": "Стань легендой Великого Шелкового пути",
     "startAdventure": "Начать приключение"
+  },
+  "home": {
+    "welcome": "Добро пожаловать",
+    "subtitle": "Начни свое приключение в Узбекистане",
+    "startGame": "Начать игру",
+    "continuePlaying": "Продолжить игру"
+  },
+  "menu": {
+    "game": "Игра",
+    "gameDesc": "Начать приключение",
+    "leaderboard": "Рейтинг",
+    "leaderboardDesc": "Топ игроков",
+    "referral": "Рефералы",
+    "referralDesc": "Пригласи друзей",
+    "shop": "Магазин",
+    "shopDesc": "Косметика",
+    "profile": "Профиль",
+    "profileDesc": "Твой профиль",
+    "settings": "Настройки",
+    "settingsDesc": "Параметры",
+    "donate": "Донат",
+    "donateDesc": "Поддержать",
+    "health": "Health Check",
+    "healthDesc": "Статус систем",
+    "logout": "Выход",
+    "logoutDesc": "Выйти из аккаунта"
   },
   "leaderboard": {
     "title": "Рейтинг",

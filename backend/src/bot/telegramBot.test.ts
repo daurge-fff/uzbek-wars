@@ -64,7 +64,7 @@ describe('Telegram Bot', () => {
     it('should store session with timestamp', () => {
       const userId = 'test-user-123';
       const beforeTime = Date.now();
-      const code = createVerificationSession(userId);
+      createVerificationSession(userId);
       const afterTime = Date.now();
 
       // Code should be generated within reasonable time

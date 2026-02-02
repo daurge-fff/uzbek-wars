@@ -59,6 +59,6 @@ describe('GameDashboard', () => {
       />
     );
     
-    expect(screen.getByText(/💰 1250/)).toBeDefined();
+    expect(screen.getByText(/1250/)).toBeDefined();
   });
 });

@@ -21,7 +21,7 @@ const router = Router();
  *   - services: Status of each service
  *   - timestamp: Current server time
  */
-router.get('/', async (req: Request, res: Response): Promise<void> => {
+router.get('/', async (_req: Request, res: Response): Promise<void> => {
   try {
     const health = {
       status: 'healthy' as 'healthy' | 'degraded' | 'down',
@@ -90,7 +90,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
  * Readiness probe for Kubernetes/Docker
  * Returns 200 if service is ready to accept traffic
  */
-router.get('/ready', async (req: Request, res: Response): Promise<void> => {
+router.get('/ready', async (_req: Request, res: Response): Promise<void> => {
   try {
     // Check if database is connected
     if (mongoose.connection.readyState !== 1) {
@@ -120,7 +120,7 @@ router.get('/ready', async (req: Request, res: Response): Promise<void> => {
  * Liveness probe for Kubernetes/Docker
  * Returns 200 if service is alive
  */
-router.get('/live', (req: Request, res: Response): void => {
+router.get('/live', (_req: Request, res: Response): void => {
   res.status(200).json({
     alive: true,
     timestamp: new Date().toISOString()

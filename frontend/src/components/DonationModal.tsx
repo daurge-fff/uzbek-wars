@@ -41,9 +41,8 @@ const currencyFlags: Record<Currency, string> = {
   UAH: '🇺🇦'
 };
 
-export const DonationModal = ({ isOpen, onClose, onDonate }: DonationModalProps) => {
+export const DonationModal = ({ isOpen, onClose }: DonationModalProps) => {
   const { t } = useTranslation();
-  const [loading] = useState(false);
   const [currency, setCurrency] = useState<Currency>('USD');
   const [rates, setRates] = useState({ USD: 1, RUB: 90, UZS: 12500, UAH: 41 });
   const [showCurrencyMenu, setShowCurrencyMenu] = useState(false);
@@ -478,7 +477,7 @@ const PaymentMethodSelection = ({
   selectedPackage,
   orderId,
   userId,
-  currency,
+  // currency,
   formatPrice,
   onSelectMethod,
   paymentMethod

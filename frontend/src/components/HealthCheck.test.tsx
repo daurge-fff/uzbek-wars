@@ -30,9 +30,31 @@ describe('HealthCheck Component', () => {
     expect(screen.getByText(/Service Status/i)).toBeInTheDocument();
   });
 
-  it('should display test results section', () => {
+  it('should display test results section', async () => {
+    (global.fetch as any).mockImplementation((url: string) => {
+      if (url === '/api/health') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ status: 'healthy', services: {} })
+        });
+      }
+      if (url === '/api/tests/results') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            results: []
+          })
+        });
+      }
+      return Promise.reject(new Error('Unknown URL'));
+    });
+
     render(<HealthCheck />);
-    expect(screen.getByText(/Test Results/i)).toBeInTheDocument();
+    
+    await waitFor(() => {
+      const elements = screen.getAllByText(/Test Results/i);
+      expect(elements.length).toBeGreaterThan(0);
+    });
   });
 
   it('should show all service names', () => {
@@ -88,9 +110,32 @@ describe('HealthCheck Component', () => {
     expect(passedElements.length).toBeGreaterThan(0);
   });
 
-  it('should display coverage percentages', () => {
+  it('should display coverage percentages', async () => {
+    (global.fetch as any).mockImplementation((url: string) => {
+      if (url === '/api/health') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ status: 'healthy', services: {} })
+        });
+      }
+      if (url === '/api/tests/results') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            results: [
+              { name: 'Backend Tests', passed: 100, failed: 0, skipped: 0, total: 100, coverage: 91, duration: 5, lastRun: new Date().toISOString(), failedTests: [] }
+            ]
+          })
+        });
+      }
+      return Promise.reject(new Error('Unknown URL'));
+    });
+
     render(<HealthCheck />);
-    expect(screen.getByText(/91% coverage/i)).toBeInTheDocument();
+    
+    await waitFor(() => {
+      expect(screen.getByText(/91% coverage/i)).toBeInTheDocument();
+    });
   });
 
   it('should render summary section at bottom', () => {

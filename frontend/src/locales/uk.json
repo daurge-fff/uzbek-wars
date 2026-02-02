@@ -50,7 +50,8 @@
     "logout": "Вийти",
     "login_with_google": "Увійти через Google",
     "logging_in": "Вхід...",
-    "welcome": "Ласкаво просимо"
+    "welcome": "Ласкаво просимо",
+    "confirmLogout": "Ви впевнені, що хочете вийти?"
   },
   "cities": {
     "select": "Оберіть місто",

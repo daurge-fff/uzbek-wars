@@ -46,8 +46,11 @@ describe('AuthService', () => {
     await disconnectDatabase();
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
+    // Очистка БД перед каждым тестом
+    await User.deleteMany({});
+    await Player.deleteMany({});
   });
 
   describe('authenticateWithGoogle', () => {

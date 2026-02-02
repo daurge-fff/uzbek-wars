@@ -58,7 +58,7 @@ describe('PlayerProfile', () => {
       />
     );
 
-    expect(screen.getByText(/verify/i)).toBeInTheDocument();
+    expect(screen.getByText(/верифицировать/i)).toBeInTheDocument();
   });
 
   it('should show verified status when verified', () => {
@@ -71,6 +71,6 @@ describe('PlayerProfile', () => {
       />
     );
 
-    expect(screen.getByText(/verified/i)).toBeInTheDocument();
+    expect(screen.getByText(/верифицирован/i)).toBeInTheDocument();
   });
 });

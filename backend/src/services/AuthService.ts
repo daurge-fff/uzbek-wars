@@ -39,15 +39,25 @@ interface AuthResult {
  */
 function generateToken(userId: string): string {
   const secret = env.JWT_SECRET;
+  
+  logger.debug(`Generating JWT token for user: ${userId}`);
+  logger.debug(`JWT_SECRET exists: ${!!secret}`);
+  logger.debug(`JWT_EXPIRES_IN: ${env.JWT_EXPIRES_IN}`);
+  
   if (!secret) {
+    logger.error('JWT_SECRET not configured! Check .env file');
     throw new Error('JWT_SECRET not configured');
   }
 
-  return jwt.sign(
+  const token = jwt.sign(
     { userId },
     secret,
     { expiresIn: env.JWT_EXPIRES_IN as any }
   );
+  
+  logger.info(`JWT token generated successfully for user: ${userId}`);
+  
+  return token;
 }
 
 /**

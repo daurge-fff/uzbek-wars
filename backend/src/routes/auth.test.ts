@@ -4,7 +4,6 @@
 
 import request from 'supertest';
 import { createServer } from '../server';
-import { User } from '../models/User';
 import jwt from 'jsonwebtoken';
 
 describe('Auth Routes', () => {

@@ -28,7 +28,6 @@ if (!process.env.MONGODB_URI || process.env.MONGODB_URI === 'mongodb://localhost
 import mongoose from 'mongoose';
 import { Player } from '../models/Player';
 import { User } from '../models/User';
-import { City } from '../models/City';
 import { connectDatabase, disconnectDatabase } from '../config/database';
 import {
   getGlobalLeaderboard,
@@ -48,9 +47,11 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
-  await Player.deleteMany({});
-  await User.deleteMany({});
-  await City.deleteMany({});
+  // Агрессивная очистка всех коллекций
+  const collections = mongoose.connection.collections;
+  for (const key in collections) {
+    await collections[key].deleteMany({});
+  }
 });
 
 /**
@@ -330,6 +331,9 @@ describe('LeaderboardService', () => {
     });
     
     it('should use level as tiebreaker for same soms', async () => {
+      // Clean database first
+      await Player.deleteMany({});
+      
       // Create players with same soms
       await createTestPlayer({
         userId: '507f1f77bcf86cd799439031',
