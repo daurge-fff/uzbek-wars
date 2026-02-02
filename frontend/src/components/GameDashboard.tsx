@@ -65,10 +65,10 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect }: Gam
 
             <div className="flex gap-2">
               <div className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full shadow-lg">
-                <span className="text-white font-black text-sm">💰 {playerState.soms}</span>
+                <span className="text-white font-black text-sm"><span>💰</span> {playerState.soms}</span>
               </div>
               <div className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-lg">
-                <span className="text-white font-black text-sm">💎 {playerState.donationCurrency}</span>
+                <span className="text-white font-black text-sm"><span>💎</span> {playerState.donationCurrency}</span>
               </div>
             </div>
           </div>
@@ -151,7 +151,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect }: Gam
                 )}
                 {activity.cooldown && (
                   <div className="absolute top-2 right-2 px-2 py-1 bg-indigo-500 text-white text-xs font-bold rounded-full">
-                    ⏱️ {activity.cooldown}м
+                    <span>⏱️</span> {activity.cooldown}м
                   </div>
                 )}
               </motion.button>
@@ -171,21 +171,21 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect }: Gam
             whileTap={{ scale: 0.98 }}
             className="p-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-[20px] shadow-lg"
           >
-            🏆 Рейтинг
+            <span>🏆</span> Рейтинг
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-[20px] shadow-lg"
           >
-            🛍️ Магазин
+            <span>🛍️</span> Магазин
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="p-4 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold rounded-[20px] shadow-lg"
           >
-            👥 Друзья
+            <span>👥</span> Друзья
           </motion.button>
         </motion.div>
       </div>

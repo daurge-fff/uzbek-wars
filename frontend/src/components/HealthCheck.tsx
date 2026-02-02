@@ -168,7 +168,7 @@ export const HealthCheck = () => {
               disabled={refreshing}
               className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-full shadow-lg disabled:opacity-50"
             >
-              {refreshing ? '🔄' : '🔃'} {t('health.refresh')}
+              <span>{refreshing ? '🔄' : '🔃'}</span> {t('health.refresh')}
             </motion.button>
           </div>
 

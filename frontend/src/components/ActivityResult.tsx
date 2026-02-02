@@ -75,7 +75,7 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
               >
                 <span className="text-gray-700 font-medium">{t('activity.soms')}</span>
                 <span className="text-xl font-black text-yellow-600">
-                  {result.somsGained > 0 ? '+' : ''}{result.somsGained} 💰
+                  {result.somsGained > 0 ? '+' : ''}{result.somsGained} <span>💰</span>
                 </span>
               </motion.div>
 

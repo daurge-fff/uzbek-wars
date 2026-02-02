@@ -79,7 +79,7 @@ export const ActivityCard = ({ activity, playerLevel, isAvailable, onExecute }: 
 
       <div className="flex justify-between text-xs mb-2">
         <span className="text-green-600 font-black">+{activity.rewards.experience} XP</span>
-        <span className="text-yellow-600 font-black">+{activity.rewards.soms} 💰</span>
+        <span className="text-yellow-600 font-black">+{activity.rewards.soms} <span>💰</span></span>
       </div>
 
       {activity.statModifiers && (

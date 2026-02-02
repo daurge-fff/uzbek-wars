@@ -11,10 +11,11 @@ import { connectDatabase } from './config/database';
 import { createServer } from './server';
 import { logger } from './utils/logger';
 import { validateEnvironment } from './config/environment';
+import { initBot } from './bot/telegramBot';
 
 // Load environment variables before anything else
-// Look for .env in project root (two levels up from dist or one level up from src)
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+// Look for .env in project root
+dotenv.config({ path: path.join(process.cwd(), '../.env') });
 
 /**
  * Bootstrap the application
@@ -35,6 +36,9 @@ async function bootstrap(): Promise<void> {
     // Establish database connection before accepting requests
     await connectDatabase();
     logger.info('Database connection established');
+    
+    // Initialize Telegram bot
+    initBot();
     
     // Create Express application with all middleware configured
     const app = createServer();

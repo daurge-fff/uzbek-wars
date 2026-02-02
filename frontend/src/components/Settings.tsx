@@ -169,11 +169,11 @@ export const Settings = ({
             <div className="space-y-3 mb-4">
               <div className="flex justify-between items-center p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-[16px] border border-green-200 dark:border-green-800">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">🌍 Онлайн всего</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">🌍 {t('settings.onlineTotal')}</span>
                   <div className="group relative">
                     <span className="text-xs cursor-help opacity-60">ℹ️</span>
                     <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
-                      Игроки онлайн прямо сейчас во всех городах
+                      {t('settings.onlineTotalHint')}
                     </div>
                   </div>
                 </div>
@@ -181,11 +181,11 @@ export const Settings = ({
               </div>
               <div className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-[16px] border border-blue-200 dark:border-blue-800">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">🏙️ В {appStats.cityName}</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">🏙️ {t('settings.onlineCity')} {appStats.cityName}</span>
                   <div className="group relative">
                     <span className="text-xs cursor-help opacity-60">ℹ️</span>
                     <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
-                      Игроки онлайн в твоем городе
+                      {t('settings.onlineCityHint')}
                     </div>
                   </div>
                 </div>
@@ -193,11 +193,11 @@ export const Settings = ({
               </div>
               <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-[16px]">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">⏱️ Время работы</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">⏱️ {t('settings.uptime')}</span>
                   <div className="group relative">
                     <span className="text-xs cursor-help opacity-60">ℹ️</span>
                     <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
-                      Время с последнего перезапуска сервера
+                      {t('settings.uptimeHint')}
                     </div>
                   </div>
                 </div>
@@ -208,18 +208,18 @@ export const Settings = ({
 
           <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
             <div className="flex justify-between">
-              <span>Версия:</span>
+              <span>{t('settings.version')}:</span>
               <span className="font-bold text-gray-900 dark:text-white">{appStats?.version || '1.0.0'}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span>Лицензия:</span>
+              <span>{t('settings.license')}:</span>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-gray-900 dark:text-white">Proprietary</span>
+                <span className="font-bold text-gray-900 dark:text-white">{t('settings.licenseType')}</span>
                 <div className="group relative">
                   <span className="text-xs cursor-help">ℹ️</span>
                   <div className="absolute bottom-full right-0 mb-2 w-56 p-3 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
-                    <div className="font-bold mb-1">🔒 Закрытый исходный код</div>
-                    Копирование, изменение и распространение запрещены без письменного разрешения автора.
+                    <div className="font-bold mb-1">🔒 {t('settings.licenseType')}</div>
+                    {t('settings.licenseHint')}
                   </div>
                 </div>
               </div>
@@ -232,7 +232,7 @@ export const Settings = ({
             onClick={() => setShowDeveloperModal(true)}
             className="w-full p-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-[20px] shadow-lg"
           >
-            👨‍💻 Разработчик
+            👨‍💻 {t('settings.developer')}
           </motion.button>
         </motion.div>
 

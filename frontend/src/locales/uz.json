@@ -61,16 +61,6 @@
     "players": "o'yinchilar",
     "full": "To'lgan"
   },
-  "leaderboard": {
-    "title": "Reyting",
-    "global": "Global",
-    "city": "Shahar",
-    "rank": "O'rin",
-    "player": "O'yinchi",
-    "level": "Daraja",
-    "soms": "So'mlar",
-    "you": "Siz"
-  },
   "referral": {
     "title": "Do'stlarni taklif qilish",
     "description": "Har bir do'st uchun 50 kristall va 500 so'm oling!",
@@ -100,10 +90,34 @@
     "title": "O'yinni qo'llab-quvvatlash",
     "description": "Kosmetika sotib olish uchun kristallar oling",
     "crystals": "kristallar",
-    "bonus": "Bonus {{percent}}%",
+    "bonus": "bonus",
     "popular": "Mashhur",
-    "donate": "Donat",
-    "info": "Kristallar faqat kosmetik buyumlar uchun ishlatiladi"
+    "donate": "Sotib olish",
+    "buyButton": "Tanlangan paketni sotib olish",
+    "info": "Kristallar faqat kosmetik buyumlar uchun ishlatiladi",
+    "paymentMethod": "To'lov usuli",
+    "continue": "Davom etish",
+    "robokassaInDev": "Robokassa ishlab chiqilmoqda. Tez orada mavjud bo'ladi!",
+    "robokassaDesc": "Bank kartalari, elektron hamyonlar",
+    "paypalDesc": "Xalqaro to'lovlar",
+    "manualPayment": "Qo'lda to'lov",
+    "manualDesc": "Dasturchi bilan bog'lanish",
+    "inDevelopment": "Ishlab chiqilmoqda",
+    "semiAuto": "Yarim avtomatik",
+    "selected": "Tanlangan paket",
+    "paymentDetails": "To'lov tafsilotlari",
+    "amount": "Summa",
+    "crystalsToReceive": "Hisoblanadi",
+    "orderId": "Buyurtma ID",
+    "profileId": "Profil ID",
+    "contactDeveloper": "Dasturchi bilan bog'laning",
+    "sendScreenshot": "Ushbu oynaning skrinshotini dasturchiga yuboring",
+    "paypalPending": "So'rov yuborildi! Administrator tasdig'ini kuting.",
+    "paypalInfo": "To'lovdan keyin administrator 24 soat ichida tasdiqlaydi",
+    "confirmPayment": "To'lov so'rovini tasdiqlang",
+    "errorSending": "So'rov yuborishda xato. Keyinroq urinib ko'ring.",
+    "tapToOpen": "Chatni ochish uchun bosing",
+    "readyToPay": "To'lashga tayyorman!"
   },
   "cosmetics": {
     "title": "Kosmetika",
@@ -154,7 +168,18 @@
     "music": "Musiqa",
     "notifications": "Bildirishnomalar",
     "pushNotifications": "Push-bildirishnomalar",
-    "about": "Ilova haqida"
+    "about": "Ilova haqida",
+    "onlineTotal": "Jami onlayn",
+    "onlineTotalHint": "Hozir barcha shaharlarda onlayn o'yinchilar",
+    "onlineCity": "Shaharda",
+    "onlineCityHint": "Sizning shahringizda onlayn o'yinchilar",
+    "uptime": "Ish vaqti",
+    "uptimeHint": "Oxirgi server qayta ishga tushirilganidan beri vaqt",
+    "version": "Versiya",
+    "license": "Litsenziya",
+    "licenseType": "Proprietary",
+    "licenseHint": "Yopiq manba kodi. Muallifning yozma ruxsatisiz nusxalash, o'zgartirish va tarqatish taqiqlanadi.",
+    "developer": "Dasturchi"
   },
   "language": {
     "select": "Tilni tanlang",
@@ -219,6 +244,19 @@
     "registrationComplete": "Ro'yxatdan o'tish tugallandi!",
     "redirecting": "O'yinga yo'naltirilmoqda...",
     "thankYou": "O'zbek Urushi'dan foydalanganingiz uchun rahmat!",
-    "starOnGithub": "Agar o'yin yoqsa - GitHub'da ⭐ qo'ying"
+    "starOnGithub": "Agar o'yin yoqsa - GitHub'da ⭐ qo'ying",
+    "tagline": "Buyuk Ipak yo'lining afsonasiga aylaning",
+    "startAdventure": "Sarguzashtni boshlash"
+  },
+  "leaderboard": {
+    "title": "Reyting",
+    "global": "Global",
+    "city": "Shahar",
+    "rank": "O'rin",
+    "player": "O'yinchi",
+    "level": "Daraja",
+    "soms": "So'mlar bo'yicha",
+    "you": "Siz",
+    "noPlayers": "Reytingda hali o'yinchilar yo'q"
   }
 }

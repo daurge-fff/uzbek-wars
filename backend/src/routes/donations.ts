@@ -20,6 +20,7 @@ import {
   getDonationHistory,
   getUserDonationStats
 } from '../services/DonationService';
+import { sendPaymentConfirmationToAdmin } from '../bot/telegramBot';
 import { logger } from '../utils/logger';
 
 const router = Router();
@@ -236,6 +237,61 @@ router.get('/history', authenticate, async (req: AuthRequest, res: Response): Pr
     });
   } catch (error) {
     logger.error('Error getting donation history:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+/**
+ * POST /api/donations/notify-admin
+ * 
+ * Send payment notification to admin for manual confirmation
+ * 
+ * Request body:
+ * - orderId: Order ID
+ * - userId: User ID
+ * - amount: Payment amount with currency
+ * - crystals: Crystals to be awarded
+ * - paymentMethod: Payment method (PayPal, Manual, etc.)
+ * 
+ * Returns:
+ * - success: Whether notification was sent
+ */
+router.post('/notify-admin', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { orderId, userId, amount, crystals, paymentMethod } = req.body;
+
+    if (!orderId || !userId || !amount || !crystals || !paymentMethod) {
+      res.status(400).json({
+        success: false,
+        error: 'Missing required fields'
+      });
+      return;
+    }
+
+    const sent = await sendPaymentConfirmationToAdmin(
+      orderId,
+      userId,
+      amount,
+      crystals,
+      paymentMethod
+    );
+
+    if (sent) {
+      res.json({
+        success: true,
+        message: 'Notification sent to admin'
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to send notification'
+      });
+    }
+  } catch (error) {
+    logger.error('Error sending admin notification:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error'

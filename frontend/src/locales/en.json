@@ -61,16 +61,6 @@
     "players": "players",
     "full": "Full"
   },
-  "leaderboard": {
-    "title": "Leaderboard",
-    "global": "Global",
-    "city": "City",
-    "rank": "Rank",
-    "player": "Player",
-    "level": "Level",
-    "soms": "Soms",
-    "you": "You"
-  },
   "referral": {
     "title": "Invite Friends",
     "description": "Get 50 crystals and 500 soms for each friend!",
@@ -100,10 +90,34 @@
     "title": "Support the Game",
     "description": "Get crystals to buy cosmetics",
     "crystals": "crystals",
-    "bonus": "Bonus {{percent}}%",
+    "bonus": "bonus",
     "popular": "Popular",
-    "donate": "Donate",
-    "info": "Crystals are used only for cosmetic items"
+    "donate": "Buy",
+    "buyButton": "Buy selected package",
+    "info": "Crystals are used only for cosmetic items",
+    "paymentMethod": "Payment Method",
+    "continue": "Continue",
+    "robokassaInDev": "Robokassa is in development. Coming soon!",
+    "robokassaDesc": "Bank cards, e-wallets",
+    "paypalDesc": "International payments",
+    "manualPayment": "Manual Payment",
+    "manualDesc": "Contact developer",
+    "inDevelopment": "In Development",
+    "semiAuto": "Semi-automatic",
+    "selected": "Selected package",
+    "paymentDetails": "Payment Details",
+    "amount": "Amount",
+    "crystalsToReceive": "To receive",
+    "orderId": "Order ID",
+    "profileId": "Profile ID",
+    "contactDeveloper": "Contact the developer",
+    "sendScreenshot": "Send a screenshot of this window to the developer",
+    "paypalPending": "Request sent! Wait for admin confirmation.",
+    "paypalInfo": "After payment, admin will confirm within 24 hours",
+    "confirmPayment": "Confirm payment request",
+    "errorSending": "Error sending request. Please try again later.",
+    "tapToOpen": "Tap to open chat",
+    "readyToPay": "Ready to pay!"
   },
   "cosmetics": {
     "title": "Cosmetics",
@@ -154,7 +168,18 @@
     "music": "Music",
     "notifications": "Notifications",
     "pushNotifications": "Push notifications",
-    "about": "About"
+    "about": "About",
+    "onlineTotal": "Online total",
+    "onlineTotalHint": "Players online right now in all cities",
+    "onlineCity": "In",
+    "onlineCityHint": "Players online in your city",
+    "uptime": "Uptime",
+    "uptimeHint": "Time since last server restart",
+    "version": "Version",
+    "license": "License",
+    "licenseType": "Proprietary",
+    "licenseHint": "Closed source code. Copying, modification and distribution are prohibited without written permission from the author.",
+    "developer": "Developer"
   },
   "language": {
     "select": "Select Language",
@@ -219,6 +244,19 @@
     "registrationComplete": "Registration complete!",
     "redirecting": "Redirecting to game...",
     "thankYou": "Thank you for using Uzbek Wars!",
-    "starOnGithub": "If you like the game - give us a ⭐ on GitHub"
+    "starOnGithub": "If you like the game - give us a ⭐ on GitHub",
+    "tagline": "Become a legend of the Great Silk Road",
+    "startAdventure": "Start Adventure"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "global": "Global",
+    "city": "City",
+    "rank": "Rank",
+    "player": "Player",
+    "level": "Level",
+    "soms": "By Soms",
+    "you": "You",
+    "noPlayers": "No players in leaderboard yet"
   }
 }

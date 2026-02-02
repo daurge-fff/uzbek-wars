@@ -11,13 +11,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { User } from '../models/User';
 import { logger } from '../utils/logger';
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
-
-if (!BOT_TOKEN) {
-  logger.warn('TELEGRAM_BOT_TOKEN not set. Verification bot disabled.');
-}
-
-export const bot = BOT_TOKEN ? new TelegramBot(BOT_TOKEN, { polling: true }) : null;
+let bot: TelegramBot | null = null;
 
 interface VerificationSession {
   userId: string;
@@ -54,10 +48,18 @@ export const createVerificationSession = (userId: string): string => {
  * Initialize bot handlers
  */
 export const initBot = () => {
-  if (!bot) return;
+  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
+
+  if (!BOT_TOKEN) {
+    logger.warn('TELEGRAM_BOT_TOKEN not set. Verification bot disabled.');
+    return;
+  }
+
+  bot = new TelegramBot(BOT_TOKEN, { polling: true });
 
   // Handle /start command with verification code
   bot.onText(/\/start (.+)/, async (msg, match) => {
+    if (!bot) return;
     const chatId = msg.chat.id;
     const telegramUserId = msg.from?.id;
     const telegramUsername = msg.from?.username;
@@ -111,6 +113,7 @@ export const initBot = () => {
 
   // Handle /start without code
   bot.onText(/\/start$/, (msg) => {
+    if (!bot) return;
     const chatId = msg.chat.id;
     bot.sendMessage(
       chatId,
@@ -128,6 +131,7 @@ export const initBot = () => {
 
   // Handle /help
   bot.onText(/\/help/, (msg) => {
+    if (!bot) return;
     const chatId = msg.chat.id;
     bot.sendMessage(
       chatId,
@@ -143,6 +147,7 @@ export const initBot = () => {
 
   // Handle /stats
   bot.onText(/\/stats/, async (msg) => {
+    if (!bot) return;
     const chatId = msg.chat.id;
     try {
       const totalUsers = await User.countDocuments();
@@ -161,6 +166,9 @@ export const initBot = () => {
       bot.sendMessage(chatId, '❌ Ошибка получения статистики');
     }
   });
+
+  // Initialize callback query handler
+  handleCallbackQueries();
 
   logger.info('Telegram bot initialized');
 };
@@ -181,4 +189,122 @@ export const sendTelegramNotification = async (
     logger.error('Failed to send Telegram notification:', error);
     return false;
   }
+};
+
+/**
+ * Send payment confirmation request to admin
+ */
+export const sendPaymentConfirmationToAdmin = async (
+  orderId: string,
+  userId: string,
+  amount: string,
+  crystals: number,
+  paymentMethod: string
+): Promise<boolean> => {
+  if (!bot) return false;
+
+  const adminId = process.env.ADMIN_TELEGRAM_ID;
+  if (!adminId) {
+    logger.error('ADMIN_TELEGRAM_ID not set in environment');
+    return false;
+  }
+
+  try {
+    const message = 
+      `🔔 *Новая заявка на оплату*\n\n` +
+      `💳 Способ: ${paymentMethod}\n` +
+      `💎 Кристаллы: ${crystals}\n` +
+      `💵 Сумма: ${amount}\n` +
+      `🆔 ID заявки: \`${orderId}\`\n` +
+      `👤 ID игрока: \`${userId}\`\n\n` +
+      `Подтвердите или отклоните платеж:`;
+
+    await bot.sendMessage(adminId, message, {
+      parse_mode: 'Markdown',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '✅ Подтвердить', callback_data: `confirm_${orderId}` },
+            { text: '❌ Отклонить', callback_data: `reject_${orderId}` }
+          ]
+        ]
+      }
+    });
+
+    logger.info(`Payment confirmation sent to admin for order ${orderId}`);
+    return true;
+  } catch (error) {
+    logger.error('Failed to send payment confirmation to admin:', error);
+    return false;
+  }
+};
+
+/**
+ * Handle callback queries from inline buttons
+ */
+export const handleCallbackQueries = () => {
+  if (!bot) return;
+
+  bot.on('callback_query', async (query) => {
+    if (!bot) return;
+    const chatId = query.message?.chat.id;
+    const messageId = query.message?.message_id;
+    const data = query.data;
+
+    if (!chatId || !data) return;
+
+    try {
+      if (data.startsWith('confirm_')) {
+        const orderId = data.replace('confirm_', '');
+        
+        // TODO: Implement actual payment confirmation logic
+        // This should update the database and credit crystals to user
+        
+        await bot.editMessageText(
+          `✅ *Платеж подтвержден*\n\n` +
+          `🆔 ID заявки: \`${orderId}\`\n` +
+          `💎 Кристаллы начислены игроку`,
+          {
+            chat_id: chatId,
+            message_id: messageId,
+            parse_mode: 'Markdown'
+          }
+        );
+
+        await bot.answerCallbackQuery(query.id, {
+          text: '✅ Платеж подтвержден'
+        });
+
+        logger.info(`Payment ${orderId} confirmed by admin`);
+      } else if (data.startsWith('reject_')) {
+        const orderId = data.replace('reject_', '');
+        
+        // TODO: Implement rejection logic
+        
+        await bot.editMessageText(
+          `❌ *Платеж отклонен*\n\n` +
+          `🆔 ID заявки: \`${orderId}\`\n` +
+          `Игрок будет уведомлен`,
+          {
+            chat_id: chatId,
+            message_id: messageId,
+            parse_mode: 'Markdown'
+          }
+        );
+
+        await bot.answerCallbackQuery(query.id, {
+          text: '❌ Платеж отклонен'
+        });
+
+        logger.info(`Payment ${orderId} rejected by admin`);
+      }
+    } catch (error) {
+      logger.error('Error handling callback query:', error);
+      if (bot) {
+        await bot.answerCallbackQuery(query.id, {
+          text: '❌ Ошибка обработки'
+        });
+      }
+    }
+  });
 };

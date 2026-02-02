@@ -9,6 +9,7 @@ import { Toaster } from 'react-hot-toast';
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ThemeToggle } from './components/ThemeToggle';
 import { ColorPalette } from './components/ColorPalette';
@@ -443,7 +444,6 @@ function AnimatedRoutes() {
             </div>
             <Leaderboard
               players={mockLeaderboard}
-              currentPlayerId="3"
               type="global"
               onTypeChange={(type) => console.log('Type:', type)}
             />
@@ -542,24 +542,7 @@ function AnimatedRoutes() {
             <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
               <ThemeToggle />
             </div>
-            <Settings
-              currentLanguage="ru"
-              onLanguageChange={(lang) => console.log('Language:', lang)}
-              soundEnabled={true}
-              onSoundToggle={() => console.log('Toggle sound')}
-              musicEnabled={true}
-              onMusicToggle={() => console.log('Toggle music')}
-              notificationsEnabled={false}
-              onNotificationsToggle={() => console.log('Toggle notifications')}
-              appStats={{
-                uptime: 3600 * 2 + 1800,
-                lastRestart: new Date(Date.now() - 3600 * 2.5 * 1000).toISOString(),
-                onlinePlayersTotal: 1247,
-                onlinePlayersCity: 342,
-                cityName: 'Самарканд',
-                version: '1.0.0'
-              }}
-            />
+            <SettingsWithI18n />
           </motion.div>
         } />
       </Routes>
@@ -593,5 +576,31 @@ function App() {
     </ThemeProvider>
   );
 }
+
+// Wrapper component for Settings with i18n
+const SettingsWithI18n = () => {
+  const { i18n } = useTranslation();
+  
+  return (
+    <Settings
+      currentLanguage={i18n.language as 'ru' | 'uz' | 'uk' | 'en'}
+      onLanguageChange={(lang) => i18n.changeLanguage(lang)}
+      soundEnabled={true}
+      onSoundToggle={() => console.log('Toggle sound')}
+      musicEnabled={true}
+      onMusicToggle={() => console.log('Toggle music')}
+      notificationsEnabled={false}
+      onNotificationsToggle={() => console.log('Toggle notifications')}
+      appStats={{
+        uptime: 3600 * 2 + 1800,
+        lastRestart: new Date(Date.now() - 3600 * 2.5 * 1000).toISOString(),
+        onlinePlayersTotal: 1247,
+        onlinePlayersCity: 342,
+        cityName: 'Самарканд',
+        version: '1.0.0'
+      }}
+    />
+  );
+};
 
 export default App;

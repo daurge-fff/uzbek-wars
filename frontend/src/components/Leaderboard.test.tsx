@@ -14,7 +14,6 @@ describe('Leaderboard', () => {
     render(
       <Leaderboard
         players={mockPlayers}
-        currentPlayerId="3"
         type="global"
         onTypeChange={vi.fn()}
       />
@@ -29,7 +28,6 @@ describe('Leaderboard', () => {
     render(
       <Leaderboard
         players={mockPlayers}
-        currentPlayerId="3"
         type="global"
         onTypeChange={vi.fn()}
       />
@@ -44,7 +42,6 @@ describe('Leaderboard', () => {
     render(
       <Leaderboard
         players={mockPlayers}
-        currentPlayerId="3"
         type="global"
         onTypeChange={vi.fn()}
       />
@@ -59,7 +56,6 @@ describe('Leaderboard', () => {
     render(
       <Leaderboard
         players={mockPlayers}
-        currentPlayerId="3"
         type="global"
         onTypeChange={onTypeChange}
       />
@@ -75,13 +71,12 @@ describe('Leaderboard', () => {
     render(
       <Leaderboard
         players={mockPlayers}
-        currentPlayerId="3"
         type="global"
         onTypeChange={vi.fn()}
       />
     );
 
-    expect(screen.getByText('Lvl.50')).toBeInTheDocument();
-    expect(screen.getByText('Lvl.45')).toBeInTheDocument();
+    expect(screen.getByText('50')).toBeInTheDocument();
+    expect(screen.getByText('45')).toBeInTheDocument();
   });
 });
