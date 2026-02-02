@@ -7,8 +7,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { getActivities, performActivity } from '../services/ActivityService';
-import { authenticate } from '../middleware/auth';
+import { getActivities } from '../services/ActivityService';
 import { logger } from '../utils/logger';
 
 const router = Router();
@@ -109,6 +108,13 @@ router.get('/activities', (_req: Request, res: Response): void => {
  *   "activityId": "work"
  * }
  */
+/**
+ * POST /api/player/perform-activity
+ * 
+ * DEPRECATED: This route is now handled in player.ts
+ * Keeping for backwards compatibility but should not be used
+ */
+/*
 router.post(
   '/player/perform-activity',
   authenticate,
@@ -196,5 +202,6 @@ router.post(
     }
   }
 );
+*/
 
 export default router;

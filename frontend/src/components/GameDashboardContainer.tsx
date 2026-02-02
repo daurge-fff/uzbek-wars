@@ -5,27 +5,35 @@ import { GameDashboard } from './GameDashboard';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface ActivityResult {
-  success: boolean;
-  experienceGained: number;
-  somsGained: number;
-  leveledUp: boolean;
-  newLevel?: number;
-  levelsGained?: number;
-  penaltyApplied: boolean;
-  statChanges: any;
-  player: any;
-}
+import { createPortal } from 'react-dom';
 
 export const GameDashboardContainer = () => {
-  const { player, token, isAuthenticated, user, refreshPlayer } = useAuth();
+  const { player, token, isAuthenticated, user, updatePlayer } = useAuth();
   const navigate = useNavigate();
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentActivity, setCurrentActivity] = useState<any>(null);
-  const [activityResult, setActivityResult] = useState<ActivityResult | null>(null);
-  const [showResultModal, setShowResultModal] = useState(false);
+  const [cooldownInfo, setCooldownInfo] = useState<{activityName: string; seconds: number} | null>(null);
+
+  // Логируем изменения статов для отладки
+  useEffect(() => {
+    if (player?.stats) {
+      console.log('Player stats updated:', player.stats);
+    }
+  }, [player?.stats]);
+
+  // Очищаем битые данные при монтировании
+  useEffect(() => {
+    setCurrentActivity(null);
+    
+    // Очищаем из localStorage если там что-то есть
+    try {
+      localStorage.removeItem('currentActivity');
+      sessionStorage.removeItem('currentActivity');
+    } catch (e) {
+      // ignore
+    }
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -33,6 +41,7 @@ export const GameDashboardContainer = () => {
       return;
     }
 
+    // Загружаем данные
     loadActivities();
     loadCurrentActivity();
     
@@ -68,7 +77,28 @@ export const GameDashboardContainer = () => {
       });
       
       if (response.data.activity) {
-        setCurrentActivity(response.data.activity);
+        const activity = response.data.activity;
+        
+        // Проверяем что все данные валидные
+        const startTime = activity.startTime;
+        const endTime = activity.endTime;
+        
+        if (!endTime || isNaN(endTime) || !startTime || isNaN(startTime) || endTime <= Date.now()) {
+          // Битые данные или активность уже завершена - очищаем на сервере
+          await axios.post(`${API_URL}/api/player/cancel-activity`, {}, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setCurrentActivity(null);
+          return;
+        }
+        
+        // Преобразуем данные с сервера в нужный формат
+        setCurrentActivity({
+          activityId: activity.activityId || activity.id,
+          activityName: activity.activityName || activity.name || 'Активность',
+          startTime: startTime,
+          endTime: endTime
+        });
       } else {
         setCurrentActivity(null);
       }
@@ -80,6 +110,12 @@ export const GameDashboardContainer = () => {
 
   const checkActivityCompletion = async () => {
     if (!currentActivity) return;
+    
+    // Проверяем валидность данных
+    if (!currentActivity.endTime || isNaN(currentActivity.endTime)) {
+      setCurrentActivity(null);
+      return;
+    }
 
     const now = Date.now();
     if (now >= currentActivity.endTime) {
@@ -97,12 +133,38 @@ export const GameDashboardContainer = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      setActivityResult(response.data);
-      setShowResultModal(true);
+      console.log('Activity completed, response:', response.data);
+      
+      // Обновляем данные игрока напрямую из ответа (без перезагрузки!)
+      if (response.data.player) {
+        updatePlayer({
+          level: response.data.player.level,
+          experience: response.data.player.experience,
+          soms: response.data.player.soms,
+          stats: response.data.player.stats
+        });
+      }
+      
+      // Очищаем текущую активность
       setCurrentActivity(null);
       
-      // Обновляем данные игрока
-      await refreshPlayer();
+      // Показываем тост с результатами
+      if (response.data.leveledUp) {
+        toast.success(
+          `🎉 Новый уровень ${response.data.newLevel}! +${response.data.experienceGained} XP, ${response.data.somsGained >= 0 ? '+' : ''}${response.data.somsGained} сомов`,
+          { duration: 4000 }
+        );
+      } else {
+        toast.success(
+          `✅ Активность завершена! +${response.data.experienceGained} XP, ${response.data.somsGained >= 0 ? '+' : ''}${response.data.somsGained} сомов`,
+          { duration: 3000 }
+        );
+      }
+      
+      // Если был штраф, показываем предупреждение
+      if (response.data.penaltyApplied) {
+        toast.error('⚠️ Попался! Штраф применен', { duration: 2000 });
+      }
     } catch (error: any) {
       console.error('Failed to complete activity:', error);
       // Если активность не найдена, просто очищаем
@@ -122,6 +184,11 @@ export const GameDashboardContainer = () => {
       );
       
       const activityName = response.data.activityName || 'Активность';
+      const endTime = response.data.endTime;
+      const durationSeconds = response.data.durationSeconds || 60;
+      
+      // Вычисляем startTime на основе endTime и duration
+      const startTime = endTime - (durationSeconds * 1000);
       
       toast.success(`Начал: ${activityName}!`);
       
@@ -129,22 +196,32 @@ export const GameDashboardContainer = () => {
       setCurrentActivity({
         activityId,
         activityName,
-        startTime: Date.now(),
-        endTime: response.data.endTime
+        startTime,
+        endTime
       });
       
       // Перезагружаем активности
       loadActivities();
     } catch (error: any) {
       console.error('Activity failed:', error);
-      const message = error.response?.data?.message || 'Ошибка выполнения активности';
+      const message = error.response?.data?.message || error.response?.data?.error || 'Ошибка выполнения активности';
+      
+      // Проверяем если это кулдаун
+      if (message.includes('cooldown') || message.includes('Wait')) {
+        const match = message.match(/Wait (\d+) seconds/);
+        if (match) {
+          const seconds = parseInt(match[1]);
+          const activity = activities.find(a => a.id === activityId);
+          setCooldownInfo({
+            activityName: activity?.name?.ru || 'Активность',
+            seconds
+          });
+          return;
+        }
+      }
+      
       toast.error(message);
     }
-  };
-
-  const closeResultModal = () => {
-    setShowResultModal(false);
-    setActivityResult(null);
   };
 
   if (loading) {
@@ -165,6 +242,7 @@ export const GameDashboardContainer = () => {
     return null;
   }
 
+  // Если статов нет, используем дефолтные значения
   const playerState = {
     characterId: player.characterId,
     level: player.level,
@@ -173,10 +251,10 @@ export const GameDashboardContainer = () => {
     soms: player.soms,
     donationCurrency: player.donationCurrency,
     stats: player.stats || {
-      hunger: 75,
-      health: 90,
-      mood: 60,
-      energy: 80
+      hunger: 100,
+      health: 100,
+      mood: 100,
+      energy: 100
     }
   };
 
@@ -188,98 +266,133 @@ export const GameDashboardContainer = () => {
         onActivitySelect={handleActivitySelect}
         userAvatar={user?.avatar}
         currentActivity={currentActivity}
+        onActivityComplete={completeActivity}
       />
 
-      {/* Activity Result Modal */}
-      <AnimatePresence>
-        {showResultModal && activityResult && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            onClick={closeResultModal}
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white dark:bg-gray-800 rounded-[32px] p-8 max-w-md w-full shadow-2xl"
-            >
-              <div className="text-center">
-                <div className="text-8xl mb-4">
-                  {activityResult.leveledUp ? '🎉' : activityResult.penaltyApplied ? '😰' : '✅'}
-                </div>
-                
-                <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-4">
-                  {activityResult.leveledUp ? 'Новый уровень!' : 'Активность завершена!'}
-                </h3>
-
-                {activityResult.leveledUp && (
-                  <div className="mb-4 p-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl">
-                    <div className="text-white text-2xl font-black">
-                      Уровень {activityResult.newLevel}!
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-                    <span className="text-gray-700 dark:text-gray-300">Опыт</span>
-                    <span className="text-xl font-black text-blue-600 dark:text-blue-400">
-                      +{activityResult.experienceGained} XP
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl">
-                    <span className="text-gray-700 dark:text-gray-300">Сомы</span>
-                    <span className={`text-xl font-black ${
-                      activityResult.somsGained >= 0 
-                        ? 'text-green-600 dark:text-green-400' 
-                        : 'text-red-600 dark:text-red-400'
-                    }`}>
-                      {activityResult.somsGained >= 0 ? '+' : ''}{activityResult.somsGained} 💰
-                    </span>
-                  </div>
-
-                  {activityResult.penaltyApplied && (
-                    <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-xl">
-                      <span className="text-red-600 dark:text-red-400 font-bold">
-                        ⚠️ Попался! Штраф применен
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Stat Changes */}
-                  {activityResult.statChanges && Object.keys(activityResult.statChanges).length > 0 && (
-                    <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-                      <div className="text-sm text-gray-700 dark:text-gray-300 mb-2">Изменения статов:</div>
-                      <div className="flex flex-wrap gap-2 justify-center">
-                        {Object.entries(activityResult.statChanges).map(([stat, value]: [string, any]) => (
-                          <span key={stat} className={`text-sm font-bold ${
-                            value > 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {stat}: {value > 0 ? '+' : ''}{value}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  onClick={closeResultModal}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black text-lg rounded-full hover:shadow-lg transition-all"
-                >
-                  Отлично!
-                </button>
+      {/* Cooldown Modal - красивое окно с обратным отсчетом */}
+      {createPortal(
+        <AnimatePresence>
+          {cooldownInfo && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setCooldownInfo(null)}
+                className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100]"
+              />
+              
+              <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
+                <CooldownModalContent 
+                  activityName={cooldownInfo.activityName}
+                  initialSeconds={cooldownInfo.seconds}
+                  onClose={() => setCooldownInfo(null)}
+                />
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
+  );
+};
+
+// Компонент с обратным отсчетом
+const CooldownModalContent = ({ activityName, initialSeconds, onClose }: { activityName: string; initialSeconds: number; onClose: () => void }) => {
+  const [seconds, setSeconds] = useState(initialSeconds);
+
+  useEffect(() => {
+    if (seconds <= 0) {
+      onClose();
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setSeconds(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setTimeout(onClose, 300); // Небольшая задержка перед закрытием
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [seconds, onClose]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+      onClick={(e) => e.stopPropagation()}
+      className="bg-white dark:bg-gray-800 rounded-[32px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden pointer-events-auto"
+    >
+      {/* Animated Background */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+        className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full blur-3xl"
+      />
+      
+      <div className="relative z-10 text-center">
+        <motion.div
+          animate={{ 
+            rotate: [0, -10, 10, -10, 10, 0],
+            scale: [1, 1.1, 1]
+          }}
+          transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+          className="text-8xl mb-4"
+        >
+          ⏰
+        </motion.div>
+        
+        <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3">
+          Подожди немного!
+        </h3>
+        
+        <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-2xl p-6 mb-6 border border-orange-200 dark:border-orange-800">
+          <p className="text-gray-700 dark:text-gray-300 mb-4 text-lg">
+            <span className="font-bold">{activityName}</span> еще на кулдауне
+          </p>
+          <div className="text-center">
+            <motion.div 
+              key={seconds}
+              initial={{ scale: 1.2, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="text-6xl font-black text-orange-600 dark:text-orange-400 mb-2"
+            >
+              {seconds}
+            </motion.div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              {seconds === 1 ? 'секунда' : seconds < 5 ? 'секунды' : 'секунд'} до следующего использования
+            </div>
+          </div>
+          
+          {/* Progress bar */}
+          <div className="mt-4 h-2 bg-white/50 dark:bg-gray-700/50 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: '100%' }}
+              animate={{ width: `${(seconds / initialSeconds) * 100}%` }}
+              transition={{ duration: 0.3 }}
+              className="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full"
+            />
+          </div>
+        </div>
+        
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onClose}
+          className="w-full px-6 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-2xl hover:shadow-xl transition-all"
+        >
+          Понятно
+        </motion.button>
+      </div>
+    </motion.div>
   );
 };
 

@@ -186,7 +186,8 @@ export async function authenticateWithGoogle(
         soms: player.soms,
         characterId: player.characterId,
         cityId: player.cityId,
-        donationCurrency: player.donationCurrency
+        donationCurrency: player.donationCurrency,
+        stats: player.stats
       } : null,
       isNewUser
     };
@@ -300,7 +301,8 @@ export async function authenticateDevLogin(
       soms: player.soms,
       characterId: player.characterId,
       cityId: player.cityId,
-      donationCurrency: player.donationCurrency
+      donationCurrency: player.donationCurrency,
+      stats: player.stats
     },
     isNewUser: false
   };

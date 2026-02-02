@@ -112,14 +112,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!token) return;
     
     try {
-      const response = await axios.get(`${API_URL}/api/profile`, {
+      const response = await axios.get(`${API_URL}/api/player/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
       if (response.data.player) {
-        const updatedPlayer = response.data.player;
+        const updatedPlayer = {
+          id: response.data.player.userId,
+          level: response.data.player.level,
+          experience: response.data.player.experience,
+          soms: response.data.player.soms,
+          characterId: response.data.player.characterId,
+          cityId: player?.cityId || '',
+          donationCurrency: response.data.player.donationCurrency,
+          stats: response.data.player.stats
+        };
         setPlayer(updatedPlayer);
         localStorage.setItem('auth_player', JSON.stringify(updatedPlayer));
+        console.log('Player refreshed successfully:', updatedPlayer);
       }
     } catch (error) {
       console.error('Failed to refresh player:', error);

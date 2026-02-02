@@ -14,6 +14,47 @@ import { logger } from '../utils/logger';
 const router = Router();
 
 /**
+ * GET /api/player/profile
+ * 
+ * Gets the authenticated player's full profile data
+ */
+router.get(
+  '/profile',
+  authenticate,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+      
+      const player = await Player.findOne({ userId });
+      if (!player) {
+        res.status(404).json({ error: 'Player not found' });
+        return;
+      }
+
+      res.status(200).json({
+        player: {
+          userId: player.userId,
+          characterId: player.characterId,
+          level: player.level,
+          experience: player.experience,
+          soms: player.soms,
+          donationCurrency: player.donationCurrency,
+          stats: player.stats,
+          referralCode: player.referralCode,
+          referredBy: player.referredBy,
+          lastActivityTime: player.lastActivityTime,
+          createdAt: player.createdAt,
+          updatedAt: player.updatedAt
+        }
+      });
+    } catch (error) {
+      logger.error('Error getting player profile:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+);
+
+/**
  * PATCH /api/player/language
  * 
  * Updates the authenticated user's language preference
@@ -122,6 +163,7 @@ router.get(
       if (player.currentActivity && player.currentActivityEndTime) {
         const now = new Date();
         const endTime = new Date(player.currentActivityEndTime);
+        const startTime = player.currentActivityStartTime ? new Date(player.currentActivityStartTime) : new Date(now.getTime() - 60000);
         
         if (endTime > now) {
           // Активность еще идет
@@ -129,7 +171,7 @@ router.get(
             activity: {
               activityId: player.currentActivity,
               activityName: player.currentActivityName || 'Активность',
-              startTime: player.currentActivityStartTime?.getTime() || Date.now(),
+              startTime: startTime.getTime(),
               endTime: endTime.getTime()
             }
           });
@@ -142,6 +184,14 @@ router.get(
           player.currentActivityEndTime = undefined;
           await player.save();
         }
+      } else if (player.currentActivity) {
+        // Битые данные - очищаем
+        logger.warn(`Cleaning up broken activity data for player ${userId}`);
+        player.currentActivity = undefined;
+        player.currentActivityName = undefined;
+        player.currentActivityStartTime = undefined;
+        player.currentActivityEndTime = undefined;
+        await player.save();
       }
 
       res.status(200).json({ activity: null });
@@ -208,10 +258,10 @@ router.post(
         return;
       }
 
-      // Устанавливаем cooldown 5-10 минут (рандомно)
-      const cooldownMinutes = Math.floor(Math.random() * 6) + 5; // 5-10 минут
+      // Используем duration из активности (в секундах)
+      const durationSeconds = activity.duration;
       const startTime = new Date();
-      const endTime = new Date(startTime.getTime() + cooldownMinutes * 60 * 1000);
+      const endTime = new Date(startTime.getTime() + durationSeconds * 1000);
 
       // Получаем название активности на русском
       const activityName = activity.name.ru;
@@ -223,11 +273,11 @@ router.post(
       player.currentActivityEndTime = endTime;
       await player.save();
 
-      logger.info(`Player ${userId} started activity ${activityId} for ${cooldownMinutes} minutes`);
+      logger.info(`Player ${userId} started activity ${activityId} for ${durationSeconds} seconds`);
 
       res.status(200).json({
         message: 'Activity started',
-        cooldownMinutes,
+        durationSeconds,
         endTime: endTime.getTime(),
         activityName
       });
@@ -307,6 +357,13 @@ router.post(
       // Применяем изменения статов
       updatePlayerStats(player, activity.statModifiers);
 
+      // Логируем статы до и после
+      logger.info(
+        `Stats after activity ${activity.id}: ` +
+        `hunger=${player.stats.hunger}, health=${player.stats.health}, ` +
+        `mood=${player.stats.mood}, energy=${player.stats.energy}`
+      );
+
       // Добавляем награды
       player.experience += experienceGained;
       player.soms = Math.max(0, player.soms + somsGained);
@@ -353,6 +410,44 @@ router.post(
       });
     } catch (error) {
       logger.error('Error completing activity:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+);
+
+/**
+ * POST /api/player/cancel-activity
+ * 
+ * Cancels the current activity (for debugging/testing)
+ */
+router.post(
+  '/cancel-activity',
+  authenticate,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+      
+      const player = await Player.findOne({ userId });
+      if (!player) {
+        res.status(404).json({ error: 'Player not found' });
+        return;
+      }
+
+      // Очищаем текущую активность
+      player.currentActivity = undefined;
+      player.currentActivityName = undefined;
+      player.currentActivityStartTime = undefined;
+      player.currentActivityEndTime = undefined;
+      await player.save();
+
+      logger.info(`Player ${userId} cancelled current activity`);
+
+      res.status(200).json({
+        message: 'Activity cancelled',
+        success: true
+      });
+    } catch (error) {
+      logger.error('Error cancelling activity:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }

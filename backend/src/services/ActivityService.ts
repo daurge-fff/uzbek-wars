@@ -44,7 +44,8 @@ export interface Activity {
     probability: number; // 0-1 range
     penalty: number; // Soms penalty
   };
-  cooldown: number; // Seconds
+  duration: number; // Seconds - how long the activity takes to complete
+  cooldown: number; // Seconds - cooldown after completion
   requiredLevel: number;
   cost?: number; // Soms cost to perform activity
 }
@@ -97,7 +98,8 @@ export const ACTIVITIES: Activity[] = [
       mood: -5,
       hunger: -10,
     },
-    cooldown: 30,
+    duration: 120, // 2 минуты
+    cooldown: 60, // 1 минута кулдаун
     requiredLevel: 1,
   },
   {
@@ -128,7 +130,8 @@ export const ACTIVITIES: Activity[] = [
       probability: 0.3,
       penalty: 300,
     },
-    cooldown: 60,
+    duration: 180, // 3 минуты
+    cooldown: 300, // 5 минут кулдаун
     requiredLevel: 3,
   },
   {
@@ -158,7 +161,8 @@ export const ACTIVITIES: Activity[] = [
       probability: 0.1,
       penalty: 100,
     },
-    cooldown: 45,
+    duration: 150, // 2.5 минуты
+    cooldown: 120, // 2 минуты кулдаун
     requiredLevel: 2,
   },
   {
@@ -188,7 +192,8 @@ export const ACTIVITIES: Activity[] = [
       probability: 0.2,
       penalty: 200,
     },
-    cooldown: 50,
+    duration: 240, // 4 минуты
+    cooldown: 180, // 3 минуты кулдаун
     requiredLevel: 4,
   },
   {
@@ -213,7 +218,8 @@ export const ACTIVITIES: Activity[] = [
       energy: 40,
       mood: 15,
     },
-    cooldown: 20,
+    duration: 60, // 1 минута
+    cooldown: 30, // 30 секунд кулдаун
     requiredLevel: 1,
   },
   {
@@ -239,7 +245,8 @@ export const ACTIVITIES: Activity[] = [
       health: 10,
       mood: 10,
     },
-    cooldown: 15,
+    duration: 30, // 30 секунд
+    cooldown: 60, // 1 минута кулдаун
     requiredLevel: 1,
     cost: 50,
   },
