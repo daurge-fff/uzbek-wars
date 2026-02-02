@@ -118,8 +118,6 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showDeveloperModal, setShowDeveloperModal] = useState(false);
-  const [showChangelogModal, setShowChangelogModal] = useState(false);
-  const [showTutorialModal, setShowTutorialModal] = useState(false);
   
   // Обновляем время каждую секунду
   useEffect(() => {
@@ -139,12 +137,6 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
   ];
 
   const dockItems = [
-    { 
-      id: 'about', 
-      icon: '📖', 
-      label: t('menu.about', 'О игре'),
-      action: () => setShowAboutModal(true)
-    },
     { 
       id: 'tutorial', 
       icon: '🎓', 
@@ -270,18 +262,19 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
               ))}
             </div>
 
-            {/* Dock - сетка 2x2 */}
+            {/* Dock - 3 иконки в ряд как у iPhone */}
             <div className="absolute bottom-8 left-6 right-6">
-              <div className="bg-white/20 backdrop-blur-2xl rounded-[2rem] p-3 border border-white/30 shadow-2xl">
-                <div className="grid grid-cols-2 gap-3">
+              <div className="bg-white/20 backdrop-blur-2xl rounded-[2rem] px-4 py-3 border border-white/30 shadow-2xl">
+                <div className="flex justify-around items-center gap-2">
                   {dockItems.map((item) => (
                     <button
                       key={item.id}
                       onClick={item.action}
-                      className="relative w-full aspect-square bg-white/20 backdrop-blur-xl rounded-[1.2rem] shadow-xl flex flex-col items-center justify-center border border-white/30 active:bg-white/40 transition-colors duration-100"
+                      className="relative flex items-center justify-center group"
                     >
-                      <span className="text-3xl mb-1">{item.icon}</span>
-                      <span className="text-[10px] text-white font-medium text-center px-1 line-clamp-1">{item.label}</span>
+                      <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-[1.2rem] shadow-xl flex items-center justify-center border border-white/30 active:bg-white/40 transition-colors duration-100">
+                        <span className="text-3xl">{item.icon}</span>
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -822,7 +815,7 @@ export function HomePage() {
           transition={{ delay: 1.3 }}
           className="text-center mt-12 pb-8"
         >
-          <div className="flex justify-center gap-4 mb-4">
+          <div className="flex justify-center gap-4">
             <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -841,12 +834,6 @@ export function HomePage() {
               📜 Terms of Service
             </motion.a>
           </div>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
-            {t('home.madeWith', 'Сделано с')} ❤️ {t('home.inUzbekistan', 'в Узбекистане')}
-          </p>
-          <p className="text-gray-400 dark:text-gray-500 text-xs">
-            © {new Date().getFullYear()} Uzbek Wars v1.0.0 • Proprietary License
-          </p>
         </motion.div>
       </main>
     </div>
