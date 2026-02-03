@@ -29,7 +29,13 @@
   "notifications": {
     "level_up": "Поздравляем! Вы достигли уровня {{level}}!",
     "activity_success": "Получено: {{exp}} опыта, {{soms}} сомов",
-    "activity_penalty": "Неудача! Потеряно {{soms}} сомов"
+    "activity_penalty": "Неудача! Потеряно {{soms}} сомов",
+    "activityStarted": "Начал: {{activity}}!",
+    "activityCompleted": "✅ Активность завершена! +{{exp}} XP, {{soms}} сомов",
+    "levelUpNotification": "🎉 Новый уровень {{level}}! +{{exp}} XP, {{soms}} сомов",
+    "penaltyApplied": "⚠️ Попался! Штраф применен",
+    "activityLoadError": "Не удалось загрузить активности",
+    "selectCharacterFirst": "Сначала выберите персонажа"
   },
   "activityResult": {
     "excellent": "Отлично!",

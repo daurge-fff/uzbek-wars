@@ -29,7 +29,13 @@
   "notifications": {
     "level_up": "Congratulations! You reached level {{level}}!",
     "activity_success": "Received: {{exp}} experience, {{soms}} soms",
-    "activity_penalty": "Failure! Lost {{soms}} soms"
+    "activity_penalty": "Failure! Lost {{soms}} soms",
+    "activityStarted": "Started: {{activity}}!",
+    "activityCompleted": "✅ Activity completed! +{{exp}} XP, {{soms}} soms",
+    "levelUpNotification": "🎉 New level {{level}}! +{{exp}} XP, {{soms}} soms",
+    "penaltyApplied": "⚠️ Caught! Penalty applied",
+    "activityLoadError": "Failed to load activities",
+    "selectCharacterFirst": "Select character first"
   },
   "activityResult": {
     "excellent": "Excellent!",

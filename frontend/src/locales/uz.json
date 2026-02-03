@@ -29,7 +29,13 @@
   "notifications": {
     "level_up": "Tabriklaymiz! Siz {{level}} darajaga yetdingiz!",
     "activity_success": "Olindi: {{exp}} tajriba, {{soms}} so'm",
-    "activity_penalty": "Muvaffaqiyatsizlik! Yo'qotildi {{soms}} so'm"
+    "activity_penalty": "Muvaffaqiyatsizlik! Yo'qotildi {{soms}} so'm",
+    "activityStarted": "Boshlandi: {{activity}}!",
+    "activityCompleted": "✅ Faoliyat tugallandi! +{{exp}} XP, {{soms}} so'm",
+    "levelUpNotification": "🎉 Yangi daraja {{level}}! +{{exp}} XP, {{soms}} so'm",
+    "penaltyApplied": "⚠️ Qo'lga tushdi! Jarima qo'llanildi",
+    "activityLoadError": "Faoliyatlarni yuklash amalga oshmadi",
+    "selectCharacterFirst": "Avval personajni tanlang"
   },
   "activityResult": {
     "excellent": "Ajoyib!",

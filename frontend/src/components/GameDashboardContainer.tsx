@@ -6,8 +6,10 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 export const GameDashboardContainer = () => {
+  const { t } = useTranslation();
   const { player, token, isAuthenticated, user, updatePlayer } = useAuth();
   const navigate = useNavigate();
   const [activities, setActivities] = useState<any[]>([]);
@@ -62,7 +64,7 @@ export const GameDashboardContainer = () => {
       setActivities(activitiesData);
     } catch (error) {
       console.error('Failed to load activities:', error);
-      toast.error('Не удалось загрузить активности');
+      toast.error(t('notifications.activityLoadError'));
       setActivities([]);
     } finally {
       setLoading(false);
@@ -151,19 +153,26 @@ export const GameDashboardContainer = () => {
       // Показываем тост с результатами
       if (response.data.leveledUp) {
         toast.success(
-          `🎉 Новый уровень ${response.data.newLevel}! +${response.data.experienceGained} XP, ${response.data.somsGained >= 0 ? '+' : ''}${response.data.somsGained} сомов`,
+          t('notifications.levelUpNotification', {
+            level: response.data.newLevel,
+            exp: response.data.experienceGained,
+            soms: `${response.data.somsGained >= 0 ? '+' : ''}${response.data.somsGained}`
+          }),
           { duration: 4000 }
         );
       } else {
         toast.success(
-          `✅ Активность завершена! +${response.data.experienceGained} XP, ${response.data.somsGained >= 0 ? '+' : ''}${response.data.somsGained} сомов`,
+          t('notifications.activityCompleted', {
+            exp: response.data.experienceGained,
+            soms: `${response.data.somsGained >= 0 ? '+' : ''}${response.data.somsGained}`
+          }),
           { duration: 3000 }
         );
       }
       
       // Если был штраф, показываем предупреждение
       if (response.data.penaltyApplied) {
-        toast.error('⚠️ Попался! Штраф применен', { duration: 2000 });
+        toast.error(t('notifications.penaltyApplied'), { duration: 2000 });
       }
     } catch (error: any) {
       console.error('Failed to complete activity:', error);
@@ -190,7 +199,7 @@ export const GameDashboardContainer = () => {
       // Вычисляем startTime на основе endTime и duration
       const startTime = endTime - (durationSeconds * 1000);
       
-      toast.success(`Начал: ${activityName}!`);
+      toast.success(t('notifications.activityStarted', { activity: activityName }));
       
       // Обновляем текущую активность
       setCurrentActivity({

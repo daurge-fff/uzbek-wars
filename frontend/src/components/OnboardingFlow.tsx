@@ -394,7 +394,7 @@ export const OnboardingFlow = () => {
 
   const handleCitySelect = async (cityId: string) => {
     if (!selectedCharacterId) {
-      toast.error(t('onboarding.selectCharacterFirst', 'Сначала выберите персонажа'));
+      toast.error(t('notifications.selectCharacterFirst'));
       return;
     }
 

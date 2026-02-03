@@ -29,7 +29,13 @@
   "notifications": {
     "level_up": "Вітаємо! Ви досягли рівня {{level}}!",
     "activity_success": "Отримано: {{exp}} досвіду, {{soms}} сомів",
-    "activity_penalty": "Невдача! Втрачено {{soms}} сомів"
+    "activity_penalty": "Невдача! Втрачено {{soms}} сомів",
+    "activityStarted": "Почав: {{activity}}!",
+    "activityCompleted": "✅ Активність завершена! +{{exp}} XP, {{soms}} сомів",
+    "levelUpNotification": "🎉 Новий рівень {{level}}! +{{exp}} XP, {{soms}} сомів",
+    "penaltyApplied": "⚠️ Спіймали! Штраф застосовано",
+    "activityLoadError": "Не вдалося завантажити активності",
+    "selectCharacterFirst": "Спочатку оберіть персонажа"
   },
   "activityResult": {
     "excellent": "Чудово!",
