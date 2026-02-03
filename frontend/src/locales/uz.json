@@ -189,6 +189,7 @@
   },
   "cosmetic": {
     "shop": "Kosmetika do'koni",
+    "shopTitle": "Do'kon",
     "filter": {
       "all": "Hammasi",
       "clothing": "Kiyim",

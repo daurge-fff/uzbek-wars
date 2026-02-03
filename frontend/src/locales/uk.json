@@ -190,6 +190,7 @@
   },
   "cosmetic": {
     "shop": "Магазин косметики",
+    "shopTitle": "Магазин",
     "filter": {
       "all": "Всі",
       "clothing": "Одяг",

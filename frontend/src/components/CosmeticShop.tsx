@@ -113,18 +113,18 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
         {/* Header */}
         <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-2xl p-6 mb-6 border border-white/50 dark:border-gray-700/50">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
-              {t('cosmetic.shop')}
+            <h1 className="text-xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+              {t('cosmetic.shopTitle', 'Магазин')}
             </h1>
             
             {/* Currency Display */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full text-white font-black shadow-lg">
-                <span className="text-xl">💰</span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full text-white font-black shadow-lg text-sm">
+                <span className="text-base">💰</span>
                 <span>{playerSoms?.toLocaleString() || 0}</span>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full text-white font-black shadow-lg">
-                <span className="text-xl">💎</span>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full text-white font-black shadow-lg text-sm">
+                <span className="text-base">💎</span>
                 <span>{playerCrystals || 0}</span>
               </div>
             </div>
@@ -138,7 +138,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setFilter(type)}
-                className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition-all ${
+                className={`px-3 py-1.5 rounded-full font-bold whitespace-nowrap transition-all text-xs ${
                   filter === type
                     ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
@@ -159,22 +159,31 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
             </p>
           </div>
         ) : (
-          <div className="grid gap-4" style={{
-            gridTemplateColumns: filteredItems.length === 1 ? '1fr' : filteredItems.length === 2 ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(280px, 1fr))',
-            maxWidth: filteredItems.length <= 2 ? '900px' : '100%',
-            margin: filteredItems.length <= 2 ? '0 auto' : '0'
-          }}>
-            {filteredItems.map((item, index) => (
-              <motion.div
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
+            {filteredItems.map((item, index) => {
+              const isThirdItem = filteredItems.length === 3 && index === 2;
+              return (
+              <div
                 key={item.id}
+                className={`${isThirdItem ? 'col-span-2 lg:col-span-1' : ''}`}
+              >
+                <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
-                className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 ${rarityBorders[item.rarity]} relative overflow-hidden`}
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 relative overflow-hidden w-full"
+                style={{ borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' : 
+                         rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
+                         rarityBorders[item.rarity].includes('purple-400') ? '#c084fc' : '#fbbf24' }}
               >
                 {/* Rarity Badge */}
                 <div className="absolute top-2 right-2 z-10">
-                  <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r ${rarityColors[item.rarity]} text-white shadow-lg uppercase tracking-wide`}>
+                  <span className="text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r text-white shadow-lg uppercase tracking-wide"
+                        style={{ backgroundImage: `linear-gradient(to right, ${
+                          rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
+                          rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
+                          rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
+                        })` }}>
                     {t(`cosmetic.rarity.${item.rarity}`)}
                   </span>
                 </div>
@@ -196,7 +205,12 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                 )}
 
                 {/* Item Icon */}
-                <div className={`w-full aspect-square rounded-2xl bg-gradient-to-br ${rarityColors[item.rarity]} flex items-center justify-center text-6xl mb-3 shadow-inner relative overflow-hidden`}>
+                <div className="w-full aspect-square max-h-64 rounded-2xl bg-gradient-to-br flex items-center justify-center text-6xl mb-3 shadow-inner relative overflow-hidden mx-auto"
+                     style={{ backgroundImage: `linear-gradient(to bottom right, ${
+                       rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
+                       rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
+                       rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
+                     })` }}>
                   <motion.div
                     animate={{ rotate: item.equipped ? [0, 5, -5, 0] : 0 }}
                     transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
@@ -257,8 +271,9 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                     {t('cosmetic.buy', 'Купить')}
                   </motion.button>
                 )}
-              </motion.div>
-            ))}
+                </motion.div>
+              </div>
+            )})}
           </div>
         )}
 

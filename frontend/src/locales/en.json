@@ -183,6 +183,7 @@
   },
   "cosmetic": {
     "shop": "Cosmetic Shop",
+    "shopTitle": "Shop",
     "filter": {
       "all": "All",
       "clothing": "Clothing",

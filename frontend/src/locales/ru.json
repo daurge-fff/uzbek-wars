@@ -157,6 +157,7 @@
   },
   "cosmetic": {
     "shop": "Магазин косметики",
+    "shopTitle": "Магазин",
     "filter": {
       "all": "Все",
       "clothing": "Одежда",

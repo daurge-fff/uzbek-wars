@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { createPortal } from 'react-dom';
 
 interface PurchaseConfirmModalProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export const PurchaseConfirmModal = ({
   const canAffordSoms = priceSoms ? playerSoms >= priceSoms : false;
   const canAffordCrystals = priceCrystals ? playerCrystals >= priceCrystals : false;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -56,17 +57,20 @@ export const PurchaseConfirmModal = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onCancel}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
+          <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-md w-full p-6 pointer-events-auto border-2 border-white/50 dark:border-gray-700/50"
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="w-full max-w-[450px] pointer-events-auto"
             >
+              <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-2xl">
+                <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
               {/* Item Preview */}
               <div className="text-center mb-6">
                 <div className={`w-32 h-32 mx-auto rounded-3xl bg-gradient-to-br ${rarityColors[itemRarity as keyof typeof rarityColors]} flex items-center justify-center text-7xl mb-4 shadow-xl`}>
@@ -93,27 +97,6 @@ export const PurchaseConfirmModal = ({
                   </div>
                 </div>
               )}
-
-              {/* Current Balance */}
-              <div className="mb-6 p-4 bg-gray-100 dark:bg-gray-700/50 rounded-2xl">
-                <div className="text-sm font-bold text-gray-600 dark:text-gray-400 mb-2 text-center">
-                  {t('cosmetic.yourBalance', 'Ваш баланс')}
-                </div>
-                <div className="flex justify-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">💰</span>
-                    <span className="font-black text-gray-900 dark:text-white">
-                      {playerSoms.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">💎</span>
-                    <span className="font-black text-gray-900 dark:text-white">
-                      {playerCrystals}
-                    </span>
-                  </div>
-                </div>
-              </div>
 
               {/* Purchase Options */}
               <div className="space-y-3 mb-6">
@@ -164,14 +147,17 @@ export const PurchaseConfirmModal = ({
                 whileTap={{ scale: 0.98 }}
                 onClick={onCancel}
                 disabled={loading}
-                className="w-full py-3 rounded-2xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
+                className="w-full py-3 rounded-full font-bold text-gray-700 dark:text-gray-300 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 shadow-lg transition-all"
               >
                 {t('common.cancel', 'Отмена')}
               </motion.button>
+                </div>
+              </div>
             </motion.div>
           </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
