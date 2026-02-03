@@ -16,6 +16,11 @@
 import { IPlayer } from '../models/Player';
 import { StatModifiers, updatePlayerStats } from './StatsService';
 import { processLevelUp } from './ProgressionService';
+import { 
+  applyIncomeBonus, 
+  applyExperienceBonus,
+  applyMoodFromWork,
+} from './CharacterBonusService';
 import { logger } from '../utils/logger';
 
 /**
@@ -378,8 +383,19 @@ export function executeActivity(player: IPlayer, activity: Activity): ActivityRe
   let somsGained = activity.rewards.soms;
   let penaltyApplied = false;
   
-  // Apply stat modifiers
-  updatePlayerStats(player, activity.statModifiers);
+  // Apply character class bonuses
+  experienceGained = applyExperienceBonus(experienceGained, player.characterId);
+  somsGained = applyIncomeBonus(somsGained, player.characterId);
+  
+  // Apply stat modifiers with character bonuses
+  const modifiedStats = { ...activity.statModifiers };
+  
+  // Apply mood bonus from work if activity gives negative mood
+  if (modifiedStats.mood && modifiedStats.mood > 0) {
+    modifiedStats.mood = applyMoodFromWork(modifiedStats.mood, player.characterId);
+  }
+  
+  updatePlayerStats(player, modifiedStats);
   
   // Check for risk-based penalty
   if (activity.risks && Math.random() < activity.risks.probability) {
@@ -421,7 +437,7 @@ export function executeActivity(player: IPlayer, activity: Activity): ActivityRe
     newLevel: levelUp ? player.level : undefined,
     levelsGained: levelUp ? levelsGained : undefined,
     penaltyApplied,
-    statChanges: activity.statModifiers,
+    statChanges: modifiedStats,
   };
 }
 

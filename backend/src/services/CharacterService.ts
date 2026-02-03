@@ -2,7 +2,7 @@
  * Character Service
  * 
  * Handles character-related business logic including:
- * - Character retrieval
+ * - Character retrieval with stat modifiers
  * - Player character selection
  * - City assignment
  * - Referral code processing
@@ -11,6 +11,7 @@
 import { Player, IPlayer } from '../models/Player';
 import { User } from '../models/User';
 import { getCityById } from './CityService';
+import { getCharacterInfo } from './CharacterBonusService';
 import { logger } from '../utils/logger';
 import { CHARACTERS } from '../scripts/seed';
 
@@ -90,15 +91,18 @@ export async function generateReferralCode(): Promise<string> {
 }
 
 /**
- * Retrieves all available characters
+ * Retrieves all available characters with their stat modifiers
  * 
  * Characters are defined in seed data and represent
- * different Uzbek cultural archetypes.
+ * different Uzbek cultural archetypes with unique bonuses.
  * 
- * @returns Array of character definitions
+ * @returns Array of character definitions with modifiers
  */
-export function getCharacters(): ICharacter[] {
-  return CHARACTERS;
+export function getCharacters() {
+  return CHARACTERS.map(char => ({
+    ...char,
+    modifiers: getCharacterInfo(char.id)?.modifiers || {},
+  }));
 }
 
 /**
