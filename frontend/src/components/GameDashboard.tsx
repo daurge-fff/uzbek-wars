@@ -140,22 +140,51 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
   const [showLevelWarning, setShowLevelWarning] = useState(false);
   const [warningActivity, setWarningActivity] = useState<Activity | null>(null);
   const [hoveredStat, setHoveredStat] = useState<string | null>(null);
+  const [characterModifiers, setCharacterModifiers] = useState<any>(null);
+
+  // Загружаем модификаторы класса при монтировании
+  useEffect(() => {
+    const fetchModifiers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch('/api/player/character-modifiers', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCharacterModifiers(data.modifiers);
+        }
+      } catch (error) {
+        console.error('Failed to fetch character modifiers:', error);
+      }
+    };
+
+    fetchModifiers();
+  }, [playerState.characterId]);
 
   // Применяем модификаторы класса к значениям активности
   const applyClassModifiers = (activity: Activity) => {
-    if (!activity.rewards) return activity;
+    if (!activity.rewards || !characterModifiers) return activity;
 
-    // Получаем модификаторы (в реальности нужно получать с сервера)
-    // Пока просто возвращаем базовые значения
     const modifiedActivity = { ...activity };
     
+    // Применяем бонусы к наградам
     if (modifiedActivity.rewards) {
+      const expBonus = characterModifiers.experienceBonus || 0;
+      const incomeBonus = characterModifiers.incomeBonus || 0;
+      
       modifiedActivity.rewards = {
-        experience: Math.round(activity.rewards.experience),
-        soms: Math.round(activity.rewards.soms),
+        experience: Math.round(activity.rewards.experience * (1 + expBonus / 100)),
+        soms: Math.round(activity.rewards.soms * (1 + incomeBonus / 100)),
       };
     }
 
+    // Применяем модификаторы к изменениям статов
     if (modifiedActivity.statModifiers) {
       const newModifiers: any = {};
       Object.entries(modifiedActivity.statModifiers).forEach(([key, value]) => {
@@ -164,8 +193,10 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       modifiedActivity.statModifiers = newModifiers;
     }
 
+    // Применяем модификатор времени
     if (modifiedActivity.duration) {
-      modifiedActivity.duration = Math.round(activity.duration || 0);
+      const timeMod = characterModifiers.activityDuration || 0;
+      modifiedActivity.duration = Math.round((activity.duration || 0) * (1 + timeMod / 100));
     }
 
     return modifiedActivity;

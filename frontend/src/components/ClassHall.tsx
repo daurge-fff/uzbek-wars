@@ -208,93 +208,129 @@ const ClassHall: React.FC<ClassHallProps> = ({
     const isLocked = isClassLocked(classData);
     const isCurrent = classData.id === currentClass;
     const canAfford = canAffordClass(classData);
-    const tierBadge = getTierBadge(classData.tier);
     const lang = i18n.language as 'ru' | 'uz' | 'uk' | 'en';
+    const cost = getChangeCost(classData.tier);
 
     return (
       <motion.div
         key={classData.id}
+        whileHover={!isLocked && !isCurrent ? { y: -4 } : {}}
         whileTap={!isLocked && !isCurrent ? { scale: 0.98 } : {}}
         onClick={() => !isLocked && !isCurrent && handleClassSelect(classData)}
-        className={`relative flex-shrink-0 w-[340px] h-[480px] rounded-2xl p-4 backdrop-blur-xl border-2 transition-all duration-300 overflow-hidden ${
+        className={`relative flex-shrink-0 w-[280px] h-full rounded-2xl p-4 shadow-md transition-all border-2 flex flex-col ${
           isCurrent
-            ? 'bg-gradient-to-br from-green-500/20 to-emerald-600/20 dark:from-green-500/30 dark:to-emerald-600/30 border-green-400 dark:border-green-500 shadow-lg shadow-green-500/20'
+            ? 'bg-gradient-to-br from-green-500/20 to-emerald-600/20 dark:from-green-500/30 dark:to-emerald-600/30 border-green-400 dark:border-green-500 shadow-lg'
             : isLocked
-            ? 'bg-gray-900/90 border-gray-700/50 opacity-30 cursor-not-allowed'
+            ? 'bg-gray-100 dark:bg-gray-800/50 border-gray-300 dark:border-gray-700 opacity-50 cursor-not-allowed'
             : canAfford
-            ? 'bg-white/80 dark:bg-gray-800/80 border-white/30 dark:border-gray-700/50 hover:border-purple-400 dark:hover:border-purple-500 cursor-pointer hover:shadow-xl'
-            : 'bg-red-900/20 dark:bg-red-900/30 border-red-700/50 cursor-not-allowed opacity-60'
-        }`}
-        style={{ userSelect: 'none' }}
+            ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-purple-400 dark:hover:border-purple-500 cursor-pointer'
+            : 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700 cursor-not-allowed opacity-60'
+        } overflow-hidden`}
       >
-        {/* Tier Badge */}
-        <div className={`absolute top-4 right-4 w-10 h-10 rounded-full bg-gradient-to-r ${tierBadge.color} text-white text-lg font-black flex items-center justify-center shadow-lg`}>
-          {tierBadge.number}
-        </div>
-
-        {/* Lock Overlay */}
+        {/* Lock Badge - top right */}
         {isLocked && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/80 rounded-2xl backdrop-blur-md z-10">
-            <div className="text-center px-4">
-              <div className="text-6xl mb-3">🔒</div>
-              <div className="text-white font-bold text-lg">
-                Lvl {classData.requiredLevel}
-              </div>
-            </div>
+          <div className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-lg shadow-md flex items-center gap-1">
+            <span>🔒</span>
+            <span>LVL {classData.requiredLevel}</span>
           </div>
         )}
 
-        {/* Current Badge */}
+        {/* Current Badge - top right */}
         {isCurrent && (
-          <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-green-500 text-white text-2xl flex items-center justify-center shadow-lg">
+          <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-base font-bold rounded-lg shadow-md">
             ✓
           </div>
         )}
 
-        {/* Avatar */}
-        <div className="text-5xl mb-2 text-center">{classData.avatar}</div>
-
-        {/* Name */}
-        <h3 className="text-lg font-black text-gray-900 dark:text-white text-center mb-1">
-          {classData.name[lang]}
-        </h3>
-
-        {/* Description */}
-        <p className="text-xs text-gray-600 dark:text-gray-400 text-center mb-3 leading-tight">
-          {classData.description[lang]}
-        </p>
-
-        {/* Strengths */}
-        <div className="mb-2 p-2 rounded-xl bg-green-100/80 dark:bg-green-900/30 border border-green-300 dark:border-green-700/50">
-          <div className="text-[10px] font-bold text-green-700 dark:text-green-400 mb-1">
-            {t('character.strengths')}
-          </div>
-          <div className="text-[10px] text-green-800 dark:text-green-200 whitespace-pre-line leading-relaxed">
-            {classData.strengths[lang]}
-          </div>
-        </div>
-
-        {/* Weaknesses */}
-        <div className="mb-2 p-2 rounded-xl bg-red-100/80 dark:bg-red-900/30 border border-red-300 dark:border-red-700/50">
-          <div className="text-[10px] font-bold text-red-700 dark:text-red-400 mb-1">
-            {t('character.weaknesses')}
-          </div>
-          <div className="text-[10px] text-red-800 dark:text-red-200 whitespace-pre-line leading-relaxed">
-            {classData.weaknesses[lang]}
-          </div>
-        </div>
-
-        {/* Unique Ability */}
-        {classData.uniqueAbilityDescription && (
-          <div className="p-2 rounded-xl bg-purple-100/80 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-700/50">
-            <div className="text-[10px] font-bold text-purple-700 dark:text-purple-400 mb-1">
-              🌟 {t('character.uniqueAbility')}
-            </div>
-            <div className="text-[10px] text-purple-800 dark:text-purple-200 leading-relaxed">
-              {classData.uniqueAbilityDescription[lang]}
-            </div>
+        {/* Not enough money badge */}
+        {!canAfford && !isLocked && !isCurrent && (
+          <div className="absolute top-2 right-2 px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded-lg shadow-md">
+            💰
           </div>
         )}
+
+        <div className="relative z-10 flex flex-col flex-1">
+          {/* Avatar */}
+          <div className={`text-6xl mb-1 text-center ${!canAfford && !isCurrent ? 'grayscale' : ''}`}>
+            {classData.avatar}
+          </div>
+
+          {/* Name */}
+          <h3 className={`text-base font-bold mb-0.5 text-center line-clamp-2 ${
+            !canAfford && !isCurrent ? 'text-gray-500 dark:text-gray-500' : 'text-gray-900 dark:text-white'
+          }`} style={{ minHeight: '2.5rem' }}>
+            {classData.name[lang]}
+          </h3>
+
+          {/* Description */}
+          <p className={`text-xs mb-1.5 text-center line-clamp-2 ${
+            !canAfford && !isCurrent ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'
+          }`} style={{ minHeight: '2rem' }}>
+            {classData.description[lang]}
+          </p>
+
+          {/* Cost - фиксированная высота для всех */}
+          <div className="mb-1.5" style={{ minHeight: '60px' }}>
+            <div className="text-[9px] text-gray-500 dark:text-gray-400 mb-1 text-center font-semibold uppercase tracking-wide">
+              {isCurrent ? t('character.changeCost') : t('character.changeCost')}
+            </div>
+            <div className="flex flex-wrap gap-1.5 justify-center">
+              <div className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${
+                isCurrent
+                  ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                  : playerSoms < cost.soms
+                  ? 'bg-red-500 text-white ring-2 ring-red-300'
+                  : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+              }`}>
+                <span>💰</span>
+                <span>{cost.soms.toLocaleString()}</span>
+              </div>
+              <div className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${
+                isCurrent
+                  ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                  : playerCrystals < cost.crystals
+                  ? 'bg-red-500 text-white ring-2 ring-red-300'
+                  : 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300'
+              }`}>
+                <span>💎</span>
+                <span>{cost.crystals}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Strengths & Weaknesses - растягиваются */}
+          <div className="space-y-1 flex-1 flex flex-col">
+            <div className="p-2 rounded-xl bg-green-100/80 dark:bg-green-900/30 border border-green-300 dark:border-green-700/50 flex-1 flex flex-col">
+              <div className="text-[10px] font-bold text-green-700 dark:text-green-400 mb-0.5">
+                {t('character.strengths')}
+              </div>
+              <div className="text-[10px] text-green-800 dark:text-green-200 whitespace-pre-line leading-relaxed flex-1">
+                {classData.strengths[lang]}
+              </div>
+            </div>
+
+            <div className="p-2 rounded-xl bg-red-100/80 dark:bg-red-900/30 border border-red-300 dark:border-red-700/50 flex-1 flex flex-col">
+              <div className="text-[10px] font-bold text-red-700 dark:text-red-400 mb-0.5">
+                {t('character.weaknesses')}
+              </div>
+              <div className="text-[10px] text-red-800 dark:text-red-200 whitespace-pre-line leading-relaxed flex-1">
+                {classData.weaknesses[lang]}
+              </div>
+            </div>
+
+            {/* Unique Ability */}
+            {classData.uniqueAbilityDescription && (
+              <div className="p-2 rounded-xl bg-purple-100/80 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-700/50 flex-shrink-0">
+                <div className="text-[10px] font-bold text-purple-700 dark:text-purple-400 mb-0.5">
+                  🌟 {t('character.uniqueAbility')}
+                </div>
+                <div className="text-[10px] text-purple-800 dark:text-purple-200 leading-relaxed">
+                  {classData.uniqueAbilityDescription[lang]}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </motion.div>
     );
   };
@@ -334,9 +370,9 @@ const ClassHall: React.FC<ClassHallProps> = ({
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          <div className="flex gap-4 pb-2">
+          <div className="flex gap-4 pb-2 items-stretch">
             {tierClasses.map((classData) => (
-              <div key={classData.id} className="snap-center">
+              <div key={classData.id} className="snap-center flex">
                 {renderClassCard(classData)}
               </div>
             ))}

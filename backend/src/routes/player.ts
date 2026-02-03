@@ -866,4 +866,48 @@ router.get(
   }
 );
 
+/**
+ * GET /api/player/character-modifiers
+ * 
+ * Gets the character modifiers for the player's current class
+ */
+router.get(
+  '/character-modifiers',
+  authenticate,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        res.status(401).json({
+          error: 'User not authenticated',
+          code: 'UNAUTHORIZED'
+        });
+        return;
+      }
+      
+      const player = await Player.findOne({ userId });
+      if (!player) {
+        res.status(404).json({ error: 'Player not found' });
+        return;
+      }
+      
+      const { getCharacterModifiers } = await import('../services/CharacterBonusService');
+      const modifiers = getCharacterModifiers(player.characterId);
+      
+      res.status(200).json({
+        characterId: player.characterId,
+        modifiers
+      });
+    } catch (error) {
+      logger.error('Get character modifiers endpoint error:', error);
+      res.status(500).json({
+        error: 'Failed to get character modifiers',
+        code: 'FETCH_FAILED',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+);
+
 export default router;
