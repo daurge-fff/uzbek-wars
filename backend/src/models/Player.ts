@@ -140,6 +140,7 @@ const PlayerSchema = new Schema<IPlayer>(
     lastActivityTime: {
       type: Date,
       default: Date.now,
+      index: true, // Indexed for online status queries
     },
     currentActivity: {
       type: String,

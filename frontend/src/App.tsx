@@ -634,7 +634,35 @@ function App() {
 // Wrapper component for Settings with i18n
 const SettingsWithI18n = () => {
   const { i18n } = useTranslation();
-  const { player } = useAuth();
+  const { player, token } = useAuth();
+  const [appStats, setAppStats] = useState<any>(null);
+  
+  useEffect(() => {
+    const fetchAppStats = async () => {
+      if (!token) return;
+      
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const response = await axios.get(`${API_URL}/api/stats/app`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setAppStats(response.data);
+      } catch (error) {
+        console.error('Failed to fetch app stats:', error);
+        // Fallback данные
+        setAppStats({
+          uptime: 0,
+          lastRestart: new Date().toISOString(),
+          onlinePlayersTotal: 0,
+          onlinePlayersCity: 0,
+          cityName: player?.cityId || 'samarkand',
+          version: '1.2.1'
+        });
+      }
+    };
+    
+    fetchAppStats();
+  }, [token, player?.cityId]);
   
   return (
     <Settings
@@ -646,14 +674,7 @@ const SettingsWithI18n = () => {
       onMusicToggle={() => console.log('Toggle music')}
       notificationsEnabled={false}
       onNotificationsToggle={() => console.log('Toggle notifications')}
-      appStats={{
-        uptime: 3600 * 2 + 1800,
-        lastRestart: new Date(Date.now() - 3600 * 2.5 * 1000).toISOString(),
-        onlinePlayersTotal: 1247,
-        onlinePlayersCity: 342,
-        cityName: player?.cityId || 'samarkand',
-        version: '1.0.0'
-      }}
+      appStats={appStats}
     />
   );
 };

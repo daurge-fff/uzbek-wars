@@ -22,6 +22,7 @@ import leaderboardRoutes from './routes/leaderboard';
 import playerRoutes from './routes/player';
 import healthRoutes from './routes/health';
 import testsRoutes from './routes/tests';
+import statsRoutes from './routes/stats';
 
 /**
  * Creates and configures Express application
@@ -86,6 +87,7 @@ export function createServer(): Application {
   // API routes - order matters! More specific routes first
   app.use('/api/health', healthRoutes);
   app.use('/api/tests', testsRoutes);
+  app.use('/api/stats', statsRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/cities', citiesRoutes);
   app.use('/api/characters', characterRoutes); // Only /characters endpoint
