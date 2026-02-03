@@ -363,11 +363,6 @@ router.post(
       logger.info(`  - Player: userId="${p.userId}", characterId="${p.characterId}", cityId="${p.cityId}"`);
     });
     
-    // Find players with valid characterId (completed onboarding)
-    const playersWithCharacters = await Player.find({
-      characterId: { $exists: true, $ne: 'default' }
-    });
-    
     // Get User model to check displayNames
     const User = (await import('../models/User')).User;
     

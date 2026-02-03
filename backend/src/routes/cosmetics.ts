@@ -78,7 +78,7 @@ const COSMETIC_ITEMS = [
  */
 router.get('/', authenticate, async (req: Request, res: Response) => {
   try {
-    const player = await Player.findOne({ userId: req.user!.userId });
+    const player = await Player.findOne({ userId: (req as any).user!.userId });
     
     if (!player) {
       return res.status(404).json({ error: 'Player not found' });
@@ -97,10 +97,10 @@ router.get('/', authenticate, async (req: Request, res: Response) => {
         player.cosmetics?.activeAccessory === item.id
     }));
 
-    res.json({ items });
+    return res.json({ items });
   } catch (error) {
     console.error('Error fetching cosmetics:', error);
-    res.status(500).json({ error: 'Failed to fetch cosmetics' });
+    return res.status(500).json({ error: 'Failed to fetch cosmetics' });
   }
 });
 
@@ -121,7 +121,7 @@ router.post('/purchase', authenticate, async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Item not found' });
     }
 
-    const player = await Player.findOne({ userId: req.user!.userId });
+    const player = await Player.findOne({ userId: (req as any).user!.userId });
     if (!player) {
       return res.status(404).json({ error: 'Player not found' });
     }
@@ -167,7 +167,7 @@ router.post('/purchase', authenticate, async (req: Request, res: Response) => {
 
     await player.save();
 
-    res.json({
+    return res.json({
       success: true,
       player: {
         soms: player.soms,
@@ -177,7 +177,7 @@ router.post('/purchase', authenticate, async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error purchasing cosmetic:', error);
-    res.status(500).json({ error: 'Failed to purchase item' });
+    return res.status(500).json({ error: 'Failed to purchase item' });
   }
 });
 
@@ -198,7 +198,7 @@ router.post('/equip', authenticate, async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Item not found' });
     }
 
-    const player = await Player.findOne({ userId: req.user!.userId });
+    const player = await Player.findOne({ userId: (req as any).user!.userId });
     if (!player) {
       return res.status(404).json({ error: 'Player not found' });
     }
@@ -229,13 +229,13 @@ router.post('/equip', authenticate, async (req: Request, res: Response) => {
 
     await player.save();
 
-    res.json({
+    return res.json({
       success: true,
       cosmetics: player.cosmetics
     });
   } catch (error) {
     console.error('Error equipping cosmetic:', error);
-    res.status(500).json({ error: 'Failed to equip item' });
+    return res.status(500).json({ error: 'Failed to equip item' });
   }
 });
 
@@ -256,7 +256,7 @@ router.post('/unequip', authenticate, async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Item not found' });
     }
 
-    const player = await Player.findOne({ userId: req.user!.userId });
+    const player = await Player.findOne({ userId: (req as any).user!.userId });
     if (!player) {
       return res.status(404).json({ error: 'Player not found' });
     }
@@ -276,13 +276,13 @@ router.post('/unequip', authenticate, async (req: Request, res: Response) => {
 
     await player.save();
 
-    res.json({
+    return res.json({
       success: true,
       cosmetics: player.cosmetics
     });
   } catch (error) {
     console.error('Error unequipping cosmetic:', error);
-    res.status(500).json({ error: 'Failed to unequip item' });
+    return res.status(500).json({ error: 'Failed to unequip item' });
   }
 });
 

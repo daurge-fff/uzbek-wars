@@ -7,8 +7,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { getCharacters, selectCharacter, ISelectCharacterRequest } from '../services/CharacterService';
-import { authenticate } from '../middleware/auth';
+import { getCharacters } from '../services/CharacterService';
 import { logger } from '../utils/logger';
 
 const router = Router();

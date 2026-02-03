@@ -17,7 +17,6 @@ async function checkPlayer() {
       logger.info(`  characterId: ${player.characterId}`);
       logger.info(`  cityId: ${player.cityId}`);
       logger.info(`  level: ${player.level}`);
-      logger.info(`  displayName: ${player.displayName}`);
     });
     
     await disconnectDatabase();
