@@ -19,91 +19,89 @@ const formatNumber = (num: number): string => {
   return num.toString();
 };
 
-// 3D карусель с перспективой (как в iOS)
+// Простая и красивая карусель с карточками
 function FeaturesCarousel({ features }: { features: any[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  const onDragEnd = (_: any, info: any) => {
-    const offset = info.offset.x;
-    const velocity = info.velocity.x;
-    
-    if (Math.abs(velocity) > 500 || Math.abs(offset) > 100) {
-      if ((velocity < 0 || offset < 0) && currentIndex < features.length - 1) {
-        setCurrentIndex(currentIndex + 1);
-      } else if ((velocity > 0 || offset > 0) && currentIndex > 0) {
-        setCurrentIndex(currentIndex - 1);
-      }
-    }
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % features.length);
+  };
+  
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + features.length) % features.length);
   };
 
   return (
-    <div className="relative py-8">
-      <div className="overflow-hidden" style={{ perspective: '1000px' }}>
-        <motion.div
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.2}
-          onDragEnd={onDragEnd}
-          animate={{ x: `calc(-${currentIndex * 100}%)` }}
-          transition={{ 
-            type: 'spring', 
-            stiffness: 300, 
-            damping: 30
-          }}
-          className="flex gap-6 cursor-grab active:cursor-grabbing px-4"
-        >
-          {features.map((feature, index) => {
-            const offset = index - currentIndex;
-            const isActive = index === currentIndex;
-            
-            return (
+    <div className="relative max-w-md mx-auto">
+      {/* Карточка */}
+      <div className="relative h-80 mb-6">
+        {features.map((feature, index) => (
+          <motion.div
+            key={index}
+            initial={false}
+            animate={{
+              opacity: index === currentIndex ? 1 : 0,
+              scale: index === currentIndex ? 1 : 0.8,
+              zIndex: index === currentIndex ? 1 : 0,
+            }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0"
+          >
+            <div className="h-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] p-8 shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center text-center">
               <motion.div
-                key={index}
-                className="min-w-full"
-                animate={{ 
-                  scale: isActive ? 1 : 0.85,
-                  opacity: isActive ? 1 : 0.4,
-                  rotateY: offset * -15,
-                  z: isActive ? 0 : -100
-                }}
-                transition={{ duration: 0.5 }}
-                style={{ transformStyle: 'preserve-3d' }}
+                initial={{ scale: 0 }}
+                animate={{ scale: index === currentIndex ? 1 : 0 }}
+                transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+                className="text-8xl mb-6"
               >
-                <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 shadow-2xl border border-gray-200 dark:border-gray-700">
-                  <motion.div
-                    animate={{ scale: isActive ? 1 : 0.8 }}
-                    className="text-7xl mb-6 text-center"
-                  >
-                    {feature.icon}
-                  </motion.div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 text-center">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-center leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
+                {feature.icon}
               </motion.div>
-            );
-          })}
-        </motion.div>
+              <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-3">
+                {feature.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                {feature.description}
+              </p>
+            </div>
+          </motion.div>
+        ))}
       </div>
       
-      {/* Элегантные dots */}
-      <div className="flex justify-center gap-2 mt-8">
-        {features.map((_, index) => (
-          <motion.button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            whileHover={{ scale: 1.3 }}
-            whileTap={{ scale: 0.9 }}
-            className={`h-2 rounded-full transition-all ${
-              index === currentIndex 
-                ? 'w-8 bg-indigo-600 dark:bg-indigo-400' 
-                : 'w-2 bg-gray-300 dark:bg-gray-600'
-            }`}
-          />
-        ))}
+      {/* Навигация */}
+      <div className="flex items-center justify-center gap-4">
+        <motion.button
+          onClick={prevSlide}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="w-12 h-12 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-full shadow-lg flex items-center justify-center text-2xl text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+        >
+          ←
+        </motion.button>
+        
+        <div className="flex gap-2">
+          {features.map((_, index) => (
+            <motion.button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
+              className={`h-2 rounded-full transition-all ${
+                index === currentIndex 
+                  ? 'w-8 bg-indigo-600 dark:bg-indigo-400' 
+                  : 'w-2 bg-gray-300 dark:bg-gray-600'
+              }`}
+            />
+          ))}
+        </div>
+        
+        <motion.button
+          onClick={nextSlide}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="w-12 h-12 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-full shadow-lg flex items-center justify-center text-2xl text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+        >
+          →
+        </motion.button>
       </div>
     </div>
   );
