@@ -170,7 +170,10 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
 
   // Применяем модификаторы класса к значениям активности
   const applyClassModifiers = (activity: Activity) => {
-    if (!activity.rewards || !characterModifiers) return activity;
+    if (!activity.rewards) return activity;
+    
+    // Если модификаторы не загружены, возвращаем базовые значения
+    if (!characterModifiers) return activity;
 
     const modifiedActivity = { ...activity };
     

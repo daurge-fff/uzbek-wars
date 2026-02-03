@@ -418,3 +418,29 @@ export async function changeClass(userId: string, newCharacterId: string): Promi
     throw error;
   }
 }
+
+/**
+ * Gets default/fallback character ID
+ * Returns the first starter class as default
+ * 
+ * @returns Default character ID
+ */
+export function getDefaultCharacterId(): string {
+  return STARTER_CLASSES[0].id; // char_trader
+}
+
+/**
+ * Ensures player has a valid character, resets to default if invalid
+ * 
+ * @param player - Player document
+ * @returns true if character was reset, false if it was valid
+ */
+export async function ensureValidCharacter(player: IPlayer): Promise<boolean> {
+  if (!isValidCharacter(player.characterId)) {
+    logger.warn(`Player ${player._id} has invalid character ${player.characterId}, resetting to default`);
+    player.characterId = getDefaultCharacterId();
+    await player.save();
+    return true;
+  }
+  return false;
+}

@@ -10,6 +10,7 @@
  */
 
 import { ALL_CLASSES } from '../data/characters';
+import { logger } from '../utils/logger';
 
 /**
  * Character stat modifiers interface
@@ -63,10 +64,12 @@ export interface CharacterModifiers {
 /**
  * Gets character modifiers by character ID
  * Searches across all tiers
+ * Returns empty object if character not found (safe fallback)
  */
 export function getCharacterModifiers(characterId: string): CharacterModifiers {
   const character = ALL_CLASSES.find(c => c.id === characterId);
   if (!character) {
+    logger.warn(`Character ${characterId} not found, returning empty modifiers`);
     return {};
   }
   

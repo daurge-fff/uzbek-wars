@@ -51,6 +51,10 @@ router.get(
         return;
       }
 
+      // Ensure player has valid character
+      const { ensureValidCharacter } = await import('../services/CharacterService');
+      await ensureValidCharacter(player);
+
       res.status(200).json({
         player: {
           userId: player.userId,
@@ -247,6 +251,10 @@ router.post(
         res.status(404).json({ error: 'Player not found' });
         return;
       }
+
+      // Ensure player has valid character
+      const { ensureValidCharacter } = await import('../services/CharacterService');
+      await ensureValidCharacter(player);
 
       // Проверяем есть ли уже активная активность
       if (player.currentActivity && player.currentActivityEndTime) {
