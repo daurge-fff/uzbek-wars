@@ -153,10 +153,10 @@ export const Settings = ({
             />
           </div>
 
-          {/* Font Section */}
+          {/* App Section */}
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
-              ⚙️ Приложение
+              ⚙️ {t('settings.application', 'Приложение')}
             </h2>
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -205,7 +205,7 @@ export const Settings = ({
               </div>
               <div className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-[16px] border border-blue-200 dark:border-blue-800">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">🏙️ {t('settings.onlineCity')} {appStats.cityName}</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">🏙️ {t('settings.onlineCity')} {t(`cities.${appStats.cityName.toLowerCase()}`, appStats.cityName)}</span>
                   <div className="group relative">
                     <span className="text-xs cursor-help opacity-60">ℹ️</span>
                     <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
@@ -233,7 +233,7 @@ export const Settings = ({
           <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
             <div className="flex justify-between">
               <span>{t('settings.version')}:</span>
-              <span className="font-bold text-gray-900 dark:text-white">{appStats?.version || '1.0.0'}</span>
+              <span className="font-bold text-gray-900 dark:text-white">1.2.1</span>
             </div>
             <div className="flex justify-between items-center">
               <span>{t('settings.license')}:</span>
@@ -314,10 +314,10 @@ export const Settings = ({
                           👨‍💻
                         </motion.div>
                         <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
-                          German Vitiaz
+                          {t('settings.developerName', 'Разработчик')}
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">
-                          Full-Stack Developer
+                          {t('settings.developerRole', 'Full-Stack Developer')}
                         </p>
                         <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-500">
                           <span>🚀 React</span>
@@ -332,7 +332,7 @@ export const Settings = ({
                         <motion.a
                           whileHover={{ scale: 1.02, y: -2 }}
                           whileTap={{ scale: 0.98 }}
-                          href="https://t.me/daurge"
+                          href="https://t.me/uzbekwars"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-[20px] font-bold shadow-lg hover:shadow-xl transition-all"
@@ -340,7 +340,7 @@ export const Settings = ({
                           <span className="text-3xl">✈️</span>
                           <div className="flex-1 text-left">
                             <div className="text-sm opacity-90">Telegram</div>
-                            <div className="text-lg">@daurge</div>
+                            <div className="text-lg">@uzbekwars</div>
                           </div>
                           <span className="text-xl">→</span>
                         </motion.a>
@@ -348,18 +348,18 @@ export const Settings = ({
                         <div className="grid grid-cols-2 gap-3">
                           <div className="p-3 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-[16px] text-center">
                             <div className="text-2xl mb-1">⭐</div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('about.codeQuality')}</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('settings.qualityCode', 'Качество кода')}</div>
                           </div>
                           <div className="p-3 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-[16px] text-center">
                             <div className="text-2xl mb-1">🎯</div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('about.fastWork')}</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('settings.fastWork', 'Быстрая работа')}</div>
                           </div>
                         </div>
 
                         <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-[20px] border border-yellow-200 dark:border-yellow-800">
                           <p className="text-xs text-gray-700 dark:text-gray-300 text-center">
-                            💝 {t('app.thankYou')}<br/>
-                            {t('app.starOnGithub')}
+                            💝 {t('settings.thankYou', 'Спасибо за использование Uzbek Wars!')}<br/>
+                            {t('settings.starOnGithub', 'Если нравится игра - поставь ⭐ на GitHub')}
                           </p>
                         </div>
                       </div>

@@ -261,6 +261,7 @@
     "music": "Musiqa",
     "notifications": "Bildirishnomalar",
     "pushNotifications": "Push-bildirishnomalar",
+    "application": "Ilova",
     "resetApp": "Sozlamalarni tiklash",
     "about": "Ilova haqida",
     "onlineTotal": "Jami onlayn",
@@ -273,7 +274,13 @@
     "license": "Litsenziya",
     "licenseType": "Proprietary",
     "licenseHint": "Yopiq manba kodi. Muallifning yozma ruxsatisiz nusxalash, o'zgartirish va tarqatish taqiqlanadi.",
-    "developer": "Dasturchi"
+    "developer": "Dasturchi",
+    "developerName": "Dasturchi",
+    "developerRole": "Full-Stack dasturchi",
+    "qualityCode": "Kod sifati",
+    "fastWork": "Tez ish",
+    "thankYou": "Uzbek Wars'dan foydalanganingiz uchun rahmat!",
+    "starOnGithub": "Agar o'yin yoqsa - GitHub'da ⭐ qo'ying"
   },
   "language": {
     "select": "Tilni tanlang",

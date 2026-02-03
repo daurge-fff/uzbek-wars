@@ -274,6 +274,7 @@
     "music": "Музыка",
     "notifications": "Уведомления",
     "pushNotifications": "Push-уведомления",
+    "application": "Приложение",
     "resetApp": "Сбросить настройки",
     "about": "О приложении",
     "onlineTotal": "Онлайн всего",
@@ -286,7 +287,13 @@
     "license": "Лицензия",
     "licenseType": "Proprietary",
     "licenseHint": "Закрытый исходный код. Копирование, изменение и распространение запрещены без письменного разрешения автора.",
-    "developer": "Разработчик"
+    "developer": "Разработчик",
+    "developerName": "Разработчик",
+    "developerRole": "Full-Stack разработчик",
+    "qualityCode": "Качество кода",
+    "fastWork": "Быстрая работа",
+    "thankYou": "Спасибо за использование Uzbek Wars!",
+    "starOnGithub": "Если нравится игра - поставь ⭐ на GitHub"
   },
   "language": {
     "select": "Выберите язык",

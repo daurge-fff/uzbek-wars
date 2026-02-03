@@ -255,6 +255,7 @@
     "music": "Music",
     "notifications": "Notifications",
     "pushNotifications": "Push notifications",
+    "application": "Application",
     "resetApp": "Reset settings",
     "about": "About",
     "onlineTotal": "Online total",
@@ -267,7 +268,13 @@
     "license": "License",
     "licenseType": "Proprietary",
     "licenseHint": "Closed source code. Copying, modification and distribution are prohibited without written permission from the author.",
-    "developer": "Developer"
+    "developer": "Developer",
+    "developerName": "Developer",
+    "developerRole": "Full-Stack Developer",
+    "qualityCode": "Code quality",
+    "fastWork": "Fast work",
+    "thankYou": "Thank you for using Uzbek Wars!",
+    "starOnGithub": "If you like the game - give us a ⭐ on GitHub"
   },
   "language": {
     "select": "Select Language",

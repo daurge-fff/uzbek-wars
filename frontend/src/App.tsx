@@ -634,6 +634,7 @@ function App() {
 // Wrapper component for Settings with i18n
 const SettingsWithI18n = () => {
   const { i18n } = useTranslation();
+  const { player } = useAuth();
   
   return (
     <Settings
@@ -650,7 +651,7 @@ const SettingsWithI18n = () => {
         lastRestart: new Date(Date.now() - 3600 * 2.5 * 1000).toISOString(),
         onlinePlayersTotal: 1247,
         onlinePlayersCity: 342,
-        cityName: 'Самарканд',
+        cityName: player?.cityId || 'samarkand',
         version: '1.0.0'
       }}
     />
