@@ -6,12 +6,26 @@
  */
 
 import { Router, Response } from 'express';
-import { authenticate, AuthRequest } from '../middleware/auth';
+import { authenticate, authenticateUser, AuthRequest } from '../middleware/auth';
 import { User, Language } from '../models/User';
 import { Player } from '../models/Player';
 import { logger } from '../utils/logger';
 
 const router = Router();
+
+/**
+ * Test endpoint
+ */
+router.get('/test', (_req, res) => {
+  res.json({ message: 'Player routes working!' });
+});
+
+/**
+ * Test POST endpoint without auth
+ */
+router.post('/test-post', (req, res) => {
+  res.json({ message: 'POST working!', body: req.body });
+});
 
 /**
  * GET /api/player/profile
@@ -449,6 +463,223 @@ router.post(
     } catch (error) {
       logger.error('Error cancelling activity:', error);
       res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+);
+
+/**
+ * POST /api/player/select-character
+ * 
+ * Selects character and city for authenticated user during onboarding
+ */
+router.post(
+  '/select-character',
+  authenticateUser,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      logger.info('=== SELECT CHARACTER REQUEST ===');
+      logger.info(`Headers: ${JSON.stringify(req.headers)}`);
+      logger.info(`Request body: ${JSON.stringify(req.body)}`);
+      logger.info(`Auth user object: ${JSON.stringify(req.user)}`);
+      
+      const userId = req.user?.id;
+      
+      logger.info(`User ID from token: ${userId}`);
+      
+      if (!userId) {
+        logger.error('No user ID in request');
+        res.status(401).json({
+          error: 'User not authenticated',
+          code: 'UNAUTHORIZED'
+        });
+        return;
+      }
+      
+      const { characterId, cityId, referralCode, displayName } = req.body;
+      
+      if (!characterId || !cityId) {
+        res.status(400).json({
+          error: 'Character ID and City ID are required',
+          code: 'MISSING_REQUIRED_FIELDS'
+        });
+        return;
+      }
+      
+      // Select character and create player profile
+      const { selectCharacter } = await import('../services/CharacterService');
+      const player = await selectCharacter(userId, {
+        characterId,
+        cityId,
+        referralCode
+      });
+
+      // Update user displayName if provided
+      if (displayName && displayName.trim()) {
+        const User = (await import('../models/User')).User;
+        await User.findByIdAndUpdate(userId, { displayName: displayName.trim() });
+      }
+
+      // Get updated user
+      const User = (await import('../models/User')).User;
+      const user = await User.findById(userId).select('-password');
+      
+      res.status(201).json({
+        player,
+        user,
+        message: 'Character selected successfully'
+      });
+    } catch (error) {
+      logger.error('Select character endpoint error:', error);
+      
+      if (error instanceof Error) {
+        if (error.message.includes('already selected')) {
+          res.status(400).json({
+            error: 'Character already selected',
+            code: 'CHARACTER_ALREADY_SELECTED',
+            message: error.message
+          });
+          return;
+        }
+        
+        if (error.message.includes('Invalid character')) {
+          res.status(400).json({
+            error: 'Invalid character ID',
+            code: 'INVALID_CHARACTER',
+            message: error.message
+          });
+          return;
+        }
+        
+        if (error.message.includes('Invalid city')) {
+          res.status(400).json({
+            error: 'Invalid city ID',
+            code: 'INVALID_CITY',
+            message: error.message
+          });
+          return;
+        }
+        
+        if (error.message.includes('full')) {
+          res.status(400).json({
+            error: 'City is full',
+            code: 'CITY_FULL',
+            message: error.message
+          });
+          return;
+        }
+      }
+      
+      res.status(500).json({
+        error: 'Failed to select character',
+        code: 'CHARACTER_SELECTION_FAILED',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+);
+
+/**
+ * PUT /api/player/update-profile
+ * 
+ * Updates player's character or city
+ */
+router.put(
+  '/update-profile',
+  authenticateUser,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        res.status(401).json({
+          error: 'User not authenticated',
+          code: 'UNAUTHORIZED'
+        });
+        return;
+      }
+      
+      const { characterId, cityId, displayName } = req.body;
+      
+      // Update user displayName if provided
+      if (displayName && displayName.trim()) {
+        const User = (await import('../models/User')).User;
+        await User.findByIdAndUpdate(userId, { displayName: displayName.trim() });
+      }
+      
+      let player: any = await Player.findOne({ userId });
+      
+      // If player doesn't exist, create new one
+      if (!player) {
+        logger.info(`Player not found for userId ${userId}, creating new player`);
+        
+        if (!characterId || !cityId) {
+          res.status(400).json({
+            error: 'Character ID and City ID are required for new player',
+            code: 'MISSING_REQUIRED_FIELDS'
+          });
+          return;
+        }
+        
+        const { selectCharacter } = await import('../services/CharacterService');
+        player = await selectCharacter(userId, { characterId, cityId, displayName });
+        
+        res.status(201).json({
+          player,
+          message: 'Player created successfully'
+        });
+        return;
+      }
+      
+      // Update character if provided
+      if (characterId) {
+        const { isValidCharacter } = await import('../services/CharacterService');
+        if (!isValidCharacter(characterId)) {
+          res.status(400).json({
+            error: 'Invalid character ID',
+            code: 'INVALID_CHARACTER'
+          });
+          return;
+        }
+        player.characterId = characterId;
+      }
+      
+      // Update city if provided
+      if (cityId) {
+        const { getCityById } = await import('../services/CityService');
+        const city = await getCityById(cityId);
+        
+        if (!city) {
+          res.status(400).json({
+            error: 'Invalid city ID',
+            code: 'INVALID_CITY'
+          });
+          return;
+        }
+        
+        if (!city.isOpen) {
+          res.status(400).json({
+            error: 'City is full',
+            code: 'CITY_FULL'
+          });
+          return;
+        }
+        
+        player.cityId = cityId;
+      }
+      
+      await player.save();
+      
+      res.status(200).json({
+        player,
+        message: 'Player profile updated successfully'
+      });
+    } catch (error) {
+      logger.error('Update player profile endpoint error:', error);
+      res.status(500).json({
+        error: 'Failed to update player profile',
+        code: 'UPDATE_FAILED',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   }
 );

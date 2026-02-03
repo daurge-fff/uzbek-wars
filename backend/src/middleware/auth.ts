@@ -52,6 +52,98 @@ export async function authenticate(
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      logger.warn('authenticate: No token provided');
+      res.status(401).json({
+        error: 'Authentication required',
+        code: 'NO_TOKEN'
+      });
+      return;
+    }
+
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+
+    // Verify token
+    let decoded;
+    try {
+      decoded = verifyToken(token);
+    } catch (error) {
+      logger.warn('authenticate: Invalid token');
+      res.status(401).json({
+        error: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+      return;
+    }
+
+    // Load user from database
+    const user = await User.findById(decoded.userId);
+    
+    if (!user) {
+      logger.warn(`authenticate: User not found: ${decoded.userId}`);
+      res.status(404).json({
+        error: 'User not found',
+        code: 'USER_NOT_FOUND'
+      });
+      return;
+    }
+
+    // Load player from database
+    const player = await Player.findOne({ userId: user._id });
+    
+    if (!player) {
+      logger.warn(`authenticate: Player not found for user: ${user._id}`);
+      res.status(404).json({
+        error: 'Player not found',
+        code: 'PLAYER_NOT_FOUND'
+      });
+      return;
+    }
+
+    // Attach user and player to request
+    req.user = {
+      id: user._id.toString(),
+      email: user.email,
+      displayName: user.displayName,
+      language: user.language
+    };
+
+    req.player = {
+      id: player._id.toString(),
+      level: player.level,
+      soms: player.soms,
+      characterId: player.characterId,
+      cityId: player.cityId
+    };
+
+    next();
+  } catch (error) {
+    logger.error('Authentication middleware error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      code: 'AUTH_ERROR'
+    });
+  }
+}
+
+/**
+ * User-only authentication middleware
+ * 
+ * Similar to authenticate() but only requires user, not player.
+ * Useful for onboarding endpoints where player doesn't exist yet.
+ * 
+ * Usage:
+ *   router.post('/select-character', authenticateUser, handler);
+ */
+export async function authenticateUser(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    // Extract token from Authorization header
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       res.status(401).json({
         error: 'Authentication required',
         code: 'NO_TOKEN'
@@ -84,18 +176,7 @@ export async function authenticate(
       return;
     }
 
-    // Load player from database
-    const player = await Player.findOne({ userId: user._id });
-    
-    if (!player) {
-      res.status(404).json({
-        error: 'Player not found',
-        code: 'PLAYER_NOT_FOUND'
-      });
-      return;
-    }
-
-    // Attach user and player to request
+    // Attach user to request (player is optional)
     req.user = {
       id: user._id.toString(),
       email: user.email,
@@ -103,17 +184,21 @@ export async function authenticate(
       language: user.language
     };
 
-    req.player = {
-      id: player._id.toString(),
-      level: player.level,
-      soms: player.soms,
-      characterId: player.characterId,
-      cityId: player.cityId
-    };
+    // Try to load player if exists
+    const player = await Player.findOne({ userId: user._id });
+    if (player) {
+      req.player = {
+        id: player._id.toString(),
+        level: player.level,
+        soms: player.soms,
+        characterId: player.characterId,
+        cityId: player.cityId
+      };
+    }
 
     next();
   } catch (error) {
-    logger.error('Authentication middleware error:', error);
+    logger.error('User authentication middleware error:', error);
     res.status(500).json({
       error: 'Internal server error',
       code: 'AUTH_ERROR'

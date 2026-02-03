@@ -105,6 +105,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const updatedPlayer = { ...player, ...updates };
       setPlayer(updatedPlayer);
       localStorage.setItem('auth_player', JSON.stringify(updatedPlayer));
+    } else {
+      // If player doesn't exist yet, create it from updates
+      const newPlayer = updates as Player;
+      setPlayer(newPlayer);
+      localStorage.setItem('auth_player', JSON.stringify(newPlayer));
     }
   };
 

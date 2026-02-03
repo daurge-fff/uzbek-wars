@@ -148,24 +148,9 @@ export async function authenticateWithGoogle(
     // Check for existing player
     let player = await Player.findOne({ userId: user._id });
 
+    // Don't create player automatically - let them complete onboarding first
     if (!player && isNewUser) {
-      // Create new player with referral handling
-      const newReferralCode = await generateReferralCode();
-      
-      player = await Player.create({
-        userId: user._id,
-        characterId: 'default', // Temporary value, will be set during character selection
-        cityId: 'default', // Temporary value, will be set during city selection
-        referralCode: newReferralCode,
-        referredBy: referralCode
-      });
-
-      // Handle referral bonus if applicable
-      if (referralCode) {
-        await handleReferralBonus(referralCode, player.cityId);
-      }
-
-      logger.info(`New player created for user: ${user.email}`);
+      logger.info(`New user registered, player will be created during onboarding: ${user.email}`);
     }
 
     // Generate JWT token

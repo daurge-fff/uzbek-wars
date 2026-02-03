@@ -491,8 +491,8 @@ export function HomePage() {
       const { token, user, player } = response.data;
       login(token, user, player);
       
-      // Check if player needs onboarding (character/city selection)
-      if (player && (player.characterId === 'default' || player.cityId === 'default')) {
+      // Check if player needs onboarding
+      if (!player || !player.characterId || !player.cityId || player.characterId === 'default' || player.cityId === 'default') {
         // New user needs to complete onboarding
         navigate('/onboarding');
       } else {

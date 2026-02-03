@@ -67,18 +67,18 @@ export function createServer(): Application {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
   
-  // API routes
+  // API routes - order matters! More specific routes first
   app.use('/api/health', healthRoutes);
   app.use('/api/tests', testsRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/cities', citiesRoutes);
-  app.use('/api', characterRoutes);
+  app.use('/api/characters', characterRoutes); // Only /characters endpoint
   app.use('/api', activitiesRoutes);
   app.use('/api/referral', referralRoutes);
   app.use('/api/donations', donationsRoutes);
   app.use('/api/cosmetics', cosmeticsRoutes);
   app.use('/api/leaderboard', leaderboardRoutes);
-  app.use('/api/player', playerRoutes);
+  app.use('/api/player', playerRoutes); // All /player/* endpoints
   
   // Error handling must be last
   app.use(errorHandler);

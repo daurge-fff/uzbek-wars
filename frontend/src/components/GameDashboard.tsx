@@ -247,14 +247,39 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
 
   const getCharacterName = (characterId: string): string => {
     const characters: Record<string, Record<string, string>> = {
-      'char1': { ru: 'Фермер', en: 'Farmer', uz: 'Fermer', uk: 'Фермер' },
-      'char2': { ru: 'Повар', en: 'Chef', uz: 'Oshpaz', uk: 'Кухар' },
-      'char3': { ru: 'Бизнесмен', en: 'Businessman', uz: 'Biznesmen', uk: 'Бізнесмен' },
-      'char4': { ru: 'Студент', en: 'Student', uz: 'Talaba', uk: 'Студент' },
+      'char_merchant': { ru: 'Торговец', en: 'Merchant', uz: 'Savdogar', uk: 'Торговець' },
+      'char_warrior': { ru: 'Воин', en: 'Warrior', uz: 'Jangchi', uk: 'Воїн' },
+      'char_scholar': { ru: 'Философ', en: 'Philosopher', uz: 'Faylasuf', uk: 'Філософ' },
+      'char_artisan': { ru: 'Ремесленник', en: 'Artisan', uz: 'Hunarmand', uk: 'Ремісник' },
+      'char_chef': { ru: 'Повар', en: 'Chef', uz: 'Oshpaz', uk: 'Кухар' },
       'default': { ru: 'Новичок', en: 'Newbie', uz: 'Yangi', uk: 'Новачок' }
     };
     const lang = i18n.language as 'ru' | 'en' | 'uz' | 'uk';
     return characters[characterId]?.[lang] || characters['default'][lang];
+  };
+
+  const getCharacterEmoji = (characterId: string): string => {
+    const emojis: Record<string, string> = {
+      'char_merchant': '🤑',
+      'char_warrior': '⚔️',
+      'char_scholar': '📚',
+      'char_artisan': '🎨',
+      'char_chef': '👨‍🍳',
+      'default': '👤'
+    };
+    return emojis[characterId] || emojis['default'];
+  };
+
+  const getCharacterGradient = (characterId: string): string => {
+    const gradients: Record<string, string> = {
+      'char_merchant': 'from-yellow-400/30 to-orange-500/30 border-yellow-400/40',
+      'char_warrior': 'from-red-400/30 to-rose-500/30 border-red-400/40',
+      'char_scholar': 'from-blue-400/30 to-cyan-500/30 border-blue-400/40',
+      'char_artisan': 'from-purple-400/30 to-fuchsia-500/30 border-purple-400/40',
+      'char_chef': 'from-green-400/30 to-emerald-500/30 border-green-400/40',
+      'default': 'from-gray-400/30 to-slate-500/30 border-gray-400/40'
+    };
+    return gradients[characterId] || gradients['default'];
   };
 
   const getCityName = (cityId: string): string => {
@@ -263,7 +288,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       'samarkand': { ru: 'Самарканд', en: 'Samarkand', uz: 'Samarqand', uk: 'Самарканд' },
       'bukhara': { ru: 'Бухара', en: 'Bukhara', uz: 'Buxoro', uk: 'Бухара' },
       'khiva': { ru: 'Хива', en: 'Khiva', uz: 'Xiva', uk: 'Хіва' },
-      'fergana': { ru: 'Фергана', en: 'Fergana', uz: "Farg'ona", uk: 'Фергана' },
+      'andijan': { ru: 'Андижан', en: 'Andijan', uz: 'Andijon', uk: 'Андіжан' },
       'default': { ru: 'Без города', en: 'No city', uz: 'Shahar yo\'q', uk: 'Без міста' }
     };
     const lang = i18n.language as 'ru' | 'en' | 'uz' | 'uk';
@@ -383,8 +408,8 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
 
               {/* Персонаж и город - одна строка */}
               <div className="flex items-center gap-1.5 mb-2">
-                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-[10px] font-bold text-gray-700 dark:text-gray-300">
-                  <span>👤</span>
+                <div className={`flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r ${getCharacterGradient(playerState.characterId)} backdrop-blur-sm border text-[10px] font-bold text-gray-700 dark:text-gray-300`}>
+                  <span>{getCharacterEmoji(playerState.characterId)}</span>
                   <span>{getCharacterName(playerState.characterId)}</span>
                 </div>
                 <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-[10px] font-bold text-gray-700 dark:text-gray-300">
@@ -450,7 +475,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs opacity-80 font-semibold mb-1">🎯 Текущая активность</div>
+                    <div className="text-xs opacity-80 font-semibold mb-1">🎯 {t('dashboard.currentActivity')}</div>
                     <div className="text-base font-bold truncate">{currentActivity.activityName}</div>
                   </div>
                   
@@ -481,7 +506,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   </div>
                   <div className="flex justify-between text-xs opacity-75 font-semibold">
                     <span>{Math.round(progress)}%</span>
-                    <span>{timeLeft <= 5 ? '⚡ Почти готово!' : '💪 Продолжай!'}</span>
+                    <span>{timeLeft <= 5 ? '⚡ ' + t('dashboard.almostDone') : '💪 ' + t('dashboard.keepItUp')}</span>
                   </div>
                 </div>
               </div>
@@ -673,7 +698,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     {/* Rewards */}
                     {activity.rewards && (
                       <div className="mb-2">
-                        <div className="text-[9px] text-gray-500 dark:text-gray-400 mb-1 text-center font-semibold uppercase tracking-wide">Награды</div>
+                        <div className="text-[9px] text-gray-500 dark:text-gray-400 mb-1 text-center font-semibold uppercase tracking-wide">{t('dashboard.rewards')}</div>
                         <div className="flex flex-wrap gap-1.5 justify-center">
                           <div className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${
                             !isAvailable 
@@ -698,7 +723,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     {/* Effects (stat changes + cost) */}
                     {((activity.statModifiers && Object.keys(activity.statModifiers).length > 0) || activity.cost) && (
                       <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                        <div className="text-[9px] text-gray-500 dark:text-gray-400 mb-1.5 text-center font-semibold uppercase tracking-wide">Эффекты</div>
+                        <div className="text-[9px] text-gray-500 dark:text-gray-400 mb-1.5 text-center font-semibold uppercase tracking-wide">{t('dashboard.effects')}</div>
                         <div className="flex flex-wrap gap-1.5 justify-center">
                           {/* Cost as negative effect */}
                           {activity.cost && (
@@ -845,7 +870,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-700 dark:text-gray-300 font-bold flex items-center gap-2">
                           <span className="text-xl">⭐</span>
-                          <span>Опыт:</span>
+                          <span>{t('activity.experience')}:</span>
                         </span>
                         <span className="text-xl font-black text-green-600 dark:text-green-400">
                           +{selectedActivity.rewards.experience} XP
@@ -854,7 +879,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-700 dark:text-gray-300 font-bold flex items-center gap-2">
                           <span className="text-xl">💰</span>
-                          <span>Сомы:</span>
+                          <span>{t('activity.soms')}:</span>
                         </span>
                         <span className="text-xl font-black text-yellow-600 dark:text-yellow-400">
                           +{selectedActivity.rewards.soms}
@@ -867,7 +892,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     <div className="flex justify-between items-center pt-3 border-t border-indigo-200 dark:border-indigo-700">
                       <span className="text-sm text-gray-700 dark:text-gray-300 font-bold flex items-center gap-2">
                         <span className="text-xl">💸</span>
-                        <span>Стоимость:</span>
+                        <span>{t('dashboard.cost')}:</span>
                       </span>
                       <span className="text-xl font-black text-red-600 dark:text-red-400">
                         -{selectedActivity.cost}
@@ -877,7 +902,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
 
                   {selectedActivity.statModifiers && Object.keys(selectedActivity.statModifiers).length > 0 && (
                     <div className="pt-3 border-t border-indigo-200 dark:border-indigo-700">
-                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-2 font-bold">Изменения статов:</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-2 font-bold">{t('dashboard.statChanges')}</div>
                       <div className="flex flex-wrap gap-2 justify-center">
                         {Object.entries(selectedActivity.statModifiers).map(([stat, value]) => {
                           const statConf = statConfig[stat as keyof typeof statConfig];
@@ -902,7 +927,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 </div>
 
                 <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm font-bold">
-                  ⏰ Займет некоторое время
+                  ⏰ {t('dashboard.takesTime')}
                 </p>
                 
                 <div className="flex gap-3">
@@ -912,7 +937,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     onClick={() => setSelectedActivity(null)}
                     className="flex-1 px-6 py-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-2xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
                   >
-                    Отмена
+                    {t('dashboard.cancel')}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -926,7 +951,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                     />
                     <span className="relative flex items-center justify-center gap-2">
-                      <span>Начать</span>
+                      <span>{t('dashboard.start')}</span>
                       <span>🚀</span>
                     </span>
                   </motion.button>
@@ -980,7 +1005,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   🔒
                 </motion.div>
                 <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3">
-                  Недостаточно уровня!
+                  {t('dashboard.levelTooLow')}!
                 </h3>
                 <div className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-5 mb-6 border border-red-200 dark:border-red-800">
                   <p className="text-gray-700 dark:text-gray-300 mb-3 text-lg">
@@ -988,14 +1013,14 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   </p>
                   <div className="flex items-center justify-center gap-4 text-sm">
                     <div className="text-center">
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Требуется</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('ui.level_required')}</div>
                       <div className="text-2xl font-black text-red-600 dark:text-red-400">
                         {warningActivity.requiredLevel}
                       </div>
                     </div>
                     <div className="text-3xl text-gray-400">→</div>
                     <div className="text-center">
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Ваш уровень</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('character.level')}</div>
                       <div className="text-2xl font-black text-gray-600 dark:text-gray-400">
                         {playerState.level}
                       </div>
@@ -1009,7 +1034,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   onClick={() => setShowLevelWarning(false)}
                   className="w-full px-6 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-2xl hover:shadow-xl transition-all"
                 >
-                  Понятно
+                  {t('dashboard.understood')}
                 </motion.button>
               </div>
             </motion.div>

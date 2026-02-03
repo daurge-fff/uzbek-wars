@@ -1,7 +1,4 @@
-import dotenv from 'dotenv';
-
-// Load environment variables FIRST, before any other imports
-dotenv.config({ path: '../../.env' });
+import '../loadEnv';
 
 import mongoose from 'mongoose';
 import { City } from '../models/City';

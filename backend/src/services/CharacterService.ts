@@ -181,7 +181,7 @@ export async function selectCharacter(
     
     // Check if player already has character selected
     const existingPlayer = await Player.findOne({ userId });
-    if (existingPlayer && existingPlayer.characterId) {
+    if (existingPlayer && existingPlayer.characterId && existingPlayer.characterId !== 'default') {
       throw new Error('Character already selected');
     }
     

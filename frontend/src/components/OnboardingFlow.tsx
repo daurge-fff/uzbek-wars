@@ -215,7 +215,7 @@ const CharacterCarousel = ({ characters, onSelect }: { characters: any[], onSele
 export const OnboardingFlow = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { token, user, updatePlayer } = useAuth();
+  const { token, user, player, updatePlayer } = useAuth();
   const [step, setStep] = useState<OnboardingStep>('name');
   const [displayName, setDisplayName] = useState('');
   const [selectedCharacterId, setSelectedCharacterId] = useState('');
@@ -225,6 +225,20 @@ export const OnboardingFlow = () => {
   const [checkingUsername, setCheckingUsername] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [usernameError, setUsernameError] = useState<'taken' | 'invalid' | ''>('');
+
+  // Проверяем, прошел ли пользователь уже онбординг
+  useEffect(() => {
+    if (user && player) {
+      // Проверяем, что у игрока есть и класс, и город (не дефолтные значения)
+      const hasCharacter = player.characterId && player.characterId !== 'default';
+      const hasCity = player.cityId && player.cityId !== 'default';
+      
+      if (hasCharacter && hasCity) {
+        // Пользователь уже прошел онбординг, перенаправляем на dashboard
+        navigate('/dashboard');
+      }
+    }
+  }, [user, player, navigate]);
 
   useEffect(() => {
     // Load characters and cities
@@ -386,12 +400,6 @@ export const OnboardingFlow = () => {
 
     setLoading(true);
     try {
-      console.log('Submitting onboarding data:', {
-        characterId: selectedCharacterId,
-        cityId,
-        displayName
-      });
-
       // Try to create new player first
       try {
         const response = await axios.post(
@@ -404,46 +412,59 @@ export const OnboardingFlow = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        updatePlayer(response.data.player);
-        toast.success(t('onboarding.complete', 'Добро пожаловать в игру!'));
+        // Update player data in context
+        if (response.data.player) {
+          const playerData = response.data.player;
+          updatePlayer({
+            id: playerData._id || playerData.id || playerData.userId,
+            level: playerData.level,
+            experience: playerData.experience,
+            soms: playerData.soms,
+            characterId: playerData.characterId,
+            cityId: playerData.cityId,
+            donationCurrency: playerData.donationCurrency,
+            stats: playerData.stats
+          });
+        }
         
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 500);
+        toast.success(t('onboarding.complete', 'Добро пожаловать в игру!'));
+        navigate('/dashboard');
       } catch (createError: any) {
         // If character already selected, try to update
         if (createError.response?.data?.code === 'CHARACTER_ALREADY_SELECTED') {
-          console.log('Character already selected, trying to update profile');
-          
-          try {
-            const response = await axios.put(
-              `${API_URL}/api/player/update-profile`,
-              { 
-                characterId: selectedCharacterId,
-                cityId
-              },
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
+          const response = await axios.put(
+            `${API_URL}/api/player/update-profile`,
+            { 
+              characterId: selectedCharacterId,
+              cityId,
+              displayName
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
 
-            updatePlayer(response.data.player);
-            toast.success(t('onboarding.complete', 'Добро пожаловать в игру!'));
-            
-            setTimeout(() => {
-              navigate('/dashboard');
-            }, 500);
-          } catch (updateError: any) {
-            // If update also fails, just redirect to dashboard
-            console.log('Update failed, redirecting to dashboard');
-            toast.success(t('onboarding.alreadyComplete', 'Вы уже зарегистрированы'));
-            navigate('/dashboard');
+          // Update player data in context
+          if (response.data.player) {
+            const playerData = response.data.player;
+            updatePlayer({
+              id: playerData._id || playerData.id || playerData.userId,
+              level: playerData.level,
+              experience: playerData.experience,
+              soms: playerData.soms,
+              characterId: playerData.characterId,
+              cityId: playerData.cityId,
+              donationCurrency: playerData.donationCurrency,
+              stats: playerData.stats
+            });
           }
+          
+          toast.success(t('onboarding.complete', 'Добро пожаловать в игру!'));
+          navigate('/dashboard');
         } else {
           throw createError;
         }
       }
     } catch (error: any) {
       console.error('Failed to complete onboarding:', error);
-      console.error('Error response:', error.response?.data);
       toast.error(error.response?.data?.error || t('onboarding.error', 'Ошибка завершения регистрации'));
     } finally {
       setLoading(false);
