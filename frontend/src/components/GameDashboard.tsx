@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface PlayerState {
   characterId: string;
@@ -134,6 +135,7 @@ const activityImages: Record<string, string> = {
 
 export const GameDashboard = ({ playerState, activities, onActivitySelect, userAvatar, currentActivity, onActivityComplete }: GameDashboardProps) => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
@@ -931,28 +933,28 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
           className="mt-6"
         >
           <div className="grid grid-cols-4 gap-3">
-            <motion.a
-              href="/"
+            <motion.button
+              onClick={() => navigate('/')}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center"
             >
               <div className="text-3xl mb-1">🏠</div>
               <div className="text-xs font-bold text-gray-900 dark:text-white truncate">{t('menu.home', 'Главная')}</div>
-            </motion.a>
+            </motion.button>
             
-            <motion.a
-              href="/shop"
+            <motion.button
+              onClick={() => navigate('/shop')}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center"
             >
               <div className="text-3xl mb-1">🛍️</div>
               <div className="text-xs font-bold text-gray-900 dark:text-white truncate">{t('menu.shop', 'Магазин')}</div>
-            </motion.a>
+            </motion.button>
             
-            <motion.a
-              href="/classes"
+            <motion.button
+              onClick={() => navigate('/classes')}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/30 dark:to-pink-500/30 border-2 border-purple-400 dark:border-purple-500 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center relative overflow-hidden"
@@ -962,17 +964,17 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 <div className="text-3xl mb-1">🏛️</div>
                 <div className="text-xs font-bold text-purple-900 dark:text-purple-200 truncate">{t('menu.classes', 'Классы')}</div>
               </div>
-            </motion.a>
+            </motion.button>
             
-            <motion.a
-              href="/settings"
+            <motion.button
+              onClick={() => navigate('/settings')}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center"
             >
               <div className="text-3xl mb-1">⚙️</div>
               <div className="text-xs font-bold text-gray-900 dark:text-white truncate">{t('menu.settings', 'Настройки')}</div>
-            </motion.a>
+            </motion.button>
           </div>
         </motion.div>
       </div>
