@@ -724,24 +724,26 @@ export function HomePage() {
           )}
         </motion.div>
 
-        {/* Features Carousel */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mb-12 max-w-2xl mx-auto"
-        >
-          <h2 className="text-3xl font-black text-center text-gray-900 dark:text-white mb-8">
-            {t('home.features', 'Возможности игры')}
-          </h2>
-          <FeaturesCarousel features={features} />
-        </motion.div>
+        {/* Features Carousel - только для незалогиненных */}
+        {!isAuthenticated && (
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="mb-12 max-w-2xl mx-auto"
+          >
+            <h2 className="text-3xl font-black text-center text-gray-900 dark:text-white mb-8">
+              {t('home.features', 'Возможности игры')}
+            </h2>
+            <FeaturesCarousel features={features} />
+          </motion.div>
+        )}
 
         {/* Phone Mockup вместо карточек */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: isAuthenticated ? 0.6 : 0.8 }}
           className="mb-12"
         >
           <h2 className="text-2xl font-black text-center text-gray-900 dark:text-white mb-8">
