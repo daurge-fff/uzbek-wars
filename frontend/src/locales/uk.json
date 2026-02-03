@@ -436,7 +436,7 @@
     "loadCitiesError": "Не вдалося завантажити міста"
   },
   "leaderboard": {
-    "title": "Рейтинг",
+    "title": "Рейтинги",
     "global": "Глобальний",
     "city": "Міський",
     "rank": "Місце",
@@ -444,7 +444,23 @@
     "level": "Рівень",
     "soms": "За сомами",
     "you": "Ви",
-    "noPlayers": "Поки немає гравців у рейтингу"
+    "noPlayers": "Поки немає даних",
+    "selectCategory": "Оберіть категорію",
+    "change": "Змінити",
+    "currentCategory": "Поточна категорія",
+    "yourRank": "Ваше місце",
+    "updateInfo": "Рейтинги оновлюються в реальному часі",
+    "categories": {
+      "level": "За рівнем",
+      "soms": "Багатії",
+      "crystals": "Донатери",
+      "cityPower": "Сила міст",
+      "totalExp": "Досвідчені",
+      "referrals": "Рекрутери",
+      "activityStreak": "Активісти",
+      "activities": "Трудівники",
+      "wealth": "Багатство"
+    }
   },
   "home": {
     "title": "Узбек Варс",

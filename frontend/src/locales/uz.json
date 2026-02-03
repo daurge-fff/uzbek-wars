@@ -435,7 +435,7 @@
     "loadCitiesError": "Shaharlarni yuklash amalga oshmadi"
   },
   "leaderboard": {
-    "title": "Reyting",
+    "title": "Reytinglar",
     "global": "Global",
     "city": "Shahar",
     "rank": "O'rin",
@@ -443,7 +443,23 @@
     "level": "Daraja",
     "soms": "So'mlar bo'yicha",
     "you": "Siz",
-    "noPlayers": "Reytingda hali o'yinchilar yo'q"
+    "noPlayers": "Hali ma'lumot yo'q",
+    "selectCategory": "Kategoriyani tanlang",
+    "change": "O'zgartirish",
+    "currentCategory": "Joriy kategoriya",
+    "yourRank": "Sizning o'rningiz",
+    "updateInfo": "Reytinglar real vaqtda yangilanadi",
+    "categories": {
+      "level": "Daraja bo'yicha",
+      "soms": "Boylar",
+      "crystals": "Donatorlar",
+      "cityPower": "Shaharlar kuchi",
+      "totalExp": "Tajribalilar",
+      "referrals": "Rekruterlar",
+      "activityStreak": "Faollar",
+      "activities": "Mehnatsevarlar",
+      "wealth": "Boylik"
+    }
   },
   "home": {
     "title": "O'zbek Urushi",

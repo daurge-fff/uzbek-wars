@@ -28,18 +28,13 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       } else {
         root.classList.remove('dark');
       }
-      console.log('Theme applied:', theme, 'Classes:', root.classList.toString());
     } catch (e) {
       console.error('Theme error:', e);
     }
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => {
-      const newTheme = prev === 'light' ? 'dark' : 'light';
-      console.log('Toggling theme from', prev, 'to', newTheme);
-      return newTheme;
-    });
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
   return (

@@ -18,15 +18,12 @@ export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps
   const { t } = useTranslation();
 
   useEffect(() => {
-    console.log('🔄 Loading Google Identity Services script...');
-    
     // Load Google Identity Services script
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.defer = true;
     script.onload = () => {
-      console.log('✅ Google script loaded successfully');
       setGoogleLoaded(true);
     };
     script.onerror = (error) => {
@@ -57,7 +54,6 @@ export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps
     }
 
     setLoading(true);
-    console.log('🚀 Opening Google account selection popup...');
     
     try {
       // Используем OAuth 2.0 Token Flow - открывает popup окно и возвращает ID token напрямую
@@ -65,12 +61,9 @@ export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps
         client_id: clientId,
         scope: 'email profile openid',
         callback: (response: any) => {
-          console.log('📩 Received token response:', response);
           setLoading(false);
           
           if (response.access_token) {
-            console.log('✅ Got access token, fetching user info...');
-            
             // Получаем информацию о пользователе с помощью access token
             fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
               headers: {
@@ -79,8 +72,6 @@ export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps
             })
             .then(res => res.json())
             .then(userInfo => {
-              console.log('✅ Got user info:', userInfo);
-              
               // Создаем простой JWT-подобный токен с информацией о пользователе
               const idToken = btoa(JSON.stringify({
                 sub: userInfo.sub,
@@ -105,10 +96,7 @@ export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps
           console.error('❌ OAuth error:', error);
           setLoading(false);
           
-          if (error.type === 'popup_closed') {
-            console.log('ℹ️ User closed the popup');
-            // Не показываем ошибку, если пользователь просто закрыл окно
-          } else {
+          if (error.type !== 'popup_closed') {
             onError?.(t('auth.oauthError', 'Ошибка OAuth'));
           }
         }

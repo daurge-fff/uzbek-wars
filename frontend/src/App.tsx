@@ -494,29 +494,7 @@ const InventoryWithData = () => {
 };
 
 const LeaderboardWithData = () => {
-  const [players, setPlayers] = useState<any[]>([]);
-  const [type, setType] = useState<'global' | 'city' | 'soms'>('global');
-  const [loading, setLoading] = useState(true);
-  
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
-      try {
-        setLoading(true);
-        // TODO: GET /api/leaderboard?type=${type}
-        setPlayers([]);
-      } catch (error) {
-        console.error('Failed to fetch leaderboard:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchLeaderboard();
-  }, [type]);
-  
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  
-  return <Leaderboard players={players} type={type} onTypeChange={(newType) => setType(newType)} />;
+  return <Leaderboard />;
 };
 
 const ReferralPanelWithData = () => {

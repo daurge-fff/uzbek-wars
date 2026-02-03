@@ -20,7 +20,7 @@ export const GameDashboardContainer = () => {
   // Логируем изменения статов для отладки
   useEffect(() => {
     if (player?.stats) {
-      console.log('Player stats updated:', player.stats);
+      // Stats updated
     }
   }, [player?.stats]);
 
@@ -134,8 +134,6 @@ export const GameDashboardContainer = () => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      console.log('Activity completed, response:', response.data);
       
       // Обновляем данные игрока напрямую из ответа (без перезагрузки!)
       if (response.data.player) {

@@ -443,7 +443,7 @@
     "loadCitiesError": "Failed to load cities"
   },
   "leaderboard": {
-    "title": "Leaderboard",
+    "title": "Leaderboards",
     "global": "Global",
     "city": "City",
     "rank": "Rank",
@@ -451,7 +451,23 @@
     "level": "Level",
     "soms": "By Soms",
     "you": "You",
-    "noPlayers": "No players in leaderboard yet"
+    "noPlayers": "No data yet",
+    "selectCategory": "Select Category",
+    "change": "Change",
+    "currentCategory": "Current Category",
+    "yourRank": "Your Rank",
+    "updateInfo": "Leaderboards update in real-time",
+    "categories": {
+      "level": "By Level",
+      "soms": "Richest",
+      "crystals": "Donors",
+      "cityPower": "City Power",
+      "totalExp": "Most Experienced",
+      "referrals": "Recruiters",
+      "activityStreak": "Most Active",
+      "activities": "Hard Workers",
+      "wealth": "Wealth"
+    }
   },
   "home": {
     "title": "Uzbek Wars",

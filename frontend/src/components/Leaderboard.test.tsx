@@ -1,82 +1,88 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { Leaderboard } from './Leaderboard';
 import '../i18n';
 
-const mockPlayers = [
-  { rank: 1, userId: '1', username: 'Timur', avatar: '👨‍💼', level: 50, soms: 100000, cityName: 'Bukhara', isCurrentPlayer: false },
-  { rank: 2, userId: '2', username: 'Aziza', avatar: '👩‍🍳', level: 45, soms: 85000, cityName: 'Tashkent', isCurrentPlayer: false },
-  { rank: 3, userId: '3', username: 'Rustam', avatar: '👨‍🌾', level: 42, soms: 75000, cityName: 'Samarkand', isCurrentPlayer: true }
-];
+// Mock fetch
+global.fetch = vi.fn();
 
 describe('Leaderboard', () => {
-  it('renders all players', () => {
-    render(
-      <Leaderboard
-        players={mockPlayers}
-        type="global"
-        onTypeChange={vi.fn()}
-      />
-    );
-
-    expect(screen.getByText('Timur')).toBeInTheDocument();
-    expect(screen.getByText('Aziza')).toBeInTheDocument();
-    expect(screen.getByText('Rustam')).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (global.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: {
+          leaderboard: [
+            {
+              rank: 1,
+              player: {
+                id: '1',
+                displayName: 'Timur',
+                level: 50,
+                soms: 100000,
+                cityId: 'bukhara',
+                characterId: 'merchant'
+              }
+            },
+            {
+              rank: 2,
+              player: {
+                id: '2',
+                displayName: 'Aziza',
+                level: 45,
+                soms: 85000,
+                cityId: 'tashkent',
+                characterId: 'warrior'
+              }
+            }
+          ],
+          playerRank: null,
+          total: 2
+        }
+      })
+    });
   });
 
-  it('shows medals for top 3', () => {
-    render(
-      <Leaderboard
-        players={mockPlayers}
-        type="global"
-        onTypeChange={vi.fn()}
-      />
-    );
-
-    expect(screen.getByText('🥇')).toBeInTheDocument();
-    expect(screen.getByText('🥈')).toBeInTheDocument();
-    expect(screen.getByText('🥉')).toBeInTheDocument();
+  it('renders leaderboard title', async () => {
+    render(<Leaderboard />);
+    
+    await waitFor(() => {
+      expect(screen.getByText(/Рейтинги/i)).toBeInTheDocument();
+    });
   });
 
-  it('highlights current player', () => {
-    render(
-      <Leaderboard
-        players={mockPlayers}
-        type="global"
-        onTypeChange={vi.fn()}
-      />
-    );
-
-    const currentPlayerBadge = screen.getByText(/You/i);
-    expect(currentPlayerBadge).toBeInTheDocument();
+  it('shows loading state initially', () => {
+    render(<Leaderboard />);
+    expect(screen.getByText(/Загрузка/i)).toBeInTheDocument();
   });
 
-  it('calls onTypeChange when switching tabs', () => {
-    const onTypeChange = vi.fn();
-    render(
-      <Leaderboard
-        players={mockPlayers}
-        type="global"
-        onTypeChange={onTypeChange}
-      />
-    );
-
-    const cityButton = screen.getByText('🏙️').closest('button');
-    fireEvent.click(cityButton!);
-
-    expect(onTypeChange).toHaveBeenCalledWith('city');
+  it('displays players after loading', async () => {
+    render(<Leaderboard />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('Timur')).toBeInTheDocument();
+      expect(screen.getByText('Aziza')).toBeInTheDocument();
+    });
   });
 
-  it('displays player levels', () => {
-    render(
-      <Leaderboard
-        players={mockPlayers}
-        type="global"
-        onTypeChange={vi.fn()}
-      />
-    );
+  it('shows medals for top 3', async () => {
+    render(<Leaderboard />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('🥇')).toBeInTheDocument();
+      expect(screen.getByText('🥈')).toBeInTheDocument();
+    });
+  });
 
-    expect(screen.getByText('50')).toBeInTheDocument();
-    expect(screen.getByText('45')).toBeInTheDocument();
+  it('renders category buttons', async () => {
+    render(<Leaderboard />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('🏆')).toBeInTheDocument();
+      expect(screen.getByText('💰')).toBeInTheDocument();
+      expect(screen.getByText('💎')).toBeInTheDocument();
+    });
   });
 });

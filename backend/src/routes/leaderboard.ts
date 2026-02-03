@@ -17,7 +17,12 @@ import {
   getSomsLeaderboard,
   getPlayerGlobalRank,
   getPlayerCityRank,
-  getPlayerSomsRank
+  getPlayerSomsRank,
+  getCrystalsLeaderboard,
+  getCityPowerLeaderboard,
+  getActivityStreakLeaderboard,
+  getTotalExpLeaderboard,
+  getReferralLeaderboard
 } from '../services/LeaderboardService';
 import { logger } from '../utils/logger';
 
@@ -180,6 +185,154 @@ router.get('/soms', optionalAuth, async (req: AuthRequest, res: Response): Promi
     logger.info(`Soms leaderboard retrieved (limit: ${limit})`);
   } catch (error) {
     logger.error('Error retrieving soms leaderboard:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+/**
+ * GET /api/leaderboard/crystals
+ * Get crystals leaderboard (top donors)
+ */
+router.get('/crystals', optionalAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 100);
+    const queryPlayerId = req.query.playerId as string;
+    
+    const result = await getCrystalsLeaderboard(limit, queryPlayerId || req.player?.id);
+    
+    res.json({
+      success: true,
+      data: {
+        leaderboard: result.leaderboard,
+        playerRank: result.currentPlayerRank,
+        total: result.leaderboard.length
+      }
+    });
+    
+    logger.info(`Crystals leaderboard retrieved (limit: ${limit})`);
+  } catch (error) {
+    logger.error('Error retrieving crystals leaderboard:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+/**
+ * GET /api/leaderboard/city-power
+ * Get city power leaderboard (cities ranked by total player levels)
+ */
+router.get('/city-power', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 100);
+    
+    const result = await getCityPowerLeaderboard(limit);
+    
+    res.json({
+      success: true,
+      data: {
+        leaderboard: result,
+        total: result.length
+      }
+    });
+    
+    logger.info(`City power leaderboard retrieved (limit: ${limit})`);
+  } catch (error) {
+    logger.error('Error retrieving city power leaderboard:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+/**
+ * GET /api/leaderboard/activity-streak
+ * Get activity streak leaderboard (longest daily login streaks)
+ */
+router.get('/activity-streak', optionalAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 100);
+    const queryPlayerId = req.query.playerId as string;
+    
+    const result = await getActivityStreakLeaderboard(limit, queryPlayerId || req.player?.id);
+    
+    res.json({
+      success: true,
+      data: {
+        leaderboard: result.leaderboard,
+        playerRank: result.currentPlayerRank,
+        total: result.leaderboard.length
+      }
+    });
+    
+    logger.info(`Activity streak leaderboard retrieved (limit: ${limit})`);
+  } catch (error) {
+    logger.error('Error retrieving activity streak leaderboard:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+/**
+ * GET /api/leaderboard/total-exp
+ * Get total experience leaderboard
+ */
+router.get('/total-exp', optionalAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 100);
+    const queryPlayerId = req.query.playerId as string;
+    
+    const result = await getTotalExpLeaderboard(limit, queryPlayerId || req.player?.id);
+    
+    res.json({
+      success: true,
+      data: {
+        leaderboard: result.leaderboard,
+        playerRank: result.currentPlayerRank,
+        total: result.leaderboard.length
+      }
+    });
+    
+    logger.info(`Total exp leaderboard retrieved (limit: ${limit})`);
+  } catch (error) {
+    logger.error('Error retrieving total exp leaderboard:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+/**
+ * GET /api/leaderboard/referrals
+ * Get referral leaderboard (most referrals)
+ */
+router.get('/referrals', optionalAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 100);
+    const queryPlayerId = req.query.playerId as string;
+    
+    const result = await getReferralLeaderboard(limit, queryPlayerId || req.player?.id);
+    
+    res.json({
+      success: true,
+      data: {
+        leaderboard: result.leaderboard,
+        playerRank: result.currentPlayerRank,
+        total: result.leaderboard.length
+      }
+    });
+    
+    logger.info(`Referral leaderboard retrieved (limit: ${limit})`);
+  } catch (error) {
+    logger.error('Error retrieving referral leaderboard:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error'

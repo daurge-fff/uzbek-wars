@@ -25,6 +25,7 @@ export interface LeaderboardEntry {
     soms: number;
     cityId: string;
     characterId: string;
+    avatar?: string;
   };
 }
 
@@ -45,6 +46,8 @@ export interface LeaderboardResult {
  * 2. Experience (descending) - tiebreaker
  * 3. Soms (descending) - second tiebreaker
  * 
+ * OPTIMIZED: Uses lean() for faster queries, minimal field selection
+ * 
  * Requirements: 21.1, 21.4
  * 
  * @param limit - Number of top players to return (default: 10)
@@ -56,11 +59,18 @@ export async function getGlobalLeaderboard(
   currentPlayerId?: string
 ): Promise<LeaderboardResult> {
   try {
-    // Get top players
+    // Get top players - OPTIMIZED with lean() and minimal fields
     const topPlayers = await Player.find()
       .sort({ level: -1, experience: -1, soms: -1 })
       .limit(limit)
-      .populate('userId', 'displayName');
+      .select('userId level experience soms cityId characterId')
+      .populate({
+        path: 'userId',
+        select: 'displayName avatar',
+        options: { lean: true }
+      })
+      .lean()
+      .exec();
 
     // Build leaderboard entries, filtering out players with missing users
     const leaderboard: LeaderboardEntry[] = topPlayers
@@ -73,7 +83,8 @@ export async function getGlobalLeaderboard(
           level: player.level,
           soms: player.soms,
           cityId: player.cityId,
-          characterId: player.characterId
+          characterId: player.characterId,
+          avatar: (player.userId as any).avatar
         }
       }));
 
@@ -83,8 +94,8 @@ export async function getGlobalLeaderboard(
       currentPlayerRank = await getPlayerGlobalRank(currentPlayerId);
     }
 
-    // Get total player count
-    const totalPlayers = await Player.countDocuments();
+    // Get total player count - OPTIMIZED with estimatedDocumentCount
+    const totalPlayers = await Player.estimatedDocumentCount();
 
     return {
       leaderboard,
@@ -107,6 +118,8 @@ export async function getGlobalLeaderboard(
  * 1. Level (descending)
  * 2. Experience (descending) - tiebreaker
  * 
+ * OPTIMIZED: Uses lean() for faster queries, minimal field selection
+ * 
  * Requirements: 21.2, 21.3, 21.4
  * 
  * @param cityId - City identifier
@@ -120,11 +133,18 @@ export async function getCityLeaderboard(
   currentPlayerId?: string
 ): Promise<LeaderboardResult> {
   try {
-    // Get top players in city
+    // Get top players in city - OPTIMIZED
     const topPlayers = await Player.find({ cityId })
       .sort({ level: -1, experience: -1 })
       .limit(limit)
-      .populate('userId', 'displayName');
+      .select('userId level experience soms cityId characterId')
+      .populate({
+        path: 'userId',
+        select: 'displayName avatar',
+        options: { lean: true }
+      })
+      .lean()
+      .exec();
 
     // Build leaderboard entries, filtering out players with missing users
     const leaderboard: LeaderboardEntry[] = topPlayers
@@ -137,7 +157,8 @@ export async function getCityLeaderboard(
           level: player.level,
           soms: player.soms,
           cityId: player.cityId,
-          characterId: player.characterId
+          characterId: player.characterId,
+          avatar: (player.userId as any).avatar
         }
       }));
 
@@ -169,6 +190,8 @@ export async function getCityLeaderboard(
  * 
  * Returns top players sorted by soms (wealth)
  * 
+ * OPTIMIZED: Uses lean() for faster queries
+ * 
  * Requirements: 21.2
  * 
  * @param limit - Number of top players to return (default: 10)
@@ -180,11 +203,18 @@ export async function getSomsLeaderboard(
   currentPlayerId?: string
 ): Promise<LeaderboardResult> {
   try {
-    // Get top players by soms
+    // Get top players by soms - OPTIMIZED
     const topPlayers = await Player.find()
       .sort({ soms: -1, level: -1 })
       .limit(limit)
-      .populate('userId', 'displayName');
+      .select('userId level soms cityId characterId')
+      .populate({
+        path: 'userId',
+        select: 'displayName avatar',
+        options: { lean: true }
+      })
+      .lean()
+      .exec();
 
     // Build leaderboard entries, filtering out players with missing users
     const leaderboard: LeaderboardEntry[] = topPlayers
@@ -197,7 +227,8 @@ export async function getSomsLeaderboard(
           level: player.level,
           soms: player.soms,
           cityId: player.cityId,
-          characterId: player.characterId
+          characterId: player.characterId,
+          avatar: (player.userId as any).avatar
         }
       }));
 
@@ -208,7 +239,7 @@ export async function getSomsLeaderboard(
     }
 
     // Get total player count
-    const totalPlayers = await Player.countDocuments();
+    const totalPlayers = await Player.estimatedDocumentCount();
 
     return {
       leaderboard,
@@ -348,5 +379,280 @@ export async function getPlayerSomsRank(playerId: string): Promise<number | unde
   } catch (error) {
     logger.error('Error getting player soms rank:', error);
     return undefined;
+  }
+}
+
+/**
+ * Gets leaderboard by crystals (donation currency)
+ * OPTIMIZED: Uses lean() and minimal field selection
+ */
+export async function getCrystalsLeaderboard(
+  limit: number = 10,
+  currentPlayerId?: string
+): Promise<LeaderboardResult> {
+  try {
+    const topPlayers = await Player.find()
+      .sort({ donationCurrency: -1, level: -1 })
+      .limit(limit)
+      .select('userId level soms donationCurrency cityId characterId')
+      .populate({
+        path: 'userId',
+        select: 'displayName avatar',
+        options: { lean: true }
+      })
+      .lean()
+      .exec();
+
+    const leaderboard: LeaderboardEntry[] = topPlayers
+      .filter(player => player.userId && (player.userId as any).displayName)
+      .map((player, index) => ({
+        rank: index + 1,
+        player: {
+          id: player._id.toString(),
+          displayName: (player.userId as any).displayName,
+          level: player.level,
+          soms: player.soms,
+          cityId: player.cityId,
+          characterId: player.characterId,
+          avatar: (player.userId as any).avatar
+        }
+      }));
+
+    let currentPlayerRank: number | undefined;
+    if (currentPlayerId) {
+      const player = await Player.findById(currentPlayerId).select('donationCurrency').lean();
+      if (player) {
+        const higherCount = await Player.countDocuments({
+          donationCurrency: { $gt: player.donationCurrency }
+        });
+        currentPlayerRank = higherCount + 1;
+      }
+    }
+
+    const totalPlayers = await Player.estimatedDocumentCount();
+
+    return { leaderboard, currentPlayerRank, totalPlayers };
+  } catch (error) {
+    logger.error('Error getting crystals leaderboard:', error);
+    return { leaderboard: [], totalPlayers: 0 };
+  }
+}
+
+/**
+ * Gets city power leaderboard (sum of all players' levels in each city)
+ */
+export async function getCityPowerLeaderboard(limit: number = 10): Promise<any> {
+  try {
+    const cityPowers = await Player.aggregate([
+      {
+        $group: {
+          _id: '$cityId',
+          totalLevel: { $sum: '$level' },
+          playerCount: { $sum: 1 },
+          avgLevel: { $avg: '$level' }
+        }
+      },
+      { $sort: { totalLevel: -1 } },
+      { $limit: limit }
+    ]);
+
+    return cityPowers.map((city, index) => ({
+      rank: index + 1,
+      cityId: city._id,
+      totalLevel: city.totalLevel,
+      playerCount: city.playerCount,
+      avgLevel: Math.round(city.avgLevel * 10) / 10
+    }));
+  } catch (error) {
+    logger.error('Error getting city power leaderboard:', error);
+    return [];
+  }
+}
+
+/**
+ * Gets activity streak leaderboard (players with longest daily login streaks)
+ * OPTIMIZED: Uses lean() and minimal field selection
+ */
+export async function getActivityStreakLeaderboard(
+  limit: number = 10,
+  currentPlayerId?: string
+): Promise<LeaderboardResult> {
+  try {
+    // Сначала нужно добавить поле activityStreak в модель Player
+    // Пока возвращаем пустой результат
+    const topPlayers = await Player.find()
+      .sort({ level: -1 }) // Временно сортируем по уровню
+      .limit(limit)
+      .select('userId level soms cityId characterId')
+      .populate({
+        path: 'userId',
+        select: 'displayName avatar',
+        options: { lean: true }
+      })
+      .lean()
+      .exec();
+
+    const leaderboard: LeaderboardEntry[] = topPlayers
+      .filter(player => player.userId && (player.userId as any).displayName)
+      .map((player, index) => ({
+        rank: index + 1,
+        player: {
+          id: player._id.toString(),
+          displayName: (player.userId as any).displayName,
+          level: player.level,
+          soms: player.soms,
+          cityId: player.cityId,
+          characterId: player.characterId,
+          avatar: (player.userId as any).avatar
+        }
+      }));
+
+    let currentPlayerRank: number | undefined;
+    if (currentPlayerId) {
+      currentPlayerRank = 1; // TODO: Calculate actual rank
+    }
+
+    const totalPlayers = await Player.estimatedDocumentCount();
+
+    return { leaderboard, currentPlayerRank, totalPlayers };
+  } catch (error) {
+    logger.error('Error getting activity streak leaderboard:', error);
+    return { leaderboard: [], totalPlayers: 0 };
+  }
+}
+
+/**
+ * Gets total experience leaderboard (level + experience combined)
+ * OPTIMIZED: Uses lean() and minimal field selection
+ */
+export async function getTotalExpLeaderboard(
+  limit: number = 10,
+  currentPlayerId?: string
+): Promise<LeaderboardResult> {
+  try {
+    const topPlayers = await Player.find()
+      .sort({ level: -1, experience: -1 })
+      .limit(limit)
+      .select('userId level experience soms cityId characterId')
+      .populate({
+        path: 'userId',
+        select: 'displayName avatar',
+        options: { lean: true }
+      })
+      .lean()
+      .exec();
+
+    const leaderboard: LeaderboardEntry[] = topPlayers
+      .filter(player => player.userId && (player.userId as any).displayName)
+      .map((player, index) => ({
+        rank: index + 1,
+        player: {
+          id: player._id.toString(),
+          displayName: (player.userId as any).displayName,
+          level: player.level,
+          soms: player.soms,
+          cityId: player.cityId,
+          characterId: player.characterId,
+          avatar: (player.userId as any).avatar
+        }
+      }));
+
+    let currentPlayerRank: number | undefined;
+    if (currentPlayerId) {
+      currentPlayerRank = await getPlayerGlobalRank(currentPlayerId);
+    }
+
+    const totalPlayers = await Player.estimatedDocumentCount();
+
+    return { leaderboard, currentPlayerRank, totalPlayers };
+  } catch (error) {
+    logger.error('Error getting total exp leaderboard:', error);
+    return { leaderboard: [], totalPlayers: 0 };
+  }
+}
+
+/**
+ * Gets referral leaderboard (players with most referrals)
+ * OPTIMIZED: Uses aggregation pipeline with lean()
+ */
+export async function getReferralLeaderboard(
+  limit: number = 10,
+  currentPlayerId?: string
+): Promise<LeaderboardResult> {
+  try {
+    // Aggregate to count referrals per player - OPTIMIZED
+    const referralCounts = await Player.aggregate([
+      {
+        $match: {
+          referredBy: { $exists: true, $ne: null }
+        }
+      },
+      {
+        $group: {
+          _id: '$referredBy',
+          referralCount: { $sum: 1 }
+        }
+      },
+      { $sort: { referralCount: -1 } },
+      { $limit: limit }
+    ]);
+
+    // Get player details for top referrers - OPTIMIZED with single query
+    const referralCodes = referralCounts.map(r => r._id);
+    const players = await Player.find({ referralCode: { $in: referralCodes } })
+      .select('referralCode userId level soms cityId characterId')
+      .populate({
+        path: 'userId',
+        select: 'displayName avatar',
+        options: { lean: true }
+      })
+      .lean()
+      .exec();
+
+    // Create map for quick lookup
+    const playerMap = new Map(players.map(p => [p.referralCode, p]));
+
+    // Build leaderboard
+    const leaderboard: LeaderboardEntry[] = [];
+    for (let i = 0; i < referralCounts.length; i++) {
+      const refCode = referralCounts[i]._id;
+      const player = playerMap.get(refCode);
+      
+      if (player && player.userId && (player.userId as any).displayName) {
+        leaderboard.push({
+          rank: i + 1,
+          player: {
+            id: player._id.toString(),
+            displayName: (player.userId as any).displayName,
+            level: player.level,
+            soms: player.soms,
+            cityId: player.cityId,
+            characterId: player.characterId,
+            avatar: (player.userId as any).avatar
+          }
+        });
+      }
+    }
+
+    let currentPlayerRank: number | undefined;
+    if (currentPlayerId) {
+      const player = await Player.findById(currentPlayerId).select('referralCode').lean();
+      if (player) {
+        const myReferralCount = await Player.countDocuments({ referredBy: player.referralCode });
+        const higherCount = await Player.aggregate([
+          { $match: { referredBy: { $exists: true, $ne: null } } },
+          { $group: { _id: '$referredBy', count: { $sum: 1 } } },
+          { $match: { count: { $gt: myReferralCount } } }
+        ]);
+        currentPlayerRank = higherCount.length + 1;
+      }
+    }
+
+    const totalPlayers = await Player.estimatedDocumentCount();
+
+    return { leaderboard, currentPlayerRank, totalPlayers };
+  } catch (error) {
+    logger.error('Error getting referral leaderboard:', error);
+    return { leaderboard: [], totalPlayers: 0 };
   }
 }

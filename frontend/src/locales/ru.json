@@ -468,7 +468,7 @@
     "inUzbekistan": "в Узбекистане"
   },
   "leaderboard": {
-    "title": "Рейтинг",
+    "title": "Рейтинги",
     "global": "Глобальный",
     "city": "Городской",
     "rank": "Место",
@@ -476,7 +476,23 @@
     "level": "Уровень",
     "soms": "По сомам",
     "you": "Вы",
-    "noPlayers": "Пока нет игроков в рейтинге"
+    "noPlayers": "Пока нет данных",
+    "selectCategory": "Выберите категорию",
+    "change": "Сменить",
+    "currentCategory": "Текущая категория",
+    "yourRank": "Ваше место",
+    "updateInfo": "Рейтинги обновляются в реальном времени",
+    "categories": {
+      "level": "По уровню",
+      "soms": "Богачи",
+      "crystals": "Донатеры",
+      "cityPower": "Сила городов",
+      "totalExp": "Опытные",
+      "referrals": "Рекрутеры",
+      "activityStreak": "Активисты",
+      "activities": "Трудяги",
+      "wealth": "Богатство"
+    }
   },
   "welcome": {
     "title": "Добро пожаловать!",

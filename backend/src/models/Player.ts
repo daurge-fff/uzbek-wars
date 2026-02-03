@@ -198,4 +198,11 @@ const PlayerSchema = new Schema<IPlayer>(
   }
 );
 
+// Compound indexes for leaderboard optimization
+PlayerSchema.index({ level: -1, experience: -1, soms: -1 }); // Global leaderboard
+PlayerSchema.index({ cityId: 1, level: -1, experience: -1 }); // City leaderboard
+PlayerSchema.index({ soms: -1, level: -1 }); // Soms leaderboard
+PlayerSchema.index({ donationCurrency: -1, level: -1 }); // Crystals leaderboard
+PlayerSchema.index({ referredBy: 1 }); // Referral leaderboard
+
 export const Player = model<IPlayer>('Player', PlayerSchema);

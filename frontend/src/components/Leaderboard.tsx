@@ -1,7 +1,12 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
-type LeaderboardType = 'global' | 'city' | 'soms';
+type LeaderboardCategory = 
+  | 'level' | 'soms' | 'crystals' 
+  | 'cityPower' | 'totalExp' | 'referrals' 
+  | 'activityStreak';
 
 interface LeaderboardPlayer {
   rank: number;
@@ -12,24 +17,125 @@ interface LeaderboardPlayer {
   soms: number;
   cityName: string;
   isCurrentPlayer?: boolean;
+  value?: number;
 }
 
-interface LeaderboardProps {
-  players: LeaderboardPlayer[];
-  type: LeaderboardType;
-  onTypeChange: (type: LeaderboardType) => void;
+interface CategoryConfig {
+  id: LeaderboardCategory;
+  emoji: string;
+  labelKey: string;
+  apiEndpoint: string;
 }
+
+const categories: CategoryConfig[] = [
+  { id: 'level', emoji: '🏆', labelKey: 'leaderboard.categories.level', apiEndpoint: '/api/leaderboard/global' },
+  { id: 'soms', emoji: '💰', labelKey: 'leaderboard.categories.soms', apiEndpoint: '/api/leaderboard/soms' },
+  { id: 'crystals', emoji: '💎', labelKey: 'leaderboard.categories.crystals', apiEndpoint: '/api/leaderboard/crystals' },
+  { id: 'cityPower', emoji: '🏙️', labelKey: 'leaderboard.categories.cityPower', apiEndpoint: '/api/leaderboard/city-power' },
+  { id: 'totalExp', emoji: '⭐', labelKey: 'leaderboard.categories.totalExp', apiEndpoint: '/api/leaderboard/total-exp' },
+  { id: 'referrals', emoji: '👥', labelKey: 'leaderboard.categories.referrals', apiEndpoint: '/api/leaderboard/referrals' },
+  { id: 'activityStreak', emoji: '🔥', labelKey: 'leaderboard.categories.activityStreak', apiEndpoint: '/api/leaderboard/activity-streak' }
+];
 
 const medals = ['🥇', '🥈', '🥉'];
 
-export const Leaderboard = ({ players, type, onTypeChange }: LeaderboardProps) => {
+export const Leaderboard = () => {
   const { t } = useTranslation();
+  const { player: currentPlayer } = useAuth();
+  const [selectedCategory, setSelectedCategory] = useState<LeaderboardCategory>('level');
+  const [players, setPlayers] = useState<LeaderboardPlayer[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [playerRank, setPlayerRank] = useState<number | null>(null);
 
-  const tabs = [
-    { id: 'global' as const, label: t('leaderboard.global', 'Глобальный'), icon: '🌍' },
-    { id: 'city' as const, label: t('leaderboard.city', 'Городской'), icon: '🏙️' },
-    { id: 'soms' as const, label: t('leaderboard.soms', 'По сомам'), icon: '💰' }
-  ];
+  const currentCategory = categories.find(c => c.id === selectedCategory)!;
+
+  useEffect(() => {
+    loadLeaderboard();
+  }, [selectedCategory]);
+
+  const loadLeaderboard = async () => {
+    setLoading(true);
+    try {
+      const category = categories.find(c => c.id === selectedCategory);
+      if (!category) return;
+
+      const response = await fetch(`${category.apiEndpoint}?limit=10`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (selectedCategory === 'cityPower') {
+          // Special handling for city power
+          setPlayers(data.data.leaderboard.map((city: any) => ({
+            rank: city.rank,
+            userId: city.cityId,
+            username: getCityName(city.cityId),
+            avatar: '🏛️',
+            level: city.totalLevel,
+            soms: city.playerCount,
+            cityName: `${city.playerCount} игроков`,
+            value: city.avgLevel
+          })));
+          setPlayerRank(null);
+        } else {
+          // Map leaderboard entries
+          const mappedPlayers = data.data.leaderboard.map((entry: any) => {
+            const isCurrentPlayer = currentPlayer?.id === entry.player.id;
+            
+            return {
+              rank: entry.rank,
+              userId: entry.player.id,
+              username: entry.player.displayName,
+              avatar: entry.player.avatar || '👤',
+              level: entry.player.level,
+              soms: entry.player.soms,
+              cityName: getCityName(entry.player.cityId),
+              isCurrentPlayer
+            };
+          });
+          
+          setPlayers(mappedPlayers);
+          setPlayerRank(data.data.playerRank || data.data.currentPlayerRank || null);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading leaderboard:', error);
+      setPlayers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCityName = (cityId: string): string => {
+    const cityNames: Record<string, string> = {
+      'samarkand': 'Самарканд',
+      'tashkent': 'Ташкент',
+      'bukhara': 'Бухара',
+      'khiva': 'Хива',
+      'andijan': 'Андижан'
+    };
+    return cityNames[cityId] || cityId;
+  };
+
+  const getValueDisplay = (player: LeaderboardPlayer): string => {
+    if (selectedCategory === 'soms') return player.soms.toLocaleString();
+    if (selectedCategory === 'cityPower') return player.level.toLocaleString();
+    if (selectedCategory === 'crystals') return player.value?.toLocaleString() || '0';
+    return player.level.toString();
+  };
+
+  const getValueLabel = (): string => {
+    if (selectedCategory === 'soms') return t('currency.soms', 'сомов');
+    if (selectedCategory === 'cityPower') return 'сила';
+    if (selectedCategory === 'crystals') return t('currency.crystals', 'кристаллов');
+    if (selectedCategory === 'referrals') return 'рефералов';
+    if (selectedCategory === 'activityStreak') return 'дней';
+    return t('character.level', 'Уровень');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4">
@@ -38,37 +144,68 @@ export const Leaderboard = ({ players, type, onTypeChange }: LeaderboardProps) =
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 mb-6 border border-gray-200 dark:border-gray-700"
+          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[24px] shadow-2xl p-4 mb-4 border border-gray-200 dark:border-gray-700"
         >
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <span className="text-4xl">🏆</span>
-            <h1 className="text-4xl font-black bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
-              {t('leaderboard.title', 'Рейтинг')}
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-3xl">{currentCategory.emoji}</span>
+            <h1 className="text-2xl font-black bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
+              {t('leaderboard.title', 'Рейтинги')}
             </h1>
           </div>
 
-          {/* Tabs */}
-          <div className="grid grid-cols-3 gap-3">
-            {tabs.map((tab) => (
+          {/* Category Grid - 7 categories in 2 rows */}
+          <div className="grid grid-cols-4 gap-2 mb-2">
+            {categories.slice(0, 4).map((category) => (
               <motion.button
-                key={tab.id}
-                whileHover={{ scale: 1.03, y: -2 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => onTypeChange(tab.id)}
-                className={`relative py-4 px-4 rounded-[20px] font-bold text-sm transition-all overflow-hidden ${
-                  type === tab.id
+                key={category.id}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`relative py-3 px-2 rounded-[16px] font-bold text-xs transition-all overflow-hidden ${
+                  selectedCategory === category.id
                     ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl'
                     : 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
               >
-                <div className="flex flex-col items-center gap-1">
-                  <span className="text-2xl">{tab.icon}</span>
-                  <span className="text-xs">{tab.label}</span>
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="text-xl">{category.emoji}</span>
+                  <span className="text-[9px] leading-tight text-center">
+                    {t(category.labelKey, category.id)}
+                  </span>
                 </div>
-                {type === tab.id && (
+                {selectedCategory === category.id && (
                   <motion.div
-                    layoutId="activeTab"
-                    className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-[20px] -z-10"
+                    layoutId="activeCategory"
+                    className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-[16px] -z-10"
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  />
+                )}
+              </motion.button>
+            ))}
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {categories.slice(4).map((category) => (
+              <motion.button
+                key={category.id}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`relative py-3 px-2 rounded-[16px] font-bold text-xs transition-all overflow-hidden ${
+                  selectedCategory === category.id
+                    ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl'
+                    : 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="text-xl">{category.emoji}</span>
+                  <span className="text-[9px] leading-tight text-center">
+                    {t(category.labelKey, category.id)}
+                  </span>
+                </div>
+                {selectedCategory === category.id && (
+                  <motion.div
+                    layoutId="activeCategory"
+                    className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-[16px] -z-10"
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                   />
                 )}
@@ -78,8 +215,19 @@ export const Leaderboard = ({ players, type, onTypeChange }: LeaderboardProps) =
         </motion.div>
 
         {/* Players List */}
-        <div className="space-y-3">
-          {players.length === 0 ? (
+        <div className="space-y-2">
+          {loading ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[24px] p-12 text-center border border-gray-200 dark:border-gray-700"
+            >
+              <div className="text-6xl mb-4">⏳</div>
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                {t('common.loading', 'Загрузка...')}
+              </p>
+            </motion.div>
+          ) : players.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -87,7 +235,7 @@ export const Leaderboard = ({ players, type, onTypeChange }: LeaderboardProps) =
             >
               <div className="text-6xl mb-4">🏜️</div>
               <p className="text-gray-600 dark:text-gray-400 text-lg">
-                {t('leaderboard.noPlayers', 'Пока нет игроков в рейтинге')}
+                {t('leaderboard.noPlayers', 'Пока нет данных')}
               </p>
             </motion.div>
           ) : (
@@ -97,52 +245,62 @@ export const Leaderboard = ({ players, type, onTypeChange }: LeaderboardProps) =
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                whileHover={{ scale: 1.02, x: 4 }}
-                className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[24px] p-5 shadow-lg border-2 transition-all ${
+                whileHover={{ scale: 1.01, x: 2 }}
+                className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[16px] p-3 shadow-lg border-2 transition-all ${
                   player.isCurrentPlayer
                     ? 'border-amber-500 dark:border-amber-400 shadow-amber-500/30 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-900/20 dark:to-orange-900/20'
                     : 'border-gray-200 dark:border-gray-700'
                 }`}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   {/* Rank */}
-                  <div className={`flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black shadow-lg ${
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-black shadow-lg ${
                     player.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white' :
                     player.rank === 2 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white' :
                     player.rank === 3 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
                     'bg-gradient-to-br from-indigo-500 to-purple-500 text-white'
                   }`}>
-                    {player.rank <= 3 ? <span>{medals[player.rank - 1]}</span> : player.rank}
+                    {player.rank <= 3 ? <span className="text-base">{medals[player.rank - 1]}</span> : <span className="text-sm">{player.rank}</span>}
                   </div>
 
                   {/* Avatar */}
-                  <div className="text-5xl">{player.avatar}</div>
+                  <div className="text-3xl flex-shrink-0">
+                    {player.avatar && player.avatar.startsWith('http') ? (
+                      <img 
+                        src={player.avatar} 
+                        alt={player.username}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span>{player.avatar || '👤'}</span>
+                    )}
+                  </div>
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-black text-lg text-gray-900 dark:text-white truncate">
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <span className="font-black text-sm text-gray-900 dark:text-white truncate">
                         {player.username}
                       </span>
                       {player.isCurrentPlayer && (
-                        <span className="px-2 py-0.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold rounded-full whitespace-nowrap">
+                        <span className="px-1.5 py-0.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold rounded-full whitespace-nowrap">
                           {t('leaderboard.you', 'Вы')}
                         </span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                      <span>📍</span>
-                      {player.cityName}
+                    <div className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                      <span className="text-[10px]">📍</span>
+                      <span className="truncate">{player.cityName}</span>
                     </div>
                   </div>
 
                   {/* Stats */}
-                  <div className="text-right">
-                    <div className="font-black text-2xl bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
-                      {type === 'soms' ? `${player.soms.toLocaleString()}` : player.level}
+                  <div className="text-right flex-shrink-0">
+                    <div className="font-black text-lg bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+                      {getValueDisplay(player)}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                      {type === 'soms' ? t('currency.soms', 'сомов') : t('character.level', 'Уровень')}
+                    <div className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                      {getValueLabel()}
                     </div>
                   </div>
                 </div>
@@ -150,6 +308,15 @@ export const Leaderboard = ({ players, type, onTypeChange }: LeaderboardProps) =
             ))
           )}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400"
+        >
+          <p>{t('leaderboard.updateInfo', 'Рейтинги обновляются в реальном времени')}</p>
+        </motion.div>
       </div>
     </div>
   );
