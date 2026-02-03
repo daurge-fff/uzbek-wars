@@ -5,7 +5,9 @@
     "experience": "Tajriba",
     "enterUsername": "Personaj nomini kiriting",
     "usernamePlaceholder": "Sizning ismingiz",
-    "usernameHint": "6-20 belgi: rus/ingliz harflari, raqamlar, defis, bo'sh joy"
+    "usernameHint": "6-20 belgi: rus/ingliz harflari, raqamlar, defis, bo'sh joy",
+    "strengths": "Kuchli tomonlar",
+    "weaknesses": "Zaif tomonlar"
   },
   "currency": {
     "soms": "so'm",
@@ -83,7 +85,6 @@
   "cities": {
     "select": "Shaharni tanlang",
     "samarkand": "Samarqand",
-    "shymkent": "Shymkent",
     "tashkent": "Toshkent",
     "bukhara": "Buxoro",
     "players": "o'yinchilar",
@@ -374,6 +375,7 @@
     "nameMaxLength": "Ism ko'pi bilan 20 ta belgidan iborat bo'lishi kerak",
     "nameTaken": "Bu ism allaqachon band",
     "nameAvailable": "Ism mavjud",
+    "nameInvalid": "Ism noto'g'ri belgilarni o'z ichiga oladi",
     "checking": "Tekshirilmoqda...",
     "chooseCharacter": "Personajni tanlang",
     "characterDesc": "Har bir personajning o'ziga xos qobiliyatlari bor",

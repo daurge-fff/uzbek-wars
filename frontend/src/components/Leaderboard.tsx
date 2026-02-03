@@ -32,7 +32,7 @@ export const Leaderboard = ({ players, type, onTypeChange }: LeaderboardProps) =
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <motion.div

@@ -32,6 +32,18 @@ export interface ICharacter {
     uk: string;
     en: string;
   };
+  strengths?: {
+    ru: string;
+    uz: string;
+    uk: string;
+    en: string;
+  };
+  weaknesses?: {
+    ru: string;
+    uz: string;
+    uk: string;
+    en: string;
+  };
 }
 
 /**

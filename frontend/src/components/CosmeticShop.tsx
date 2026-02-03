@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
@@ -44,13 +44,6 @@ const rarityBorders = {
   rare: 'border-blue-400 dark:border-blue-500',
   epic: 'border-purple-400 dark:border-purple-500',
   legendary: 'border-yellow-400 dark:border-orange-500'
-};
-
-const rarityGlow = {
-  common: 'shadow-gray-400/50',
-  rare: 'shadow-blue-400/50',
-  epic: 'shadow-purple-400/50',
-  legendary: 'shadow-yellow-400/50'
 };
 
 const typeEmojis = {
@@ -115,7 +108,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-2xl p-6 mb-6 border border-white/50 dark:border-gray-700/50">

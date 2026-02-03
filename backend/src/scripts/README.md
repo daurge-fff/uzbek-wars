@@ -6,8 +6,8 @@ This directory contains scripts for seeding the database with initial data.
 
 The `seed.ts` script populates the database with:
 
-- **4 Cities**: Samarkand, Shymkent, Tashkent, and Bukhara with exact data from design.md
-- **4 Characters**: Merchant Aziz, Craftsman Rustam, Student Farhod, and Chef Shavkat
+- **3 Cities**: Samarkand, Tashkent, and Bukhara with exact data from design.md
+- **5 Characters**: Merchant Aziz, Warrior Timur, Scholar Farhod, Artisan Rustam, and Chef Shavkat
 - **10 Cosmetic Items**: 5 clothing items and 5 background items with Uzbek cultural aesthetics
 - **Dev User**: A development user for testing (if DEV_USERNAME and DEV_PASSWORD are set)
 

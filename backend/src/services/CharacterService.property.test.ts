@@ -58,7 +58,6 @@ describe('Property 1: Round-trip сохранения выбора персон�
    */
   const cityIdArbitrary = fc.constantFrom(
     'samarkand',
-    'shymkent',
     'tashkent',
     'bukhara'
   );

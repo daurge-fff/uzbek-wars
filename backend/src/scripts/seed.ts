@@ -14,10 +14,10 @@ import { logger } from '../utils/logger';
  * Character definitions for initial game setup
  * These characters represent different Uzbek cultural archetypes
  */
-const CHARACTERS = [
+export const CHARACTERS = [
   {
     id: 'char_merchant',
-    avatar: '🧔',
+    avatar: '🤑',
     name: {
       ru: 'Торговец Азиз',
       uz: 'Savdogar Aziz',
@@ -30,37 +30,101 @@ const CHARACTERS = [
       uk: 'Досвідчений торговець з базару Чорсу',
       en: 'Experienced merchant from Chorsu Bazaar',
     },
-  },
-  {
-    id: 'char_craftsman',
-    avatar: '👨‍🔧',
-    name: {
-      ru: 'Мастер Рустам',
-      uz: 'Usta Rustam',
-      uk: 'Майстер Рустам',
-      en: 'Craftsman Rustam',
+    strengths: {
+      ru: '💰 +20% к заработку сомов',
+      uz: '💰 So\'m daromadiga +20%',
+      uk: '💰 +20% до заробітку сомів',
+      en: '💰 +20% soms income',
     },
-    description: {
-      ru: 'Искусный ремесленник, создающий традиционные изделия',
-      uz: "An'anaviy buyumlar yasaydigan mohir hunarmand",
-      uk: 'Майстерний ремісник, що створює традиційні вироби',
-      en: 'Skilled craftsman creating traditional items',
+    weaknesses: {
+      ru: '⚔️ -10% к боевым навыкам',
+      uz: '⚔️ Jang ko\'nikmalariga -10%',
+      uk: '⚔️ -10% до бойових навичок',
+      en: '⚔️ -10% combat skills',
     },
   },
   {
-    id: 'char_student',
-    avatar: '👨‍🎓',
+    id: 'char_warrior',
+    avatar: '⚔️',
     name: {
-      ru: 'Студент Фарход',
-      uz: 'Talaba Farhod',
-      uk: 'Студент Фархад',
-      en: 'Student Farhod',
+      ru: 'Воин Тимур',
+      uz: 'Jangchi Temur',
+      uk: 'Воїн Тимур',
+      en: 'Warrior Timur',
     },
     description: {
-      ru: 'Молодой студент, изучающий современные технологии',
-      uz: 'Zamonaviy texnologiyalarni o\'rganayotgan yosh talaba',
-      uk: 'Молодий студент, що вивчає сучасні технології',
-      en: 'Young student learning modern technologies',
+      ru: 'Храбрый защитник караванов',
+      uz: 'Karvonlarning jasur himoyachisi',
+      uk: 'Хоробрий захисник караванів',
+      en: 'Brave caravan defender',
+    },
+    strengths: {
+      ru: '⚔️ +30% к боевым навыкам',
+      uz: '⚔️ Jang ko\'nikmalariga +30%',
+      uk: '⚔️ +30% до бойових навичок',
+      en: '⚔️ +30% combat skills',
+    },
+    weaknesses: {
+      ru: '💰 -15% к заработку',
+      uz: '💰 Daromadga -15%',
+      uk: '💰 -15% до заробітку',
+      en: '💰 -15% income',
+    },
+  },
+  {
+    id: 'char_scholar',
+    avatar: '📚',
+    name: {
+      ru: 'Ученый Фарход',
+      uz: 'Olim Farhod',
+      uk: 'Вчений Фархад',
+      en: 'Scholar Farhod',
+    },
+    description: {
+      ru: 'Мудрый исследователь древних манускриптов',
+      uz: 'Qadimgi qo\'lyozmalarni o\'rganuvchi dono tadqiqotchi',
+      uk: 'Мудрий дослідник стародавніх манускриптів',
+      en: 'Wise researcher of ancient manuscripts',
+    },
+    strengths: {
+      ru: '✨ +25% к получению опыта',
+      uz: '✨ Tajriba olishga +25%',
+      uk: '✨ +25% до отримання досвіду',
+      en: '✨ +25% experience gain',
+    },
+    weaknesses: {
+      ru: '💪 -10% к физической силе',
+      uz: '💪 Jismoniy kuchga -10%',
+      uk: '💪 -10% до фізичної сили',
+      en: '💪 -10% physical strength',
+    },
+  },
+  {
+    id: 'char_artisan',
+    avatar: '🎨',
+    name: {
+      ru: 'Ремесленник Рустам',
+      uz: 'Hunarmand Rustam',
+      uk: 'Ремісник Рустам',
+      en: 'Artisan Rustam',
+    },
+    description: {
+      ru: 'Искусный мастер традиционных ремесел',
+      uz: 'An\'anaviy hunarmandchilik ustasi',
+      uk: 'Майстерний майстер традиційних ремесел',
+      en: 'Skilled master of traditional crafts',
+    },
+    strengths: {
+      ru: '🎨 +20% к качеству изделий',
+      uz: '🎨 Mahsulot sifatiga +20%',
+      uk: '🎨 +20% до якості виробів',
+      en: '🎨 +20% craft quality',
+    },
+    weaknesses: {
+      ru: '🏃 -10% к скорости',
+      uz: '🏃 Tezlikka -10%',
+      uk: '🏃 -10% до швидкості',
+      en: '🏃 -10% speed',
     },
   },
   {
@@ -77,6 +141,18 @@ const CHARACTERS = [
       uz: 'Osh va boshqa o\'zbek taomlarini tayyorlash ustasi',
       uk: 'Майстер приготування плову та інших узбецьких страв',
       en: 'Master of cooking plov and other Uzbek dishes',
+    },
+    strengths: {
+      ru: '🍽️ +30% к восстановлению здоровья',
+      uz: '🍽️ Salomatlikni tiklashga +30%',
+      uk: '🍽️ +30% до відновлення здоров\'я',
+      en: '🍽️ +30% health recovery',
+    },
+    weaknesses: {
+      ru: '💼 -10% к деловым навыкам',
+      uz: '💼 Biznes ko\'nikmalariga -10%',
+      uk: '💼 -10% до ділових навичок',
+      en: '💼 -10% business skills',
     },
   },
 ];
@@ -99,21 +175,6 @@ const CITIES = [
       primaryColor: '#4A90E2',
       backgroundImage: '/assets/cities/samarkand.jpg',
       description: 'Древний город на Великом шелковом пути',
-    },
-  },
-  {
-    cityId: 'shymkent',
-    name: {
-      ru: 'Шымкент',
-      uz: 'Shymkent',
-      uk: 'Шимкент',
-      en: 'Shymkent',
-    },
-    maxPlayers: 1000,
-    theme: {
-      primaryColor: '#E24A4A',
-      backgroundImage: '/assets/cities/shymkent.jpg',
-      description: 'Южная столица Казахстана',
     },
   },
   {
@@ -529,4 +590,4 @@ if (require.main === module) {
     });
 }
 
-export { seed, CHARACTERS, CITIES };
+export { seed, CITIES };

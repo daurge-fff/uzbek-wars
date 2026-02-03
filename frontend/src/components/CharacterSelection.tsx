@@ -32,69 +32,9 @@ const wrap = (min: number, max: number, v: number) => {
 export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionProps) => {
   const [[page, direction], setPage] = useState([0, 0]);
   const { t, i18n } = useTranslation();
-  const [username, setUsername] = useState('');
-  const [usernameError, setUsernameError] = useState('');
 
   const characterIndex = wrap(0, characters.length, page);
   const currentCharacter = characters[characterIndex];
-
-  // Валидация имени пользователя
-  const validateUsername = (name: string): string => {
-    // Только русские, английские буквы, цифры, дефис и пробел
-    const validCharsRegex = /^[a-zA-Zа-яА-ЯёЁ0-9\s-]+$/;
-    
-    if (name.length < 6) {
-      return t('validation.usernameTooShort') || 'Минимум 6 символов';
-    }
-    
-    if (name.length > 20) {
-      return t('validation.usernameTooLong') || 'Максимум 20 символов';
-    }
-    
-    if (!validCharsRegex.test(name)) {
-      return t('validation.usernameInvalidChars') || 'Только русские/английские буквы, цифры, дефис и пробел';
-    }
-    
-    // Не может состоять только из цифр
-    if (/^\d+$/.test(name)) {
-      return t('validation.usernameOnlyNumbers') || 'Имя не может состоять только из цифр';
-    }
-    
-    // Не может состоять только из пробелов
-    if (/^\s+$/.test(name)) {
-      return t('validation.usernameOnlySpaces') || 'Имя не может состоять только из пробелов';
-    }
-    
-    // Не может содержать два пробела подряд
-    if (/\s{2,}/.test(name)) {
-      return t('validation.usernameDoubleSpaces') || 'Имя не может содержать два пробела подряд';
-    }
-    
-    return '';
-  };
-
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setUsername(value);
-    
-    if (value) {
-      const error = validateUsername(value);
-      setUsernameError(error);
-    } else {
-      setUsernameError('');
-    }
-  };
-
-  const handleConfirm = () => {
-    const error = validateUsername(username);
-    if (error) {
-      setUsernameError(error);
-      return;
-    }
-    
-    // Передаем и ID персонажа и имя пользователя
-    onSelect(currentCharacter.id);
-  };
 
   const swipeConfidenceThreshold = 5000;
   const swipePower = (offset: number, velocity: number) => {
@@ -113,7 +53,6 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
     } else if (swipe > swipeConfidenceThreshold) {
       paginate(-1);
     } else if (Math.abs(offset.x) > 100) {
-      // Если просто потянули больше 100px без учета скорости
       if (offset.x < 0) {
         paginate(1);
       } else {
@@ -145,32 +84,19 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
     })
   };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 p-4 overflow-hidden transition-colors duration-300">
-      <motion.h1 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-4xl font-black text-gray-900 dark:text-white mb-2 transition-colors"
-      >
-        {t('character.select')}
-      </motion.h1>
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="text-gray-600 dark:text-gray-300 mb-2 font-medium transition-colors"
-      >
-        {t('app.swipeHint')}
-      </motion.p>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2, repeat: 3, repeatType: "reverse", duration: 0.8 }}
-        className="text-4xl mb-6"
-      >
-        👈 👉
-      </motion.div>
+  const getCharacterGradient = (characterId: string) => {
+    const gradients: Record<string, string> = {
+      merchant: 'from-yellow-100 via-amber-100 to-orange-100',
+      warrior: 'from-red-100 via-rose-100 to-pink-100',
+      scholar: 'from-blue-100 via-cyan-100 to-sky-100',
+      artisan: 'from-purple-100 via-violet-100 to-fuchsia-100',
+      nomad: 'from-green-100 via-emerald-100 to-teal-100'
+    };
+    return gradients[characterId] || 'from-gray-100 via-slate-100 to-zinc-100';
+  };
 
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4 overflow-hidden transition-colors duration-300">
       <div className="relative w-full max-w-sm h-[520px] mb-8" style={{ perspective: '1200px' }}>
         <AnimatePresence initial={false} custom={direction}>
           <motion.div
@@ -196,18 +122,19 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
             <motion.div 
               whileHover={{ scale: 1.02, y: -8 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white/90 dark:bg-gray-800/95 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 border border-gray-100 dark:border-gray-700 transition-colors"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 border-2 border-green-200 dark:border-green-700 transition-colors"
             >
-              <div className="w-full h-72 bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:bg-gray-700 rounded-[24px] mb-6 flex items-center justify-center overflow-hidden shadow-inner transition-colors">
+              <div className={`w-full h-72 bg-gradient-to-br ${getCharacterGradient(currentCharacter.id)} rounded-[24px] mb-6 flex flex-col items-center justify-center overflow-hidden shadow-inner relative`}>
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
-                  className="text-9xl"
+                  className="text-9xl mb-4"
                 >
                   {currentCharacter.avatar}
                 </motion.div>
               </div>
+
               <motion.h2 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -216,14 +143,17 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
               >
                 {currentCharacter.name[i18n.language as keyof typeof currentCharacter.name] || currentCharacter.name.ru}
               </motion.h2>
-              <motion.p 
+
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="text-gray-600 dark:text-gray-300 text-center leading-relaxed font-medium transition-colors"
+                className="space-y-3"
               >
-                {currentCharacter.description[i18n.language as keyof typeof currentCharacter.description] || currentCharacter.description.ru}
-              </motion.p>
+                <p className="text-center text-sm text-gray-600 dark:text-gray-300 font-medium transition-colors">
+                  {currentCharacter.description[i18n.language as keyof typeof currentCharacter.description] || currentCharacter.description.ru}
+                </p>
+              </motion.div>
             </motion.div>
           </motion.div>
         </AnimatePresence>
@@ -267,53 +197,13 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
         ))}
       </div>
 
-      {/* Username Input */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="w-full max-w-sm mb-6"
-      >
-        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-          {t('character.enterUsername') || 'Введите имя персонажа'}
-        </label>
-        <input
-          type="text"
-          value={username}
-          onChange={handleUsernameChange}
-          placeholder={t('character.usernamePlaceholder') || 'Ваше имя'}
-          className={`w-full px-4 py-3 rounded-[20px] border-2 font-medium transition-all ${
-            usernameError
-              ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-              : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
-          } text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-        />
-        {usernameError && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-2 text-sm text-red-600 dark:text-red-400 font-medium"
-          >
-            ⚠️ {usernameError}
-          </motion.p>
-        )}
-        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-          {t('character.usernameHint') || '6-20 символов: русские/английские буквы, цифры, дефис'}
-        </p>
-      </motion.div>
-
       <motion.button
-        onClick={handleConfirm}
-        disabled={!username || !!usernameError}
-        whileHover={{ scale: username && !usernameError ? 1.05 : 1 }}
-        whileTap={{ scale: username && !usernameError ? 0.95 : 1 }}
-        className={`min-h-touch w-full max-w-sm font-black py-4 px-8 rounded-[24px] shadow-2xl transition-all ${
-          username && !usernameError
-            ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white cursor-pointer'
-            : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-        }`}
+        onClick={() => onSelect(currentCharacter.id)}
+        whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(99, 102, 241, 0.3)' }}
+        whileTap={{ scale: 0.95 }}
+        className="min-h-touch w-full max-w-sm bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-black py-4 px-8 rounded-[24px] shadow-2xl transition-all cursor-pointer"
       >
-        {t('ui.confirm')}
+        {t('ui.continue')}
       </motion.button>
     </div>
   );

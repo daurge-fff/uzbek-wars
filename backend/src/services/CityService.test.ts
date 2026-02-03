@@ -230,7 +230,7 @@ describe('CityService', () => {
 
     it('should not go below zero', async () => {
       const mockCity = {
-        cityId: 'shymkent',
+        cityId: 'tashkent',
         playerCount: 0,
         maxPlayers: 1000,
         isOpen: true,
@@ -239,7 +239,7 @@ describe('CityService', () => {
 
       (City.findOne as jest.Mock).mockResolvedValue(mockCity);
 
-      await decrementCityPlayerCount('shymkent');
+      await decrementCityPlayerCount('tashkent');
 
       expect(mockCity.playerCount).toBe(0);
       expect(mockCity.save).toHaveBeenCalled();

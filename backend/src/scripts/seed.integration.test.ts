@@ -176,7 +176,7 @@ describe('Seed Data Validation', () => {
 
     it('should have correct city IDs', () => {
       const cityIds = CITIES.map((c) => c.cityId);
-      expect(cityIds).toEqual(['samarkand', 'shymkent', 'tashkent', 'bukhara']);
+      expect(cityIds).toEqual(['samarkand', 'tashkent', 'bukhara']);
     });
   });
 });

@@ -15,6 +15,7 @@ describe('CosmeticShop', () => {
       <CosmeticShop
         items={mockItems}
         playerCrystals={1000}
+        playerSoms={5000}
         onPurchase={vi.fn()}
         onEquip={vi.fn()}
       />
@@ -30,6 +31,7 @@ describe('CosmeticShop', () => {
       <CosmeticShop
         items={mockItems}
         playerCrystals={1000}
+        playerSoms={5000}
         onPurchase={vi.fn()}
         onEquip={vi.fn()}
       />
@@ -43,6 +45,7 @@ describe('CosmeticShop', () => {
       <CosmeticShop
         items={mockItems}
         playerCrystals={1000}
+        playerSoms={5000}
         onPurchase={vi.fn()}
         onEquip={vi.fn()}
       />
@@ -61,6 +64,7 @@ describe('CosmeticShop', () => {
       <CosmeticShop
         items={mockItems}
         playerCrystals={1000}
+        playerSoms={5000}
         onPurchase={onPurchase}
         onEquip={vi.fn()}
       />
@@ -77,6 +81,7 @@ describe('CosmeticShop', () => {
       <CosmeticShop
         items={mockItems}
         playerCrystals={10}
+        playerSoms={5000}
         onPurchase={vi.fn()}
         onEquip={vi.fn()}
       />
@@ -91,6 +96,7 @@ describe('CosmeticShop', () => {
       <CosmeticShop
         items={mockItems}
         playerCrystals={1000}
+        playerSoms={5000}
         onPurchase={vi.fn()}
         onEquip={vi.fn()}
       />

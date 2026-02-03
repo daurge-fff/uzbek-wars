@@ -4,6 +4,7 @@ import { GameDashboard } from './GameDashboard';
 
 const mockPlayerState = {
   characterId: 'char1',
+  cityId: 'samarkand',
   level: 5,
   experience: 450,
   experienceToNextLevel: 506,

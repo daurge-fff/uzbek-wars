@@ -44,6 +44,15 @@ body {
     -webkit-tap-highlight-color: transparent;
   }
   
+  /* Minimalist black background for dark theme */
+  .dark {
+    background-color: #000000;
+  }
+  
+  .dark body {
+    background-color: #000000;
+  }
+  
   /* Ensure touch targets are large enough */
   button, a {
     @apply min-h-touch min-w-touch;

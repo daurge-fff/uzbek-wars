@@ -11,7 +11,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 type OnboardingStep = 'name' | 'character' | 'city';
 
-// Simplified character carousel for onboarding
+// Character carousel - ТОЧНО КАК CitySelection
 const CharacterCarousel = ({ characters, onSelect }: { characters: any[], onSelect: (id: string) => void }) => {
   const { t, i18n } = useTranslation();
   const [[page, direction], setPage] = useState([0, 0]);
@@ -24,17 +24,24 @@ const CharacterCarousel = ({ characters, onSelect }: { characters: any[], onSele
   const characterIndex = wrap(0, characters.length, page);
   const currentCharacter = characters[characterIndex];
   
+  const swipeConfidenceThreshold = 5000;
+  const swipePower = (offset: number, velocity: number) => {
+    return Math.abs(offset) * velocity;
+  };
+  
   const paginate = (newDirection: number) => {
     setPage([page + newDirection, newDirection]);
   };
   
-  const handleDragEnd = (_e: any, info: { offset: { x: number }, velocity: { x: number } }) => {
-    const offset = info.offset.x;
-    const velocity = info.velocity.x;
-    
-    // Более чувствительная физика
-    if (Math.abs(velocity) > 300 || Math.abs(offset) > 50) {
-      if (velocity < 0 || offset < 0) {
+  const handleDragEnd = (_e: any, { offset, velocity }: { offset: { x: number }, velocity: { x: number } }) => {
+    const swipe = swipePower(offset.x, velocity.x);
+
+    if (swipe < -swipeConfidenceThreshold) {
+      paginate(1);
+    } else if (swipe > swipeConfidenceThreshold) {
+      paginate(-1);
+    } else if (Math.abs(offset.x) > 100) {
+      if (offset.x < 0) {
         paginate(1);
       } else {
         paginate(-1);
@@ -44,26 +51,53 @@ const CharacterCarousel = ({ characters, onSelect }: { characters: any[], onSele
   
   const variants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 300 : -300,
+      x: direction > 0 ? 1000 : -1000,
       opacity: 0,
-      scale: 0.8,
+      scale: 0.85,
+      rotateY: direction > 0 ? 25 : -25
     }),
     center: {
+      zIndex: 1,
       x: 0,
       opacity: 1,
       scale: 1,
+      rotateY: 0
     },
     exit: (direction: number) => ({
-      x: direction < 0 ? 300 : -300,
+      zIndex: 0,
+      x: direction < 0 ? 1000 : -1000,
       opacity: 0,
-      scale: 0.8,
+      scale: 0.85,
+      rotateY: direction < 0 ? 25 : -25
     })
   };
   
+  const getCharacterGradient = (characterId: string) => {
+    const gradients: Record<string, string> = {
+      char_merchant: 'from-yellow-100 via-amber-100 to-orange-100',
+      char_warrior: 'from-red-100 via-rose-100 to-pink-100',
+      char_scholar: 'from-blue-100 via-cyan-100 to-sky-100',
+      char_artisan: 'from-purple-100 via-violet-100 to-fuchsia-100',
+      char_chef: 'from-green-100 via-emerald-100 to-teal-100'
+    };
+    return gradients[characterId] || 'from-gray-100 via-slate-100 to-zinc-100';
+  };
+
+  const getCharacterEmoji = (characterId: string) => {
+    const emojis: Record<string, string> = {
+      char_merchant: '🤑',
+      char_warrior: '⚔️',
+      char_scholar: '📚',
+      char_artisan: '🎨',
+      char_chef: '👨‍🍳'
+    };
+    return emojis[characterId] || currentCharacter.avatar || '👤';
+  };
+  
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <div className="relative h-[450px] mb-6">
-        <AnimatePresence initial={false} custom={direction} mode="popLayout">
+    <div className="w-full max-w-sm mx-auto">
+      <div className="relative h-[520px] mb-8" style={{ perspective: '1200px' }}>
+        <AnimatePresence initial={false} custom={direction}>
           <motion.div
             key={page}
             custom={direction}
@@ -72,77 +106,126 @@ const CharacterCarousel = ({ characters, onSelect }: { characters: any[], onSele
             animate="center"
             exit="exit"
             transition={{
-              x: { type: 'spring', stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 },
-              scale: { duration: 0.2 }
+              x: { type: 'spring', stiffness: 500, damping: 40 },
+              opacity: { duration: 0.1 },
+              scale: { duration: 0.1 },
+              rotateY: { type: 'spring', stiffness: 500, damping: 40 }
             }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.3}
+            dragElastic={0.2}
             onDragEnd={handleDragEnd}
             className="absolute w-full cursor-grab active:cursor-grabbing"
+            style={{ touchAction: 'pan-y' }}
           >
-            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] p-8 shadow-2xl border border-gray-200 dark:border-gray-700">
-              <div className="w-full h-64 bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-[24px] mb-6 flex items-center justify-center">
+            <motion.div 
+              whileHover={{ scale: 1.02, y: -8 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 border-2 border-green-200 dark:border-green-700 transition-colors"
+            >
+              <div className={`w-full h-72 bg-gradient-to-br ${getCharacterGradient(currentCharacter.id)} dark:bg-gray-700 rounded-[24px] mb-6 flex flex-col items-center justify-center overflow-hidden shadow-inner relative transition-colors`}>
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                  className="text-9xl"
+                  transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
+                  className="text-9xl mb-4"
                 >
-                  {currentCharacter.avatar}
+                  {getCharacterEmoji(currentCharacter.id)}
                 </motion.div>
               </div>
-              <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3 text-center">
+
+              <motion.h2 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-3xl font-black text-gray-900 dark:text-white mb-3 text-center transition-colors"
+              >
                 {currentCharacter.name[i18n.language as keyof typeof currentCharacter.name] || currentCharacter.name.ru}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-center leading-relaxed">
-                {currentCharacter.description[i18n.language as keyof typeof currentCharacter.description] || currentCharacter.description.ru}
-              </p>
-            </div>
+              </motion.h2>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-3"
+              >
+                {currentCharacter.strengths && (
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 px-4 py-3 rounded-[16px] border border-green-200 dark:border-green-700 transition-colors">
+                    <div className="text-xs text-green-700 dark:text-green-300 font-bold mb-1">
+                      {t('character.strengths', 'Сильные стороны')}
+                    </div>
+                    <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                      {currentCharacter.strengths[i18n.language as keyof typeof currentCharacter.strengths] || currentCharacter.strengths.ru}
+                    </div>
+                  </div>
+                )}
+
+                {currentCharacter.weaknesses && (
+                  <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/30 dark:to-orange-900/30 px-4 py-3 rounded-[16px] border border-red-200 dark:border-red-700 transition-colors">
+                    <div className="text-xs text-red-700 dark:text-red-300 font-bold mb-1">
+                      {t('character.weaknesses', 'Слабые стороны')}
+                    </div>
+                    <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                      {currentCharacter.weaknesses[i18n.language as keyof typeof currentCharacter.weaknesses] || currentCharacter.weaknesses.ru}
+                    </div>
+                  </div>
+                )}
+
+                <p className="text-center text-xs text-gray-500 dark:text-gray-400 font-medium transition-colors pt-1">
+                  {currentCharacter.description[i18n.language as keyof typeof currentCharacter.description] || currentCharacter.description.ru}
+                </p>
+              </motion.div>
+            </motion.div>
           </motion.div>
         </AnimatePresence>
         
-        {/* Navigation arrows */}
-        <button
+        {/* Navigation arrows for desktop */}
+        <motion.button
           onClick={() => paginate(-1)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-16 w-12 h-12 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-full shadow-lg flex items-center justify-center text-2xl hover:scale-110 transition-transform"
+          whileHover={{ scale: 1.1, x: -4 }}
+          whileTap={{ scale: 0.9 }}
+          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 w-12 h-12 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-full shadow-lg items-center justify-center text-2xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 transition-colors border border-gray-100 dark:border-gray-700"
         >
           ←
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           onClick={() => paginate(1)}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-16 w-12 h-12 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-full shadow-lg flex items-center justify-center text-2xl hover:scale-110 transition-transform"
+          whileHover={{ scale: 1.1, x: 4 }}
+          whileTap={{ scale: 0.9 }}
+          className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 w-12 h-12 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-full shadow-lg items-center justify-center text-2xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 transition-colors border border-gray-100 dark:border-gray-700"
         >
           →
-        </button>
+        </motion.button>
       </div>
       
-      {/* Dots */}
-      <div className="flex justify-center gap-2 mb-6">
+      <div className="flex justify-center gap-2 mb-8">
         {characters.map((_, index) => (
-          <button
+          <motion.button
             key={index}
             onClick={() => {
               const newDirection = index > characterIndex ? 1 : -1;
               setPage([index, newDirection]);
             }}
-            className={`transition-all rounded-full ${
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+            className={`transition-all duration-300 rounded-full ${
               index === characterIndex 
-                ? 'w-10 h-3 bg-gradient-to-r from-indigo-500 to-purple-500' 
-                : 'w-3 h-3 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
+                ? 'w-10 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 shadow-md' 
+                : 'w-3 h-3 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
             }`}
+            aria-label={`Select character ${index + 1}`}
           />
         ))}
       </div>
       
-      {/* Confirm button */}
-      <button
+      <motion.button
         onClick={() => onSelect(currentCharacter.id)}
-        className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black text-lg rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+        whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(99, 102, 241, 0.3)' }}
+        whileTap={{ scale: 0.95 }}
+        className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black text-lg rounded-[24px] shadow-lg hover:shadow-xl transition-all"
       >
-        {t('ui.confirm', 'Подтвердить')}
-      </button>
+        {t('ui.continue', 'Продолжить')}
+      </motion.button>
     </div>
   );
 };
@@ -159,15 +242,25 @@ export const OnboardingFlow = () => {
   const [loading, setLoading] = useState(false);
   const [checkingUsername, setCheckingUsername] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [usernameError, setUsernameError] = useState<'taken' | 'invalid' | ''>('');
 
   useEffect(() => {
     // Load characters and cities
     loadCharacters();
     loadCities();
     
-    // Pre-fill with Google name if available
+    // Pre-fill with Google name if available, but clean it up
     if (user?.displayName) {
-      setDisplayName(user.displayName);
+      // Очищаем имя: убираем лишние пробелы, оставляем только допустимые символы
+      let cleanedName = user.displayName
+        .trim()
+        .replace(/\s{2,}/g, ' ') // Заменяем множественные пробелы на один
+        .replace(/[^a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ0-9\s-]/g, ''); // Убираем недопустимые символы
+      
+      // Если после очистки имя слишком короткое или состоит только из цифр, не заполняем
+      if (cleanedName.length >= 3 && !/^\d+$/.test(cleanedName)) {
+        setDisplayName(cleanedName);
+      }
     }
   }, [user]);
 
@@ -201,15 +294,51 @@ export const OnboardingFlow = () => {
       return;
     }
 
+    const trimmedName = username.trim();
+    
+    // Валидация перед проверкой на сервере
+    // Только цифры
+    if (/^\d+$/.test(trimmedName)) {
+      setUsernameAvailable(false);
+      setUsernameError('invalid'); // Помечаем как невалидное
+      return;
+    }
+    
+    // Только пробелы
+    if (/^\s+$/.test(trimmedName)) {
+      setUsernameAvailable(false);
+      setUsernameError('invalid');
+      return;
+    }
+    
+    // Два пробела подряд
+    if (/\s{2,}/.test(trimmedName)) {
+      setUsernameAvailable(false);
+      setUsernameError('invalid');
+      return;
+    }
+    
+    // Только буквы, цифры, пробелы и дефис (включая украинские и русские буквы)
+    if (!/^[a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ0-9\s-]+$/.test(trimmedName)) {
+      setUsernameAvailable(false);
+      setUsernameError('invalid');
+      return;
+    }
+
     setCheckingUsername(true);
+    setUsernameError('');
     try {
       const response = await axios.post(`${API_URL}/api/auth/check-username`, {
-        username
+        username: trimmedName
       });
       setUsernameAvailable(response.data.available);
+      if (!response.data.available) {
+        setUsernameError('taken'); // Помечаем как занятое
+      }
     } catch (error) {
       console.error('Failed to check username:', error);
       setUsernameAvailable(null);
+      setUsernameError('');
     } finally {
       setCheckingUsername(false);
     }
@@ -228,6 +357,33 @@ export const OnboardingFlow = () => {
 
     if (usernameAvailable === false) {
       toast.error(t('onboarding.nameTaken', 'Это имя уже занято'));
+      return;
+    }
+
+    // Дополнительная валидация
+    const trimmedName = displayName.trim();
+    
+    // Только цифры
+    if (/^\d+$/.test(trimmedName)) {
+      toast.error(t('validation.usernameOnlyNumbers', 'Имя не может состоять только из цифр'));
+      return;
+    }
+    
+    // Только пробелы
+    if (/^\s+$/.test(trimmedName)) {
+      toast.error(t('validation.usernameOnlySpaces', 'Имя не может состоять только из пробелов'));
+      return;
+    }
+    
+    // Два пробела подряд
+    if (/\s{2,}/.test(trimmedName)) {
+      toast.error(t('validation.usernameDoubleSpaces', 'Имя не может содержать два пробела подряд'));
+      return;
+    }
+    
+    // Только буквы, цифры, пробелы и дефис
+    if (!/^[a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ0-9\s-]+$/.test(trimmedName)) {
+      toast.error(t('validation.usernameInvalidChars', 'Только буквы, цифры, пробелы и дефис'));
       return;
     }
 
@@ -282,7 +438,7 @@ export const OnboardingFlow = () => {
   }, [displayName]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black flex items-center justify-center p-4">
       <AnimatePresence mode="wait">
         {step === 'name' && (
           <motion.div
@@ -330,13 +486,21 @@ export const OnboardingFlow = () => {
                       <span className="text-green-600 dark:text-green-400">
                         ✓ {t('onboarding.nameAvailable', 'Имя доступно')}
                       </span>
-                    ) : usernameAvailable === false ? (
+                    ) : usernameAvailable === false && usernameError === 'taken' ? (
                       <span className="text-red-600 dark:text-red-400">
-                        ✗ {t('onboarding.nameTaken', 'Имя занято')}
+                        ✗ {t('onboarding.nameTaken', 'Это имя уже занято')}
+                      </span>
+                    ) : usernameAvailable === false && usernameError === 'invalid' ? (
+                      <span className="text-red-600 dark:text-red-400">
+                        ✗ {t('onboarding.nameInvalid', 'Имя содержит недопустимые символы')}
                       </span>
                     ) : null}
                   </div>
                 )}
+                
+                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  {t('name.hint', '3-20 символов, буквы, цифры, пробелы и дефисы')}
+                </p>
               </div>
               
               <button
@@ -365,13 +529,9 @@ export const OnboardingFlow = () => {
               <p className="text-gray-600 dark:text-gray-300 mb-4">
                 {t('onboarding.characterDesc', 'Каждый персонаж имеет уникальные способности')}
               </p>
-              <motion.div
-                animate={{ x: [-10, 10, -10] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                className="text-4xl"
-              >
-                👈 👉
-              </motion.div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
+                {t('app.swipeHint', 'Свайпните влево или вправо')}
+              </p>
             </div>
             
             {characters.length > 0 ? (
@@ -399,8 +559,11 @@ export const OnboardingFlow = () => {
               <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
                 {t('onboarding.chooseCity', 'Выбери город')}
               </h2>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
                 {t('onboarding.cityDesc', 'Твой родной город на Великом Шёлковом пути')}
+              </p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
+                {t('app.swipeHint', 'Свайпните влево или вправо')}
               </p>
             </div>
             

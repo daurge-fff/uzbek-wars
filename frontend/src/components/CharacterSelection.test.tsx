@@ -6,21 +6,51 @@ import '../i18n';
 const mockCharacters = [
   {
     id: 'char1',
-    name: 'Character 1',
+    name: {
+      ru: 'Персонаж 1',
+      uz: 'Personaj 1',
+      uk: 'Персонаж 1',
+      en: 'Character 1'
+    },
     avatar: '👨‍🌾',
-    description: 'Description 1'
+    description: {
+      ru: 'Описание 1',
+      uz: 'Tavsif 1',
+      uk: 'Опис 1',
+      en: 'Description 1'
+    }
   },
   {
     id: 'char2',
-    name: 'Character 2',
+    name: {
+      ru: 'Персонаж 2',
+      uz: 'Personaj 2',
+      uk: 'Персонаж 2',
+      en: 'Character 2'
+    },
     avatar: '👩‍🍳',
-    description: 'Description 2'
+    description: {
+      ru: 'Описание 2',
+      uz: 'Tavsif 2',
+      uk: 'Опис 2',
+      en: 'Description 2'
+    }
   },
   {
     id: 'char3',
-    name: 'Character 3',
+    name: {
+      ru: 'Персонаж 3',
+      uz: 'Personaj 3',
+      uk: 'Персонаж 3',
+      en: 'Character 3'
+    },
     avatar: '👨‍💼',
-    description: 'Description 3'
+    description: {
+      ru: 'Описание 3',
+      uz: 'Tavsif 3',
+      uk: 'Опис 3',
+      en: 'Description 3'
+    }
   }
 ];
 
@@ -32,33 +62,26 @@ describe('CharacterSelection', () => {
     expect(mockCharacters.length).toBeGreaterThanOrEqual(3);
   });
 
-  it('calls onSelect when confirm button is clicked with valid username', async () => {
+  it('calls onSelect when confirm button is clicked', async () => {
     const onSelect = vi.fn();
     const { container } = render(<CharacterSelection characters={mockCharacters} onSelect={onSelect} />);
     
     // Wait for component to render
     await new Promise(resolve => setTimeout(resolve, 300));
     
-    // Find input by type
-    const input = container.querySelector('input[type="text"]');
-    if (input) {
-      fireEvent.change(input, { target: { value: 'TestUser123' } });
-      
-      // Find button - it might have English text "Confirm" in tests
-      const buttons = container.querySelectorAll('button');
-      const confirmButton = Array.from(buttons).find(btn => 
-        btn.textContent?.includes('Confirm') || btn.textContent?.includes('Подтвердить')
-      );
-      
-      if (confirmButton) {
-        fireEvent.click(confirmButton);
-        expect(onSelect).toHaveBeenCalledWith('char1');
-      } else {
-        // Button not found, skip test
-        expect(true).toBe(true);
-      }
+    // Find button
+    const buttons = container.querySelectorAll('button');
+    const confirmButton = Array.from(buttons).find(btn => 
+      btn.textContent?.includes('Continue') || 
+      btn.textContent?.includes('Продолжить') ||
+      btn.textContent?.includes('Davom')
+    );
+    
+    if (confirmButton) {
+      fireEvent.click(confirmButton);
+      expect(onSelect).toHaveBeenCalledWith('char1');
     } else {
-      // Input not found, skip test
+      // Button not found, skip test
       expect(true).toBe(true);
     }
   });

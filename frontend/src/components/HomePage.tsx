@@ -535,7 +535,7 @@ export function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black transition-colors duration-300 overflow-hidden">
       {/* Animated background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <motion.div

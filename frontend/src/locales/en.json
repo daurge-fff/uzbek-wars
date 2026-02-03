@@ -5,7 +5,9 @@
     "experience": "Experience",
     "enterUsername": "Enter character name",
     "usernamePlaceholder": "Your name",
-    "usernameHint": "6-20 characters: Russian/English letters, numbers, hyphen, space"
+    "usernameHint": "6-20 characters: Russian/English letters, numbers, hyphen, space",
+    "strengths": "Strengths",
+    "weaknesses": "Weaknesses"
   },
   "currency": {
     "soms": "soms",
@@ -77,7 +79,6 @@
   "cities": {
     "select": "Select City",
     "samarkand": "Samarkand",
-    "shymkent": "Shymkent",
     "tashkent": "Tashkent",
     "bukhara": "Bukhara",
     "players": "players",
@@ -382,6 +383,7 @@
     "nameMaxLength": "Name must be no more than 20 characters",
     "nameTaken": "This name is already taken",
     "nameAvailable": "Name available",
+    "nameInvalid": "Name contains invalid characters",
     "checking": "Checking...",
     "chooseCharacter": "Choose your character",
     "characterDesc": "Each character has unique abilities",

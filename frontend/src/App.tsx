@@ -8,7 +8,6 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -127,7 +126,7 @@ function AnimatedRoutes() {
             animate="animate"
             exit="exit"
             transition={pageTransition}
-            className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex items-center justify-center"
+            className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black flex items-center justify-center"
           >
             <LogoutPage />
           </motion.div>
@@ -139,7 +138,7 @@ function AnimatedRoutes() {
             animate="animate"
             exit="exit"
             transition={pageTransition}
-            className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex items-center justify-center p-4"
+            className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black flex items-center justify-center p-4"
           >
             <ReferralLanding />
           </motion.div>
@@ -210,7 +209,7 @@ function AnimatedRoutes() {
             animate="animate"
             exit="exit"
             transition={pageTransition}
-            className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900"
+            className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black"
           >
             <DonationModal
               isOpen={true}
@@ -374,7 +373,7 @@ const CosmeticShopWithData = () => {
   
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black">
         <div className="text-6xl animate-bounce">🛍️</div>
       </div>
     );
@@ -461,7 +460,7 @@ const InventoryWithData = () => {
   
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black">
         <div className="text-6xl animate-bounce">📦</div>
       </div>
     );
@@ -503,31 +502,24 @@ const LeaderboardWithData = () => {
 };
 
 const ReferralPanelWithData = () => {
-  const { player } = useAuth();
   const [referrals, setReferrals] = useState<any[]>([]);
   const [bonus, setBonus] = useState({ crystals: 0, soms: 0 });
-  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     const fetchReferrals = async () => {
       try {
-        setLoading(true);
         // TODO: GET /api/referrals
         setReferrals([]);
         setBonus({ crystals: 0, soms: 0 });
       } catch (error) {
         console.error('Failed to fetch referrals:', error);
-      } finally {
-        setLoading(false);
       }
     };
     
     fetchReferrals();
   }, []);
   
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  
-  const referralCode = player?.referralCode || 'LOADING';
+  const referralCode = 'LOADING';
   const referralLink = `${window.location.origin}/ref/${referralCode}`;
   
   return (
@@ -543,12 +535,10 @@ const ReferralPanelWithData = () => {
 const PlayerProfileWithData = () => {
   const { user, player } = useAuth();
   const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        setLoading(true);
         // TODO: GET /api/player/profile
         setStats({
           level: player?.level || 1,
@@ -562,23 +552,19 @@ const PlayerProfileWithData = () => {
         });
       } catch (error) {
         console.error('Failed to fetch profile:', error);
-      } finally {
-        setLoading(false);
       }
     };
     
     fetchProfile();
   }, [player]);
   
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  
   const playerInfo = {
     username: user?.displayName || 'Player',
     avatar: user?.avatar || '👤',
     characterName: player?.characterId || 'Newbie',
     cityName: player?.cityId || 'No city',
-    joinedDate: user?.createdAt || new Date().toISOString(),
-    referralCode: player?.referralCode || ''
+    joinedDate: new Date().toISOString(),
+    referralCode: ''
   };
   
   return (

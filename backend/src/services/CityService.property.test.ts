@@ -41,7 +41,7 @@ describe('Property 18: Балансировка городов', () => {
         // Generate array of 2-6 cities with random player counts and capacities
         fc.array(
           fc.record({
-            cityId: fc.constantFrom('samarkand', 'tashkent', 'bukhara', 'shymkent'),
+            cityId: fc.constantFrom('samarkand', 'tashkent', 'bukhara'),
             playerCount: fc.integer({ min: 0, max: 2000 }),
             maxPlayers: fc.integer({ min: 100, max: 1500 }),
             isOpen: fc.boolean()
@@ -167,7 +167,7 @@ describe('Property 18: Балансировка городов', () => {
     await fc.assert(
       fc.asyncProperty(
         fc.record({
-          cityId: fc.constantFrom('samarkand', 'tashkent', 'bukhara', 'shymkent'),
+          cityId: fc.constantFrom('samarkand', 'tashkent', 'bukhara'),
           maxPlayers: fc.integer({ min: 100, max: 1500 }),
           // Generate player count that is >= maxPlayers
           playerCountOffset: fc.integer({ min: 0, max: 500 })
@@ -252,7 +252,7 @@ describe('Property 18: Балансировка городов', () => {
     await fc.assert(
       fc.asyncProperty(
         fc.record({
-          cityId: fc.constantFrom('samarkand', 'tashkent', 'bukhara', 'shymkent'),
+          cityId: fc.constantFrom('samarkand', 'tashkent', 'bukhara'),
           maxPlayers: fc.integer({ min: 200, max: 1500 }),
           // Generate player count that is < maxPlayers
           fillPercentage: fc.integer({ min: 0, max: 99 })
@@ -309,7 +309,7 @@ describe('Property 18: Балансировка городов', () => {
         // Generate 2-4 cities all at or above capacity
         fc.array(
           fc.record({
-            cityId: fc.constantFrom('samarkand', 'tashkent', 'bukhara', 'shymkent'),
+            cityId: fc.constantFrom('samarkand', 'tashkent', 'bukhara'),
             maxPlayers: fc.integer({ min: 500, max: 1000 }),
             excessPlayers: fc.integer({ min: 0, max: 100 })
           }),
@@ -403,7 +403,7 @@ describe('Property 18: Балансировка городов', () => {
       fc.asyncProperty(
         fc.array(
           fc.record({
-            cityId: fc.constantFrom('samarkand', 'tashkent', 'bukhara', 'shymkent'),
+            cityId: fc.constantFrom('samarkand', 'tashkent', 'bukhara'),
             actualPlayerCount: fc.integer({ min: 0, max: 1500 }),
             maxPlayers: fc.integer({ min: 500, max: 1500 })
           }),

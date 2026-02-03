@@ -111,23 +111,7 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 p-4 overflow-hidden transition-colors duration-300">
-      <motion.h1 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-4xl font-black text-gray-900 dark:text-white mb-2 transition-colors"
-      >
-        {t('cities.select')}
-      </motion.h1>
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="text-gray-600 dark:text-gray-300 mb-8 font-medium transition-colors"
-      >
-        {t('app.swipeHint')}
-      </motion.p>
-
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4 overflow-hidden transition-colors duration-300">
       <div className="relative w-full max-w-sm h-[520px] mb-8" style={{ perspective: '1200px' }}>
         <AnimatePresence initial={false} custom={direction}>
           <motion.div

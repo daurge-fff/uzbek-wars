@@ -31,10 +31,9 @@ describe('Seed Script', () => {
       expect(CITIES.length).toBe(4);
     });
 
-    it('should include Samarkand, Shymkent, Tashkent, and Bukhara', () => {
+    it('should include Samarkand, Tashkent, and Bukhara', () => {
       const cityIds = CITIES.map((c) => c.cityId);
       expect(cityIds).toContain('samarkand');
-      expect(cityIds).toContain('shymkent');
       expect(cityIds).toContain('tashkent');
       expect(cityIds).toContain('bukhara');
     });
@@ -72,12 +71,10 @@ describe('Seed Script', () => {
   describe('City Theme Colors', () => {
     it('should have correct theme colors from design document', () => {
       const samarkand = CITIES.find((c) => c.cityId === 'samarkand');
-      const shymkent = CITIES.find((c) => c.cityId === 'shymkent');
       const tashkent = CITIES.find((c) => c.cityId === 'tashkent');
       const bukhara = CITIES.find((c) => c.cityId === 'bukhara');
 
       expect(samarkand?.theme.primaryColor).toBe('#4A90E2');
-      expect(shymkent?.theme.primaryColor).toBe('#E24A4A');
       expect(tashkent?.theme.primaryColor).toBe('#50C878');
       expect(bukhara?.theme.primaryColor).toBe('#DAA520');
     });
