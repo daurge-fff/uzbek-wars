@@ -9,7 +9,7 @@
  * - Combat effectiveness
  */
 
-import { CHARACTERS } from '../scripts/seed';
+import { ALL_CLASSES } from '../data/characters';
 
 /**
  * Character stat modifiers interface
@@ -53,9 +53,10 @@ export interface CharacterModifiers {
 
 /**
  * Gets character modifiers by character ID
+ * Searches across all tiers
  */
 export function getCharacterModifiers(characterId: string): CharacterModifiers {
-  const character = CHARACTERS.find(c => c.id === characterId);
+  const character = ALL_CLASSES.find(c => c.id === characterId);
   if (!character) {
     return {};
   }
@@ -237,9 +238,10 @@ export function getInventoryBonus(characterId: string): number {
 
 /**
  * Gets all character info including modifiers
+ * Searches across all tiers
  */
 export function getCharacterInfo(characterId: string) {
-  const character = CHARACTERS.find(c => c.id === characterId);
+  const character = ALL_CLASSES.find(c => c.id === characterId);
   if (!character) {
     return null;
   }

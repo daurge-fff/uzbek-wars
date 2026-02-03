@@ -7,7 +7,22 @@
     "usernamePlaceholder": "Ваше имя",
     "usernameHint": "6-20 символов: русские/английские буквы, цифры, дефис, пробел",
     "strengths": "Сильные стороны",
-    "weaknesses": "Слабые стороны"
+    "weaknesses": "Слабые стороны",
+    "changeClass": "Сменить класс",
+    "currentClass": "Текущий класс",
+    "availableClasses": "Доступные классы",
+    "lockedClasses": "Заблокированные классы",
+    "changeCost": "Стоимость смены",
+    "requiresLevel": "Требуется уровень {{level}}",
+    "tier1": "Стартовые классы",
+    "tier2": "Продвинутые классы",
+    "tier3": "Мастер-классы",
+    "confirmChange": "Подтвердить смену класса",
+    "changeSuccess": "Класс успешно изменен!",
+    "changeFailed": "Не удалось сменить класс",
+    "insufficientFunds": "Недостаточно средств",
+    "alreadyThisClass": "Вы уже используете этот класс",
+    "levelTooLow": "Недостаточный уровень"
   },
   "currency": {
     "soms": "сомов",

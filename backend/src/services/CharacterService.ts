@@ -13,7 +13,7 @@ import { User } from '../models/User';
 import { getCityById } from './CityService';
 import { getCharacterInfo } from './CharacterBonusService';
 import { logger } from '../utils/logger';
-import { CHARACTERS } from '../scripts/seed';
+import { CHARACTERS, ALL_CLASSES, STARTER_CLASSES, ADVANCED_CLASSES, MASTER_CLASSES } from '../data/characters';
 
 /**
  * Character definition with multilingual support
@@ -107,12 +107,13 @@ export function getCharacters() {
 
 /**
  * Validates character ID exists in available characters
+ * Checks across all tiers
  * 
  * @param characterId - Character ID to validate
  * @returns true if valid, false otherwise
  */
 export function isValidCharacter(characterId: string): boolean {
-  return CHARACTERS.some(char => char.id === characterId);
+  return ALL_CLASSES.some(char => char.id === characterId);
 }
 
 /**
@@ -290,5 +291,116 @@ export async function getPlayerByUserId(userId: string): Promise<IPlayer | null>
   } catch (error) {
     logger.error(`Error getting player for user ${userId}:`, error);
     throw new Error('Failed to retrieve player profile');
+  }
+}
+
+/**
+ * Gets all classes grouped by tier
+ * 
+ * @returns Object with classes grouped by tier
+ */
+export function getAllClassesByTier() {
+  return {
+    tier1: STARTER_CLASSES.map(char => ({
+      ...char,
+      modifiers: getCharacterInfo(char.id)?.modifiers || {},
+    })),
+    tier2: ADVANCED_CLASSES.map(char => ({
+      ...char,
+      modifiers: getCharacterInfo(char.id)?.modifiers || {},
+    })),
+    tier3: MASTER_CLASSES.map(char => ({
+      ...char,
+      modifiers: getCharacterInfo(char.id)?.modifiers || {},
+    })),
+  };
+}
+
+/**
+ * Gets available classes for a player based on their level
+ * 
+ * @param playerLevel - Current player level
+ * @returns Array of available classes
+ */
+export function getAvailableClasses(playerLevel: number) {
+  return ALL_CLASSES.filter(char => char.requiredLevel <= playerLevel).map(char => ({
+    ...char,
+    modifiers: getCharacterInfo(char.id)?.modifiers || {},
+  }));
+}
+
+/**
+ * Changes player's class
+ * 
+ * Requirements:
+ * - Player must meet level requirement for new class
+ * - Player must have 5000 soms + 100 crystals
+ * - Cannot change to same class
+ * 
+ * @param userId - User ID from authentication
+ * @param newCharacterId - New character class ID
+ * @returns Updated player profile
+ * @throws Error if validation fails
+ */
+export async function changeClass(userId: string, newCharacterId: string): Promise<IPlayer> {
+  try {
+    // Find player
+    const player = await Player.findOne({ userId });
+    if (!player) {
+      throw new Error('Player not found');
+    }
+    
+    // Check if trying to change to same class
+    if (player.characterId === newCharacterId) {
+      throw new Error('Already using this class');
+    }
+    
+    // Find new character class
+    const newClass = ALL_CLASSES.find(c => c.id === newCharacterId);
+    if (!newClass) {
+      throw new Error(`Invalid character class ID: ${newCharacterId}`);
+    }
+    
+    // Check level requirement
+    if (player.level < newClass.requiredLevel) {
+      throw new Error(
+        `Level ${newClass.requiredLevel} required. Current level: ${player.level}`
+      );
+    }
+    
+    // Check cost (5000 soms + 100 crystals)
+    const CHANGE_COST_SOMS = 5000;
+    const CHANGE_COST_CRYSTALS = 100;
+    
+    if (player.soms < CHANGE_COST_SOMS) {
+      throw new Error(
+        `Insufficient soms. Required: ${CHANGE_COST_SOMS}, Available: ${player.soms}`
+      );
+    }
+    
+    if (player.donationCurrency < CHANGE_COST_CRYSTALS) {
+      throw new Error(
+        `Insufficient crystals. Required: ${CHANGE_COST_CRYSTALS}, Available: ${player.donationCurrency}`
+      );
+    }
+    
+    // Deduct cost
+    player.soms -= CHANGE_COST_SOMS;
+    player.donationCurrency -= CHANGE_COST_CRYSTALS;
+    
+    // Change class
+    player.characterId = newCharacterId;
+    
+    await player.save();
+    
+    logger.info(
+      `Player ${player._id} changed class to ${newCharacterId} ` +
+      `(Level ${player.level}, Tier ${newClass.tier})`
+    );
+    
+    return player;
+  } catch (error) {
+    logger.error(`Error changing class for user ${userId}:`, error);
+    throw error;
   }
 }

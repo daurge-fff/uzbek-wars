@@ -7,7 +7,22 @@
     "usernamePlaceholder": "Your name",
     "usernameHint": "6-20 characters: Russian/English letters, numbers, hyphen, space",
     "strengths": "Strengths",
-    "weaknesses": "Weaknesses"
+    "weaknesses": "Weaknesses",
+    "changeClass": "Change Class",
+    "currentClass": "Current Class",
+    "availableClasses": "Available Classes",
+    "lockedClasses": "Locked Classes",
+    "changeCost": "Change Cost",
+    "requiresLevel": "Requires level {{level}}",
+    "tier1": "Starter Classes",
+    "tier2": "Advanced Classes",
+    "tier3": "Master Classes",
+    "confirmChange": "Confirm Class Change",
+    "changeSuccess": "Class changed successfully!",
+    "changeFailed": "Failed to change class",
+    "insufficientFunds": "Insufficient funds",
+    "alreadyThisClass": "Already using this class",
+    "levelTooLow": "Level too low"
   },
   "currency": {
     "soms": "soms",

@@ -13,6 +13,7 @@
 import { Player } from '../models/Player';
 import { CosmeticItem } from '../models/CosmeticItem';
 import { logger } from '../utils/logger';
+import { applyShopDiscount } from './CharacterBonusService';
 
 /**
  * Cosmetic purchase result
@@ -131,17 +132,20 @@ export async function purchaseCosmetic(
       };
     }
 
+    // Apply character class discount
+    const finalPrice = applyShopDiscount(cosmetic.price, player.characterId);
+    
     // Check if player has enough currency
-    if (player.donationCurrency < cosmetic.price) {
+    if (player.donationCurrency < finalPrice) {
       return {
         success: false,
         remainingCurrency: player.donationCurrency,
-        error: `Insufficient crystals. Required: ${cosmetic.price}, Available: ${player.donationCurrency}`
+        error: `Insufficient crystals. Required: ${finalPrice}, Available: ${player.donationCurrency}`
       };
     }
 
     // Deduct currency
-    player.donationCurrency -= cosmetic.price;
+    player.donationCurrency -= finalPrice;
 
     // Add item to collection
     if (cosmetic.type === 'clothing') {

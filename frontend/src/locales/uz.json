@@ -7,7 +7,22 @@
     "usernamePlaceholder": "Sizning ismingiz",
     "usernameHint": "6-20 belgi: rus/ingliz harflari, raqamlar, defis, bo'sh joy",
     "strengths": "Kuchli tomonlar",
-    "weaknesses": "Zaif tomonlar"
+    "weaknesses": "Zaif tomonlar",
+    "changeClass": "Sinfni o'zgartirish",
+    "currentClass": "Joriy sinf",
+    "availableClasses": "Mavjud sinflar",
+    "lockedClasses": "Yopiq sinflar",
+    "changeCost": "O'zgartirish narxi",
+    "requiresLevel": "{{level}} daraja talab qilinadi",
+    "tier1": "Boshlang'ich sinflar",
+    "tier2": "Ilg'or sinflar",
+    "tier3": "Usta sinflar",
+    "confirmChange": "Sinf o'zgarishini tasdiqlash",
+    "changeSuccess": "Sinf muvaffaqiyatli o'zgartirildi!",
+    "changeFailed": "Sinfni o'zgartirib bo'lmadi",
+    "insufficientFunds": "Mablag' yetarli emas",
+    "alreadyThisClass": "Siz allaqachon bu sinfdan foydalanyapsiz",
+    "levelTooLow": "Daraja juda past"
   },
   "currency": {
     "soms": "so'm",

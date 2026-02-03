@@ -7,7 +7,22 @@
     "usernamePlaceholder": "Ваше ім'я",
     "usernameHint": "6-20 символів: російські/англійські літери, цифри, дефіс, пробіл",
     "strengths": "Сильні сторони",
-    "weaknesses": "Слабкі сторони"
+    "weaknesses": "Слабкі сторони",
+    "changeClass": "Змінити клас",
+    "currentClass": "Поточний клас",
+    "availableClasses": "Доступні класи",
+    "lockedClasses": "Заблоковані класи",
+    "changeCost": "Вартість зміни",
+    "requiresLevel": "Потрібен рівень {{level}}",
+    "tier1": "Стартові класи",
+    "tier2": "Просунуті класи",
+    "tier3": "Майстер-класи",
+    "confirmChange": "Підтвердити зміну класу",
+    "changeSuccess": "Клас успішно змінено!",
+    "changeFailed": "Не вдалося змінити клас",
+    "insufficientFunds": "Недостатньо коштів",
+    "alreadyThisClass": "Ви вже використовуєте цей клас",
+    "levelTooLow": "Недостатній рівень"
   },
   "currency": {
     "soms": "сомів",

@@ -694,4 +694,168 @@ router.put(
   }
 );
 
+/**
+ * POST /api/player/change-class
+ * 
+ * Changes player's character class
+ * 
+ * Requirements:
+ * - Player must meet level requirement for new class
+ * - Cost: 5000 soms + 100 crystals
+ * - Cannot change to same class
+ * 
+ * Request body:
+ *   - characterId: New character class ID (required)
+ * 
+ * Response:
+ *   - player: Updated player profile
+ *   - message: Success message
+ * 
+ * Error responses:
+ *   - 400: Invalid class, insufficient funds, or level too low
+ *   - 401: Not authenticated
+ *   - 404: Player not found
+ *   - 500: Server error
+ */
+router.post(
+  '/change-class',
+  authenticate,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        res.status(401).json({
+          error: 'User not authenticated',
+          code: 'UNAUTHORIZED'
+        });
+        return;
+      }
+      
+      const { characterId } = req.body;
+      
+      if (!characterId) {
+        res.status(400).json({
+          error: 'Character ID is required',
+          code: 'MISSING_CHARACTER_ID'
+        });
+        return;
+      }
+      
+      // Change class
+      const { changeClass } = await import('../services/CharacterService');
+      const player = await changeClass(userId, characterId);
+      
+      res.status(200).json({
+        player,
+        message: 'Class changed successfully'
+      });
+    } catch (error) {
+      logger.error('Change class endpoint error:', error);
+      
+      if (error instanceof Error) {
+        if (error.message.includes('not found')) {
+          res.status(404).json({
+            error: 'Player not found',
+            code: 'PLAYER_NOT_FOUND',
+            message: error.message
+          });
+          return;
+        }
+        
+        if (error.message.includes('same class')) {
+          res.status(400).json({
+            error: 'Already using this class',
+            code: 'SAME_CLASS',
+            message: error.message
+          });
+          return;
+        }
+        
+        if (error.message.includes('Invalid character')) {
+          res.status(400).json({
+            error: 'Invalid character class',
+            code: 'INVALID_CLASS',
+            message: error.message
+          });
+          return;
+        }
+        
+        if (error.message.includes('Level') || error.message.includes('required')) {
+          res.status(400).json({
+            error: 'Level requirement not met',
+            code: 'LEVEL_TOO_LOW',
+            message: error.message
+          });
+          return;
+        }
+        
+        if (error.message.includes('Insufficient')) {
+          res.status(400).json({
+            error: 'Insufficient funds',
+            code: 'INSUFFICIENT_FUNDS',
+            message: error.message
+          });
+          return;
+        }
+      }
+      
+      res.status(500).json({
+        error: 'Failed to change class',
+        code: 'CLASS_CHANGE_FAILED',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+);
+
+/**
+ * GET /api/player/available-classes
+ * 
+ * Gets all classes available to the player based on their level
+ */
+router.get(
+  '/available-classes',
+  authenticate,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        res.status(401).json({
+          error: 'User not authenticated',
+          code: 'UNAUTHORIZED'
+        });
+        return;
+      }
+      
+      const player = await Player.findOne({ userId });
+      if (!player) {
+        res.status(404).json({ error: 'Player not found' });
+        return;
+      }
+      
+      const { getAvailableClasses, getAllClassesByTier } = await import('../services/CharacterService');
+      
+      res.status(200).json({
+        currentClass: player.characterId,
+        currentLevel: player.level,
+        availableClasses: getAvailableClasses(player.level),
+        allClassesByTier: getAllClassesByTier(),
+        changeCost: {
+          soms: 5000,
+          crystals: 100
+        }
+      });
+    } catch (error) {
+      logger.error('Get available classes endpoint error:', error);
+      res.status(500).json({
+        error: 'Failed to get available classes',
+        code: 'FETCH_FAILED',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+);
+
 export default router;

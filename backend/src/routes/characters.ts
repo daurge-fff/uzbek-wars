@@ -3,11 +3,12 @@
  * 
  * Handles character-related endpoints:
  * - GET /api/characters - Retrieve all available characters
+ * - GET /api/characters/by-tier - Retrieve characters grouped by tier
  * - POST /api/player/select-character - Select character and city during registration
  */
 
 import { Router, Request, Response } from 'express';
-import { getCharacters } from '../services/CharacterService';
+import { getCharacters, getAllClassesByTier } from '../services/CharacterService';
 import { logger } from '../utils/logger';
 
 const router = Router();
@@ -60,6 +61,31 @@ router.get('/', (_req: Request, res: Response): void => {
     logger.error('Characters endpoint error:', error);
     res.status(500).json({
       error: 'Failed to retrieve characters',
+      code: 'CHARACTERS_FETCH_FAILED',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+/**
+ * GET /api/characters/by-tier
+ * 
+ * Retrieves all characters grouped by tier
+ * 
+ * Response:
+ *   - tier1: Starter classes (Level 1+)
+ *   - tier2: Advanced classes (Level 20+)
+ *   - tier3: Master classes (Level 50+)
+ */
+router.get('/by-tier', (_req: Request, res: Response): void => {
+  try {
+    const classesByTier = getAllClassesByTier();
+    
+    res.status(200).json(classesByTier);
+  } catch (error) {
+    logger.error('Characters by tier endpoint error:', error);
+    res.status(500).json({
+      error: 'Failed to retrieve characters by tier',
       code: 'CHARACTERS_FETCH_FAILED',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
