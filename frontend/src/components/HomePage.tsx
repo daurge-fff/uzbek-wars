@@ -570,7 +570,7 @@ export function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black transition-colors duration-300 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black transition-colors duration-300 overflow-hidden pb-32">
       {/* Animated background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -713,13 +713,49 @@ export function HomePage() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5, type: 'spring' }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => navigate('/dashboard')}
-              className="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-black text-xl rounded-full shadow-2xl hover:shadow-3xl transition-all mb-12 inline-flex items-center gap-3"
+              className="relative group overflow-hidden mb-12"
             >
-              <span className="text-3xl">🎮</span>
-              {t('home.continuePlaying', 'Продолжить игру')}
+              {/* Gradient border wrapper */}
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-[28px] p-[2px]">
+                <div className="absolute inset-[2px] bg-white dark:bg-gray-900 rounded-[26px]" />
+              </div>
+              
+              {/* Button content */}
+              <div className="relative px-10 py-5 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-500/20 dark:via-purple-500/20 dark:to-pink-500/20 backdrop-blur-xl rounded-[26px] flex items-center gap-4">
+                {/* Animated gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-purple-500/20 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[26px]" />
+                
+                {/* Icon */}
+                <motion.div
+                  animate={{ rotate: [0, -10, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                  className="relative text-4xl"
+                >
+                  🎮
+                </motion.div>
+                
+                {/* Text */}
+                <div className="relative">
+                  <div className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold mb-1">
+                    {t('app.name')}
+                  </div>
+                  <div className="text-xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
+                    {t('home.continuePlaying', 'Продолжить игру')}
+                  </div>
+                </div>
+                
+                {/* Arrow */}
+                <motion.div
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className="relative text-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent"
+                >
+                  →
+                </motion.div>
+              </div>
             </motion.button>
           )}
         </motion.div>

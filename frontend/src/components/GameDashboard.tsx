@@ -50,7 +50,6 @@ interface GameDashboardProps {
   userAvatar?: string;
   currentActivity?: {
     activityId: string;
-    activityName: string;
     startTime: number;
     endTime: number;
   } | null;
@@ -363,10 +362,8 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
   };
 
   const getActivityName = (activity: Activity): string => {
-    if (typeof activity.name === 'object') {
-      return activity.name[i18n.language as keyof typeof activity.name] || activity.name.ru;
-    }
-    return activity.name;
+    // Всегда используем перевод из локалей по ID активности
+    return t(`activities.${activity.id}`);
   };
 
   const getActivityDescription = (activity: Activity): string => {
@@ -606,19 +603,27 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   </motion.button>
 
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-yellow-400/30 to-orange-500/30 border border-yellow-400/50 shadow-sm flex-1">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-yellow-400/30 to-orange-500/30 border border-yellow-400/50 shadow-sm hover:shadow-md transition-all flex-1"
+                    >
                       <span className="text-base">💰</span>
                       <span className="text-gray-900 dark:text-white font-black text-[11px] whitespace-nowrap">
                         {playerState.soms.toLocaleString()}
                       </span>
-                    </div>
+                    </motion.button>
 
-                    <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-cyan-400/30 to-blue-500/30 border border-cyan-400/50 shadow-sm">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-cyan-400/30 to-blue-500/30 border border-cyan-400/50 shadow-sm hover:shadow-md transition-all"
+                    >
                       <span className="text-base">💎</span>
                       <span className="text-gray-900 dark:text-white font-black text-[11px]">
                         {playerState.donationCurrency}
                       </span>
-                    </div>
+                    </motion.button>
                   </div>
                 </div>
               </div>
@@ -749,35 +754,35 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       <span className="text-xs">💪</span>
                     </div>
                     <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.strength}</span>
-                    <span className="text-[8px] text-gray-600 dark:text-gray-400 font-bold uppercase">{t('stats.strength', 'Сила')}</span>
+                    <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.strength', 'Сила')}</span>
                   </div>
                   <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
                     <div className="absolute -top-2 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center shadow-md">
                       <span className="text-xs">🛡️</span>
                     </div>
                     <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.defense}</span>
-                    <span className="text-[8px] text-gray-600 dark:text-gray-400 font-bold uppercase">{t('stats.defense', 'Захист')}</span>
+                    <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.defense', 'Защита')}</span>
                   </div>
                   <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
                     <div className="absolute -top-2 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center shadow-md">
                       <span className="text-xs">⚡</span>
                     </div>
                     <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.agility}</span>
-                    <span className="text-[8px] text-gray-600 dark:text-gray-400 font-bold uppercase">{t('stats.agility', 'Спритн.')}</span>
+                    <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.agility', 'Ловкость')}</span>
                   </div>
                   <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
                     <div className="absolute -top-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow-md">
                       <span className="text-xs">❤️</span>
                     </div>
                     <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.stamina}</span>
-                    <span className="text-[8px] text-gray-600 dark:text-gray-400 font-bold uppercase">{t('stats.stamina', 'Витрив.')}</span>
+                    <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.stamina', 'Выносливость')}</span>
                   </div>
                   <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
                     <div className="absolute -top-2 w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center shadow-md">
                       <span className="text-xs">🧠</span>
                     </div>
                     <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.intelligence}</span>
-                    <span className="text-[8px] text-gray-600 dark:text-gray-400 font-bold uppercase">{t('stats.intelligence', 'Інтел.')}</span>
+                    <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.intelligence', 'Интеллект')}</span>
                   </div>
                 </div>
               </motion.div>
@@ -860,7 +865,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   <div className="flex-1 min-w-0">
                     <div className="text-xs opacity-80 font-semibold mb-1">🎯 {t('dashboard.currentActivity')}</div>
                     <div className="text-base font-bold truncate">
-                      {t(`activities.${currentActivity.activityId}`, currentActivity.activityName)}
+                      {t(`activities.${currentActivity.activityId}`)}
                     </div>
                   </div>
                   

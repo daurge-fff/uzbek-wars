@@ -38,13 +38,11 @@
   "activities": {
     "title": "Faoliyatlar",
     "work_svyaznoy": "Svyaznoida ishlash",
-    "rob": "O'g'irlash",
-    "catch_criminals": "Jinoyatchilarni ushlash",
+    "rob": "Talon-taroj qilish",
     "cook_plov": "Osh pishirish",
     "trade_bazaar": "Bozorda savdo qilish",
     "rest": "Dam olish",
-    "eat": "Ovqatlanish",
-    "bake_samsa": "Somsa pishirish"
+    "eat": "Ovqatlanish"
   },
   "notifications": {
     "level_up": "Tabriklaymiz! Siz {{level}} darajaga yetdingiz!",

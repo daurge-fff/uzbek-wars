@@ -74,7 +74,7 @@ export const ActivityCard = ({ activity, playerLevel, isAvailable, onExecute }: 
       }`}
     >
       <div className="text-4xl mb-2">{activity.icon}</div>
-      <h3 className="text-sm font-black text-gray-900 mb-1">{activity.name}</h3>
+      <h3 className="text-sm font-black text-gray-900 mb-1">{t(`activities.${activity.id}`)}</h3>
       <p className="text-xs text-gray-600 mb-2 font-medium">{activity.description}</p>
 
       <div className="flex justify-between text-xs mb-2">

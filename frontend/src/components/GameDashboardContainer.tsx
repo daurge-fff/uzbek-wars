@@ -98,7 +98,6 @@ export const GameDashboardContainer = () => {
         // Преобразуем данные с сервера в нужный формат
         setCurrentActivity({
           activityId: activity.activityId || activity.id,
-          activityName: activity.activityName || activity.name || 'Активность',
           startTime: startTime,
           endTime: endTime
         });
@@ -199,13 +198,12 @@ export const GameDashboardContainer = () => {
       const startTime = endTime - (durationSeconds * 1000);
       
       // Переводим название активности на текущий язык
-      const translatedActivityName = t(`activities.${activityId}`, activityName);
+      const translatedActivityName = t(`activities.${activityId}`);
       toast.success(t('notifications.activityStarted', { activity: translatedActivityName }));
       
       // Обновляем текущую активность
       setCurrentActivity({
         activityId,
-        activityName: translatedActivityName,
         startTime,
         endTime
       });
@@ -224,9 +222,8 @@ export const GameDashboardContainer = () => {
         const match = message.match(/Wait (\d+) seconds/);
         if (match) {
           const seconds = parseInt(match[1]);
-          const activity = activities.find(a => a.id === activityId);
           setCooldownInfo({
-            activityName: activity?.name?.ru || 'Активность',
+            activityName: t(`activities.${activityId}`),
             seconds
           });
           return;

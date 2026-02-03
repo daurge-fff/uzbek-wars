@@ -81,7 +81,7 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4 pb-32">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Profile Card */}
         <motion.div

@@ -205,7 +205,6 @@ router.get(
           res.status(200).json({
             activity: {
               activityId: player.currentActivity,
-              activityName: player.currentActivityName || 'Активность',
               startTime: startTime.getTime(),
               endTime: endTime.getTime()
             }
@@ -306,12 +305,9 @@ router.post(
       const startTime = new Date();
       const endTime = new Date(startTime.getTime() + durationSeconds * 1000);
 
-      // Получаем название активности на русском
-      const activityName = activity.name.ru;
-
-      // Сохраняем активность
+      // Сохраняем активность (только ID, название берется на фронте из локалей)
       player.currentActivity = activityId;
-      player.currentActivityName = activityName;
+      player.currentActivityName = undefined; // Не сохраняем название, используем только ID
       player.currentActivityStartTime = startTime;
       player.currentActivityEndTime = endTime;
       await player.save();
@@ -321,8 +317,7 @@ router.post(
       res.status(200).json({
         message: 'Activity started',
         durationSeconds,
-        endTime: endTime.getTime(),
-        activityName
+        endTime: endTime.getTime()
       });
     } catch (error) {
       logger.error('Error performing activity:', error);

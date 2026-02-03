@@ -111,7 +111,7 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4 overflow-hidden transition-colors duration-300">
+    <div className="flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4 pb-32 overflow-hidden transition-colors duration-300">
       <div className="relative w-full max-w-sm h-[490px]" style={{ perspective: '1200px' }}>
         <AnimatePresence initial={false} custom={direction}>
           <motion.div
