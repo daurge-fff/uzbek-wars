@@ -114,7 +114,7 @@ export async function authenticateWithGoogle(
   profile: GoogleProfile,
   ipAddress: string,
   deviceInfo: DeviceInfo,
-  referralCode?: string
+  _referralCode?: string
 ): Promise<AuthResult> {
   try {
     // Check if user already exists
@@ -188,8 +188,11 @@ export async function authenticateWithGoogle(
  * 
  * Awards bonus currency and soms to the player who invited new user.
  * Only processes if referral code is valid and belongs to existing player.
+ * 
+ * @deprecated Currently not used, but kept for future implementation
  */
-async function handleReferralBonus(referralCode: string, _newPlayerCity: string): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function _handleReferralBonus(referralCode: string, _newPlayerCity: string): Promise<void> {
   try {
     const referrer = await Player.findOne({ referralCode });
     

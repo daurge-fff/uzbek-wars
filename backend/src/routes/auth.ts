@@ -353,45 +353,42 @@ router.post(
     }
 
     // Check if username exists in Player collection (case-insensitive)
-    // We only check players that have completed onboarding (have real displayName set)
+    // We only check players that have completed onboarding (have real username set)
     const Player = (await import('../models/Player')).Player;
     
     // First, let's see all players
-    const allPlayers = await Player.find({}).select('displayName characterId cityId');
+    const allPlayers = await Player.find({}).select('userId characterId cityId');
     logger.info(`Total players in DB: ${allPlayers.length}`);
     allPlayers.forEach(p => {
-      logger.info(`  - Player: displayName="${p.displayName}", characterId="${p.characterId}", cityId="${p.cityId}"`);
+      logger.info(`  - Player: userId="${p.userId}", characterId="${p.characterId}", cityId="${p.cityId}"`);
     });
     
-    // Find players with valid displayName (not null, not empty, not "undefined" string)
-    const playersWithNames = await Player.find({
-      displayName: { $exists: true }
+    // Find players with valid characterId (completed onboarding)
+    const playersWithCharacters = await Player.find({
+      characterId: { $exists: true, $ne: 'default' }
     });
     
-    // Filter in JavaScript to handle "undefined" string and check name match
-    const existingPlayer = playersWithNames.find(p => {
-      const pName = p.displayName;
-      // Skip if displayName is null, undefined, empty, or string "undefined"
-      if (!pName || pName === '' || pName === 'undefined') {
-        return false;
-      }
-      // Check if names match (case-insensitive)
-      return pName.toLowerCase() === normalizedUsername;
+    // Get User model to check displayNames
+    const User = (await import('../models/User')).User;
+    
+    // Check if any user has this displayName
+    const existingUser = await User.findOne({
+      displayName: { $regex: new RegExp(`^${normalizedUsername}$`, 'i') }
     });
 
-    logger.info(`Search result: ${existingPlayer ? 'FOUND' : 'NOT FOUND'}`);
-    if (existingPlayer) {
-      logger.info(`Existing player: displayName="${existingPlayer.displayName}", ID=${existingPlayer._id}`);
+    logger.info(`Search result: ${existingUser ? 'FOUND' : 'NOT FOUND'}`);
+    if (existingUser) {
+      logger.info(`Existing user: displayName="${existingUser.displayName}", ID=${existingUser._id}`);
     }
     logger.info(`=== End username check ===`);
 
-    res.json({ 
-      available: !existingPlayer,
-      message: existingPlayer ? 'Username already taken' : 'Username available'
+    return res.json({ 
+      available: !existingUser,
+      message: existingUser ? 'Username already taken' : 'Username available'
     });
   } catch (error) {
     logger.error('Check username error:', error);
-    res.status(500).json({ 
+    return res.status(500).json({ 
       available: false, 
       error: 'Failed to check username' 
     });
