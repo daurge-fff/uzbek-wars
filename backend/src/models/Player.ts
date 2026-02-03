@@ -19,9 +19,27 @@ export interface IPlayerCosmetics {
   clothing: string[];
   backgrounds: string[];
   accessories: string[];
+  backpacks: string[];
+  consumables: string[];
   activeClothing?: string;
   activeBackground?: string;
   activeAccessory?: string;
+  activeBackpack?: string;
+  // Equipment slots for clothing
+  equippedHead?: string;
+  equippedBody?: string;
+  equippedFeet?: string;
+}
+
+/**
+ * Player inventory system
+ */
+export interface IPlayerInventory {
+  items: Array<{
+    itemId: string;
+    quantity: number;
+  }>;
+  maxSlots: number;
 }
 
 /**
@@ -38,6 +56,7 @@ export interface IPlayer extends Document {
   donationCurrency: number;
   stats: IPlayerStats;
   cosmetics: IPlayerCosmetics;
+  inventory: IPlayerInventory;
   referralCode: string;
   referredBy?: string;
   lastActivityTime: Date;
@@ -123,9 +142,28 @@ const PlayerSchema = new Schema<IPlayer>(
       clothing: [{ type: String }],
       backgrounds: [{ type: String }],
       accessories: [{ type: String }],
+      backpacks: [{ type: String }],
+      consumables: [{ type: String }],
       activeClothing: { type: String },
       activeBackground: { type: String },
       activeAccessory: { type: String },
+      activeBackpack: { type: String },
+      equippedHead: { type: String },
+      equippedBody: { type: String },
+      equippedFeet: { type: String },
+    },
+    inventory: {
+      items: [
+        {
+          itemId: { type: String, required: true },
+          quantity: { type: Number, required: true, min: 1 },
+        },
+      ],
+      maxSlots: {
+        type: Number,
+        default: 20,
+        min: 1,
+      },
     },
     referralCode: {
       type: String,

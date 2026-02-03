@@ -11,13 +11,23 @@ export interface ICityName {
 }
 
 /**
+ * Localized city description in all supported languages
+ */
+export interface ICityDescription {
+  ru: string;
+  uz: string;
+  uk: string;
+  en: string;
+}
+
+/**
  * Visual theme configuration for the city
  * Each city has unique aesthetics
  */
 export interface ICityTheme {
   primaryColor: string;
   backgroundImage: string;
-  description: string;
+  description: ICityDescription;
 }
 
 /**
@@ -66,7 +76,12 @@ const CitySchema = new Schema<ICity>({
   theme: {
     primaryColor: { type: String },
     backgroundImage: { type: String },
-    description: { type: String },
+    description: {
+      ru: { type: String },
+      uz: { type: String },
+      uk: { type: String },
+      en: { type: String },
+    },
   },
 });
 

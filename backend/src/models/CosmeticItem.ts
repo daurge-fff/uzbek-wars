@@ -2,9 +2,24 @@ import { Schema, model, Document } from 'mongoose';
 
 /**
  * Cosmetic item type
- * Determines where the item can be equipped
+ * Determines where the item can be equipped or how it can be used
  */
-export type CosmeticType = 'clothing' | 'background';
+export type CosmeticType = 'clothing' | 'background' | 'backpack' | 'consumable';
+
+/**
+ * Equipment slot for clothing items
+ */
+export type EquipmentSlot = 'head' | 'body' | 'feet' | 'backpack' | 'accessory';
+
+/**
+ * Consumable item category
+ */
+export type ConsumableCategory = 'food' | 'drink' | 'medicine';
+
+/**
+ * Price currency type
+ */
+export type PriceCurrency = 'soms' | 'crystals';
 
 /**
  * Cosmetic item rarity
@@ -33,23 +48,48 @@ export interface ICosmeticDescription {
 }
 
 /**
+ * Item bonus effects (for backpacks and special items)
+ */
+export interface IItemBonus {
+  inventorySlots?: number;
+  incomeBonus?: number;
+  sellBonus?: number;
+}
+
+/**
+ * Consumable item effects (stat restoration)
+ */
+export interface IConsumableEffects {
+  hunger?: number;
+  health?: number;
+  mood?: number;
+  energy?: number;
+}
+
+/**
  * CosmeticItem document interface
  * Represents purchasable cosmetic items (no gameplay impact)
+ * and consumable items (can be used to restore stats)
  */
 export interface ICosmeticItem extends Document {
   itemId: string;
   type: CosmeticType;
+  slot?: EquipmentSlot;
+  category?: ConsumableCategory;
   name: ICosmeticName;
   description: ICosmeticDescription;
   price: number;
+  priceCurrency?: PriceCurrency;
   imageUrl: string;
   rarity: CosmeticRarity;
+  bonus?: IItemBonus;
+  effects?: IConsumableEffects;
 }
 
 /**
  * CosmeticItem schema for MongoDB
- * Stores cosmetic items purchasable with donation currency
- * These items provide no gameplay advantage (cosmetic only)
+ * Stores cosmetic items purchasable with donation currency or soms
+ * These items provide no gameplay advantage (cosmetic only) or can be consumed
  */
 const CosmeticItemSchema = new Schema<ICosmeticItem>({
   itemId: {
@@ -60,8 +100,16 @@ const CosmeticItemSchema = new Schema<ICosmeticItem>({
   },
   type: {
     type: String,
-    enum: ['clothing', 'background'],
+    enum: ['clothing', 'background', 'backpack', 'consumable'],
     required: true,
+  },
+  slot: {
+    type: String,
+    enum: ['head', 'body', 'feet', 'backpack', 'accessory'],
+  },
+  category: {
+    type: String,
+    enum: ['food', 'drink', 'medicine'],
   },
   name: {
     ru: { type: String, required: true },
@@ -78,7 +126,12 @@ const CosmeticItemSchema = new Schema<ICosmeticItem>({
   price: {
     type: Number,
     required: true,
-    min: 0, // Price in donation currency (crystals)
+    min: 0,
+  },
+  priceCurrency: {
+    type: String,
+    enum: ['soms', 'crystals'],
+    default: 'crystals',
   },
   imageUrl: {
     type: String,
@@ -88,6 +141,17 @@ const CosmeticItemSchema = new Schema<ICosmeticItem>({
     type: String,
     enum: ['common', 'rare', 'epic', 'legendary'],
     default: 'common',
+  },
+  bonus: {
+    inventorySlots: { type: Number },
+    incomeBonus: { type: Number },
+    sellBonus: { type: Number },
+  },
+  effects: {
+    hunger: { type: Number },
+    health: { type: Number },
+    mood: { type: Number },
+    energy: { type: Number },
   },
 });
 
