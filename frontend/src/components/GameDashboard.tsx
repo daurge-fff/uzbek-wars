@@ -476,7 +476,9 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="text-xs opacity-80 font-semibold mb-1">🎯 {t('dashboard.currentActivity')}</div>
-                    <div className="text-base font-bold truncate">{currentActivity.activityName}</div>
+                    <div className="text-base font-bold truncate">
+                      {t(`activities.${currentActivity.activityId}`, currentActivity.activityName)}
+                    </div>
                   </div>
                   
                   {/* Timer */}

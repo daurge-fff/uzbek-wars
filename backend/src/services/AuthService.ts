@@ -182,34 +182,6 @@ export async function authenticateWithGoogle(
     throw error;
   }
 }
-
-/**
- * Handles referral bonus for inviter
- * 
- * Awards bonus currency and soms to the player who invited new user.
- * Only processes if referral code is valid and belongs to existing player.
- * 
- * @deprecated Currently not used, but kept for future implementation
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function _handleReferralBonus(referralCode: string, _newPlayerCity: string): Promise<void> {
-  try {
-    const referrer = await Player.findOne({ referralCode });
-    
-    if (referrer) {
-      // Award referral bonuses
-      referrer.donationCurrency += 50; // 50 crystals
-      referrer.soms += 500; // 500 soms
-      await referrer.save();
-
-      logger.info(`Referral bonus awarded to player: ${referrer._id}`);
-    }
-  } catch (error) {
-    // Don't fail registration if referral bonus fails
-    logger.error('Failed to process referral bonus:', error);
-  }
-}
-
 /**
  * Authenticates developer in development mode
  * 

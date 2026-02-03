@@ -634,7 +634,7 @@ function App() {
 // Wrapper component for Settings with i18n
 const SettingsWithI18n = () => {
   const { i18n } = useTranslation();
-  const { player, token } = useAuth();
+  const { player, token, user } = useAuth();
   const [appStats, setAppStats] = useState<any>(null);
   
   useEffect(() => {
@@ -664,10 +664,35 @@ const SettingsWithI18n = () => {
     fetchAppStats();
   }, [token, player?.cityId]);
   
+  const handleLanguageChange = async (lang: 'ru' | 'uz' | 'uk' | 'en') => {
+    // Change language in i18n
+    i18n.changeLanguage(lang);
+    
+    // Save to backend
+    if (token) {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        await axios.patch(
+          `${API_URL}/api/player/language`,
+          { language: lang },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
+        // Update user in localStorage
+        if (user) {
+          const updatedUser = { ...user, language: lang };
+          localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+        }
+      } catch (error) {
+        console.error('Failed to save language:', error);
+      }
+    }
+  };
+  
   return (
     <Settings
       currentLanguage={i18n.language as 'ru' | 'uz' | 'uk' | 'en'}
-      onLanguageChange={(lang) => i18n.changeLanguage(lang)}
+      onLanguageChange={handleLanguageChange}
       soundEnabled={true}
       onSoundToggle={() => console.log('Toggle sound')}
       musicEnabled={true}

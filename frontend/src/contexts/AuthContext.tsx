@@ -7,6 +7,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 interface User {
   id: string;
@@ -53,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [player, setPlayer] = useState<Player | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { i18n } = useTranslation();
 
   // Load auth state from localStorage on mount
   useEffect(() => {
@@ -61,16 +63,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const storedPlayer = localStorage.getItem('auth_player');
 
     if (storedToken && storedUser && storedPlayer) {
+      const parsedUser = JSON.parse(storedUser);
       setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+      setUser(parsedUser);
       setPlayer(JSON.parse(storedPlayer));
       
       // Set axios default header
       axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+      
+      // Sync language from user profile
+      if (parsedUser.language && ['ru', 'uz', 'uk', 'en'].includes(parsedUser.language)) {
+        i18n.changeLanguage(parsedUser.language);
+      }
     }
     
     setIsLoading(false);
-  }, []);
+  }, [i18n]);
 
   const login = (newToken: string, newUser: User, newPlayer: Player) => {
     setToken(newToken);
@@ -84,6 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     // Set axios default header
     axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+    
+    // Sync language from user profile
+    if (newUser.language && ['ru', 'uz', 'uk', 'en'].includes(newUser.language)) {
+      i18n.changeLanguage(newUser.language);
+    }
   };
 
   const logout = () => {
