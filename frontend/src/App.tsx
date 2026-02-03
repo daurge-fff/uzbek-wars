@@ -30,6 +30,7 @@ import { ReferralLanding } from './components/ReferralLanding';
 import { FontLoader } from './components/FontLoader';
 import { TermsOfService } from './components/TermsOfService';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { OnboardingFlow } from './components/OnboardingFlow';
 import { cosmeticItems } from './data/cosmeticItems';
 
 const queryClient = new QueryClient({
@@ -95,6 +96,18 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/onboarding" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="relative"
+          >
+            <OnboardingFlow />
+          </motion.div>
+        } />
         <Route path="/dashboard" element={
           <motion.div
             variants={pageVariants}

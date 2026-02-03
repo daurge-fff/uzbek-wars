@@ -19,6 +19,7 @@ import { CHARACTERS } from '../scripts/seed';
  */
 export interface ICharacter {
   id: string;
+  avatar: string;
   name: {
     ru: string;
     uz: string;

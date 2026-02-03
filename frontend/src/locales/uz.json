@@ -192,6 +192,7 @@
     "unequip": "Yechish"
   },
   "menu": {
+    "title": "O'yin bo'limlari",
     "home": "Bosh sahifa",
     "leaderboard": "Reyting",
     "leaderboardDesc": "Top o'yinchilar",
@@ -361,6 +362,26 @@
     "starOnGithub": "Agar o'yin yoqsa - GitHub'da ⭐ qo'ying",
     "tagline": "Buyuk Ipak yo'lining afsonasiga aylaning",
     "startAdventure": "Sarguzashtni boshlash"
+  },
+  "onboarding": {
+    "welcome": "Xush kelibsiz!",
+    "enterName": "Ismingiz nima?",
+    "namePlaceholder": "Ismingizni kiriting",
+    "nameMinLength": "Ism kamida 3 ta belgidan iborat bo'lishi kerak",
+    "nameMaxLength": "Ism ko'pi bilan 20 ta belgidan iborat bo'lishi kerak",
+    "nameTaken": "Bu ism allaqachon band",
+    "nameAvailable": "Ism mavjud",
+    "checking": "Tekshirilmoqda...",
+    "chooseCharacter": "Personajni tanlang",
+    "characterDesc": "Har bir personajning o'ziga xos qobiliyatlari bor",
+    "loadingCharacters": "Personajlar yuklanmoqda...",
+    "chooseCity": "Shaharni tanlang",
+    "cityDesc": "Buyuk Ipak yo'lidagi ona shahringiz",
+    "loadingCities": "Shaharlar yuklanmoqda...",
+    "complete": "O'yinga xush kelibsiz!",
+    "error": "Ro'yxatdan o'tish xatosi",
+    "loadCharactersError": "Personajlarni yuklash amalga oshmadi",
+    "loadCitiesError": "Shaharlarni yuklash amalga oshmadi"
   },
   "leaderboard": {
     "title": "Reyting",

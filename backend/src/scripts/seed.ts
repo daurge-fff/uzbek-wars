@@ -17,6 +17,7 @@ import { logger } from '../utils/logger';
 const CHARACTERS = [
   {
     id: 'char_merchant',
+    avatar: '🧔',
     name: {
       ru: 'Торговец Азиз',
       uz: 'Savdogar Aziz',
@@ -32,6 +33,7 @@ const CHARACTERS = [
   },
   {
     id: 'char_craftsman',
+    avatar: '👨‍🔧',
     name: {
       ru: 'Мастер Рустам',
       uz: 'Usta Rustam',
@@ -47,6 +49,7 @@ const CHARACTERS = [
   },
   {
     id: 'char_student',
+    avatar: '👨‍🎓',
     name: {
       ru: 'Студент Фарход',
       uz: 'Talaba Farhod',
@@ -62,6 +65,7 @@ const CHARACTERS = [
   },
   {
     id: 'char_chef',
+    avatar: '👨‍🍳',
     name: {
       ru: 'Повар Шавкат',
       uz: 'Oshpaz Shavkat',

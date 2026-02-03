@@ -371,6 +371,26 @@
     "tagline": "Become a legend of the Great Silk Road",
     "startAdventure": "Start Adventure"
   },
+  "onboarding": {
+    "welcome": "Welcome!",
+    "enterName": "What's your name?",
+    "namePlaceholder": "Enter your name",
+    "nameMinLength": "Name must be at least 3 characters",
+    "nameMaxLength": "Name must be no more than 20 characters",
+    "nameTaken": "This name is already taken",
+    "nameAvailable": "Name available",
+    "checking": "Checking...",
+    "chooseCharacter": "Choose your character",
+    "characterDesc": "Each character has unique abilities",
+    "loadingCharacters": "Loading characters...",
+    "chooseCity": "Choose your city",
+    "cityDesc": "Your home city on the Great Silk Road",
+    "loadingCities": "Loading cities...",
+    "complete": "Welcome to the game!",
+    "error": "Registration error",
+    "loadCharactersError": "Failed to load characters",
+    "loadCitiesError": "Failed to load cities"
+  },
   "leaderboard": {
     "title": "Leaderboard",
     "global": "Global",

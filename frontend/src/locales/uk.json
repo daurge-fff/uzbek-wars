@@ -193,6 +193,7 @@
     "unequip": "Зняти"
   },
   "menu": {
+    "title": "Розділи гри",
     "home": "Головна",
     "leaderboard": "Рейтинг",
     "leaderboardDesc": "Топ гравців",
@@ -362,6 +363,26 @@
     "starOnGithub": "Якщо подобається гра - поставте ⭐ на GitHub",
     "tagline": "Стань легендою Великого Шовкового шляху",
     "startAdventure": "Почати пригоду"
+  },
+  "onboarding": {
+    "welcome": "Ласкаво просимо!",
+    "enterName": "Як тебе звати?",
+    "namePlaceholder": "Введи своє ім'я",
+    "nameMinLength": "Ім'я має бути мінімум 3 символи",
+    "nameMaxLength": "Ім'я має бути максимум 20 символів",
+    "nameTaken": "Це ім'я вже зайняте",
+    "nameAvailable": "Ім'я доступне",
+    "checking": "Перевірка...",
+    "chooseCharacter": "Обери персонажа",
+    "characterDesc": "Кожен персонаж має унікальні здібності",
+    "loadingCharacters": "Завантаження персонажів...",
+    "chooseCity": "Обери місто",
+    "cityDesc": "Твоє рідне місто на Великому Шовковому шляху",
+    "loadingCities": "Завантаження міст...",
+    "complete": "Ласкаво просимо до гри!",
+    "error": "Помилка реєстрації",
+    "loadCharactersError": "Не вдалося завантажити персонажів",
+    "loadCitiesError": "Не вдалося завантажити міста"
   },
   "leaderboard": {
     "title": "Рейтинг",

@@ -492,7 +492,15 @@ export function HomePage() {
       
       const { token, user, player } = response.data;
       login(token, user, player);
-      navigate('/dashboard');
+      
+      // Check if player needs onboarding (character/city selection)
+      if (player && (player.characterId === 'default' || player.cityId === 'default')) {
+        // New user needs to complete onboarding
+        navigate('/onboarding');
+      } else {
+        // Existing user, go to dashboard
+        navigate('/dashboard');
+      }
     } catch (error) {
       console.error('Login failed:', error);
       toast.error(t('auth.loginError', 'Ошибка входа'));
