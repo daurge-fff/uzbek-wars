@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { CombatStatsModal } from './CombatStatsModal';
 
 interface PlayerState {
   characterId: string;
@@ -144,6 +145,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
   const [hoveredStat, setHoveredStat] = useState<string | null>(null);
   const [characterModifiers, setCharacterModifiers] = useState<any>(null);
   const [shakingStat, setShakingStat] = useState<string | null>(null);
+  const [showCombatStats, setShowCombatStats] = useState(false);
 
   // Загружаем модификаторы класса при монтировании
   useEffect(() => {
@@ -532,12 +534,13 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   />
                 </div>
 
-                <div className="flex items-stretch gap-1.5">
+                <div className="grid grid-cols-2 gap-1.5">
+                  {/* Первая строка - класс и статы */}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => window.location.href = '/classes'}
-                    className="relative flex items-center gap-1.5 px-2 rounded-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 dark:from-purple-500/30 dark:to-pink-500/30 border border-purple-400/50 dark:border-purple-500/50 hover:border-purple-500 dark:hover:border-purple-400 transition-all shadow-sm hover:shadow-md"
+                    className="relative flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 dark:from-purple-500/30 dark:to-pink-500/30 border border-purple-400/50 dark:border-purple-500/50 hover:border-purple-500 dark:hover:border-purple-400 transition-all shadow-sm hover:shadow-md"
                   >
                     <span className="text-base">{getCharacterEmoji(playerState.characterId)}</span>
                     <span className="text-gray-900 dark:text-white font-bold text-[11px] whitespace-nowrap">
@@ -550,25 +553,40 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     </div>
                   </motion.button>
                   
-                  <div className="flex items-center gap-1 px-2 rounded-lg bg-gradient-to-r from-blue-500/20 to-cyan-500/20 dark:from-blue-500/30 dark:to-cyan-500/30 border border-blue-400/50 dark:border-blue-500/50 shadow-sm">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setShowCombatStats(true)}
+                    className="relative flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-gradient-to-r from-red-500/20 to-orange-500/20 dark:from-red-500/30 dark:to-orange-500/30 border border-red-400/50 dark:border-red-500/50 hover:border-red-500 dark:hover:border-red-400 transition-all shadow-sm hover:shadow-md"
+                  >
+                    <span className="text-base">⚔️</span>
+                    <span className="text-gray-900 dark:text-white font-bold text-[11px] whitespace-nowrap">
+                      {t('stats.title', 'Статы')}
+                    </span>
+                  </motion.button>
+                  
+                  {/* Вторая строка - город и валюты */}
+                  <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-blue-500/20 to-cyan-500/20 dark:from-blue-500/30 dark:to-cyan-500/30 border border-blue-400/50 dark:border-blue-500/50 shadow-sm">
                     <span className="text-base">🏙️</span>
                     <span className="text-gray-900 dark:text-white font-bold text-[11px] whitespace-nowrap">
                       {getCityName(playerState.cityId)}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1 px-2 rounded-lg bg-gradient-to-r from-yellow-400/30 to-orange-500/30 border border-yellow-400/50 shadow-sm ml-auto">
-                    <span className="text-base">💰</span>
-                    <span className="text-gray-900 dark:text-white font-black text-[11px] whitespace-nowrap">
-                      {playerState.soms.toLocaleString()}
-                    </span>
-                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-yellow-400/30 to-orange-500/30 border border-yellow-400/50 shadow-sm flex-1">
+                      <span className="text-base">💰</span>
+                      <span className="text-gray-900 dark:text-white font-black text-[11px] whitespace-nowrap">
+                        {playerState.soms.toLocaleString()}
+                      </span>
+                    </div>
 
-                  <div className="flex items-center gap-1 px-2 rounded-lg bg-gradient-to-r from-cyan-400/30 to-blue-500/30 border border-cyan-400/50 shadow-sm">
-                    <span className="text-base">💎</span>
-                    <span className="text-gray-900 dark:text-white font-black text-[11px]">
-                      {playerState.donationCurrency}
-                    </span>
+                    <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-cyan-400/30 to-blue-500/30 border border-cyan-400/50 shadow-sm">
+                      <span className="text-base">💎</span>
+                      <span className="text-gray-900 dark:text-white font-black text-[11px]">
+                        {playerState.donationCurrency}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1222,6 +1240,18 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
     </AnimatePresence>,
     document.body
   )}
+
+      {/* Combat Stats Modal */}
+      <CombatStatsModal 
+        isOpen={showCombatStats} 
+        onClose={() => setShowCombatStats(false)}
+        onStatsUpdated={() => {
+          // Reload player data if needed
+          if (onActivityComplete) {
+            onActivityComplete();
+          }
+        }}
+      />
     </div>
   );
 };

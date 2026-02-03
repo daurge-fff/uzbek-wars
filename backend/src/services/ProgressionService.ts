@@ -13,6 +13,7 @@
 
 import { IPlayer } from '../models/Player';
 import { logger } from '../utils/logger';
+import { awardStatPointsOnLevelUp } from './CombatStatsService';
 
 /**
  * Minimal player interface for progression calculations
@@ -135,8 +136,17 @@ export function processLevelUp(player: IPlayerProgression): number {
     levelUpResult = checkLevelUp(player);
   }
   
-  if (levelsGained > 1 && player._id) {
-    logger.info(`Player ${player._id} gained ${levelsGained} levels in one operation`);
+  if (levelsGained > 0) {
+    // Award stat points for level ups (5 points per level)
+    if (player._id) {
+      awardStatPointsOnLevelUp(player._id.toString(), levelsGained).catch(error => {
+        logger.error('Failed to award stat points on level up:', error);
+      });
+    }
+    
+    if (levelsGained > 1 && player._id) {
+      logger.info(`Player ${player._id} gained ${levelsGained} levels in one operation`);
+    }
   }
   
   return levelsGained;

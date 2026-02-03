@@ -82,7 +82,6 @@ const ClassHall: React.FC<ClassHallProps> = ({
   const fetchPlayerData = async () => {
     try {
       if (!token) {
-        console.log('No token found');
         return;
       }
       
@@ -98,7 +97,6 @@ const ClassHall: React.FC<ClassHallProps> = ({
       }
       
       const data = await response.json();
-      console.log('Player data loaded:', data);
       if (data.player) {
         setCurrentClass(data.player.characterId);
         setCurrentLevel(data.player.level);

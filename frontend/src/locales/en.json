@@ -382,6 +382,10 @@
     "somsLabel": "Soms - game currency",
     "crystalsLabel": "Crystals - donation currency"
   },
+  "levelUp": {
+    "statPointsHint": "Distribute points in combat stats!",
+    "keepGoing": "Keep it up! You're getting stronger!"
+  },
   "stats": {
     "hunger": "Hunger",
     "health": "Health",
@@ -394,7 +398,29 @@
     "hungerLow": "Need to eat urgently!",
     "healthLow": "Health is running out!",
     "moodLow": "Bad mood!",
-    "energyLow": "Need rest!"
+    "energyLow": "Need rest!",
+    "title": "Combat Stats",
+    "availablePoints": "Available Points",
+    "combatPower": "Combat Power",
+    "strength": "Strength",
+    "defense": "Defense",
+    "agility": "Agility",
+    "stamina": "Stamina",
+    "intelligence": "Intelligence",
+    "luck": "Luck",
+    "strengthDesc": "Physical attack",
+    "defenseDesc": "Damage reduction",
+    "agilityDesc": "Dodge and crits",
+    "staminaDesc": "Maximum health",
+    "intelligenceDesc": "Magic power",
+    "luckDesc": "Affects all +10% to power",
+    "allocated": "Point allocated!",
+    "allocationFailed": "Failed to allocate point",
+    "confirmReset": "Reset all stats for 100 crystals?",
+    "resetSuccess": "Stats reset!",
+    "resetFailed": "Failed to reset stats",
+    "reset": "Reset (100)",
+    "secret": "Secret"
   },
   "back": "Back",
   "about": {

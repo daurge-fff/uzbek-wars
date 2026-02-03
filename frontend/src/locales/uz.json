@@ -83,7 +83,29 @@
     "hungerLow": "Zudlik bilan ovqatlanish kerak!",
     "healthLow": "Salomatlik tugayapti!",
     "moodLow": "Yomon kayfiyat!",
-    "energyLow": "Dam olish kerak!"
+    "energyLow": "Dam olish kerak!",
+    "title": "Jang Statistikasi",
+    "availablePoints": "Mavjud ochkolar",
+    "combatPower": "Jang kuchi",
+    "strength": "Kuch",
+    "defense": "Himoya",
+    "agility": "Chaqqonlik",
+    "stamina": "Chidamlilik",
+    "intelligence": "Aql",
+    "luck": "Omad",
+    "strengthDesc": "Jismoniy hujum",
+    "defenseDesc": "Zarar kamaytirish",
+    "agilityDesc": "Qochish va kritlar",
+    "staminaDesc": "Maksimal salomatlik",
+    "intelligenceDesc": "Sehrli kuch",
+    "luckDesc": "Hammaga ta'sir qiladi +10% kuchga",
+    "allocated": "Ochko taqsimlandi!",
+    "allocationFailed": "Ochkoni taqsimlab bo'lmadi",
+    "confirmReset": "Barcha statistikani 100 kristall uchun tiklash?",
+    "resetSuccess": "Statistika tiklandi!",
+    "resetFailed": "Statistikani tiklab bo'lmadi",
+    "reset": "Tiklash (100)",
+    "secret": "Sir"
   },
   "ui": {
     "loading": "Yuklanmoqda...",
@@ -387,6 +409,10 @@
     "changes": "O'zgarishlar:",
     "somsLabel": "So'm - o'yin valyutasi",
     "crystalsLabel": "Kristallar - donat valyutasi"
+  },
+  "levelUp": {
+    "statPointsHint": "Jang statistikasida ochkolarni taqsimlang!",
+    "keepGoing": "Davom eting! Siz kuchliroq bo'lyapsiz!"
   },
   "back": "Orqaga",
   "about": {

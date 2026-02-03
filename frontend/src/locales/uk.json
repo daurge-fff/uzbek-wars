@@ -83,7 +83,29 @@
     "hungerLow": "Терміново треба поїсти!",
     "healthLow": "Здоров'я на межі!",
     "moodLow": "Поганий настрій!",
-    "energyLow": "Потрібен відпочинок!"
+    "energyLow": "Потрібен відпочинок!",
+    "title": "Бойові Стати",
+    "availablePoints": "Доступно очок",
+    "combatPower": "Бойова міць",
+    "strength": "Сила",
+    "defense": "Захист",
+    "agility": "Спритність",
+    "stamina": "Витривалість",
+    "intelligence": "Інтелект",
+    "luck": "Удача",
+    "strengthDesc": "Фізична атака",
+    "defenseDesc": "Зниження шкоди",
+    "agilityDesc": "Ухилення та крити",
+    "staminaDesc": "Максимальне здоров'я",
+    "intelligenceDesc": "Магічна сила",
+    "luckDesc": "Впливає на все +10% до міці",
+    "allocated": "Очко розподілено!",
+    "allocationFailed": "Не вдалося розподілити очко",
+    "confirmReset": "Скинути всі стати за 100 кристалів?",
+    "resetSuccess": "Стати скинуто!",
+    "resetFailed": "Не вдалося скинути стати",
+    "reset": "Скидання (100)",
+    "secret": "Секрет"
   },
   "ui": {
     "loading": "Завантаження...",
@@ -388,6 +410,10 @@
     "changes": "Зміни:",
     "somsLabel": "Соми - ігрова валюта",
     "crystalsLabel": "Кристали - донатна валюта"
+  },
+  "levelUp": {
+    "statPointsHint": "Розподіліть очки в бойових статах!",
+    "keepGoing": "Продовжуй! Ти стаєш сильнішим!"
   },
   "back": "Назад",
   "about": {

@@ -12,6 +12,20 @@ export interface IPlayerStats {
 }
 
 /**
+ * Combat statistics for PvP and city battles
+ * Used for arena fights and city wars
+ */
+export interface IPlayerCombatStats {
+  strength: number;      // Physical attack power (0-100)
+  defense: number;       // Physical damage reduction (0-100)
+  agility: number;       // Dodge/crit chance (0-100)
+  stamina: number;       // Max health points (0-100)
+  intelligence: number;  // Magic power/resistance (0-100)
+  luck: number;          // Secret stat, affects all (0-1, default 0)
+  statPoints: number;    // Available points to distribute
+}
+
+/**
  * Cosmetic items owned and equipped by the player
  * Purchased with soms or donation currency (crystals)
  */
@@ -55,6 +69,7 @@ export interface IPlayer extends Document {
   soms: number;
   donationCurrency: number;
   stats: IPlayerStats;
+  combatStats: IPlayerCombatStats;
   cosmetics: IPlayerCosmetics;
   inventory: IPlayerInventory;
   referralCode: string;
@@ -138,6 +153,49 @@ const PlayerSchema = new Schema<IPlayer>(
         max: 100,
       },
     },
+    combatStats: {
+      strength: {
+        type: Number,
+        default: 10,
+        min: 0,
+        max: 100,
+      },
+      defense: {
+        type: Number,
+        default: 10,
+        min: 0,
+        max: 100,
+      },
+      agility: {
+        type: Number,
+        default: 10,
+        min: 0,
+        max: 100,
+      },
+      stamina: {
+        type: Number,
+        default: 10,
+        min: 0,
+        max: 100,
+      },
+      intelligence: {
+        type: Number,
+        default: 10,
+        min: 0,
+        max: 100,
+      },
+      luck: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 1,
+      },
+      statPoints: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+    },
     cosmetics: {
       clothing: [{ type: String }],
       backgrounds: [{ type: String }],
@@ -204,5 +262,12 @@ PlayerSchema.index({ cityId: 1, level: -1, experience: -1 }); // City leaderboar
 PlayerSchema.index({ soms: -1, level: -1 }); // Soms leaderboard
 PlayerSchema.index({ donationCurrency: -1, level: -1 }); // Crystals leaderboard
 PlayerSchema.index({ referredBy: 1 }); // Referral leaderboard
+
+// Combat stats indexes for PvP matchmaking
+PlayerSchema.index({ 
+  'combatStats.strength': 1, 
+  'combatStats.defense': 1, 
+  'combatStats.agility': 1 
+}); // Combat power index
 
 export const Player = model<IPlayer>('Player', PlayerSchema);

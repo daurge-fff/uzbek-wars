@@ -197,12 +197,14 @@ export const GameDashboardContainer = () => {
       // Вычисляем startTime на основе endTime и duration
       const startTime = endTime - (durationSeconds * 1000);
       
-      toast.success(t('notifications.activityStarted', { activity: activityName }));
+      // Переводим название активности на текущий язык
+      const translatedActivityName = t(`activities.${activityId}`, activityName);
+      toast.success(t('notifications.activityStarted', { activity: translatedActivityName }));
       
       // Обновляем текущую активность
       setCurrentActivity({
         activityId,
-        activityName,
+        activityName: translatedActivityName,
         startTime,
         endTime
       });
