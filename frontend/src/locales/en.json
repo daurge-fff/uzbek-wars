@@ -241,7 +241,9 @@
     "loading": "Loading...",
     "back": "Back",
     "confirm": "Confirm",
-    "have": "You have"
+    "have": "You have",
+    "minutes": "min",
+    "seconds": "sec"
   },
   "name": {
     "title": "What's your name?",
@@ -356,7 +358,7 @@
     "locked": "Lvl.",
     "noMoney": "No money",
     "startActivity": "Start this activity?",
-    "takesTime": "This will take approximately 5-10 minutes",
+    "takesTime": "Duration",
     "start": "Start!",
     "cancel": "Cancel",
     "levelTooLow": "Not enough experience",

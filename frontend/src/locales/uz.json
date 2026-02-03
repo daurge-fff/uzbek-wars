@@ -247,7 +247,9 @@
     "loading": "Yuklanmoqda...",
     "back": "Orqaga",
     "confirm": "Tasdiqlash",
-    "have": "Sizda"
+    "have": "Sizda",
+    "minutes": "daq",
+    "seconds": "son"
   },
   "name": {
     "title": "Ismingiz nima?",
@@ -362,7 +364,7 @@
     "locked": "Dar.",
     "noMoney": "Pul yo'q",
     "startActivity": "Ushbu harakatni boshlaysizmi?",
-    "takesTime": "Bu taxminan 5-10 daqiqa davom etadi",
+    "takesTime": "Davomiyligi",
     "start": "Boshlash!",
     "cancel": "Bekor qilish",
     "levelTooLow": "Tajriba yetarli emas",

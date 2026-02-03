@@ -141,6 +141,36 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
   const [warningActivity, setWarningActivity] = useState<Activity | null>(null);
   const [hoveredStat, setHoveredStat] = useState<string | null>(null);
 
+  // Применяем модификаторы класса к значениям активности
+  const applyClassModifiers = (activity: Activity) => {
+    if (!activity.rewards) return activity;
+
+    // Получаем модификаторы (в реальности нужно получать с сервера)
+    // Пока просто возвращаем базовые значения
+    const modifiedActivity = { ...activity };
+    
+    if (modifiedActivity.rewards) {
+      modifiedActivity.rewards = {
+        experience: Math.round(activity.rewards.experience),
+        soms: Math.round(activity.rewards.soms),
+      };
+    }
+
+    if (modifiedActivity.statModifiers) {
+      const newModifiers: any = {};
+      Object.entries(modifiedActivity.statModifiers).forEach(([key, value]) => {
+        newModifiers[key] = Math.round(value as number);
+      });
+      modifiedActivity.statModifiers = newModifiers;
+    }
+
+    if (modifiedActivity.duration) {
+      modifiedActivity.duration = Math.round(activity.duration || 0);
+    }
+
+    return modifiedActivity;
+  };
+
   // Блокировка скролла когда открыта модалка
   useEffect(() => {
     if (selectedActivity || showLevelWarning) {
@@ -833,7 +863,16 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       {/* Activity Confirmation Modal - ПОРТАЛ В ЦЕНТР ЭКРАНА */}
       {createPortal(
         <AnimatePresence>
-          {selectedActivity && (
+          {selectedActivity && (() => {
+            const modifiedActivity = applyClassModifiers(selectedActivity);
+            const duration = modifiedActivity.duration || 0;
+            const minutes = Math.floor(duration / 60);
+            const seconds = duration % 60;
+            const timeText = minutes > 0 
+              ? `${minutes} ${t('common.minutes', 'хв')}${seconds > 0 ? ` ${seconds} ${t('common.seconds', 'с')}` : ''}`
+              : `${seconds} ${t('common.seconds', 'с')}`;
+
+            return (
             <>
               <motion.div
                 initial={{ opacity: 0 }}
@@ -884,7 +923,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 )}
 
                 <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-5 mb-6 space-y-3 border border-indigo-200 dark:border-indigo-800">
-                  {selectedActivity.rewards && (
+                  {modifiedActivity.rewards && (
                     <>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-700 dark:text-gray-300 font-bold flex items-center gap-2">
@@ -892,7 +931,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                           <span>{t('activity.experience')}:</span>
                         </span>
                         <span className="text-xl font-black text-green-600 dark:text-green-400">
-                          +{selectedActivity.rewards.experience} XP
+                          +{modifiedActivity.rewards.experience} XP
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
@@ -901,29 +940,29 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                           <span>{t('activity.soms')}:</span>
                         </span>
                         <span className="text-xl font-black text-yellow-600 dark:text-yellow-400">
-                          +{selectedActivity.rewards.soms}
+                          +{modifiedActivity.rewards.soms}
                         </span>
                       </div>
                     </>
                   )}
                   
-                  {selectedActivity.cost && (
+                  {modifiedActivity.cost && (
                     <div className="flex justify-between items-center pt-3 border-t border-indigo-200 dark:border-indigo-700">
                       <span className="text-sm text-gray-700 dark:text-gray-300 font-bold flex items-center gap-2">
                         <span className="text-xl">💸</span>
                         <span>{t('dashboard.cost')}:</span>
                       </span>
                       <span className="text-xl font-black text-red-600 dark:text-red-400">
-                        -{selectedActivity.cost}
+                        -{modifiedActivity.cost}
                       </span>
                     </div>
                   )}
 
-                  {selectedActivity.statModifiers && Object.keys(selectedActivity.statModifiers).length > 0 && (
+                  {modifiedActivity.statModifiers && Object.keys(modifiedActivity.statModifiers).length > 0 && (
                     <div className="pt-3 border-t border-indigo-200 dark:border-indigo-700">
                       <div className="text-xs text-gray-600 dark:text-gray-400 mb-2 font-bold">{t('dashboard.statChanges')}</div>
                       <div className="flex flex-wrap gap-2 justify-center">
-                        {Object.entries(selectedActivity.statModifiers).map(([stat, value]) => {
+                        {Object.entries(modifiedActivity.statModifiers).map(([stat, value]) => {
                           const statConf = statConfig[stat as keyof typeof statConfig];
                           if (!statConf) return null;
                           return (
@@ -946,7 +985,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 </div>
 
                 <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm font-bold">
-                  ⏰ {t('dashboard.takesTime')}
+                  ⏰ {t('dashboard.takesTime')}: {timeText}
                 </p>
                 
                 <div className="flex gap-3">
@@ -979,7 +1018,8 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
             </motion.div>
           </div>
         </>
-      )}
+      );
+    })()}
     </AnimatePresence>,
     document.body
   )}
