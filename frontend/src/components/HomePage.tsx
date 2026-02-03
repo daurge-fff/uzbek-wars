@@ -496,6 +496,76 @@ export function HomePage() {
   const navigate = useNavigate();
   const { isAuthenticated, user, player, login } = useAuth();
   const { t, i18n } = useTranslation();
+  const [randomEmoji, setRandomEmoji] = useState('🎮');
+
+  // Генератор случайного эмодзи с проверкой что он реально отображается
+  const generateRandomEmoji = () => {
+    // Широкие диапазоны эмодзи
+    const emojiRanges = [
+      [0x1F600, 0x1F64F], // Emoticons
+      [0x1F300, 0x1F5FF], // Misc Symbols and Pictographs
+      [0x1F680, 0x1F6FF], // Transport and Map
+      [0x1F900, 0x1F9FF], // Supplemental Symbols
+      [0x1FA70, 0x1FAFF], // Extended Pictographs
+    ];
+
+    // Создаем canvas для проверки отображения (один раз)
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return '🎮';
+    
+    canvas.width = 20;
+    canvas.height = 20;
+    ctx.textBaseline = 'top';
+    ctx.font = '16px Arial';
+
+    let attempts = 0;
+    const maxAttempts = 50; // Уменьшил до 50
+
+    while (attempts < maxAttempts) {
+      // Генерируем случайный код
+      const range = emojiRanges[Math.floor(Math.random() * emojiRanges.length)];
+      const code = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
+      const emoji = String.fromCodePoint(code);
+
+      // Очищаем canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Рисуем эмодзи
+      ctx.fillText(emoji, 0, 0);
+      
+      // Проверяем что что-то нарисовалось
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      let hasPixels = false;
+      
+      // Проверяем есть ли хоть какие-то непрозрачные пиксели
+      for (let i = 3; i < imageData.data.length; i += 4) {
+        if (imageData.data[i] > 0) { // alpha > 0
+          hasPixels = true;
+          break;
+        }
+      }
+      
+      // Если что-то нарисовалось - это валидный эмодзи
+      if (hasPixels) {
+        return emoji;
+      }
+      
+      attempts++;
+    }
+    
+    // Если не получилось, возвращаем дефолтный
+    return '🎮';
+  };
+
+  // Генерируем новый эмодзи при монтировании и каждые 3 секунды
+  useEffect(() => {
+    setRandomEmoji(generateRandomEmoji());
+    const interval = setInterval(() => {
+      setRandomEmoji(generateRandomEmoji());
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLanguageChange = (lang: 'ru' | 'uz' | 'uk' | 'en') => {
     i18n.changeLanguage(lang);
@@ -730,17 +800,22 @@ export function HomePage() {
                 
                 {/* Icon */}
                 <motion.div
-                  animate={{ rotate: [0, -10, 10, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                  key={randomEmoji}
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ 
+                    scale: 1, 
+                    rotate: 0,
+                  }}
+                  transition={{ type: 'spring', stiffness: 200 }}
                   className="relative text-4xl"
                 >
-                  🎮
+                  {randomEmoji}
                 </motion.div>
                 
                 {/* Text */}
                 <div className="relative">
                   <div className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold mb-1">
-                    {t('app.name')}
+                    {t('dashboard.activities', 'Активности')}
                   </div>
                   <div className="text-xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
                     {t('home.continuePlaying', 'Продолжить игру')}
