@@ -17,12 +17,17 @@
     "tier1": "Boshlang'ich sinflar",
     "tier2": "Ilg'or sinflar",
     "tier3": "Usta sinflar",
+    "tier1Description": "Yangi boshlanuvchilar uchun muvozanatli sinflar",
+    "tier2Description": "Noyob qobiliyatlarga ega ixtisoslashgan sinflar",
+    "tier3Description": "Ustalar uchun afsonaviy sinflar",
     "confirmChange": "Sinf o'zgarishini tasdiqlash",
     "changeSuccess": "Sinf muvaffaqiyatli o'zgartirildi!",
     "changeFailed": "Sinfni o'zgartirib bo'lmadi",
     "insufficientFunds": "Mablag' yetarli emas",
     "alreadyThisClass": "Siz allaqachon bu sinfdan foydalanyapsiz",
-    "levelTooLow": "Daraja juda past"
+    "levelTooLow": "Daraja juda past",
+    "classHall": "Sinflar zali",
+    "uniqueAbility": "Noyob qobiliyat"
   },
   "currency": {
     "soms": "so'm",
@@ -229,6 +234,8 @@
     "shopDesc": "Kosmetika",
     "inventory": "Inventar",
     "inventoryDesc": "Narsalaringiz",
+    "classes": "Sinflar",
+    "classesDesc": "Sinflar zali",
     "settings": "Sozlamalar",
     "settingsDesc": "Parametrlar",
     "donate": "Donat",
@@ -237,7 +244,10 @@
   "common": {
     "cancel": "Bekor qilish",
     "continue": "Davom etish",
-    "loading": "Yuklanmoqda..."
+    "loading": "Yuklanmoqda...",
+    "back": "Orqaga",
+    "confirm": "Tasdiqlash",
+    "have": "Sizda"
   },
   "name": {
     "title": "Ismingiz nima?",

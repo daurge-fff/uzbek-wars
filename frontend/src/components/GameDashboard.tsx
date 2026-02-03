@@ -252,10 +252,34 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       'char_scholar': { ru: 'Философ', en: 'Philosopher', uz: 'Faylasuf', uk: 'Філософ' },
       'char_artisan': { ru: 'Ремесленник', en: 'Artisan', uz: 'Hunarmand', uk: 'Ремісник' },
       'char_chef': { ru: 'Повар', en: 'Chef', uz: 'Oshpaz', uk: 'Кухар' },
+      'char_trader': { ru: 'Торговец', en: 'Trader', uz: 'Savdogar', uk: 'Торговець' },
+      'char_worker': { ru: 'Работник', en: 'Worker', uz: 'Ishchi', uk: 'Робітник' },
+      'char_student': { ru: 'Студент', en: 'Student', uz: 'Talaba', uk: 'Студент' },
+      'char_cook': { ru: 'Повар', en: 'Cook', uz: 'Oshpaz', uk: 'Кухар' },
+      'char_craftsman': { ru: 'Ремесленник', en: 'Craftsman', uz: 'Hunarmand', uk: 'Ремісник' },
+      'char_master_chef': { ru: 'Шеф-повар', en: 'Master Chef', uz: 'Bosh oshpaz', uk: 'Шеф-кухар' },
+      'char_master_artisan': { ru: 'Мастер-ремесленник', en: 'Master Artisan', uz: 'Usta hunarmand', uk: 'Майстер-ремісник' },
+      'char_tycoon': { ru: 'Магнат', en: 'Tycoon', uz: 'Magnate', uk: 'Магнат' },
+      'char_legend': { ru: 'Легенда', en: 'Legend', uz: 'Afsona', uk: 'Легенда' },
+      'char_sage': { ru: 'Мудрец', en: 'Sage', uz: 'Donishmand', uk: 'Мудрець' },
       'default': { ru: 'Новичок', en: 'Newbie', uz: 'Yangi', uk: 'Новачок' }
     };
     const lang = i18n.language as 'ru' | 'en' | 'uz' | 'uk';
     return characters[characterId]?.[lang] || characters['default'][lang];
+  };
+
+  const getCharacterTier = (characterId: string): number => {
+    // Tier 1 classes
+    const tier1 = ['char_trader', 'char_worker', 'char_student', 'char_cook', 'char_craftsman'];
+    // Tier 2 classes
+    const tier2 = ['char_merchant', 'char_warrior', 'char_scholar', 'char_master_chef', 'char_master_artisan'];
+    // Tier 3 classes
+    const tier3 = ['char_tycoon', 'char_legend', 'char_sage'];
+    
+    if (tier1.includes(characterId)) return 1;
+    if (tier2.includes(characterId)) return 2;
+    if (tier3.includes(characterId)) return 3;
+    return 1; // default
   };
 
   const getCharacterEmoji = (characterId: string): string => {
@@ -268,18 +292,6 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       'default': '👤'
     };
     return emojis[characterId] || emojis['default'];
-  };
-
-  const getCharacterGradient = (characterId: string): string => {
-    const gradients: Record<string, string> = {
-      'char_merchant': 'from-yellow-400/30 to-orange-500/30 border-yellow-400/40',
-      'char_warrior': 'from-red-400/30 to-rose-500/30 border-red-400/40',
-      'char_scholar': 'from-blue-400/30 to-cyan-500/30 border-blue-400/40',
-      'char_artisan': 'from-purple-400/30 to-fuchsia-500/30 border-purple-400/40',
-      'char_chef': 'from-green-400/30 to-emerald-500/30 border-green-400/40',
-      'default': 'from-gray-400/30 to-slate-500/30 border-gray-400/40'
-    };
-    return gradients[characterId] || gradients['default'];
   };
 
   const getCityName = (cityId: string): string => {
@@ -299,11 +311,11 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black pb-20">
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         
-        {/* Карточка профиля - компактная с крутым дизайном */}
+        {/* Объединенная карточка профиля и статов */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative rounded-3xl p-4 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden"
+          className="relative rounded-3xl p-6 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden"
         >
           {/* Animated background blobs */}
           <div className="absolute inset-0 opacity-30 dark:opacity-20">
@@ -312,83 +324,78 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
             <div className="absolute -bottom-10 left-1/2 w-40 h-40 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-2xl animate-blob animation-delay-4000" />
           </div>
 
-          <div className="relative z-10 flex items-center gap-4">
-            {/* Avatar с круговой полоской опыта */}
-            <div className="relative flex-shrink-0">
-              {/* Круговая полоска опыта - большая и толстая */}
-              <svg className="absolute -inset-2 w-20 h-20 -rotate-90">
-                {/* Фон круга */}
-                <circle
-                  cx="40"
-                  cy="40"
-                  r="36"
-                  stroke="currentColor"
-                  strokeWidth="5"
-                  fill="none"
-                  className="text-gray-300/50 dark:text-gray-600/50"
-                />
-                {/* Прогресс */}
-                <motion.circle
-                  cx="40"
-                  cy="40"
-                  r="36"
-                  stroke="url(#xpGradient)"
-                  strokeWidth="5"
-                  fill="none"
-                  strokeDasharray={`${2 * Math.PI * 36}`}
-                  initial={{ strokeDashoffset: 2 * Math.PI * 36 }}
-                  animate={{ 
-                    strokeDashoffset: 2 * Math.PI * 36 * (1 - playerState.experience / playerState.experienceToNextLevel)
-                  }}
-                  transition={{ duration: 1, ease: 'easeOut' }}
-                  strokeLinecap="round"
-                  className="drop-shadow-lg"
-                />
-                <defs>
-                  <linearGradient id="xpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#3b82f6" />
-                    <stop offset="50%" stopColor="#a855f7" />
-                    <stop offset="100%" stopColor="#ec4899" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              
-              {/* Аватар */}
-              <div className="w-16 h-16 rounded-full overflow-hidden shadow-xl ring-2 ring-white dark:ring-gray-800 bg-gray-200 dark:bg-gray-700">
-                {userAvatar && userAvatar.startsWith('http') ? (
-                  <img 
-                    src={userAvatar} 
-                    alt="Avatar" 
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-3xl">👤</div>';
-                    }}
+          <div className="relative z-10">
+            {/* Верхняя часть - профиль */}
+            <div className="flex items-center gap-4 mb-6">
+              {/* Аватар с XP кольцом */}
+              <div className="relative flex-shrink-0">
+                <svg className="absolute -inset-2 w-20 h-20 -rotate-90">
+                  <circle
+                    cx="40"
+                    cy="40"
+                    r="36"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                    className="text-gray-300/50 dark:text-gray-600/50"
                   />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-3xl">
-                    {userAvatar || '👤'}
-                  </div>
-                )}
+                  <motion.circle
+                    cx="40"
+                    cy="40"
+                    r="36"
+                    stroke="url(#xpGradient)"
+                    strokeWidth="4"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 36}`}
+                    initial={{ strokeDashoffset: 2 * Math.PI * 36 }}
+                    animate={{ 
+                      strokeDashoffset: 2 * Math.PI * 36 * (1 - playerState.experience / playerState.experienceToNextLevel)
+                    }}
+                    transition={{ duration: 1, ease: 'easeOut' }}
+                    strokeLinecap="round"
+                    className="drop-shadow-lg"
+                  />
+                  <defs>
+                    <linearGradient id="xpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#3b82f6" />
+                      <stop offset="50%" stopColor="#a855f7" />
+                      <stop offset="100%" stopColor="#ec4899" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                
+                <div className="w-16 h-16 rounded-full overflow-hidden shadow-xl ring-2 ring-white dark:ring-gray-800 bg-gray-200 dark:bg-gray-700">
+                  {userAvatar && userAvatar.startsWith('http') ? (
+                    <img 
+                      src={userAvatar} 
+                      alt="Avatar" 
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-3xl">👤</div>';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-3xl">
+                      {userAvatar || '👤'}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Основная инфа - компактно */}
-            <div className="flex-1 min-w-0">
-              {/* Уровень и XP */}
-              <div className="mb-2">
-                <div className="flex items-center justify-between mb-1">
+              {/* Инфо и валюта */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-2">
                   <h2 className="text-xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
                     {t('dashboard.level')} {playerState.level}
                   </h2>
-                  <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 px-2 py-0.5 rounded-lg">
+                  <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 px-2 py-1 rounded-lg">
                     {Math.round((playerState.experience / playerState.experienceToNextLevel) * 100)}%
                   </span>
                 </div>
                 
-                {/* XP bar - компактный без анимации */}
-                <div className="relative h-2 bg-gray-300/60 dark:bg-gray-600/60 rounded-full overflow-hidden">
+                <div className="relative h-2 bg-gray-300/60 dark:bg-gray-600/60 rounded-full overflow-hidden mb-3">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${(playerState.experience / playerState.experienceToNextLevel) * 100}%` }}
@@ -396,46 +403,137 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
                   />
                 </div>
-                <div className="flex justify-between mt-0.5">
-                  <span className="text-[9px] font-bold text-gray-600 dark:text-gray-400">
-                    {playerState.experience}
-                  </span>
-                  <span className="text-[9px] font-bold text-gray-600 dark:text-gray-400">
-                    {playerState.experienceToNextLevel}
-                  </span>
-                </div>
-              </div>
 
-              {/* Персонаж и город - одна строка */}
-              <div className="flex items-center gap-1.5 mb-2">
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r ${getCharacterGradient(playerState.characterId)} backdrop-blur-sm border text-[10px] font-bold text-gray-700 dark:text-gray-300`}>
-                  <span>{getCharacterEmoji(playerState.characterId)}</span>
-                  <span>{getCharacterName(playerState.characterId)}</span>
-                </div>
-                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-[10px] font-bold text-gray-700 dark:text-gray-300">
-                  <span>🏙️</span>
-                  <span>{getCityName(playerState.cityId)}</span>
-                </div>
-              </div>
+                <div className="flex items-stretch gap-1.5">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => window.location.href = '/classes'}
+                    className="relative flex items-center gap-1.5 px-2 rounded-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 dark:from-purple-500/30 dark:to-pink-500/30 border border-purple-400/50 dark:border-purple-500/50 hover:border-purple-500 dark:hover:border-purple-400 transition-all shadow-sm hover:shadow-md"
+                  >
+                    <span className="text-base">{getCharacterEmoji(playerState.characterId)}</span>
+                    <span className="text-gray-900 dark:text-white font-bold text-[11px] whitespace-nowrap">
+                      {getCharacterName(playerState.characterId)}
+                    </span>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-400 dark:bg-yellow-500 flex items-center justify-center shadow-sm">
+                      <span className="text-[9px] font-black text-gray-900">
+                        {getCharacterTier(playerState.characterId)}
+                      </span>
+                    </div>
+                  </motion.button>
+                  
+                  <div className="flex items-center gap-1 px-2 rounded-lg bg-gradient-to-r from-blue-500/20 to-cyan-500/20 dark:from-blue-500/30 dark:to-cyan-500/30 border border-blue-400/50 dark:border-blue-500/50 shadow-sm">
+                    <span className="text-base">🏙️</span>
+                    <span className="text-gray-900 dark:text-white font-bold text-[11px] whitespace-nowrap">
+                      {getCityName(playerState.cityId)}
+                    </span>
+                  </div>
 
-              {/* Валюта - компактно в одну строку */}
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-yellow-400/30 to-orange-500/30 backdrop-blur-sm border border-yellow-400/40 flex-1">
-                  <span className="text-lg">💰</span>
-                  <div className="flex flex-col leading-none">
-                    <span className="text-[8px] font-bold text-yellow-900 dark:text-yellow-200 uppercase">{t('dashboard.soms')}</span>
-                    <span className="text-sm font-black text-yellow-800 dark:text-yellow-100">{playerState.soms.toLocaleString()}</span>
+                  <div className="flex items-center gap-1 px-2 rounded-lg bg-gradient-to-r from-yellow-400/30 to-orange-500/30 border border-yellow-400/50 shadow-sm ml-auto">
+                    <span className="text-base">💰</span>
+                    <span className="text-gray-900 dark:text-white font-black text-[11px] whitespace-nowrap">
+                      {playerState.soms.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1 px-2 rounded-lg bg-gradient-to-r from-cyan-400/30 to-blue-500/30 border border-cyan-400/50 shadow-sm">
+                    <span className="text-base">💎</span>
+                    <span className="text-gray-900 dark:text-white font-black text-[11px]">
+                      {playerState.donationCurrency}
+                    </span>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400/30 to-blue-500/30 backdrop-blur-sm border border-cyan-400/40 flex-1">
-                  <span className="text-lg">💎</span>
-                  <div className="flex flex-col leading-none">
-                    <span className="text-[8px] font-bold text-cyan-900 dark:text-cyan-200 uppercase">{t('dashboard.crystals')}</span>
-                    <span className="text-sm font-black text-cyan-800 dark:text-cyan-100">{playerState.donationCurrency}</span>
-                  </div>
-                </div>
               </div>
+            </div>
+
+            {/* Нижняя часть - статы в одну строку */}
+            <div className="grid grid-cols-4 gap-3">
+              {Object.entries(playerState.stats).map(([key, value], index) => {
+                const config = statConfig[key as keyof typeof statConfig];
+                const isLow = value < 30;
+                const isCritical = value < 15;
+                return (
+                  <motion.div
+                    key={key}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 + index * 0.05 }}
+                    onHoverStart={() => setHoveredStat(key)}
+                    onHoverEnd={() => setHoveredStat(null)}
+                    className={`relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-xl p-3 shadow-md border-2 ${
+                      isCritical ? 'border-red-500 dark:border-red-400' :
+                      isLow ? 'border-orange-500 dark:border-orange-400' :
+                      'border-gray-200 dark:border-gray-700'
+                    } cursor-pointer hover:shadow-lg transition-all hover:scale-105`}
+                  >
+                    {isCritical && (
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1 }}
+                        className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-lg"
+                      >
+                        !
+                      </motion.div>
+                    )}
+                    
+                    <div className="flex flex-col items-center">
+                      <div className="relative mb-1">
+                        <CircularProgress 
+                          value={value} 
+                          max={100} 
+                          size={50} 
+                          strokeWidth={5}
+                          color={
+                            value >= 70 ? '#10b981' : 
+                            value >= 40 ? '#f59e0b' : '#ef4444'
+                          }
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <motion.span 
+                            animate={isLow ? { rotate: [0, -10, 10, -10, 0] } : {}}
+                            transition={{ duration: 0.5, repeat: isLow ? Infinity : 0, repeatDelay: 2 }}
+                            className="text-xl"
+                          >
+                            {config.icon}
+                          </motion.span>
+                        </div>
+                      </div>
+                      
+                      <div className="text-center w-full">
+                        <div className={`text-lg font-black mb-0.5 ${
+                          value >= 70 ? 'text-green-600 dark:text-green-400' :
+                          value >= 40 ? 'text-yellow-600 dark:text-yellow-400' :
+                          'text-red-600 dark:text-red-400'
+                        }`}>
+                          {value}%
+                        </div>
+                        <div className="text-[10px] text-gray-600 dark:text-gray-400 font-bold">
+                          {t(config.labelKey)}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <AnimatePresence>
+                      {hoveredStat === key && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          className={`absolute bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-xl shadow-2xl z-[200] max-w-[180px] text-center whitespace-normal pointer-events-none ${
+                            index >= 2 ? 'right-0' : 'left-1/2 transform -translate-x-1/2'
+                          }`}
+                        >
+                          <div className="font-bold mb-1">{t(config.descKey)}</div>
+                          {isLow && <div className="text-red-400 font-bold">{t(config.lowWarningKey)}</div>}
+                          <div className={`absolute top-full border-[6px] border-transparent border-t-gray-900 dark:border-t-gray-700 ${
+                            index >= 2 ? 'right-4' : 'left-1/2 transform -translate-x-1/2'
+                          }`} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </motion.div>
@@ -515,100 +613,6 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Stats Grid - 4 карточки в ряд */}
-        <div className="grid grid-cols-4 gap-4">
-          {Object.entries(playerState.stats).map(([key, value], index) => {
-            const config = statConfig[key as keyof typeof statConfig];
-            const isLow = value < 30;
-            const isCritical = value < 15;
-            return (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                onHoverStart={() => setHoveredStat(key)}
-                onHoverEnd={() => setHoveredStat(null)}
-                className={`relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl p-4 shadow-lg border-2 ${
-                  isCritical ? 'border-red-500 dark:border-red-400' :
-                  isLow ? 'border-orange-500 dark:border-orange-400' :
-                  'border-gray-200 dark:border-gray-700'
-                } cursor-pointer z-10 hover:z-[100] hover:shadow-xl transition-all hover:scale-105`}
-              >
-                {isCritical && (
-                  <motion.div
-                    animate={{ 
-                      scale: [1, 1.2, 1]
-                    }}
-                    transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1 }}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg z-10"
-                  >
-                    !
-                  </motion.div>
-                )}
-                
-                <div className="flex flex-col items-center">
-                  {/* Circular progress */}
-                  <div className="relative mb-2">
-                    <CircularProgress 
-                      value={value} 
-                      max={100} 
-                      size={70} 
-                      strokeWidth={6}
-                      color={
-                        value >= 70 ? '#10b981' : 
-                        value >= 40 ? '#f59e0b' : '#ef4444'
-                      }
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <motion.span 
-                        animate={isLow ? { rotate: [0, -10, 10, -10, 0] } : {}}
-                        transition={{ duration: 0.5, repeat: isLow ? Infinity : 0, repeatDelay: 2 }}
-                        className="text-3xl"
-                      >
-                        {config.icon}
-                      </motion.span>
-                    </div>
-                  </div>
-                  
-                  <div className="text-center w-full">
-                    <div className={`text-2xl font-black mb-1 ${
-                      value >= 70 ? 'text-green-600 dark:text-green-400' :
-                      value >= 40 ? 'text-yellow-600 dark:text-yellow-400' :
-                      'text-red-600 dark:text-red-400'
-                    }`}>
-                      {value}%
-                    </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400 font-bold">
-                      {t(config.labelKey)}
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Tooltip - фиксированный, для последних двух карточек слева */}
-                <AnimatePresence>
-                  {hoveredStat === key && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className={`absolute bottom-full mb-3 px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-xl shadow-2xl z-[200] max-w-[200px] text-center whitespace-normal pointer-events-none ${
-                        index >= 2 ? 'right-0' : 'left-1/2 transform -translate-x-1/2'
-                      }`}
-                    >
-                      <div className="font-bold mb-1">{t(config.descKey)}</div>
-                      {isLow && <div className="text-red-400 font-bold">{t(config.lowWarningKey)}</div>}
-                      <div className={`absolute top-full border-[6px] border-transparent border-t-gray-900 dark:border-t-gray-700 ${
-                        index >= 2 ? 'right-4' : 'left-1/2 transform -translate-x-1/2'
-                      }`} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </div>
 
         {/* Activities Section - карточки по 2 в ряд */}
         <motion.div
@@ -779,7 +783,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
           transition={{ delay: 0.6 }}
           className="mt-6"
         >
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-4 gap-3">
             <motion.a
               href="/"
               whileHover={{ scale: 1.02 }}
@@ -787,7 +791,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center"
             >
               <div className="text-3xl mb-1">🏠</div>
-              <div className="text-sm font-bold text-gray-900 dark:text-white">{t('menu.home', 'Главная')}</div>
+              <div className="text-xs font-bold text-gray-900 dark:text-white truncate">{t('menu.home', 'Главная')}</div>
             </motion.a>
             
             <motion.a
@@ -797,7 +801,20 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center"
             >
               <div className="text-3xl mb-1">🛍️</div>
-              <div className="text-sm font-bold text-gray-900 dark:text-white">{t('menu.shop', 'Магазин')}</div>
+              <div className="text-xs font-bold text-gray-900 dark:text-white truncate">{t('menu.shop', 'Магазин')}</div>
+            </motion.a>
+            
+            <motion.a
+              href="/classes"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/30 dark:to-pink-500/30 border-2 border-purple-400 dark:border-purple-500 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 to-pink-400/10 animate-pulse" />
+              <div className="relative">
+                <div className="text-3xl mb-1">🏛️</div>
+                <div className="text-xs font-bold text-purple-900 dark:text-purple-200 truncate">{t('menu.classes', 'Классы')}</div>
+              </div>
             </motion.a>
             
             <motion.a
@@ -807,7 +824,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center"
             >
               <div className="text-3xl mb-1">⚙️</div>
-              <div className="text-sm font-bold text-gray-900 dark:text-white">{t('menu.settings', 'Настройки')}</div>
+              <div className="text-xs font-bold text-gray-900 dark:text-white truncate">{t('menu.settings', 'Настройки')}</div>
             </motion.a>
           </div>
         </motion.div>

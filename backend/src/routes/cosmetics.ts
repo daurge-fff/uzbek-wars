@@ -154,7 +154,13 @@ router.post('/purchase', authenticate, async (req: Request, res: Response) => {
 
     // Add item to inventory
     if (!player.cosmetics) {
-      player.cosmetics = { clothing: [], backgrounds: [], accessories: [] };
+      player.cosmetics = { 
+        clothing: [], 
+        backgrounds: [], 
+        accessories: [],
+        backpacks: [],
+        consumables: []
+      };
     }
 
     if (item.type === 'clothing') {
@@ -216,7 +222,13 @@ router.post('/equip', authenticate, async (req: Request, res: Response) => {
 
     // Equip item (unequips previous item of same type)
     if (!player.cosmetics) {
-      player.cosmetics = { clothing: [], backgrounds: [], accessories: [] };
+      player.cosmetics = { 
+        clothing: [], 
+        backgrounds: [], 
+        accessories: [],
+        backpacks: [],
+        consumables: []
+      };
     }
 
     if (item.type === 'clothing') {

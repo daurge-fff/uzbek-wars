@@ -30,6 +30,7 @@ import { FontLoader } from './components/FontLoader';
 import { TermsOfService } from './components/TermsOfService';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { OnboardingFlow } from './components/OnboardingFlow';
+import ClassHall from './components/ClassHall';
 import { cosmeticItems } from './data/cosmeticItems';
 
 const queryClient = new QueryClient({
@@ -276,6 +277,23 @@ function AnimatedRoutes() {
             className="relative"
           >
             <PrivacyPolicy />
+          </motion.div>
+        } />
+        <Route path="/classes" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="relative"
+          >
+            <ClassHall 
+              currentClass={'char_trader'}
+              currentLevel={1}
+              playerSoms={0}
+              playerCrystals={0}
+            />
           </motion.div>
         } />
       </Routes>

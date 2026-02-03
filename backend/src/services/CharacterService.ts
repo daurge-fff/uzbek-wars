@@ -368,9 +368,23 @@ export async function changeClass(userId: string, newCharacterId: string): Promi
       );
     }
     
-    // Check cost (5000 soms + 100 crystals)
-    const CHANGE_COST_SOMS = 5000;
-    const CHANGE_COST_CRYSTALS = 100;
+    // Check cost based on tier
+    let CHANGE_COST_SOMS = 0;
+    let CHANGE_COST_CRYSTALS = 0;
+    
+    if (newClass.tier === 1) {
+      // Tier 1 class change
+      CHANGE_COST_SOMS = 1000;
+      CHANGE_COST_CRYSTALS = 10;
+    } else if (newClass.tier === 2) {
+      // Tier 2 class change
+      CHANGE_COST_SOMS = 3000;
+      CHANGE_COST_CRYSTALS = 50;
+    } else if (newClass.tier === 3) {
+      // Tier 3 class change
+      CHANGE_COST_SOMS = 10000;
+      CHANGE_COST_CRYSTALS = 200;
+    }
     
     if (player.soms < CHANGE_COST_SOMS) {
       throw new Error(

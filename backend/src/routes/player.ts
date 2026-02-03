@@ -843,8 +843,16 @@ router.get(
         availableClasses: getAvailableClasses(player.level),
         allClassesByTier: getAllClassesByTier(),
         changeCost: {
-          soms: 5000,
-          crystals: 100
+          tier2: {
+            soms: 3000,
+            crystals: 50,
+            requiredLevel: 15
+          },
+          tier3: {
+            soms: 10000,
+            crystals: 200,
+            requiredLevel: 35
+          }
         }
       });
     } catch (error) {

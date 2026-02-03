@@ -17,12 +17,17 @@
     "tier1": "Starter Classes",
     "tier2": "Advanced Classes",
     "tier3": "Master Classes",
+    "tier1Description": "Balanced classes for beginners",
+    "tier2Description": "Specialized classes with unique abilities",
+    "tier3Description": "Legendary classes for masters",
     "confirmChange": "Confirm Class Change",
     "changeSuccess": "Class changed successfully!",
     "changeFailed": "Failed to change class",
     "insufficientFunds": "Insufficient funds",
     "alreadyThisClass": "Already using this class",
-    "levelTooLow": "Level too low"
+    "levelTooLow": "Level too low",
+    "classHall": "Class Hall",
+    "uniqueAbility": "Unique Ability"
   },
   "currency": {
     "soms": "soms",
@@ -223,6 +228,8 @@
     "shopDesc": "Cosmetics",
     "inventory": "Inventory",
     "inventoryDesc": "Your items",
+    "classes": "Classes",
+    "classesDesc": "Class Hall",
     "settings": "Settings",
     "settingsDesc": "Parameters",
     "donate": "Donate",
@@ -231,7 +238,10 @@
   "common": {
     "cancel": "Cancel",
     "continue": "Continue",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "back": "Back",
+    "confirm": "Confirm",
+    "have": "You have"
   },
   "name": {
     "title": "What's your name?",
