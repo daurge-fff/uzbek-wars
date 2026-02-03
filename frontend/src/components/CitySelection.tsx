@@ -123,18 +123,10 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="text-gray-600 dark:text-gray-300 mb-2 font-medium transition-colors"
+        className="text-gray-600 dark:text-gray-300 mb-8 font-medium transition-colors"
       >
         {t('app.swipeHint')}
       </motion.p>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2, repeat: 3, repeatType: "reverse", duration: 0.8 }}
-        className="text-4xl mb-6"
-      >
-        👈 👉
-      </motion.div>
 
       <div className="relative w-full max-w-sm h-[520px] mb-8" style={{ perspective: '1200px' }}>
         <AnimatePresence initial={false} custom={direction}>
@@ -222,8 +214,8 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
 
                 <p className="text-center text-sm text-gray-600 dark:text-gray-300 font-medium transition-colors">
                   {isAvailable 
-                    ? '✅ Доступен для регистрации' 
-                    : '❌ Город переполнен'}
+                    ? `✅ ${t('cities.available')}` 
+                    : `❌ ${t('cities.overpopulated')}`}
                 </p>
               </motion.div>
             </motion.div>

@@ -65,7 +65,8 @@
     "cancel": "Скасувати",
     "close": "Закрити",
     "save": "Зберегти",
-    "level_required": "Потрібно"
+    "level_required": "Потрібно",
+    "continue": "Продовжити"
   },
   "auth": {
     "login": "Увійти",
@@ -87,7 +88,9 @@
     "tashkent": "Ташкент",
     "bukhara": "Бухара",
     "players": "гравців",
-    "full": "Заповнено"
+    "full": "Заповнено",
+    "available": "Доступне для реєстрації",
+    "overpopulated": "Місто переповнене"
   },
   "referral": {
     "title": "Запросити друзів",

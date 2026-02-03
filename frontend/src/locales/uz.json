@@ -65,7 +65,8 @@
     "cancel": "Bekor qilish",
     "close": "Yopish",
     "save": "Saqlash",
-    "level_required": "Kerak"
+    "level_required": "Kerak",
+    "continue": "Davom etish"
   },
   "auth": {
     "login": "Kirish",
@@ -86,7 +87,9 @@
     "tashkent": "Toshkent",
     "bukhara": "Buxoro",
     "players": "o'yinchilar",
-    "full": "To'lgan"
+    "full": "To'lgan",
+    "available": "Ro'yxatdan o'tish uchun mavjud",
+    "overpopulated": "Shahar to'lgan"
   },
   "referral": {
     "title": "Do'stlarni taklif qilish",

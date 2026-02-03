@@ -51,7 +51,8 @@
     "cancel": "Cancel",
     "close": "Close",
     "save": "Save",
-    "level_required": "Required"
+    "level_required": "Required",
+    "continue": "Continue"
   },
   "auth": {
     "login": "Login",
@@ -80,7 +81,9 @@
     "tashkent": "Tashkent",
     "bukhara": "Bukhara",
     "players": "players",
-    "full": "Full"
+    "full": "Full",
+    "available": "Available for registration",
+    "overpopulated": "City is full"
   },
   "referral": {
     "title": "Invite Friends",
