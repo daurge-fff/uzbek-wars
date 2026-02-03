@@ -684,5 +684,27 @@
       "title": "11. Savollar?",
       "text": "Biz yordam berish uchun shu yerdamiz! Agar maxfiylik yoki ushbu ta'lim loyihasida ma'lumotlaringizni qanday qayta ishlashimiz haqida savollaringiz bo'lsa:"
     }
+  },
+  "city": {
+    "migration": "Boshqa shaharga ko'chish",
+    "migrate": "Ko'chish",
+    "description": "Tavsif",
+    "occupancy": "To'ldirilganlik",
+    "clickToMigrate": "Ko'chish uchun bosing",
+    "availableCities": "Mavjud shaharlar",
+    "migrationDescription": "Ko'chish uchun shaharni tanlang. Narx sizning darajangiz va jangovar statlaringizga bog'liq.",
+    "confirmMigration": "Ko'chishni tasdiqlang",
+    "selectPayment": "To'lov usulini tanlang",
+    "cost": "Narx",
+    "migrationSuccess": "Ko'chish boshlandi! 60 daqiqadan keyin yetib kelasiz",
+    "migrationFailed": "Ko'chib bo'lmadi",
+    "loadFailed": "Ma'lumotni yuklab bo'lmadi",
+    "noData": "Ma'lumot yo'q",
+    "activeActivityError": "Boshqa faoliyat davom etayotganda ko'chib bo'lmaydi",
+    "alreadyInCity": "Siz allaqachon bu shaharda",
+    "cityFull": "Shahar to'lgan",
+    "insufficientFunds": "Mablag' yetarli emas",
+    "migrationInProgress": "Ko'chish jarayonida...",
+    "migrationTime": "Ko'chish vaqti: 60 daqiqa"
   }
 }

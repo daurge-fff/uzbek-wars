@@ -695,5 +695,27 @@
         "text": "We're here to help! If you have any questions about privacy or how we handle your data in this educational project:"
       }
     }
+  },
+  "city": {
+    "migration": "City Migration",
+    "migrate": "Migrate",
+    "description": "Description",
+    "occupancy": "Occupancy",
+    "clickToMigrate": "Click to migrate",
+    "availableCities": "Available Cities",
+    "migrationDescription": "Choose a city to migrate to. Cost depends on your level and combat stats.",
+    "confirmMigration": "Confirm Migration",
+    "selectPayment": "Select payment method",
+    "cost": "Cost",
+    "migrationSuccess": "Migration started! Arrival in 60 minutes",
+    "migrationFailed": "Failed to migrate",
+    "loadFailed": "Failed to load information",
+    "noData": "No data available",
+    "activeActivityError": "Cannot migrate while another activity is in progress",
+    "alreadyInCity": "You are already in this city",
+    "cityFull": "City is full",
+    "insufficientFunds": "Insufficient funds",
+    "migrationInProgress": "Migration in progress...",
+    "migrationTime": "Migration time: 60 minutes"
   }
 }

@@ -593,12 +593,17 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   </motion.button>
                   
                   {/* Вторая строка - город и валюты */}
-                  <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-blue-500/20 to-cyan-500/20 dark:from-blue-500/30 dark:to-cyan-500/30 border border-blue-400/50 dark:border-blue-500/50 shadow-sm">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate('/cities')}
+                    className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-blue-500/20 to-cyan-500/20 dark:from-blue-500/30 dark:to-cyan-500/30 border border-blue-400/50 dark:border-blue-500/50 hover:border-blue-500 dark:hover:border-blue-400 transition-all shadow-sm hover:shadow-md"
+                  >
                     <span className="text-base">🏙️</span>
                     <span className="text-gray-900 dark:text-white font-bold text-[11px] whitespace-nowrap">
                       {getCityName(playerState.cityId)}
                     </span>
-                  </div>
+                  </motion.button>
 
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-yellow-400/30 to-orange-500/30 border border-yellow-400/50 shadow-sm flex-1">

@@ -31,6 +31,7 @@ import { TermsOfService } from './components/TermsOfService';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { OnboardingFlow } from './components/OnboardingFlow';
 import ClassHall from './components/ClassHall';
+import CityMigration from './components/CityMigration';
 import { cosmeticItems } from './data/cosmeticItems';
 
 const queryClient = new QueryClient({
@@ -294,6 +295,18 @@ function AnimatedRoutes() {
               playerSoms={0}
               playerCrystals={0}
             />
+          </motion.div>
+        } />
+        <Route path="/cities" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="relative"
+          >
+            <CityMigration />
           </motion.div>
         } />
       </Routes>

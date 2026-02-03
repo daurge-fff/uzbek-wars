@@ -148,19 +148,26 @@ export const CombatStatsModal = ({ isOpen, onClose, onStatsUpdated }: CombatStat
         if (!response.ok) {
           const error = await response.json();
           toast.error(error.error || t('stats.allocationFailed'));
+          setLoading(false);
           await loadStats();
           return;
         }
       }
 
       toast.success(t('stats.allocated', 'Статы распределены!'));
-      await loadStats();
+      
+      // Сбрасываем состояние и закрываем модалку сразу
+      setLoading(false);
+      setStats(null);
+      setTempStats({});
+      onClose();
+      
+      // Вызываем callback для обновления данных и открытия панели
       onStatsUpdated?.();
     } catch (error) {
       toast.error(t('stats.allocationFailed'));
-      await loadStats();
-    } finally {
       setLoading(false);
+      await loadStats();
     }
   };
 

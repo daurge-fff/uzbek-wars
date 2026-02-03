@@ -24,6 +24,7 @@ import healthRoutes from './routes/health';
 import testsRoutes from './routes/tests';
 import statsRoutes from './routes/stats';
 import combatStatsRoutes from './routes/combatStats';
+import cityMigrationRoutes from './routes/cityMigration';
 
 /**
  * Creates and configures Express application
@@ -97,6 +98,7 @@ export function createServer(): Application {
   app.use('/api/donations', donationsRoutes);
   app.use('/api/cosmetics', cosmeticsRoutes);
   app.use('/api/combat-stats', combatStatsRoutes);
+  app.use('/api/city-migration', cityMigrationRoutes);
   app.use('/api/leaderboard', leaderboardRoutes);
   app.use('/api/player', playerRoutes); // All /player/* endpoints
   

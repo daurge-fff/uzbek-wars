@@ -708,5 +708,27 @@
     "equip": "Надеть",
     "equipped": "Надето",
     "not_enough_currency": "Недостаточно кристаллов"
+  },
+  "city": {
+    "migration": "Переезд в другой город",
+    "migrate": "Переехать",
+    "description": "Описание",
+    "occupancy": "Заполненность",
+    "clickToMigrate": "Нажмите чтобы переехать",
+    "availableCities": "Доступные города",
+    "migrationDescription": "Выберите город для переезда. Стоимость зависит от вашего уровня и боевых статов.",
+    "confirmMigration": "Подтвердите переезд",
+    "selectPayment": "Выберите способ оплаты",
+    "cost": "Стоимость",
+    "migrationSuccess": "Переезд начат! Прибытие через 60 минут",
+    "migrationFailed": "Не удалось переехать",
+    "loadFailed": "Не удалось загрузить информацию",
+    "noData": "Нет данных",
+    "activeActivityError": "Невозможно переехать во время выполнения другой активности",
+    "alreadyInCity": "Вы уже в этом городе",
+    "cityFull": "Город переполнен",
+    "insufficientFunds": "Недостаточно средств",
+    "migrationInProgress": "Переезд в процессе...",
+    "migrationTime": "Время переезда: 60 минут"
   }
 }
