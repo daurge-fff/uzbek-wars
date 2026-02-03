@@ -287,6 +287,7 @@ export const OnboardingFlow = () => {
   const checkUsername = async (username: string) => {
     if (!username || username.length < 3) {
       setUsernameAvailable(null);
+      setUsernameError('');
       return;
     }
 
@@ -324,17 +325,31 @@ export const OnboardingFlow = () => {
     setCheckingUsername(true);
     setUsernameError('');
     try {
-      const response = await axios.post(`${API_URL}/api/auth/check-username`, {
-        username: trimmedName
-      });
+      const response = await axios.post(
+        `${API_URL}/api/auth/check-username`,
+        { username: trimmedName },
+        {
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        }
+      );
       setUsernameAvailable(response.data.available);
       if (!response.data.available) {
         setUsernameError('taken'); // Помечаем как занятое
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to check username:', error);
-      setUsernameAvailable(null);
-      setUsernameError('');
+      // Если ошибка сети или сервера - считаем имя доступным
+      // чтобы не блокировать регистрацию
+      if (error.response?.status === 500 || !error.response) {
+        setUsernameAvailable(true);
+        setUsernameError('');
+      } else {
+        setUsernameAvailable(null);
+        setUsernameError('');
+      }
     } finally {
       setCheckingUsername(false);
     }

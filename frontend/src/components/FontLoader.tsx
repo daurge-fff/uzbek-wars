@@ -114,7 +114,10 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ onLoaded }) => {
                       key={lang.code}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => i18n.changeLanguage(lang.code)}
+                      onClick={() => {
+                        i18n.changeLanguage(lang.code);
+                        localStorage.setItem('i18nextLng', lang.code);
+                      }}
                       className={`p-3 rounded-[16px] font-bold transition-all ${
                         i18n.language === lang.code
                           ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'

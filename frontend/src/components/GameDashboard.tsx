@@ -414,11 +414,22 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
 
   const getCharacterEmoji = (characterId: string): string => {
     const emojis: Record<string, string> = {
+      // Tier 1 - Starter Classes
+      'char_trader': '🤝',
+      'char_worker': '👷',
+      'char_student': '📖',
+      'char_cook': '🍳',
+      'char_craftsman': '🔨',
+      // Tier 2 - Advanced Classes
       'char_merchant': '🤑',
       'char_warrior': '⚔️',
       'char_scholar': '📚',
-      'char_artisan': '🎨',
-      'char_chef': '👨‍🍳',
+      'char_master_chef': '👨‍🍳',
+      'char_master_artisan': '🎨',
+      // Tier 3 - Master Classes
+      'char_tycoon': '💼',
+      'char_legend': '🏆',
+      'char_sage': '🧙',
       'default': '👤'
     };
     return emojis[characterId] || emojis['default'];

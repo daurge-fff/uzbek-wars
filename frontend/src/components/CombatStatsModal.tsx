@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 interface CombatStats {
   strength: number;
   defense: number;
@@ -54,7 +56,7 @@ export const CombatStatsModal = ({ isOpen, onClose, onStatsUpdated }: CombatStat
 
   const loadStats = async () => {
     try {
-      const response = await fetch('/api/combat-stats', {
+      const response = await fetch(`${API_URL}/api/combat-stats`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -65,6 +67,8 @@ export const CombatStatsModal = ({ isOpen, onClose, onStatsUpdated }: CombatStat
         setStats(data.data);
         setTempStats({});
         setHasChanges(false);
+      } else {
+        console.error('Failed to load stats:', response.status);
       }
     } catch (error) {
       console.error('Failed to load combat stats:', error);
@@ -119,7 +123,7 @@ export const CombatStatsModal = ({ isOpen, onClose, onStatsUpdated }: CombatStat
       const allocations = Object.entries(tempStats).filter(([_, points]) => points > 0);
       
       for (const [stat, points] of allocations) {
-        const response = await fetch('/api/combat-stats/allocate', {
+        const response = await fetch(`${API_URL}/api/combat-stats/allocate`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

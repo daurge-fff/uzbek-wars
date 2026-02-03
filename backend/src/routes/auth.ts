@@ -10,6 +10,7 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { OAuth2Client } from 'google-auth-library';
+import jwt from 'jsonwebtoken';
 import { authenticateWithGoogle, authenticateDevLogin, detectTwinks } from '../services/AuthService';
 import { logger } from '../utils/logger';
 import { createVerificationSession } from '../bot/telegramBot';
@@ -341,10 +342,6 @@ router.post(
     // Normalize username
     const normalizedUsername = username.trim().toLowerCase();
 
-    logger.info(`=== Username check request ===`);
-    logger.info(`Original: "${username}"`);
-    logger.info(`Normalized: "${normalizedUsername}"`);
-
     if (normalizedUsername.length < 3 || normalizedUsername.length > 20) {
       return res.status(400).json({ 
         available: false, 
@@ -352,30 +349,35 @@ router.post(
       });
     }
 
-    // Check if username exists in Player collection (case-insensitive)
-    // We only check players that have completed onboarding (have real username set)
-    const Player = (await import('../models/Player')).Player;
-    
-    // First, let's see all players
-    const allPlayers = await Player.find({}).select('userId characterId cityId');
-    logger.info(`Total players in DB: ${allPlayers.length}`);
-    allPlayers.forEach(p => {
-      logger.info(`  - Player: userId="${p.userId}", characterId="${p.characterId}", cityId="${p.cityId}"`);
-    });
-    
     // Get User model to check displayNames
     const User = (await import('../models/User')).User;
     
-    // Check if any user has this displayName
-    const existingUser = await User.findOne({
-      displayName: { $regex: new RegExp(`^${normalizedUsername}$`, 'i') }
-    });
-
-    logger.info(`Search result: ${existingUser ? 'FOUND' : 'NOT FOUND'}`);
-    if (existingUser) {
-      logger.info(`Existing user: displayName="${existingUser.displayName}", ID=${existingUser._id}`);
+    // Get current user ID from token if available (optional, for editing profile)
+    let currentUserId: string | null = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        currentUserId = decoded.userId;
+      } catch (error) {
+        // Token invalid or expired, ignore
+      }
     }
-    logger.info(`=== End username check ===`);
+    
+    // Check if any OTHER user has this displayName (case-insensitive)
+    const query: any = {
+      displayName: { $regex: new RegExp(`^${normalizedUsername}$`, 'i') }
+    };
+    
+    // Exclude current user if logged in
+    if (currentUserId) {
+      query._id = { $ne: currentUserId };
+    }
+    
+    const existingUser = await User.findOne(query);
+
+    logger.info(`Username check: "${username}" - ${existingUser ? 'TAKEN' : 'AVAILABLE'}${currentUserId ? ` (excluding user ${currentUserId})` : ''}`);
 
     return res.json({ 
       available: !existingUser,
