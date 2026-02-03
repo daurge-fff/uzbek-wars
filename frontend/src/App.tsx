@@ -30,6 +30,7 @@ import { FontLoader } from './components/FontLoader';
 import { TermsOfService } from './components/TermsOfService';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { OnboardingFlow } from './components/OnboardingFlow';
+import { BottomNavBar } from './components/BottomNavBar';
 import ClassHall from './components/ClassHall';
 import CityMigration from './components/CityMigration';
 import { cosmeticItems } from './data/cosmeticItems';
@@ -618,6 +619,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             <AnimatedRoutes />
+            <BottomNavBar />
           </BrowserRouter>
           
           <Toaster
