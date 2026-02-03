@@ -232,7 +232,7 @@ export const OnboardingFlow = () => {
     loadCities();
     
     // Pre-fill with Google name if available, but clean it up
-    if (user?.displayName) {
+    if (user?.displayName && !displayName) {
       // Очищаем имя: убираем лишние пробелы, оставляем только допустимые символы
       let cleanedName = user.displayName
         .trim()
@@ -379,29 +379,71 @@ export const OnboardingFlow = () => {
   };
 
   const handleCitySelect = async (cityId: string) => {
+    if (!selectedCharacterId) {
+      toast.error(t('onboarding.selectCharacterFirst', 'Сначала выберите персонажа'));
+      return;
+    }
+
     setLoading(true);
     try {
-      // Submit all onboarding data at once
-      const response = await axios.post(
-        `${API_URL}/api/player/select-character`,
-        { 
-          characterId: selectedCharacterId,
-          cityId,
-          displayName
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      console.log('Submitting onboarding data:', {
+        characterId: selectedCharacterId,
+        cityId,
+        displayName
+      });
 
-      updatePlayer(response.data.player);
-      
-      toast.success(t('onboarding.complete', 'Добро пожаловать в игру!'));
-      
-      // Onboarding complete, navigate to dashboard
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 500);
+      // Try to create new player first
+      try {
+        const response = await axios.post(
+          `${API_URL}/api/player/select-character`,
+          { 
+            characterId: selectedCharacterId,
+            cityId,
+            displayName
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        updatePlayer(response.data.player);
+        toast.success(t('onboarding.complete', 'Добро пожаловать в игру!'));
+        
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 500);
+      } catch (createError: any) {
+        // If character already selected, try to update
+        if (createError.response?.data?.code === 'CHARACTER_ALREADY_SELECTED') {
+          console.log('Character already selected, trying to update profile');
+          
+          try {
+            const response = await axios.put(
+              `${API_URL}/api/player/update-profile`,
+              { 
+                characterId: selectedCharacterId,
+                cityId
+              },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            updatePlayer(response.data.player);
+            toast.success(t('onboarding.complete', 'Добро пожаловать в игру!'));
+            
+            setTimeout(() => {
+              navigate('/dashboard');
+            }, 500);
+          } catch (updateError: any) {
+            // If update also fails, just redirect to dashboard
+            console.log('Update failed, redirecting to dashboard');
+            toast.success(t('onboarding.alreadyComplete', 'Вы уже зарегистрированы'));
+            navigate('/dashboard');
+          }
+        } else {
+          throw createError;
+        }
+      }
     } catch (error: any) {
       console.error('Failed to complete onboarding:', error);
+      console.error('Error response:', error.response?.data);
       toast.error(error.response?.data?.error || t('onboarding.error', 'Ошибка завершения регистрации'));
     } finally {
       setLoading(false);

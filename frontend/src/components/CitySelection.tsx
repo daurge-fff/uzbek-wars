@@ -93,8 +93,8 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
       samarkand: '🕌',
       tashkent: '🏙️',
       bukhara: '🏛️',
-      andijan: '🏰',
-      namangan: '🌆'
+      khiva: '🏰',
+      andijan: '🌆'
     };
     return emojis[cityId] || '🏙️';
   };
@@ -104,15 +104,15 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
       samarkand: 'from-blue-100 via-cyan-100 to-sky-100',
       tashkent: 'from-green-100 via-emerald-100 to-teal-100',
       bukhara: 'from-yellow-100 via-amber-100 to-orange-100',
-      andijan: 'from-red-100 via-rose-100 to-pink-100',
-      namangan: 'from-purple-100 via-violet-100 to-fuchsia-100'
+      khiva: 'from-orange-100 via-red-100 to-pink-100',
+      andijan: 'from-purple-100 via-violet-100 to-fuchsia-100'
     };
     return gradients[cityId] || 'from-gray-100 via-slate-100 to-zinc-100';
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4 overflow-hidden transition-colors duration-300">
-      <div className="relative w-full max-w-sm h-[520px] mb-8" style={{ perspective: '1200px' }}>
+    <div className="flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4 overflow-hidden transition-colors duration-300">
+      <div className="relative w-full max-w-sm h-[490px]" style={{ perspective: '1200px' }}>
         <AnimatePresence initial={false} custom={direction}>
           <motion.div
             key={page}
@@ -137,16 +137,16 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
             <motion.div 
               whileHover={{ scale: 1.02, y: -8 }}
               whileTap={{ scale: 0.98 }}
-              className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 border-2 transition-colors ${
+              className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-7 border-2 transition-colors ${
                 isAvailable ? 'border-green-200 dark:border-green-700' : 'border-red-200 dark:border-red-700'
               }`}
             >
-              <div className={`w-full h-72 bg-gradient-to-br ${getCityGradient(currentCity.cityId)} rounded-[24px] mb-6 flex flex-col items-center justify-center overflow-hidden shadow-inner relative`}>
+              <div className={`w-full h-64 bg-gradient-to-br ${getCityGradient(currentCity.cityId)} rounded-[24px] mb-5 flex flex-col items-center justify-center overflow-hidden shadow-inner relative`}>
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
-                  className="text-9xl mb-4"
+                  className="text-8xl"
                 >
                   {getCityEmoji(currentCity.cityId)}
                 </motion.div>
@@ -167,7 +167,7 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-3xl font-black text-gray-900 dark:text-white mb-3 text-center transition-colors"
+                className="text-3xl font-black text-gray-900 dark:text-white mb-4 text-center transition-colors"
               >
                 {currentCity.name[i18n.language as keyof typeof currentCity.name] || currentCity.name.ru}
               </motion.h2>
@@ -176,14 +176,14 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="space-y-3"
+                className="space-y-2.5"
               >
-                <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 px-4 py-3 rounded-[16px] border border-purple-200 dark:border-purple-700 transition-colors">
-                  <span className="text-gray-700 dark:text-gray-300 font-medium transition-colors">👥 {t('cities.players')}</span>
+                <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 px-4 py-2.5 rounded-[16px] border border-purple-200 dark:border-purple-700 transition-colors">
+                  <span className="text-gray-700 dark:text-gray-300 font-medium text-sm transition-colors">👥 {t('cities.players')}</span>
                   <span className="font-black text-gray-900 dark:text-white transition-colors">{currentCity.playerCount}</span>
                 </div>
 
-                <div className="bg-gray-100 dark:bg-gray-700 rounded-full h-3 overflow-hidden shadow-inner transition-colors">
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner transition-colors">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${(currentCity.playerCount / currentCity.maxPlayers) * 100}%` }}
@@ -196,7 +196,7 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
                   />
                 </div>
 
-                <p className="text-center text-sm text-gray-600 dark:text-gray-300 font-medium transition-colors">
+                <p className="text-center text-xs text-gray-600 dark:text-gray-300 font-medium transition-colors">
                   {isAvailable 
                     ? `✅ ${t('cities.available')}` 
                     : `❌ ${t('cities.overpopulated')}`}
@@ -225,39 +225,21 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
         </motion.button>
       </div>
 
-      <div className="flex gap-2 mb-8">
-        {cities.map((_, index) => (
-          <motion.button
-            key={index}
-            onClick={() => {
-              const newDirection = index > cityIndex ? 1 : -1;
-              setPage([index, newDirection]);
-            }}
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.9 }}
-            className={`transition-all duration-300 rounded-full ${
-              index === cityIndex 
-                ? 'w-10 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 shadow-md' 
-                : 'w-3 h-3 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
-            }`}
-            aria-label={`Select city ${index + 1}`}
-          />
-        ))}
+      <div className="mt-8 w-full max-w-sm">
+        <motion.button
+          onClick={() => isAvailable && onSelect(currentCity.cityId)}
+          disabled={!isAvailable}
+          whileHover={isAvailable ? { scale: 1.05, boxShadow: '0 20px 40px rgba(99, 102, 241, 0.3)' } : {}}
+          whileTap={isAvailable ? { scale: 0.95 } : {}}
+          className={`w-full text-white font-black py-4 px-8 rounded-[24px] shadow-2xl transition-all ${
+            isAvailable
+              ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 cursor-pointer'
+              : 'bg-gray-400 cursor-not-allowed opacity-50'
+          }`}
+        >
+          {isAvailable ? t('ui.confirm') : t('cities.full')}
+        </motion.button>
       </div>
-
-      <motion.button
-        onClick={() => isAvailable && onSelect(currentCity.cityId)}
-        disabled={!isAvailable}
-        whileHover={isAvailable ? { scale: 1.05, boxShadow: '0 20px 40px rgba(99, 102, 241, 0.3)' } : {}}
-        whileTap={isAvailable ? { scale: 0.95 } : {}}
-        className={`min-h-touch w-full max-w-sm text-white font-black py-4 px-8 rounded-[24px] shadow-2xl transition-all ${
-          isAvailable
-            ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 cursor-pointer'
-            : 'bg-gray-400 cursor-not-allowed opacity-50'
-        }`}
-      >
-        {isAvailable ? t('ui.confirm') : t('cities.full')}
-      </motion.button>
     </div>
   );
 };

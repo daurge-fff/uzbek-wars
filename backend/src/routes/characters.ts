@@ -207,4 +207,125 @@ router.post(
   }
 );
 
+/**
+ * PUT /api/player/update-profile
+ * 
+ * Updates player's character or city
+ * 
+ * This endpoint allows updating character or city after initial selection.
+ * Useful for allowing players to change their character/city later.
+ * 
+ * Request body:
+ *   - characterId: New character ID (optional)
+ *   - cityId: New city ID (optional)
+ * 
+ * Response:
+ *   - player: Updated player profile
+ *   - message: Success message
+ * 
+ * Error responses:
+ *   - 400: Invalid character/city
+ *   - 401: Not authenticated
+ *   - 404: Player not found
+ *   - 500: Server error
+ */
+router.put(
+  '/player/update-profile',
+  authenticate,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userId = (req as any).user?.id;
+      
+      if (!userId) {
+        res.status(401).json({
+          error: 'User not authenticated',
+          code: 'UNAUTHORIZED'
+        });
+        return;
+      }
+      
+      const { characterId, cityId } = req.body;
+      
+      // Find existing player
+      const Player = (await import('../models/Player')).Player;
+      let player = await Player.findOne({ userId });
+      
+      // If player doesn't exist, create new one
+      if (!player) {
+        logger.info(`Player not found for userId ${userId}, creating new player`);
+        
+        // Validate inputs
+        if (!characterId || !cityId) {
+          res.status(400).json({
+            error: 'Character ID and City ID are required for new player',
+            code: 'MISSING_REQUIRED_FIELDS'
+          });
+          return;
+        }
+        
+        // Use selectCharacter to create new player
+        const { selectCharacter } = await import('../services/CharacterService');
+        player = await selectCharacter(userId, { characterId, cityId });
+        
+        res.status(201).json({
+          player,
+          message: 'Player created successfully'
+        });
+        return;
+      }
+      
+      // Update character if provided
+      if (characterId) {
+        const { isValidCharacter } = await import('../services/CharacterService');
+        if (!isValidCharacter(characterId)) {
+          res.status(400).json({
+            error: 'Invalid character ID',
+            code: 'INVALID_CHARACTER'
+          });
+          return;
+        }
+        player.characterId = characterId;
+      }
+      
+      // Update city if provided
+      if (cityId) {
+        const { getCityById } = await import('../services/CityService');
+        const city = await getCityById(cityId);
+        
+        if (!city) {
+          res.status(400).json({
+            error: 'Invalid city ID',
+            code: 'INVALID_CITY'
+          });
+          return;
+        }
+        
+        if (!city.isOpen) {
+          res.status(400).json({
+            error: 'City is full',
+            code: 'CITY_FULL'
+          });
+          return;
+        }
+        
+        player.cityId = cityId;
+      }
+      
+      await player.save();
+      
+      res.status(200).json({
+        player,
+        message: 'Player profile updated successfully'
+      });
+    } catch (error) {
+      logger.error('Update player profile endpoint error:', error);
+      res.status(500).json({
+        error: 'Failed to update player profile',
+        code: 'UPDATE_FAILED',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+);
+
 export default router;
