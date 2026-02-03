@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { ThemeToggle } from './ThemeToggle';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { createPortal } from 'react-dom';
 import { GoogleLoginButton } from './GoogleLoginButton';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -329,54 +330,87 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
       })()}
 
       {/* Модалка "О игре" */}
-      {showAboutModal && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowAboutModal(false)}>
-          <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="text-center mb-4">
-              <div className="text-6xl mb-3">🏛️</div>
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">UZBEK WARS</h2>
-              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                {t('menu.aboutText', 'Стань легендой Великого Шёлкового пути! Исследуй древние города Узбекистана, развивай своего персонажа, торгуй, сражайся и соревнуйся с другими игроками.')}
-              </p>
-            </div>
-            <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl p-4 mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t('menu.version', 'Версия')}</span>
-                <span className="font-bold text-gray-900 dark:text-white">1.0.0</span>
+      {createPortal(
+        <AnimatePresence>
+          {showAboutModal && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowAboutModal(false)}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+              />
+              
+              <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full max-w-[450px] pointer-events-auto"
+                >
+                  <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-2xl">
+                    <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
+                      <div className="text-center mb-4">
+                        <div className="text-6xl mb-3">🏛️</div>
+                        <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">UZBEK WARS</h2>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                          {t('menu.aboutText', 'Стань легендой Великого Шёлкового пути! Исследуй древние города Узбекистана, развивай своего персонажа, торгуй, сражайся и соревнуйся с другими игроками.')}
+                        </p>
+                      </div>
+                      <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl p-4 mb-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{t('menu.version', 'Версия')}</span>
+                          <span className="font-bold text-gray-900 dark:text-white">1.0.0</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{t('menu.releaseDate', 'Дата выпуска')}</span>
+                          <span className="font-bold text-gray-900 dark:text-white">2026</span>
+                        </div>
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setShowAboutModal(false)}
+                        className="w-full py-3 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-white font-bold rounded-full shadow-lg"
+                      >
+                        {t('ui.close', 'Закрыть')}
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t('menu.releaseDate', 'Дата выпуска')}</span>
-                <span className="font-bold text-gray-900 dark:text-white">2026</span>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowAboutModal(false)}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors"
-            >
-              {t('ui.close', 'Закрыть')}
-            </button>
-          </div>
-        </div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
 
       {/* Модалка "Разработчик" - из Settings */}
-      {showDeveloperModal && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-            onClick={() => setShowDeveloperModal(false)}
-          />
-          
-          <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="w-full max-w-[450px] pointer-events-auto"
-            >
-              <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-2xl">
-                <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
+      {createPortal(
+        <AnimatePresence>
+          {showDeveloperModal && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowDeveloperModal(false)}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+              />
+              
+              <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  className="w-full max-w-[450px] pointer-events-auto"
+                >
+                  <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-2xl">
+                    <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
                   <div className="text-center mb-6">
                     <motion.div
                       initial={{ scale: 0 }}
@@ -451,6 +485,9 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
           </div>
         </>
       )}
+    </AnimatePresence>,
+    document.body
+  )}
     </div>
   );
 }
