@@ -8,20 +8,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Apple Color Emoji Font */
-@font-face {
-  font-family: 'Apple Color Emoji';
-  src: url('/AppleColorEmoji.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+/* Apple Color Emoji Font - загружается динамически через JS */
+/* Применяется только к эмодзи через класс .emoji-font */
 
-/* Apply emoji font globally */
+/* Apply system fonts globally WITHOUT emoji font */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    'Apple Color Emoji', sans-serif;
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 @layer base {
@@ -106,6 +99,12 @@ body {
 
 @layer utilities {
   /* Custom utility classes */
+  
+  /* Emoji font - применяется только к эмодзи после загрузки */
+  .emoji-font {
+    font-family: 'Apple Color Emoji', sans-serif;
+  }
+  
   .text-shadow {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
   }

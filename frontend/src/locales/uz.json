@@ -514,7 +514,7 @@
     "darkMode": "Qorong'i mavzu",
     "lightMode": "Yorug' mavzu",
     "dataLoading": "Ma'lumotlar yuklanmoqda",
-    "dataLoadingDesc": "Ilova to'g'ri ishlashi uchun ~40 MB zarur resurslar yuklanadi",
+    "dataLoadingDesc": "Ilova to'g'ri ishlashi uchun 42 MB zarur resurslar yuklanadi",
     "continue": "Davom etish",
     "loading": "Yuklanmoqda...",
     "preparing": "Ilova tayyorlanmoqda"

@@ -8,34 +8,34 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Uzbek cultural color palette
+        // Modern gradient color palette (indigo-purple-pink)
         primary: {
-          DEFAULT: '#D4AF37', // Gold
-          light: '#E5C158',
-          dark: '#B8941F'
+          DEFAULT: '#6366f1', // Indigo
+          light: '#818cf8',
+          dark: '#4f46e5'
         },
         secondary: {
-          DEFAULT: '#8B4513', // Brown
-          light: '#A0522D',
-          dark: '#654321'
+          DEFAULT: '#a855f7', // Purple
+          light: '#c084fc',
+          dark: '#9333ea'
         },
         accent: {
-          DEFAULT: '#FF6B35', // Orange
-          light: '#FF8C5A',
-          dark: '#E54A1A'
+          DEFAULT: '#ec4899', // Pink
+          light: '#f472b6',
+          dark: '#db2777'
         },
         background: {
-          primary: '#FFF8DC', // Cream
-          secondary: '#F5E6D3' // Light beige
+          primary: '#ffffff', // White
+          secondary: '#f9fafb' // Light gray
         },
         text: {
-          primary: '#2C1810', // Dark brown
-          secondary: '#5D4E37' // Medium brown
+          primary: '#111827', // Dark gray
+          secondary: '#6b7280' // Medium gray
         },
         // Status colors
-        success: '#4CAF50', // Green
-        danger: '#F44336', // Red
-        warning: '#FF9800' // Orange
+        success: '#10b981', // Green
+        danger: '#ef4444', // Red
+        warning: '#f59e0b' // Amber
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']

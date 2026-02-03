@@ -19,8 +19,7 @@ export default defineConfig({
         name: 'Узбек Варс',
         short_name: 'Uzbek Wars',
         description: 'Mobile-first PWA game with Uzbek cultural aesthetics',
-        theme_color: '#D4AF37',
-        background_color: '#FFF8DC',
+        background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',
@@ -78,6 +77,7 @@ export default defineConfig({
     }
   },
   server: {
+    host: '0.0.0.0', // Доступ из локальной сети
     port: 5173,
     proxy: {
       '/api': {

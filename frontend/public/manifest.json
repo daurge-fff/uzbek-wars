@@ -4,8 +4,7 @@
   "description": "Мобильная веб-игра с узбекской тематикой",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F5E6D3",
-  "theme_color": "#D4AF37",
+  "background_color": "#ffffff",
   "orientation": "portrait",
   "icons": [
     {

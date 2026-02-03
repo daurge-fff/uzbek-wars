@@ -768,7 +768,7 @@ export function HomePage() {
                     rotate: 0,
                   }}
                   transition={{ type: 'spring', stiffness: 200 }}
-                  className="relative text-4xl"
+                  className="relative text-4xl emoji-font"
                 >
                   {randomEmoji}
                 </motion.div>
