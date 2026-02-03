@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import Emoji from './Emoji';
 
 type LeaderboardCategory = 
   | 'level' | 'soms' | 'crystals' 
@@ -147,7 +148,7 @@ export const Leaderboard = () => {
           className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[24px] shadow-2xl p-4 mb-4 border border-gray-200 dark:border-gray-700"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="text-3xl">{currentCategory.emoji}</span>
+            <Emoji emoji={currentCategory.emoji} size={36} />
             <h1 className="text-2xl font-black bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
               {t('leaderboard.title', 'Рейтинги')}
             </h1>
@@ -222,7 +223,7 @@ export const Leaderboard = () => {
               animate={{ opacity: 1 }}
               className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[24px] p-12 text-center border border-gray-200 dark:border-gray-700"
             >
-              <div className="text-6xl mb-4">⏳</div>
+              <div className="mb-4"><Emoji emoji="⏳" size={72} /></div>
               <p className="text-gray-600 dark:text-gray-400 text-lg">
                 {t('common.loading', 'Загрузка...')}
               </p>
@@ -233,7 +234,7 @@ export const Leaderboard = () => {
               animate={{ opacity: 1 }}
               className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[24px] p-12 text-center border border-gray-200 dark:border-gray-700"
             >
-              <div className="text-6xl mb-4">🏜️</div>
+              <div className="mb-4"><Emoji emoji="🏜️" size={72} /></div>
               <p className="text-gray-600 dark:text-gray-400 text-lg">
                 {t('leaderboard.noPlayers', 'Пока нет данных')}
               </p>
@@ -260,11 +261,11 @@ export const Leaderboard = () => {
                     player.rank === 3 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
                     'bg-gradient-to-br from-indigo-500 to-purple-500 text-white'
                   }`}>
-                    {player.rank <= 3 ? <span className="text-base">{medals[player.rank - 1]}</span> : <span className="text-sm">{player.rank}</span>}
+                    {player.rank <= 3 ? <Emoji emoji={medals[player.rank - 1]} size={20} /> : <span className="text-sm">{player.rank}</span>}
                   </div>
 
                   {/* Avatar */}
-                  <div className="text-3xl flex-shrink-0">
+                  <div className="flex-shrink-0">
                     {player.avatar && player.avatar.startsWith('http') ? (
                       <img 
                         src={player.avatar} 
@@ -272,7 +273,7 @@ export const Leaderboard = () => {
                         className="w-10 h-10 rounded-full object-cover"
                       />
                     ) : (
-                      <span>{player.avatar || '👤'}</span>
+                      <Emoji emoji={player.avatar || '👤'} size={40} />
                     )}
                   </div>
 
@@ -289,7 +290,7 @@ export const Leaderboard = () => {
                       )}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                      <span className="text-[10px]">📍</span>
+                      <Emoji emoji="📍" size={12} />
                       <span className="truncate">{player.cityName}</span>
                     </div>
                   </div>

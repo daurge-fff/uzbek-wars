@@ -10,6 +10,7 @@ import { ThemeToggle } from './ThemeToggle';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { createPortal } from 'react-dom';
 import { GoogleLoginButton } from './GoogleLoginButton';
+import Emoji from './Emoji';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -53,9 +54,9 @@ function FeaturesCarousel({ features }: { features: any[] }) {
                 initial={{ scale: 0 }}
                 animate={{ scale: index === currentIndex ? 1 : 0 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-                className="text-8xl mb-6"
+                className="mb-6"
               >
-                {feature.icon}
+                <Emoji emoji={feature.icon} size={96} />
               </motion.div>
               <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-3">
                 {feature.title}
@@ -140,8 +141,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
       id: 'tutorial', 
       icon: '🎓', 
       label: t('menu.tutorial', 'Обучение'),
-      action: () => toast('🚧 ' + t('donation.inDevelopment', 'В разработке'), { 
-        icon: '🎓',
+      action: () => toast(t('donation.inDevelopment', 'В разработке'), { 
         duration: 2000 
       })
     },
@@ -149,8 +149,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
       id: 'changelog', 
       icon: '📋', 
       label: t('menu.changelog', 'История версий'),
-      action: () => toast('🚧 ' + t('donation.inDevelopment', 'В разработке'), { 
-        icon: '📋',
+      action: () => toast(t('donation.inDevelopment', 'В разработке'), { 
         duration: 2000 
       })
     },
@@ -256,7 +255,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
                     }}
                   >
-                    <span className="text-5xl">{item.icon}</span>
+                    <Emoji emoji={item.icon} size={48} />
                     <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-[1.3rem] pointer-events-none" />
                   </button>
                   
@@ -278,7 +277,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                       className="relative flex items-center justify-center group"
                     >
                       <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-[1.2rem] shadow-xl flex items-center justify-center border border-white/30 active:bg-white/40 transition-colors duration-100">
-                        <span className="text-3xl">{item.icon}</span>
+                        <Emoji emoji={item.icon} size={36} />
                       </div>
                     </button>
                   ))}
@@ -313,7 +312,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
           >
             <div className="bg-gray-900/95 backdrop-blur-xl text-white rounded-xl px-4 py-3 shadow-2xl border border-white/10 whitespace-nowrap">
               <div className="flex items-center gap-2">
-                <span className="text-2xl">{item.icon}</span>
+                <Emoji emoji={item.icon} size={24} />
                 <div>
                   <div className="font-bold text-sm">{item.label}</div>
                   <div className="text-xs text-gray-300">{item.desc}</div>
@@ -354,7 +353,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                   <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-2xl">
                     <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
                       <div className="text-center mb-4">
-                        <div className="text-6xl mb-3">🏛️</div>
+                        <div className="mb-3"><Emoji emoji="🏛️" size={72} /></div>
                         <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">UZBEK WARS</h2>
                         <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
                           {t('menu.aboutText', 'Стань легендой Великого Шёлкового пути! Исследуй древние города Узбекистана, развивай своего персонажа, торгуй, сражайся и соревнуйся с другими игроками.')}
@@ -416,9 +415,9 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: 'spring', stiffness: 500, delay: 0.2 }}
-                      className="text-8xl mb-4"
+                      className="mb-4"
                     >
-                      👨‍💻
+                      <Emoji emoji="👨‍💻" size={96} />
                     </motion.div>
                     <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
                       German Vitiaz
@@ -427,11 +426,11 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                       Full-Stack Developer
                     </p>
                     <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-500">
-                      <span>🚀 React</span>
+                      <span className="flex items-center gap-1"><Emoji emoji="🚀" size={14} /> React</span>
                       <span>•</span>
-                      <span>⚡ Node.js</span>
+                      <span className="flex items-center gap-1"><Emoji emoji="⚡" size={14} /> Node.js</span>
                       <span>•</span>
-                      <span>🎨 TypeScript</span>
+                      <span className="flex items-center gap-1"><Emoji emoji="🎨" size={14} /> TypeScript</span>
                     </div>
                   </div>
 
@@ -454,19 +453,19 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                     
                     <div className="grid grid-cols-2 gap-3">
                       <div className="p-3 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-[16px] text-center">
-                        <div className="text-2xl mb-1">⭐</div>
+                        <div className="mb-1"><Emoji emoji="⭐" size={24} /></div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">{t('about.codeQuality', 'Качество кода')}</div>
                       </div>
                       <div className="p-3 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-[16px] text-center">
-                        <div className="text-2xl mb-1">🎯</div>
+                        <div className="mb-1"><Emoji emoji="🎯" size={24} /></div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">{t('about.fastWork', 'Быстрая работа')}</div>
                       </div>
                     </div>
 
                     <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-[20px] border border-yellow-200 dark:border-yellow-800">
                       <p className="text-xs text-gray-700 dark:text-gray-300 text-center">
-                        💝 {t('app.thankYou', 'Спасибо за использование Узбек Варс!')}<br/>
-                        {t('app.starOnGithub', 'Если нравится игра - поставь ⭐ на GitHub')}
+                        <Emoji emoji="💝" size={14} className="inline" /> {t('app.thankYou', 'Спасибо за использование Узбек Варс!')}<br/>
+                        {t('app.starOnGithub', 'Если нравится игра - поставь')} <Emoji emoji="⭐" size={14} className="inline" /> {t('app.starOnGithub', 'на GitHub')}
                       </p>
                     </div>
                   </div>
@@ -534,8 +533,7 @@ export function HomePage() {
 
   const handleMenuClick = (path: string) => {
     if (!isAuthenticated) {
-      toast.error(t('auth.loginRequired', 'Войдите в аккаунт, узбек! 👆'), {
-        icon: '🔒',
+      toast.error(t('auth.loginRequired', 'Войдите в аккаунт, узбек!'), {
         duration: 3000
       });
       window.scrollTo({ top: 0, behavior: 'smooth' });

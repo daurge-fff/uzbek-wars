@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { PurchaseConfirmModal } from './PurchaseConfirmModal';
+import Emoji from './Emoji';
 
 type CosmeticType = 'clothing' | 'background' | 'accessory';
 type CosmeticRarity = 'common' | 'rare' | 'epic' | 'legendary';
@@ -46,7 +47,7 @@ const rarityBorders = {
   legendary: 'border-yellow-400 dark:border-orange-500'
 };
 
-const typeEmojis = {
+const typeEmojis: Record<CosmeticType, string> = {
   clothing: '👕',
   background: '🖼️',
   accessory: '💎'
@@ -120,11 +121,11 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
             {/* Currency Display */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full text-white font-black shadow-lg text-sm">
-                <span className="text-base">💰</span>
+                <Emoji emoji="💰" size={16} />
                 <span>{playerSoms?.toLocaleString() || 0}</span>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full text-white font-black shadow-lg text-sm">
-                <span className="text-base">💎</span>
+                <Emoji emoji="💎" size={16} />
                 <span>{playerCrystals || 0}</span>
               </div>
             </div>
@@ -153,7 +154,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
         {/* Items Grid */}
         {filteredItems.length === 0 ? (
           <div className="text-center py-20">
-            <div className="text-6xl mb-4">🛍️</div>
+            <div className="mb-4"><Emoji emoji="🛍️" size={72} /></div>
             <p className="text-xl font-bold text-gray-600 dark:text-gray-400">
               {t('cosmetic.noItems')}
             </p>
@@ -191,7 +192,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                 {/* Type Emoji */}
                 <div className="absolute top-2 left-2 z-10">
                   <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center">
-                    <span className="text-lg">{typeEmojis[item.type]}</span>
+                    <Emoji emoji={typeEmojis[item.type]} size={20} />
                   </div>
                 </div>
 
@@ -205,7 +206,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                 )}
 
                 {/* Item Icon */}
-                <div className="w-full aspect-square max-h-64 rounded-2xl bg-gradient-to-br flex items-center justify-center text-6xl mb-3 shadow-inner relative overflow-hidden mx-auto"
+                <div className="w-full aspect-square max-h-64 rounded-2xl bg-gradient-to-br flex items-center justify-center mb-3 shadow-inner relative overflow-hidden mx-auto"
                      style={{ backgroundImage: `linear-gradient(to bottom right, ${
                        rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
                        rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
@@ -215,7 +216,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                     animate={{ rotate: item.equipped ? [0, 5, -5, 0] : 0 }}
                     transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
                   >
-                    {item.icon}
+                    <Emoji emoji={item.icon} size={72} />
                   </motion.div>
                   {item.equipped && (
                     <div className="absolute inset-0 bg-gradient-to-t from-green-500/30 to-transparent" />
@@ -232,13 +233,13 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                   <div className="mb-3 flex gap-2 justify-center">
                     {item.priceSoms && (
                       <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-black text-sm shadow-lg">
-                        <span className="text-lg">💰</span>
+                        <Emoji emoji="💰" size={20} />
                         <span>{item.priceSoms.toLocaleString()}</span>
                       </div>
                     )}
                     {item.priceCrystals && (
                       <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl text-white font-black text-sm shadow-lg">
-                        <span className="text-lg">💎</span>
+                        <Emoji emoji="💎" size={20} />
                         <span>{item.priceCrystals}</span>
                       </div>
                     )}

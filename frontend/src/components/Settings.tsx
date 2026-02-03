@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { createPortal } from 'react-dom';
+import Emoji from './Emoji';
 
 interface SettingsProps {
   currentLanguage: 'ru' | 'uz' | 'uk' | 'en';
@@ -81,7 +82,7 @@ export const Settings = ({
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
                   }`}
                 >
-                  <div className="text-3xl mb-2">{lang.flag}</div>
+                  <div className="mb-2"><Emoji emoji={lang.flag} size={36} /></div>
                   <div className="text-sm">{lang.name}</div>
                 </motion.button>
               ))}
@@ -100,7 +101,7 @@ export const Settings = ({
               className="w-full p-4 bg-gray-100 dark:bg-gray-700 rounded-[20px] flex items-center justify-between"
             >
               <div className="flex items-center gap-3">
-                <span className="text-3xl">{theme === 'light' ? '🌙' : '☀️'}</span>
+                <Emoji emoji={theme === 'light' ? '🌙' : '☀️'} size={36} />
                 <span className="font-bold text-gray-900 dark:text-white">
                   {theme === 'light' 
                     ? t('settings.darkMode', 'Темная тема')
@@ -162,13 +163,19 @@ export const Settings = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
-                localStorage.removeItem('appInitialized');
+                // Очищаем кэш и перезагружаем
+                if ('caches' in window) {
+                  caches.keys().then(names => {
+                    names.forEach(name => caches.delete(name));
+                  });
+                }
+                localStorage.clear();
                 window.location.reload();
               }}
               className="w-full p-4 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-[20px] flex items-center justify-between"
             >
               <div className="flex items-center gap-3">
-                <span className="text-2xl">🔄</span>
+                <Emoji emoji="🔄" size={24} />
                 <span className="font-bold text-gray-900 dark:text-white">
                   {t('settings.resetApp', 'Сбросить настройки')}
                 </span>
@@ -309,9 +316,9 @@ export const Settings = ({
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ type: 'spring', stiffness: 500, delay: 0.2 }}
-                          className="text-8xl mb-4"
+                          className="mb-4"
                         >
-                          👨‍💻
+                          <Emoji emoji="👨‍💻" size={96} />
                         </motion.div>
                         <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
                           {t('settings.developerName', 'Разработчик')}
@@ -320,11 +327,11 @@ export const Settings = ({
                           {t('settings.developerRole', 'Full-Stack Developer')}
                         </p>
                         <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-500">
-                          <span>🚀 React</span>
+                          <span className="flex items-center gap-1"><Emoji emoji="🚀" size={14} /> React</span>
                           <span>•</span>
-                          <span>⚡ Node.js</span>
+                          <span className="flex items-center gap-1"><Emoji emoji="⚡" size={14} /> Node.js</span>
                           <span>•</span>
-                          <span>🎨 TypeScript</span>
+                          <span className="flex items-center gap-1"><Emoji emoji="🎨" size={14} /> TypeScript</span>
                         </div>
                       </div>
 
@@ -347,19 +354,19 @@ export const Settings = ({
                         
                         <div className="grid grid-cols-2 gap-3">
                           <div className="p-3 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-[16px] text-center">
-                            <div className="text-2xl mb-1">⭐</div>
+                            <div className="mb-1"><Emoji emoji="⭐" size={24} /></div>
                             <div className="text-xs text-gray-600 dark:text-gray-400">{t('settings.qualityCode', 'Качество кода')}</div>
                           </div>
                           <div className="p-3 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-[16px] text-center">
-                            <div className="text-2xl mb-1">🎯</div>
+                            <div className="mb-1"><Emoji emoji="🎯" size={24} /></div>
                             <div className="text-xs text-gray-600 dark:text-gray-400">{t('settings.fastWork', 'Быстрая работа')}</div>
                           </div>
                         </div>
 
                         <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-[20px] border border-yellow-200 dark:border-yellow-800">
                           <p className="text-xs text-gray-700 dark:text-gray-300 text-center">
-                            💝 {t('settings.thankYou', 'Спасибо за использование Uzbek Wars!')}<br/>
-                            {t('settings.starOnGithub', 'Если нравится игра - поставь ⭐ на GitHub')}
+                            <Emoji emoji="💝" size={14} className="inline" /> {t('settings.thankYou', 'Спасибо за использование Uzbek Wars!')}<br/>
+                            {t('settings.starOnGithub', 'Если нравится игра - поставь')} <Emoji emoji="⭐" size={14} className="inline" /> {t('settings.starOnGithub', 'на GitHub')}
                           </p>
                         </div>
                       </div>
@@ -401,7 +408,7 @@ const ToggleButton = ({ icon, label, enabled, onToggle }: ToggleButtonProps) => 
     className="w-full p-4 bg-gray-100 dark:bg-gray-700 rounded-[20px] flex items-center justify-between"
   >
     <div className="flex items-center gap-3">
-      <span className="text-2xl">{icon}</span>
+      <Emoji emoji={icon} size={24} />
       <span className="font-bold text-gray-900 dark:text-white">{label}</span>
     </div>
     <div className={`w-12 h-6 rounded-full transition-colors ${

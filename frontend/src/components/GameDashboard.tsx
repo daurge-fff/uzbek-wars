@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { CombatStatsModal } from './CombatStatsModal';
+import Emoji from './Emoji';
 
 interface PlayerState {
   characterId: string;
@@ -552,7 +553,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     onClick={() => window.location.href = '/classes'}
                     className="relative flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 dark:from-purple-500/30 dark:to-pink-500/30 border border-purple-400/50 dark:border-purple-500/50 hover:border-purple-500 dark:hover:border-purple-400 transition-all shadow-sm hover:shadow-md"
                   >
-                    <span className="text-base">{getCharacterEmoji(playerState.characterId)}</span>
+                    <Emoji emoji={getCharacterEmoji(playerState.characterId)} size={16} />
                     <span className="text-gray-900 dark:text-white font-bold text-[11px] whitespace-nowrap">
                       {getCharacterName(playerState.characterId)}
                     </span>
@@ -569,7 +570,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     onClick={() => setShowCombatStats(true)}
                     className="relative flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-gradient-to-r from-red-500/20 to-orange-500/20 dark:from-red-500/30 dark:to-orange-500/30 border border-red-400/50 dark:border-red-500/50 hover:border-red-500 dark:hover:border-red-400 transition-all shadow-sm hover:shadow-md"
                   >
-                    <span className="text-base">⚔️</span>
+                    <Emoji emoji="⚔️" size={16} />
                     <div className="flex-1 text-left">
                       <div className="text-gray-900 dark:text-white font-bold text-[11px] whitespace-nowrap">
                         {t('stats.title', 'Статы')}
@@ -596,7 +597,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     onClick={() => navigate('/cities')}
                     className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-blue-500/20 to-cyan-500/20 dark:from-blue-500/30 dark:to-cyan-500/30 border border-blue-400/50 dark:border-blue-500/50 hover:border-blue-500 dark:hover:border-blue-400 transition-all shadow-sm hover:shadow-md"
                   >
-                    <span className="text-base">🏙️</span>
+                    <Emoji emoji="🏙️" size={16} />
                     <span className="text-gray-900 dark:text-white font-bold text-[11px] whitespace-nowrap">
                       {getCityName(playerState.cityId)}
                     </span>
@@ -608,7 +609,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       whileTap={{ scale: 0.98 }}
                       className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-yellow-400/30 to-orange-500/30 border border-yellow-400/50 shadow-sm hover:shadow-md transition-all flex-1"
                     >
-                      <span className="text-base">💰</span>
+                      <Emoji emoji="💰" size={16} />
                       <span className="text-gray-900 dark:text-white font-black text-[11px] whitespace-nowrap">
                         {playerState.soms.toLocaleString()}
                       </span>
@@ -619,7 +620,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       whileTap={{ scale: 0.98 }}
                       className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-cyan-400/30 to-blue-500/30 border border-cyan-400/50 shadow-sm hover:shadow-md transition-all"
                     >
-                      <span className="text-base">💎</span>
+                      <Emoji emoji="💎" size={16} />
                       <span className="text-gray-900 dark:text-white font-black text-[11px]">
                         {playerState.donationCurrency}
                       </span>
@@ -688,13 +689,12 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                           }
                         />
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <motion.span 
+                          <motion.div
                             animate={isLow ? { rotate: [0, -10, 10, -10, 0] } : {}}
                             transition={{ duration: 0.5, repeat: isLow ? Infinity : 0, repeatDelay: 2 }}
-                            className="text-xl"
                           >
-                            {config.icon}
-                          </motion.span>
+                            <Emoji emoji={config.icon} size={24} />
+                          </motion.div>
                         </div>
                       </div>
                       

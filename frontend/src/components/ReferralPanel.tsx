@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import Emoji from './Emoji';
 
 interface ReferredFriend {
   username: string;
@@ -70,12 +71,12 @@ export const ReferralPanel = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-[20px] p-4 text-center">
-              <div className="text-3xl mb-2">💎</div>
+              <div className="mb-2"><Emoji emoji="💎" size={36} /></div>
               <div className="text-2xl font-black text-purple-600 dark:text-purple-400">{totalBonus.crystals}</div>
               <div className="text-xs text-gray-600 dark:text-gray-400">{t('referral.totalCrystals', 'Всего кристаллов')}</div>
             </div>
             <div className="bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-[20px] p-4 text-center">
-              <div className="text-3xl mb-2">💰</div>
+              <div className="mb-2"><Emoji emoji="💰" size={36} /></div>
               <div className="text-2xl font-black text-orange-600 dark:text-orange-400">{totalBonus.soms}</div>
               <div className="text-xs text-gray-600 dark:text-gray-400">{t('referral.totalSoms', 'Всего сомов')}</div>
             </div>
@@ -89,7 +90,7 @@ export const ReferralPanel = ({
 
           {referredFriends.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <div className="text-6xl mb-4">👥</div>
+              <div className="mb-4"><Emoji emoji="👥" size={72} /></div>
               <p>{t('referral.noFriends', 'Пока никто не присоединился')}</p>
             </div>
           ) : (
@@ -102,7 +103,7 @@ export const ReferralPanel = ({
                   transition={{ delay: index * 0.05 }}
                   className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-[20px]"
                 >
-                  <div className="text-4xl">{friend.avatar}</div>
+                  <Emoji emoji={friend.avatar} size={48} />
                   <div className="flex-1">
                     <div className="font-bold text-gray-900 dark:text-white">{friend.username}</div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
