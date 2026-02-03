@@ -59,11 +59,21 @@ router.get(
         player: {
           userId: player.userId,
           characterId: player.characterId,
+          cityId: player.cityId,
           level: player.level,
           experience: player.experience,
           soms: player.soms,
           donationCurrency: player.donationCurrency,
           stats: player.stats,
+          combatStats: player.combatStats || {
+            strength: 1,
+            defense: 1,
+            agility: 1,
+            stamina: 1,
+            intelligence: 1,
+            luck: 0,
+            statPoints: 5
+          },
           referralCode: player.referralCode,
           referredBy: player.referredBy,
           lastActivityTime: player.lastActivityTime,

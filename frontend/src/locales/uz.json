@@ -105,7 +105,9 @@
     "resetSuccess": "Statistika tiklandi!",
     "resetFailed": "Statistikani tiklab bo'lmadi",
     "reset": "Tiklash (100)",
-    "secret": "Sir"
+    "secret": "Sir",
+    "confirm": "Tasdiqlash",
+    "pointsToDistribute": "ochkolar taqsimlash uchun"
   },
   "ui": {
     "loading": "Yuklanmoqda...",

@@ -420,7 +420,9 @@
     "resetSuccess": "Stats reset!",
     "resetFailed": "Failed to reset stats",
     "reset": "Reset (100)",
-    "secret": "Secret"
+    "secret": "Secret",
+    "confirm": "Confirm",
+    "pointsToDistribute": "points to distribute"
   },
   "back": "Back",
   "about": {

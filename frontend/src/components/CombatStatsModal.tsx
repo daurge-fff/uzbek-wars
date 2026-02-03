@@ -42,8 +42,9 @@ const statColors = {
 export const CombatStatsModal = ({ isOpen, onClose, onStatsUpdated }: CombatStatsModalProps) => {
   const { t } = useTranslation();
   const [stats, setStats] = useState<CombatStats | null>(null);
+  const [tempStats, setTempStats] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
-  const [allocating, setAllocating] = useState<string | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -62,68 +63,101 @@ export const CombatStatsModal = ({ isOpen, onClose, onStatsUpdated }: CombatStat
       if (response.ok) {
         const data = await response.json();
         setStats(data.data);
+        setTempStats({});
+        setHasChanges(false);
       }
     } catch (error) {
       console.error('Failed to load combat stats:', error);
     }
   };
 
-  const allocatePoint = async (stat: string) => {
-    if (!stats || stats.statPoints <= 0) return;
-
-    setAllocating(stat);
-    try {
-      const response = await fetch('/api/combat-stats/allocate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ stat, points: 1 })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data.data);
-        toast.success(t('stats.allocated', `+1 ${t(`stats.${stat}`)}`));
-        onStatsUpdated?.();
-      } else {
-        const error = await response.json();
-        toast.error(error.error || t('stats.allocationFailed'));
-      }
-    } catch (error) {
-      toast.error(t('stats.allocationFailed'));
-    } finally {
-      setAllocating(null);
-    }
+  const getTempValue = (stat: string): number => {
+    if (!stats) return 0;
+    return (stats[stat as keyof CombatStats] as number) + (tempStats[stat] || 0);
   };
 
-  const resetStats = async () => {
-    if (!confirm(t('stats.confirmReset', 'Сбросить все статы за 100 кристаллов?'))) return;
+  const getAvailablePoints = (): number => {
+    if (!stats) return 0;
+    const usedPoints = Object.values(tempStats).reduce((sum, val) => sum + val, 0);
+    return stats.statPoints - usedPoints;
+  };
+
+  const canIncrease = (stat: string): boolean => {
+    const available = getAvailablePoints();
+    const currentValue = getTempValue(stat);
+    return available > 0 && currentValue < 100;
+  };
+
+  const canDecrease = (stat: string): boolean => {
+    return (tempStats[stat] || 0) > 0;
+  };
+
+  const increaseStat = (stat: string) => {
+    if (!canIncrease(stat)) return;
+    setTempStats(prev => ({
+      ...prev,
+      [stat]: (prev[stat] || 0) + 1
+    }));
+    setHasChanges(true);
+  };
+
+  const decreaseStat = (stat: string) => {
+    if (!canDecrease(stat)) return;
+    setTempStats(prev => ({
+      ...prev,
+      [stat]: (prev[stat] || 0) - 1
+    }));
+    setHasChanges(true);
+  };
+
+  const confirmAllocation = async () => {
+    if (!hasChanges || !stats) return;
 
     setLoading(true);
     try {
-      const response = await fetch('/api/combat-stats/reset', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      // Отправляем все изменения одним запросом
+      const allocations = Object.entries(tempStats).filter(([_, points]) => points > 0);
+      
+      for (const [stat, points] of allocations) {
+        const response = await fetch('/api/combat-stats/allocate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ stat, points })
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data.data);
-        toast.success(t('stats.resetSuccess', 'Статы сброшены!'));
-        onStatsUpdated?.();
-      } else {
-        const error = await response.json();
-        toast.error(error.error || t('stats.resetFailed'));
+        if (!response.ok) {
+          const error = await response.json();
+          toast.error(error.error || t('stats.allocationFailed'));
+          await loadStats();
+          return;
+        }
       }
+
+      toast.success(t('stats.allocated', 'Статы распределены!'));
+      await loadStats();
+      onStatsUpdated?.();
     } catch (error) {
-      toast.error(t('stats.resetFailed'));
+      toast.error(t('stats.allocationFailed'));
+      await loadStats();
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateTempPower = (): number => {
+    if (!stats) return 0;
+    const str = getTempValue('strength');
+    const def = getTempValue('defense');
+    const agi = getTempValue('agility');
+    const sta = getTempValue('stamina');
+    const int = getTempValue('intelligence');
+    const luck = getTempValue('luck');
+    
+    const basePower = str * 2 + def * 1.5 + agi * 1.8 + sta * 1.2 + int * 1.5;
+    return Math.round(basePower * (1 + luck * 0.1));
   };
 
   if (!isOpen) return null;
@@ -168,11 +202,11 @@ export const CombatStatsModal = ({ isOpen, onClose, onStatsUpdated }: CombatStat
                       <div className="flex items-center justify-center gap-4 mt-4">
                         <div className="px-4 py-2 bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl text-white font-black shadow-lg">
                           <div className="text-xs opacity-90">{t('stats.availablePoints', 'Доступно')}</div>
-                          <div className="text-2xl">{stats.statPoints}</div>
+                          <div className="text-2xl">{getAvailablePoints()}</div>
                         </div>
                         <div className="px-4 py-2 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl text-white font-black shadow-lg">
                           <div className="text-xs opacity-90">{t('stats.combatPower', 'Мощь')}</div>
-                          <div className="text-2xl">{stats.combatPower}</div>
+                          <div className="text-2xl">{calculateTempPower()}</div>
                         </div>
                       </div>
                     )}
@@ -181,56 +215,81 @@ export const CombatStatsModal = ({ isOpen, onClose, onStatsUpdated }: CombatStat
                   {/* Stats List */}
                   {stats && (
                     <div className="space-y-3 mb-6">
-                      {(['strength', 'defense', 'agility', 'stamina', 'intelligence'] as const).map((stat) => (
-                        <motion.div
-                          key={stat}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-4 border border-gray-200 dark:border-gray-600"
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-3">
-                              <span className="text-3xl">{statIcons[stat]}</span>
-                              <div>
-                                <div className="font-black text-gray-900 dark:text-white">
-                                  {t(`stats.${stat}`, stat)}
+                      {(['strength', 'defense', 'agility', 'stamina', 'intelligence'] as const).map((stat) => {
+                        const currentValue = getTempValue(stat);
+                        const hasTemp = (tempStats[stat] || 0) !== 0;
+                        
+                        return (
+                          <motion.div
+                            key={stat}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-4 border border-gray-200 dark:border-gray-600"
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-3">
+                                <span className="text-3xl">{statIcons[stat]}</span>
+                                <div>
+                                  <div className="font-black text-gray-900 dark:text-white">
+                                    {t(`stats.${stat}`, stat)}
+                                  </div>
+                                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                                    {t(`stats.${stat}Desc`, '')}
+                                  </div>
                                 </div>
-                                <div className="text-xs text-gray-600 dark:text-gray-400">
-                                  {t(`stats.${stat}Desc`, '')}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className={`text-2xl font-black ${hasTemp ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>
+                                  {currentValue}
+                                  {hasTemp && (
+                                    <span className="text-sm ml-1">
+                                      (+{tempStats[stat]})
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex gap-1">
+                                  <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => decreaseStat(stat)}
+                                    disabled={!canDecrease(stat)}
+                                    className={`w-8 h-8 rounded-full font-black text-lg shadow-lg transition-all ${
+                                      canDecrease(stat)
+                                        ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white hover:shadow-xl'
+                                        : 'bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed'
+                                    }`}
+                                  >
+                                    −
+                                  </motion.button>
+                                  <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => increaseStat(stat)}
+                                    disabled={!canIncrease(stat)}
+                                    className={`w-8 h-8 rounded-full font-black text-lg shadow-lg transition-all ${
+                                      canIncrease(stat)
+                                        ? `bg-gradient-to-r ${statColors[stat]} text-white hover:shadow-xl`
+                                        : 'bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed'
+                                    }`}
+                                  >
+                                    +
+                                  </motion.button>
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <div className="text-2xl font-black text-gray-900 dark:text-white">
-                                {stats[stat]}
-                              </div>
-                              <motion.button
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={() => allocatePoint(stat)}
-                                disabled={stats.statPoints <= 0 || stats[stat] >= 100 || allocating === stat}
-                                className={`w-10 h-10 rounded-full font-black text-xl shadow-lg transition-all ${
-                                  stats.statPoints > 0 && stats[stat] < 100
-                                    ? `bg-gradient-to-r ${statColors[stat]} text-white hover:shadow-xl`
-                                    : 'bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed'
-                                }`}
-                              >
-                                {allocating === stat ? '...' : '+'}
-                              </motion.button>
+                            
+                            {/* Progress Bar */}
+                            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 overflow-hidden">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${currentValue}%` }}
+                                transition={{ duration: 0.5, delay: 0.1 }}
+                                className={`h-full bg-gradient-to-r ${statColors[stat]}`}
+                              />
                             </div>
-                          </div>
-                          
-                          {/* Progress Bar */}
-                          <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${stats[stat]}%` }}
-                              transition={{ duration: 0.5, delay: 0.1 }}
-                              className={`h-full bg-gradient-to-r ${statColors[stat]}`}
-                            />
-                          </div>
-                        </motion.div>
-                      ))}
+                          </motion.div>
+                        );
+                      })}
 
                       {/* Luck - Special */}
                       <motion.div
@@ -271,16 +330,21 @@ export const CombatStatsModal = ({ isOpen, onClose, onStatsUpdated }: CombatStat
                     >
                       {t('common.close', 'Закрыть')}
                     </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={resetStats}
-                      disabled={loading}
-                      className="flex-1 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-full shadow-lg flex items-center justify-center gap-2"
-                    >
-                      <span>💎</span>
-                      <span>{t('stats.reset', 'Сброс (100)')}</span>
-                    </motion.button>
+                    
+                    {hasChanges && (
+                      <motion.button
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={confirmAllocation}
+                        disabled={loading}
+                        className="flex-1 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-full shadow-lg flex items-center justify-center gap-2"
+                      >
+                        <span>✓</span>
+                        <span>{t('stats.confirm', 'Подтвердить')}</span>
+                      </motion.button>
+                    )}
                   </div>
                 </div>
               </div>

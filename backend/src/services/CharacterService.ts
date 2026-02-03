@@ -234,7 +234,7 @@ export async function selectCharacter(
       }
       player = await existingPlayer.save();
     } else {
-      // Create new player profile
+      // Create new player profile with initial combat stats
       player = await Player.create({
         userId,
         characterId: request.characterId,
@@ -248,6 +248,15 @@ export async function selectCharacter(
           health: 100,
           mood: 100,
           energy: 100,
+        },
+        combatStats: {
+          strength: 1,
+          defense: 1,
+          agility: 1,
+          stamina: 1,
+          intelligence: 1,
+          luck: 0,
+          statPoints: 5, // 5 free points to distribute
         },
         cosmetics: {
           clothing: [],

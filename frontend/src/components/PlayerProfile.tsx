@@ -12,6 +12,15 @@ interface PlayerStats {
   totalActivities: number;
   daysPlayed: number;
   achievements: number;
+  // Combat stats
+  strength?: number;
+  defense?: number;
+  agility?: number;
+  stamina?: number;
+  intelligence?: number;
+  luck?: number;
+  statPoints?: number;
+  combatPower?: number;
 }
 
 interface PlayerInfo {
@@ -207,6 +216,62 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
               </motion.div>
             ))}
           </div>
+        </motion.div>
+
+        {/* Combat Stats - NEW */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 border-2 border-red-200 dark:border-red-800"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+              <span>⚔️</span>
+              <span>{t('stats.title', 'Боевые Статы')}</span>
+            </h2>
+            <div className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-white font-black text-sm">
+              {t('stats.combatPower', 'Мощь')}: {stats.combatPower || 0}
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { key: 'strength', icon: '💪', color: 'from-red-500 to-orange-500' },
+              { key: 'defense', icon: '🛡️', color: 'from-blue-500 to-cyan-500' },
+              { key: 'agility', icon: '⚡', color: 'from-yellow-500 to-amber-500' },
+              { key: 'stamina', icon: '❤️', color: 'from-green-500 to-emerald-500' },
+              { key: 'intelligence', icon: '🧠', color: 'from-purple-500 to-pink-500' },
+              { key: 'luck', icon: '🍀', color: 'from-teal-500 to-green-500' }
+            ].map((stat, index) => (
+              <motion.div
+                key={stat.key}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.25 + index * 0.05 }}
+                className={`bg-gradient-to-br ${stat.color} rounded-xl p-3 text-center shadow-lg`}
+              >
+                <div className="text-2xl mb-1">{stat.icon}</div>
+                <div className="text-xl font-black text-white mb-0.5">
+                  {stats[stat.key as keyof PlayerStats] || (stat.key === 'luck' ? '0.00' : 0)}
+                </div>
+                <div className="text-[10px] text-white/90 font-semibold">
+                  {t(`stats.${stat.key}`, stat.key)}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          {stats.statPoints > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mt-4 p-3 bg-amber-100 dark:bg-amber-900/30 rounded-xl border border-amber-300 dark:border-amber-700 text-center"
+            >
+              <span className="text-amber-800 dark:text-amber-200 font-bold text-sm">
+                ⭐ {t('stats.availablePoints', 'Доступно')}: {stats.statPoints} {t('stats.pointsToDistribute', 'очков для распределения')}
+              </span>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Referral Code */}
