@@ -498,64 +498,25 @@ export function HomePage() {
   const { t, i18n } = useTranslation();
   const [randomEmoji, setRandomEmoji] = useState('🎮');
 
-  // Генератор случайного эмодзи с проверкой что он реально отображается
+  // Генератор случайного эмодзи - только проверенные диапазоны без placeholder
   const generateRandomEmoji = () => {
-    // Широкие диапазоны эмодзи
+    // Узкие проверенные диапазоны с реальными эмодзи (без placeholder)
     const emojiRanges = [
-      [0x1F600, 0x1F64F], // Emoticons
-      [0x1F300, 0x1F5FF], // Misc Symbols and Pictographs
-      [0x1F680, 0x1F6FF], // Transport and Map
-      [0x1F900, 0x1F9FF], // Supplemental Symbols
-      [0x1FA70, 0x1FAFF], // Extended Pictographs
+      [0x1F600, 0x1F636], // Смайлики и эмоции
+      [0x1F680, 0x1F6C5], // Транспорт
+      [0x1F300, 0x1F320], // Природа и погода
+      [0x1F330, 0x1F37D], // Еда и напитки
+      [0x1F3A0, 0x1F3C4], // Активности
+      [0x1F3C6, 0x1F3CA], // Спорт
+      [0x1F400, 0x1F43E], // Животные
+      [0x1F440, 0x1F4FC], // Объекты
+      [0x1F950, 0x1F96B], // Еда (дополнительно)
+      [0x1F980, 0x1F991], // Животные (дополнительно)
     ];
 
-    // Создаем canvas для проверки отображения (один раз)
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return '🎮';
-    
-    canvas.width = 20;
-    canvas.height = 20;
-    ctx.textBaseline = 'top';
-    ctx.font = '16px Arial';
-
-    let attempts = 0;
-    const maxAttempts = 50; // Уменьшил до 50
-
-    while (attempts < maxAttempts) {
-      // Генерируем случайный код
-      const range = emojiRanges[Math.floor(Math.random() * emojiRanges.length)];
-      const code = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
-      const emoji = String.fromCodePoint(code);
-
-      // Очищаем canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Рисуем эмодзи
-      ctx.fillText(emoji, 0, 0);
-      
-      // Проверяем что что-то нарисовалось
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      let hasPixels = false;
-      
-      // Проверяем есть ли хоть какие-то непрозрачные пиксели
-      for (let i = 3; i < imageData.data.length; i += 4) {
-        if (imageData.data[i] > 0) { // alpha > 0
-          hasPixels = true;
-          break;
-        }
-      }
-      
-      // Если что-то нарисовалось - это валидный эмодзи
-      if (hasPixels) {
-        return emoji;
-      }
-      
-      attempts++;
-    }
-    
-    // Если не получилось, возвращаем дефолтный
-    return '🎮';
+    const range = emojiRanges[Math.floor(Math.random() * emojiRanges.length)];
+    const code = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
+    return String.fromCodePoint(code);
   };
 
   // Генерируем новый эмодзи при монтировании и каждые 3 секунды
