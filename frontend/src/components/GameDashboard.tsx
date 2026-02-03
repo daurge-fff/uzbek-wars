@@ -141,6 +141,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
   const [warningActivity, setWarningActivity] = useState<Activity | null>(null);
   const [hoveredStat, setHoveredStat] = useState<string | null>(null);
   const [characterModifiers, setCharacterModifiers] = useState<any>(null);
+  const [shakingStat, setShakingStat] = useState<string | null>(null);
 
   // Загружаем модификаторы класса при монтировании
   useEffect(() => {
@@ -188,7 +189,29 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
     if (modifiedActivity.statModifiers) {
       const newModifiers: any = {};
       Object.entries(modifiedActivity.statModifiers).forEach(([key, value]) => {
-        newModifiers[key] = Math.round(value as number);
+        const statValue = value as number;
+        
+        // Применяем модификаторы класса к статам
+        if (key === 'mood' && statValue > 0) {
+          // Положительное настроение от работы
+          const moodBonus = characterModifiers.moodFromWork || 0;
+          newModifiers[key] = Math.round(statValue * (1 + moodBonus / 100));
+        } else if (key === 'hunger' && statValue > 0) {
+          // Восстановление голода от еды
+          const foodBonus = characterModifiers.foodRecovery || 0;
+          newModifiers[key] = Math.round(statValue * (1 + foodBonus / 100));
+        } else if (key === 'health' && statValue > 0) {
+          // Восстановление здоровья от еды
+          const healthBonus = characterModifiers.healthFromFood || 0;
+          newModifiers[key] = Math.round(statValue * (1 + healthBonus / 100));
+        } else if (key === 'energy' && statValue > 0) {
+          // Восстановление энергии
+          const energyBonus = characterModifiers.energyRecovery || 0;
+          newModifiers[key] = Math.round(statValue * (1 + energyBonus / 100));
+        } else {
+          // Остальные статы без изменений
+          newModifiers[key] = Math.round(statValue);
+        }
       });
       modifiedActivity.statModifiers = newModifiers;
     }
@@ -273,11 +296,50 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Проверяем хватает ли статов для активности
+  const checkStatsForActivity = (activity: Activity): { canPerform: boolean; missingStats: string[] } => {
+    if (!activity.statModifiers) return { canPerform: true, missingStats: [] };
+
+    const missingStats: string[] = [];
+
+    Object.entries(activity.statModifiers).forEach(([stat, change]) => {
+      if (change < 0) { // Только негативные изменения (расход статов)
+        const currentValue = playerState.stats[stat as keyof typeof playerState.stats];
+        const requiredValue = Math.abs(change);
+        
+        if (currentValue < requiredValue) {
+          missingStats.push(stat);
+        }
+      }
+    });
+
+    return {
+      canPerform: missingStats.length === 0,
+      missingStats
+    };
+  };
+
   const handleActivityClick = (activity: Activity) => {
     // Проверка уровня
     if (activity.requiredLevel && playerState.level < activity.requiredLevel) {
       setWarningActivity(activity);
       setShowLevelWarning(true);
+      return;
+    }
+
+    // Проверка статов
+    const { canPerform, missingStats } = checkStatsForActivity(activity);
+    if (!canPerform) {
+      // Трясем все недостающие статы по очереди
+      missingStats.forEach((stat, index) => {
+        setTimeout(() => {
+          setShakingStat(stat);
+          setTimeout(() => setShakingStat(null), 600);
+        }, index * 200);
+      });
+      
+      // Скроллим наверх к статам
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -513,12 +575,26 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 const config = statConfig[key as keyof typeof statConfig];
                 const isLow = value < 30;
                 const isCritical = value < 15;
+                const isShaking = shakingStat === key;
                 return (
                   <motion.div
                     key={key}
                     initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.1 + index * 0.05 }}
+                    animate={
+                      isShaking 
+                        ? { 
+                            opacity: 1, 
+                            scale: 1,
+                            x: [0, -10, 10, -10, 10, -5, 5, 0],
+                            rotate: [0, -5, 5, -5, 5, 0]
+                          }
+                        : { opacity: 1, scale: 1 }
+                    }
+                    transition={
+                      isShaking 
+                        ? { duration: 0.6, ease: 'easeInOut' }
+                        : { delay: 0.1 + index * 0.05 }
+                    }
                     onHoverStart={() => setHoveredStat(key)}
                     onHoverEnd={() => setHoveredStat(null)}
                     className={`relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-xl p-3 shadow-md border-2 ${
@@ -698,7 +774,8 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               const isLocked = activity.requiredLevel && playerState.level < activity.requiredLevel;
               const activityImage = activityImages[activity.id] || activity.icon;
               const canAfford = !activity.cost || playerState.soms >= activity.cost;
-              const isAvailable = !isLocked && canAfford;
+              const { canPerform: hasEnoughStats, missingStats } = checkStatsForActivity(activity);
+              const isAvailable = !isLocked && canAfford && hasEnoughStats;
 
               return (
                 <motion.button
@@ -737,7 +814,13 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     </div>
                   )}
 
-                  {!canAfford && !isLocked && (
+                  {!hasEnoughStats && !isLocked && (
+                    <div className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-lg shadow-md z-10 flex items-center gap-1">
+                      {missingStats.map(stat => statConfig[stat as keyof typeof statConfig]?.icon).join('')}
+                    </div>
+                  )}
+
+                  {!canAfford && !isLocked && hasEnoughStats && (
                     <div className="absolute top-2 right-2 px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded-lg shadow-md z-10">
                       💰
                     </div>

@@ -264,6 +264,7 @@ router.post(
 
       // Импортируем ActivityService для получения информации об активности
       const { getActivityById } = await import('../services/ActivityService');
+      const { applyActivityTime } = await import('../services/CharacterBonusService');
       const activity = getActivityById(activityId);
       
       if (!activity) {
@@ -280,8 +281,10 @@ router.post(
         return;
       }
 
-      // Используем duration из активности (в секундах)
-      const durationSeconds = activity.duration;
+      // Применяем модификатор времени класса к длительности активности
+      const baseDuration = activity.duration;
+      const modifiedDuration = applyActivityTime(baseDuration, player.characterId);
+      const durationSeconds = modifiedDuration;
       const startTime = new Date();
       const endTime = new Date(startTime.getTime() + durationSeconds * 1000);
 

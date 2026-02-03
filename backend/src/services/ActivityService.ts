@@ -20,6 +20,9 @@ import {
   applyIncomeBonus, 
   applyExperienceBonus,
   applyMoodFromWork,
+  applyEnergyRecovery,
+  applyFoodRecovery,
+  applyHealthFromFood,
 } from './CharacterBonusService';
 import { logger } from '../utils/logger';
 
@@ -390,9 +393,18 @@ export function executeActivity(player: IPlayer, activity: Activity): ActivityRe
   // Apply stat modifiers with character bonuses
   const modifiedStats = { ...activity.statModifiers };
   
-  // Apply mood bonus from work if activity gives negative mood
+  // Apply character-specific stat modifiers
   if (modifiedStats.mood && modifiedStats.mood > 0) {
     modifiedStats.mood = applyMoodFromWork(modifiedStats.mood, player.characterId);
+  }
+  if (modifiedStats.hunger && modifiedStats.hunger > 0) {
+    modifiedStats.hunger = applyFoodRecovery(modifiedStats.hunger, player.characterId);
+  }
+  if (modifiedStats.health && modifiedStats.health > 0) {
+    modifiedStats.health = applyHealthFromFood(modifiedStats.health, player.characterId);
+  }
+  if (modifiedStats.energy && modifiedStats.energy > 0) {
+    modifiedStats.energy = applyEnergyRecovery(modifiedStats.energy, player.characterId);
   }
   
   updatePlayerStats(player, modifiedStats);

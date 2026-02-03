@@ -36,19 +36,28 @@ export interface CharacterModifiers {
   
   // Activity modifiers
   activityTime?: number;
+  activityDuration?: number;
   cookingSpeed?: number;
   craftingSpeed?: number;
   
   // Work modifiers
   moodFromWork?: number;
+  moodFromFood?: number;
   
   // Experience modifiers
   experienceBonus?: number;
+  doubleXpChance?: number;
   
   // Combat modifiers
   maxHealthBonus?: number;
   damageBonus?: number;
   defenseBonus?: number;
+  
+  // Other modifiers
+  crystalBonus?: number;
+  cooldownReduction?: number;
+  allPurchaseDiscount?: number;
+  foodDiscount?: number;
 }
 
 /**
@@ -156,12 +165,15 @@ export function applyHealthDrain(baseDrain: number, characterId: string): number
 
 /**
  * Applies activity time modifier
+ * Negative values = faster (less time), Positive values = slower (more time)
  */
 export function applyActivityTime(baseTime: number, characterId: string): number {
   const modifiers = getCharacterModifiers(characterId);
-  const penalty = modifiers.activityTime || 0;
+  const modifier = modifiers.activityDuration || 0;
   
-  return Math.floor(baseTime * (1 + penalty / 100));
+  // activityDuration: -10 means 10% faster (0.9x time)
+  // activityDuration: +10 means 10% slower (1.1x time)
+  return Math.floor(baseTime * (1 + modifier / 100));
 }
 
 /**
