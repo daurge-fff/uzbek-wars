@@ -55,6 +55,7 @@ interface GameDashboardProps {
     endTime: number;
   } | null;
   onActivityComplete?: () => void;
+  onRefreshPlayer?: () => void;
 }
 
 // Circular progress component
@@ -134,7 +135,7 @@ const activityImages: Record<string, string> = {
   'eat': '🍽️'
 };
 
-export const GameDashboard = ({ playerState, activities, onActivitySelect, userAvatar, currentActivity, onActivityComplete }: GameDashboardProps) => {
+export const GameDashboard = ({ playerState, activities, onActivitySelect, userAvatar, currentActivity, onActivityComplete, onRefreshPlayer }: GameDashboardProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState<number>(0);
@@ -146,6 +147,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
   const [characterModifiers, setCharacterModifiers] = useState<any>(null);
   const [shakingStat, setShakingStat] = useState<string | null>(null);
   const [showCombatStats, setShowCombatStats] = useState(false);
+  const [isCombatStatsOpen, setIsCombatStatsOpen] = useState(false);
 
   // Загружаем модификаторы класса при монтировании
   useEffect(() => {
@@ -456,7 +458,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative rounded-3xl p-6 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden"
+          className="relative rounded-3xl px-4 pt-4 pb-2 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden"
         >
           {/* Animated background blobs */}
           <div className="absolute inset-0 opacity-30 dark:opacity-20">
@@ -467,7 +469,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
 
           <div className="relative z-10">
             {/* Верхняя часть - профиль */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-4 mb-4">
               {/* Аватар с XP кольцом */}
               <div className="relative flex-shrink-0">
                 <svg className="absolute -inset-2 w-20 h-20 -rotate-90">
@@ -571,9 +573,23 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     className="relative flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-gradient-to-r from-red-500/20 to-orange-500/20 dark:from-red-500/30 dark:to-orange-500/30 border border-red-400/50 dark:border-red-500/50 hover:border-red-500 dark:hover:border-red-400 transition-all shadow-sm hover:shadow-md"
                   >
                     <span className="text-base">⚔️</span>
-                    <span className="text-gray-900 dark:text-white font-bold text-[11px] whitespace-nowrap">
-                      {t('stats.title', 'Статы')}
-                    </span>
+                    <div className="flex-1 text-left">
+                      <div className="text-gray-900 dark:text-white font-bold text-[11px] whitespace-nowrap">
+                        {t('stats.title', 'Статы')}
+                      </div>
+                      {playerState.stats.combatPower !== undefined && (
+                        <div className="text-[9px] text-gray-600 dark:text-gray-400">
+                          💥 {playerState.stats.combatPower}
+                        </div>
+                      )}
+                    </div>
+                    {playerState.stats.statPoints > 0 && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 flex items-center justify-center shadow-sm animate-pulse">
+                        <span className="text-[9px] font-black text-white">
+                          {playerState.stats.statPoints}
+                        </span>
+                      </div>
+                    )}
                   </motion.button>
                   
                   {/* Вторая строка - город и валюты */}
@@ -603,9 +619,11 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               </div>
             </div>
 
-            {/* Нижняя часть - статы в одну строку */}
-            <div className="grid grid-cols-4 gap-3">
-              {Object.entries(playerState.stats).map(([key, value], index) => {
+            {/* Расходные статы */}
+            <div className="grid grid-cols-4 gap-3 mt-3 mb-2">
+              {Object.entries(playerState.stats)
+                .filter(([key]) => ['hunger', 'health', 'mood', 'energy'].includes(key))
+                .map(([key, value], index) => {
                 const config = statConfig[key as keyof typeof statConfig];
                 const isLow = value < 30;
                 const isCritical = value < 15;
@@ -706,6 +724,97 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 );
               })}
             </div>
+
+            {/* Боевые статы - расширяемая секция (выползает сверху) */}
+            <AnimatePresence>
+              {playerState.stats.strength !== undefined && isCombatStatsOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ 
+                    height: { type: 'spring', stiffness: 500, damping: 40 },
+                    opacity: { duration: 0.2 }
+                  }}
+                  className="overflow-hidden mt-2"
+                >
+                <div className="grid grid-cols-5 gap-2 pt-2 pb-1">
+                  <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
+                    <div className="absolute -top-2 w-6 h-6 rounded-full bg-red-500 flex items-center justify-center shadow-md">
+                      <span className="text-xs">💪</span>
+                    </div>
+                    <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.strength}</span>
+                    <span className="text-[8px] text-gray-600 dark:text-gray-400 font-bold uppercase">{t('stats.strength', 'Сила')}</span>
+                  </div>
+                  <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
+                    <div className="absolute -top-2 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center shadow-md">
+                      <span className="text-xs">🛡️</span>
+                    </div>
+                    <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.defense}</span>
+                    <span className="text-[8px] text-gray-600 dark:text-gray-400 font-bold uppercase">{t('stats.defense', 'Захист')}</span>
+                  </div>
+                  <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
+                    <div className="absolute -top-2 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center shadow-md">
+                      <span className="text-xs">⚡</span>
+                    </div>
+                    <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.agility}</span>
+                    <span className="text-[8px] text-gray-600 dark:text-gray-400 font-bold uppercase">{t('stats.agility', 'Спритн.')}</span>
+                  </div>
+                  <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
+                    <div className="absolute -top-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow-md">
+                      <span className="text-xs">❤️</span>
+                    </div>
+                    <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.stamina}</span>
+                    <span className="text-[8px] text-gray-600 dark:text-gray-400 font-bold uppercase">{t('stats.stamina', 'Витрив.')}</span>
+                  </div>
+                  <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
+                    <div className="absolute -top-2 w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center shadow-md">
+                      <span className="text-xs">🧠</span>
+                    </div>
+                    <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.intelligence}</span>
+                    <span className="text-[8px] text-gray-600 dark:text-gray-400 font-bold uppercase">{t('stats.intelligence', 'Інтел.')}</span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+            </AnimatePresence>
+
+            {/* Drag handle для раскрытия боевых статов (всегда внизу) */}
+            {playerState.stats.strength !== undefined && (
+              <motion.div
+                drag="y"
+                dragConstraints={{ top: 0, bottom: 0 }}
+                dragElastic={0.2}
+                dragMomentum={false}
+                onDragEnd={(e, info) => {
+                  const velocity = info.velocity.y;
+                  const offset = info.offset.y;
+                  
+                  // Используем velocity для более естественного поведения
+                  if (Math.abs(velocity) > 500) {
+                    // Быстрый свайп
+                    if (velocity > 0) {
+                      setIsCombatStatsOpen(true); // Открыть
+                    } else {
+                      setIsCombatStatsOpen(false); // Закрыть
+                    }
+                  } else {
+                    // Медленное перетаскивание - используем порог
+                    if (!isCombatStatsOpen && offset > 30) {
+                      setIsCombatStatsOpen(true);
+                    } else if (isCombatStatsOpen && offset < -30) {
+                      setIsCombatStatsOpen(false);
+                    }
+                  }
+                }}
+                className="w-full py-1 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none"
+              >
+                <motion.div 
+                  animate={{ scaleX: isCombatStatsOpen ? 1.2 : 1 }}
+                  className="w-8 h-0.5 bg-gray-300 dark:bg-gray-600 rounded-full"
+                />
+              </motion.div>
+            )}
           </div>
         </motion.div>
 
@@ -1257,10 +1366,16 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
         isOpen={showCombatStats} 
         onClose={() => setShowCombatStats(false)}
         onStatsUpdated={() => {
-          // Reload player data if needed
-          if (onActivityComplete) {
-            onActivityComplete();
+          // Закрываем модалку
+          setShowCombatStats(false);
+          // Обновляем данные игрока
+          if (onRefreshPlayer) {
+            onRefreshPlayer();
           }
+          // Небольшая задержка перед открытием панели, чтобы данные успели обновиться
+          setTimeout(() => {
+            setIsCombatStatsOpen(true);
+          }, 300);
         }}
       />
     </div>

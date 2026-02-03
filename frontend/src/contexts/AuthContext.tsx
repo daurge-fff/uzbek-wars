@@ -30,6 +30,14 @@ interface Player {
     health: number;
     mood: number;
     energy: number;
+    strength?: number;
+    defense?: number;
+    agility?: number;
+    stamina?: number;
+    intelligence?: number;
+    luck?: number;
+    statPoints?: number;
+    combatPower?: number;
   };
 }
 
@@ -143,7 +151,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           characterId: response.data.player.characterId,
           cityId: player?.cityId || '',
           donationCurrency: response.data.player.donationCurrency,
-          stats: response.data.player.stats
+          stats: {
+            ...response.data.player.stats,
+            // Объединяем боевые статы
+            ...(response.data.player.combatStats || {})
+          }
         };
         setPlayer(updatedPlayer);
         localStorage.setItem('auth_player', JSON.stringify(updatedPlayer));

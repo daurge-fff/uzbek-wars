@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 export const GameDashboardContainer = () => {
   const { t } = useTranslation();
-  const { player, token, isAuthenticated, user, updatePlayer } = useAuth();
+  const { player, token, isAuthenticated, user, updatePlayer, refreshPlayer } = useAuth();
   const navigate = useNavigate();
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,6 +46,7 @@ export const GameDashboardContainer = () => {
     // Загружаем данные
     loadActivities();
     loadCurrentActivity();
+    refreshPlayer();  // Обновляем данные игрока включая боевые статы
     
     // Проверяем активность каждые 5 секунд
     const interval = setInterval(checkActivityCompletion, 5000);
@@ -263,11 +264,22 @@ export const GameDashboardContainer = () => {
     experienceToNextLevel: calculateExpToNextLevel(player.level),
     soms: player.soms,
     donationCurrency: player.donationCurrency,
-    stats: player.stats || {
-      hunger: 100,
-      health: 100,
-      mood: 100,
-      energy: 100
+    stats: {
+      ...(player.stats || {
+        hunger: 100,
+        health: 100,
+        mood: 100,
+        energy: 100
+      }),
+      // Добавляем боевые статы если они есть
+      strength: player.stats?.strength,
+      defense: player.stats?.defense,
+      agility: player.stats?.agility,
+      stamina: player.stats?.stamina,
+      intelligence: player.stats?.intelligence,
+      luck: player.stats?.luck,
+      statPoints: player.stats?.statPoints,
+      combatPower: player.stats?.combatPower
     }
   };
 
@@ -280,6 +292,7 @@ export const GameDashboardContainer = () => {
         userAvatar={user?.avatar}
         currentActivity={currentActivity}
         onActivityComplete={completeActivity}
+        onRefreshPlayer={refreshPlayer}
       />
 
       {/* Cooldown Modal - красивое окно с обратным отсчетом */}

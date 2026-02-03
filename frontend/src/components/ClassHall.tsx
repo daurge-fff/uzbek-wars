@@ -19,40 +19,28 @@ interface ClassData {
 
 const ClassHall: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { token } = useAuth();
+  const { token, player } = useAuth();
   const [classes, setClasses] = useState<{ tier1: ClassData[]; tier2: ClassData[]; tier3: ClassData[] } | null>(null);
   const [selectedClass, setSelectedClass] = useState<ClassData | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [currentClass, setCurrentClass] = useState('char_trader');
-  const [currentLevel, setCurrentLevel] = useState(1);
-  const [playerSoms, setPlayerSoms] = useState(0);
-  const [playerCrystals, setPlayerCrystals] = useState(0);
+  const [currentClass, setCurrentClass] = useState(player?.characterId || 'char_trader');
+  const [currentLevel, setCurrentLevel] = useState(player?.level || 1);
+  const [playerSoms, setPlayerSoms] = useState(player?.soms || 0);
+  const [playerCrystals, setPlayerCrystals] = useState(player?.donationCurrency || 0);
 
   useEffect(() => {
-    fetchPlayerData();
+    if (player) {
+      setCurrentClass(player.characterId);
+      setCurrentLevel(player.level);
+      setPlayerSoms(player.soms);
+      setPlayerCrystals(player.donationCurrency);
+    }
+  }, [player]);
+
+  useEffect(() => {
     fetchClasses();
   }, []);
-
-  const fetchPlayerData = async () => {
-    try {
-      if (!token) return;
-      const response = await fetch('/api/player/profile', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.player) {
-          setCurrentClass(data.player.characterId);
-          setCurrentLevel(data.player.level);
-          setPlayerSoms(data.player.soms);
-          setPlayerCrystals(data.player.donationCurrency);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch player data:', error);
-    }
-  };
 
   const fetchClasses = async () => {
     try {
@@ -112,14 +100,14 @@ const ClassHall: React.FC = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        setCurrentClass(selectedClass.id);
         if (data.player) {
+          setCurrentClass(data.player.characterId);
+          setCurrentLevel(data.player.level);
           setPlayerSoms(data.player.soms);
           setPlayerCrystals(data.player.donationCurrency);
         }
         setShowConfirmModal(false);
         setSelectedClass(null);
-        await fetchPlayerData();
       }
     } catch (error) {
       console.error('Failed to change class:', error);
@@ -210,7 +198,6 @@ const ClassHall: React.FC = () => {
   const renderTierCarousel = (tierClasses: ClassData[], tier: number) => {
     const tierBadge = getTierBadge(tier);
     
-    // Find index of current class in this tier - use key to force re-render when currentClass changes
     const currentClassIndex = tierClasses.findIndex(c => c.id === currentClass);
     const initialIndex = currentClassIndex >= 0 ? currentClassIndex : 0;
 
