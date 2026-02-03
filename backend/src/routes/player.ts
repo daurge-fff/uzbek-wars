@@ -7,6 +7,12 @@
 
 import { Router, Response } from 'express';
 import { authenticate, authenticateUser, AuthRequest } from '../middleware/auth';
+import { 
+  validateSelectCharacter, 
+  validatePerformActivity, 
+  validateLanguage,
+  rateLimit 
+} from '../middleware/validation';
 import { User, Language } from '../models/User';
 import { Player } from '../models/Player';
 import { logger } from '../utils/logger';
@@ -107,6 +113,7 @@ router.get(
 router.patch(
   '/language',
   authenticate,
+  validateLanguage,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { language } = req.body;
@@ -224,6 +231,7 @@ router.get(
 router.post(
   '/perform-activity',
   authenticate,
+  validatePerformActivity,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { activityId } = req.body;
@@ -475,6 +483,8 @@ router.post(
 router.post(
   '/select-character',
   authenticateUser,
+  validateSelectCharacter,
+  rateLimit(10, 60000), // 10 requests per minute
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       logger.info('=== SELECT CHARACTER REQUEST ===');

@@ -39,17 +39,33 @@ export function createServer(): Application {
   const app = express();
   
   // Security headers - must be first
-  app.use(helmet());
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "https:"],
+      },
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true
+    }
+  }));
   
   // CORS configuration for frontend
   app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   }));
   
-  // Request parsing
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  // Request parsing with size limits to prevent DoS
+  app.use(express.json({ limit: '10kb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10kb' }));
   
   // Response compression for better performance
   app.use(compression());

@@ -15,6 +15,7 @@ import { logger } from '../utils/logger';
 import { createVerificationSession } from '../bot/telegramBot';
 import { User } from '../models/User';
 import { authenticate } from '../middleware/auth';
+import { validateUsernameCheck, rateLimit } from '../middleware/validation';
 import { env } from '../config/environment';
 
 const router = Router();
@@ -322,7 +323,11 @@ async function verifyGoogleToken(idToken: string): Promise<{
  * POST /api/auth/check-username
  * Check if username is available
  */
-router.post('/check-username', async (req: Request, res: Response) => {
+router.post(
+  '/check-username',
+  rateLimit(20, 60000), // 20 requests per minute
+  validateUsernameCheck,
+  async (req: Request, res: Response) => {
   try {
     const { username } = req.body;
 
