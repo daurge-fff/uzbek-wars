@@ -855,7 +855,7 @@ export function HomePage() {
                   <div className="text-xs text-gray-600 dark:text-gray-300">{t('dashboard.crystals', 'Кристаллы')}</div>
                 </div>
                 <div className="text-center p-3 bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-2xl">
-                  <div className="text-2xl mb-1">✨</div>
+                  <div className="text-2xl mb-1"><Emoji emoji="✨" size={24} /></div>
                   <div className={`font-black text-gray-900 dark:text-white mb-1 ${player.experience >= 1000 ? 'text-xl' : 'text-2xl'
                     }`}>
                     {formatNumber(player.experience)}
@@ -881,7 +881,7 @@ export function HomePage() {
               href="/privacy"
               className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
             >
-              🔒 Privacy Policy
+              <Emoji emoji="🔒" size={14} /> Privacy Policy
             </motion.a>
             <span className="text-gray-400">•</span>
             <motion.a
@@ -890,7 +890,7 @@ export function HomePage() {
               href="/terms"
               className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
             >
-              📜 Terms of Service
+              <Emoji emoji="📜" size={14} /> Terms of Service
             </motion.a>
           </div>
         </motion.div>
