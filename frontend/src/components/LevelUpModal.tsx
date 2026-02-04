@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
+import Emoji from './Emoji';
+
 
 interface LevelUpModalProps {
   isOpen: boolean;
@@ -26,7 +28,7 @@ export const LevelUpModal = ({ isOpen, onClose, level, statPoints = 5 }: LevelUp
             onClick={onClose}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
           />
-          
+
           {/* Modal Container */}
           <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
             <motion.div
@@ -43,13 +45,13 @@ export const LevelUpModal = ({ isOpen, onClose, level, statPoints = 5 }: LevelUp
                     {[...Array(20)].map((_, i) => (
                       <motion.div
                         key={i}
-                        initial={{ 
+                        initial={{
                           x: Math.random() * 400 - 200,
                           y: Math.random() * 400 - 200,
                           scale: 0,
                           opacity: 0
                         }}
-                        animate={{ 
+                        animate={{
                           x: Math.random() * 400 - 200,
                           y: Math.random() * 400 - 200,
                           scale: [0, 1, 0],
@@ -76,15 +78,15 @@ export const LevelUpModal = ({ isOpen, onClose, level, statPoints = 5 }: LevelUp
                     <motion.div
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
-                      transition={{ 
-                        type: 'spring', 
-                        stiffness: 200, 
+                      transition={{
+                        type: 'spring',
+                        stiffness: 200,
                         damping: 15,
                         delay: 0.2
                       }}
                       className="text-9xl mb-4"
                     >
-                      🎉
+                      <Emoji emoji="🎉" size={96} />
                     </motion.div>
 
                     {/* Title */}
@@ -101,7 +103,7 @@ export const LevelUpModal = ({ isOpen, onClose, level, statPoints = 5 }: LevelUp
                     <motion.div
                       initial={{ opacity: 0, scale: 0 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ 
+                      transition={{
                         type: 'spring',
                         stiffness: 300,
                         delay: 0.6
@@ -127,7 +129,7 @@ export const LevelUpModal = ({ isOpen, onClose, level, statPoints = 5 }: LevelUp
                         className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-2xl p-6 mb-6 border-2 border-red-200 dark:border-red-800"
                       >
                         <div className="flex items-center justify-center gap-3 mb-2">
-                          <span className="text-4xl">⚔️</span>
+                          <Emoji emoji="⚔️" size={32} />
                           <div className="text-left">
                             <div className="text-sm text-gray-600 dark:text-gray-400 font-bold">
                               {t('stats.availablePoints', 'Доступно очков')}
@@ -170,7 +172,7 @@ export const LevelUpModal = ({ isOpen, onClose, level, statPoints = 5 }: LevelUp
                       />
                       <span className="relative flex items-center justify-center gap-2">
                         <span>{t('common.continue', 'Продолжить')}</span>
-                        <span>🚀</span>
+                        <Emoji emoji="🚀" size={20} />
                       </span>
                     </motion.button>
                   </div>

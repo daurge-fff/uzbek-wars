@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
+import Emoji from './Emoji';
 
 interface ActivityResultProps {
   isOpen: boolean;
@@ -46,9 +47,9 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
                   initial={{ scale: 0 }}
                   animate={{ scale: [0, 1.2, 1] }}
                   transition={{ duration: 0.5 }}
-                  className="text-6xl mb-2"
+                  className="mb-2"
                 >
-                  🎉
+                  <Emoji emoji="🎉" size={64} />
                 </motion.div>
                 <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
                   {t('notifications.level_up', { level: result.newLevel })}
@@ -74,8 +75,8 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
                 className="flex items-center justify-between bg-gradient-to-r from-yellow-50 to-orange-50 rounded-[20px] p-3 border border-yellow-200"
               >
                 <span className="text-gray-700 font-medium">{t('activity.soms')}</span>
-                <span className="text-xl font-black text-yellow-600">
-                  {result.somsGained > 0 ? '+' : ''}{result.somsGained} <span>💰</span>
+                <span className="text-xl font-black text-yellow-600 flex items-center gap-1">
+                  {result.somsGained > 0 ? '+' : ''}{result.somsGained} <Emoji emoji="💰" size={20} />
                 </span>
               </motion.div>
 
@@ -89,23 +90,23 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
                   <div className="text-sm text-gray-700 mb-2 font-medium">{t('activity.statChanges')}</div>
                   <div className="flex gap-3 justify-center flex-wrap">
                     {result.statChanges.hunger && (
-                      <span className={`px-3 py-1 rounded-full font-black ${result.statChanges.hunger > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        🍖 {result.statChanges.hunger > 0 ? '+' : ''}{result.statChanges.hunger}
+                      <span className={`px-3 py-1 rounded-full font-black flex items-center gap-1 ${result.statChanges.hunger > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <Emoji emoji="🍖" size={16} /> {result.statChanges.hunger > 0 ? '+' : ''}{result.statChanges.hunger}
                       </span>
                     )}
                     {result.statChanges.health && (
-                      <span className={`px-3 py-1 rounded-full font-black ${result.statChanges.health > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        ❤️ {result.statChanges.health > 0 ? '+' : ''}{result.statChanges.health}
+                      <span className={`px-3 py-1 rounded-full font-black flex items-center gap-1 ${result.statChanges.health > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <Emoji emoji="❤️" size={16} /> {result.statChanges.health > 0 ? '+' : ''}{result.statChanges.health}
                       </span>
                     )}
                     {result.statChanges.mood && (
-                      <span className={`px-3 py-1 rounded-full font-black ${result.statChanges.mood > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        😊 {result.statChanges.mood > 0 ? '+' : ''}{result.statChanges.mood}
+                      <span className={`px-3 py-1 rounded-full font-black flex items-center gap-1 ${result.statChanges.mood > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <Emoji emoji="😊" size={16} /> {result.statChanges.mood > 0 ? '+' : ''}{result.statChanges.mood}
                       </span>
                     )}
                     {result.statChanges.energy && (
-                      <span className={`px-3 py-1 rounded-full font-black ${result.statChanges.energy > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        ⚡ {result.statChanges.energy > 0 ? '+' : ''}{result.statChanges.energy}
+                      <span className={`px-3 py-1 rounded-full font-black flex items-center gap-1 ${result.statChanges.energy > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <Emoji emoji="⚡" size={16} /> {result.statChanges.energy > 0 ? '+' : ''}{result.statChanges.energy}
                       </span>
                     )}
                   </div>

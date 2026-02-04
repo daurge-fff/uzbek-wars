@@ -21,11 +21,11 @@ interface ReferralPanelProps {
   };
 }
 
-export const ReferralPanel = ({ 
-  referralCode, 
-  referralLink, 
+export const ReferralPanel = ({
+  referralCode,
+  referralLink,
   referredFriends,
-  totalBonus 
+  totalBonus
 }: ReferralPanelProps) => {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
@@ -48,7 +48,7 @@ export const ReferralPanel = ({
           <h1 className="text-3xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-4">
             {t('referral.title', 'Пригласи друзей')}
           </h1>
-          
+
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             {t('referral.description', 'Получай 50 кристаллов и 500 сомов за каждого друга!')}
           </p>
@@ -58,14 +58,14 @@ export const ReferralPanel = ({
               <div className="text-sm opacity-90 mb-2">{t('referral.yourCode', 'Твой код')}</div>
               <div className="text-4xl font-black tracking-wider">{referralCode}</div>
             </div>
-            
+
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={copyToClipboard}
               className="w-full py-3 bg-white/20 backdrop-blur-xl rounded-full font-bold flex items-center justify-center gap-2 hover:bg-white/30 transition-all"
             >
-              {copied ? '✓' : '📋'} {copied ? t('referral.copied', 'Скопировано!') : t('referral.copy', 'Копировать ссылку')}
+              {copied ? <Emoji emoji="✅" size={18} /> : <Emoji emoji="📋" size={18} />} {copied ? t('referral.copied', 'Скопировано!') : t('referral.copy', 'Копировать ссылку')}
             </motion.button>
           </div>
 

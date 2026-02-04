@@ -95,30 +95,30 @@ const CircularProgress = ({ value, max, size = 120, strokeWidth = 8, color = '#6
 };
 
 const statConfig = {
-  hunger: { 
-    icon: '🍖', 
-    color: 'from-orange-500 to-red-500', 
+  hunger: {
+    icon: '🍖',
+    color: 'from-orange-500 to-red-500',
     labelKey: 'stats.hunger',
     descKey: 'stats.hungerDesc',
     lowWarningKey: 'stats.hungerLow'
   },
-  health: { 
-    icon: '❤️', 
-    color: 'from-red-500 to-pink-500', 
+  health: {
+    icon: '❤️',
+    color: 'from-red-500 to-pink-500',
     labelKey: 'stats.health',
     descKey: 'stats.healthDesc',
     lowWarningKey: 'stats.healthLow'
   },
-  mood: { 
-    icon: '😊', 
-    color: 'from-yellow-500 to-orange-500', 
+  mood: {
+    icon: '😊',
+    color: 'from-yellow-500 to-orange-500',
     labelKey: 'stats.mood',
     descKey: 'stats.moodDesc',
     lowWarningKey: 'stats.moodLow'
   },
-  energy: { 
-    icon: '⚡', 
-    color: 'from-blue-500 to-cyan-500', 
+  energy: {
+    icon: '⚡',
+    color: 'from-blue-500 to-cyan-500',
     labelKey: 'stats.energy',
     descKey: 'stats.energyDesc',
     lowWarningKey: 'stats.energyLow'
@@ -177,17 +177,17 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
   // Применяем модификаторы класса к значениям активности
   const applyClassModifiers = (activity: Activity) => {
     if (!activity.rewards) return activity;
-    
+
     // Если модификаторы не загружены, возвращаем базовые значения
     if (!characterModifiers) return activity;
 
     const modifiedActivity = { ...activity };
-    
+
     // Применяем бонусы к наградам
     if (modifiedActivity.rewards) {
       const expBonus = characterModifiers.experienceBonus || 0;
       const incomeBonus = characterModifiers.incomeBonus || 0;
-      
+
       modifiedActivity.rewards = {
         experience: Math.round(activity.rewards.experience * (1 + expBonus / 100)),
         soms: Math.round(activity.rewards.soms * (1 + incomeBonus / 100)),
@@ -199,7 +199,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       const newModifiers: any = {};
       Object.entries(modifiedActivity.statModifiers).forEach(([key, value]) => {
         const statValue = value as number;
-        
+
         // Применяем модификаторы класса к статам
         if (key === 'mood' && statValue > 0) {
           // Положительное настроение от работы
@@ -253,10 +253,10 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       setProgress(0);
       return;
     }
-    
+
     // Проверяем что данные валидные - если нет, просто не запускаем таймер
-    if (!currentActivity.startTime || !currentActivity.endTime || 
-        isNaN(currentActivity.startTime) || isNaN(currentActivity.endTime)) {
+    if (!currentActivity.startTime || !currentActivity.endTime ||
+      isNaN(currentActivity.startTime) || isNaN(currentActivity.endTime)) {
       setTimeLeft(0);
       setProgress(0);
       return;
@@ -315,7 +315,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       if (change < 0) { // Только негативные изменения (расход статов)
         const currentValue = playerState.stats[stat as keyof typeof playerState.stats];
         const requiredValue = Math.abs(change);
-        
+
         if (currentValue < requiredValue) {
           missingStats.push(stat);
         }
@@ -346,7 +346,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
           setTimeout(() => setShakingStat(null), 600);
         }, index * 200);
       });
-      
+
       // Скроллим наверх к статам
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
@@ -405,7 +405,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
     const tier2 = ['char_merchant', 'char_warrior', 'char_scholar', 'char_master_chef', 'char_master_artisan'];
     // Tier 3 classes
     const tier3 = ['char_tycoon', 'char_legend', 'char_sage'];
-    
+
     if (tier1.includes(characterId)) return 1;
     if (tier2.includes(characterId)) return 2;
     if (tier3.includes(characterId)) return 3;
@@ -451,7 +451,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black pb-32">
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        
+
         {/* Объединенная карточка профиля и статов */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -489,7 +489,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     fill="none"
                     strokeDasharray={`${2 * Math.PI * 36}`}
                     initial={{ strokeDashoffset: 2 * Math.PI * 36 }}
-                    animate={{ 
+                    animate={{
                       strokeDashoffset: 2 * Math.PI * 36 * (1 - playerState.experience / playerState.experienceToNextLevel)
                     }}
                     transition={{ duration: 1, ease: 'easeOut' }}
@@ -504,12 +504,12 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     </linearGradient>
                   </defs>
                 </svg>
-                
+
                 <div className="w-16 h-16 rounded-full overflow-hidden shadow-xl ring-2 ring-white dark:ring-gray-800 bg-gray-200 dark:bg-gray-700">
                   {userAvatar && userAvatar.startsWith('http') ? (
-                    <img 
-                      src={userAvatar} 
-                      alt="Avatar" 
+                    <img
+                      src={userAvatar}
+                      alt="Avatar"
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
                       onError={(e) => {
@@ -519,7 +519,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-3xl">
-                      {userAvatar || '👤'}
+                      <Emoji emoji="👤" size={32} />
                     </div>
                   )}
                 </div>
@@ -535,7 +535,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     {Math.round((playerState.experience / playerState.experienceToNextLevel) * 100)}%
                   </span>
                 </div>
-                
+
                 <div className="relative h-2 bg-gray-300/60 dark:bg-gray-600/60 rounded-full overflow-hidden mb-3">
                   <motion.div
                     initial={{ width: 0 }}
@@ -563,7 +563,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       </span>
                     </div>
                   </motion.button>
-                  
+
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -576,12 +576,12 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                         {t('stats.title', 'Статы')}
                       </div>
                       {playerState.stats.combatPower !== undefined && (
-                        <div className="text-[9px] text-gray-600 dark:text-gray-400">
-                          💥 {playerState.stats.combatPower}
+                        <div className="text-[9px] text-gray-600 dark:text-gray-400 flex items-center gap-0.5">
+                          <Emoji emoji="💥" size={10} /> {playerState.stats.combatPower}
                         </div>
                       )}
                     </div>
-                    {playerState.stats.statPoints > 0 && (
+                    {(playerState.stats.statPoints ?? 0) > 0 && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 flex items-center justify-center shadow-sm animate-pulse">
                         <span className="text-[9px] font-black text-white">
                           {playerState.stats.statPoints}
@@ -589,7 +589,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       </div>
                     )}
                   </motion.button>
-                  
+
                   {/* Вторая строка - город и валюты */}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -635,104 +635,100 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               {Object.entries(playerState.stats)
                 .filter(([key]) => ['hunger', 'health', 'mood', 'energy'].includes(key))
                 .map(([key, value], index) => {
-                const config = statConfig[key as keyof typeof statConfig];
-                const isLow = value < 30;
-                const isCritical = value < 15;
-                const isShaking = shakingStat === key;
-                return (
-                  <motion.div
-                    key={key}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={
-                      isShaking 
-                        ? { 
-                            opacity: 1, 
+                  const config = statConfig[key as keyof typeof statConfig];
+                  const isLow = value < 30;
+                  const isCritical = value < 15;
+                  const isShaking = shakingStat === key;
+                  return (
+                    <motion.div
+                      key={key}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={
+                        isShaking
+                          ? {
+                            opacity: 1,
                             scale: 1,
                             x: [0, -10, 10, -10, 10, -5, 5, 0],
                             rotate: [0, -5, 5, -5, 5, 0]
                           }
-                        : { opacity: 1, scale: 1 }
-                    }
-                    transition={
-                      isShaking 
-                        ? { duration: 0.6, ease: 'easeInOut' }
-                        : { delay: 0.1 + index * 0.05 }
-                    }
-                    onHoverStart={() => setHoveredStat(key)}
-                    onHoverEnd={() => setHoveredStat(null)}
-                    className={`relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-xl p-3 shadow-md border-2 ${
-                      isCritical ? 'border-red-500 dark:border-red-400' :
-                      isLow ? 'border-orange-500 dark:border-orange-400' :
-                      'border-gray-200 dark:border-gray-700'
-                    } cursor-pointer hover:shadow-lg transition-all hover:scale-105`}
-                  >
-                    {isCritical && (
-                      <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1 }}
-                        className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-lg"
-                      >
-                        !
-                      </motion.div>
-                    )}
-                    
-                    <div className="flex flex-col items-center">
-                      <div className="relative mb-1">
-                        <CircularProgress 
-                          value={value} 
-                          max={100} 
-                          size={50} 
-                          strokeWidth={5}
-                          color={
-                            value >= 70 ? '#10b981' : 
-                            value >= 40 ? '#f59e0b' : '#ef4444'
-                          }
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <motion.div
-                            animate={isLow ? { rotate: [0, -10, 10, -10, 0] } : {}}
-                            transition={{ duration: 0.5, repeat: isLow ? Infinity : 0, repeatDelay: 2 }}
-                          >
-                            <Emoji emoji={config.icon} size={24} />
-                          </motion.div>
-                        </div>
-                      </div>
-                      
-                      <div className="text-center w-full">
-                        <div className={`text-lg font-black mb-0.5 ${
-                          value >= 70 ? 'text-green-600 dark:text-green-400' :
-                          value >= 40 ? 'text-yellow-600 dark:text-yellow-400' :
-                          'text-red-600 dark:text-red-400'
-                        }`}>
-                          {value}%
-                        </div>
-                        <div className="text-[10px] text-gray-600 dark:text-gray-400 font-bold">
-                          {t(config.labelKey)}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <AnimatePresence>
-                      {hoveredStat === key && (
+                          : { opacity: 1, scale: 1 }
+                      }
+                      transition={
+                        isShaking
+                          ? { duration: 0.6, ease: 'easeInOut' }
+                          : { delay: 0.1 + index * 0.05 }
+                      }
+                      onHoverStart={() => setHoveredStat(key)}
+                      onHoverEnd={() => setHoveredStat(null)}
+                      className={`relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-xl p-3 shadow-md border-2 ${isCritical ? 'border-red-500 dark:border-red-400' :
+                        isLow ? 'border-orange-500 dark:border-orange-400' :
+                          'border-gray-200 dark:border-gray-700'
+                        } cursor-pointer hover:shadow-lg transition-all hover:scale-105`}
+                    >
+                      {isCritical && (
                         <motion.div
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.9 }}
-                          className={`absolute bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-xl shadow-2xl z-[200] max-w-[180px] text-center whitespace-normal pointer-events-none ${
-                            index >= 2 ? 'right-0' : 'left-1/2 transform -translate-x-1/2'
-                          }`}
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1 }}
+                          className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-lg"
                         >
-                          <div className="font-bold mb-1">{t(config.descKey)}</div>
-                          {isLow && <div className="text-red-400 font-bold">{t(config.lowWarningKey)}</div>}
-                          <div className={`absolute top-full border-[6px] border-transparent border-t-gray-900 dark:border-t-gray-700 ${
-                            index >= 2 ? 'right-4' : 'left-1/2 transform -translate-x-1/2'
-                          }`} />
+                          !
                         </motion.div>
                       )}
-                    </AnimatePresence>
-                  </motion.div>
-                );
-              })}
+
+                      <div className="flex flex-col items-center">
+                        <div className="relative mb-1">
+                          <CircularProgress
+                            value={value}
+                            max={100}
+                            size={50}
+                            strokeWidth={5}
+                            color={
+                              value >= 70 ? '#10b981' :
+                                value >= 40 ? '#f59e0b' : '#ef4444'
+                            }
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <motion.div
+                              animate={isLow ? { rotate: [0, -10, 10, -10, 0] } : {}}
+                              transition={{ duration: 0.5, repeat: isLow ? Infinity : 0, repeatDelay: 2 }}
+                            >
+                              <Emoji emoji={config.icon} size={24} />
+                            </motion.div>
+                          </div>
+                        </div>
+
+                        <div className="text-center w-full">
+                          <div className={`text-lg font-black mb-0.5 ${value >= 70 ? 'text-green-600 dark:text-green-400' :
+                            value >= 40 ? 'text-yellow-600 dark:text-yellow-400' :
+                              'text-red-600 dark:text-red-400'
+                            }`}>
+                            {value}%
+                          </div>
+                          <div className="text-[10px] text-gray-600 dark:text-gray-400 font-bold">
+                            {t(config.labelKey)}
+                          </div>
+                        </div>
+                      </div>
+
+                      <AnimatePresence>
+                        {hoveredStat === key && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className={`absolute bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-xl shadow-2xl z-[200] max-w-[180px] text-center whitespace-normal pointer-events-none ${index >= 2 ? 'right-0' : 'left-1/2 transform -translate-x-1/2'
+                              }`}
+                          >
+                            <div className="font-bold mb-1">{t(config.descKey)}</div>
+                            {isLow && <div className="text-red-400 font-bold">{t(config.lowWarningKey)}</div>}
+                            <div className={`absolute top-full border-[6px] border-transparent border-t-gray-900 dark:border-t-gray-700 ${index >= 2 ? 'right-4' : 'left-1/2 transform -translate-x-1/2'
+                              }`} />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  );
+                })}
             </div>
 
             {/* Боевые статы - расширяемая секция (выползает сверху) */}
@@ -742,51 +738,51 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ 
+                  transition={{
                     height: { type: 'spring', stiffness: 500, damping: 40 },
                     opacity: { duration: 0.2 }
                   }}
                   className="overflow-hidden mt-2"
                 >
-                <div className="grid grid-cols-5 gap-2 pt-2 pb-1">
-                  <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
-                    <div className="absolute -top-2 w-6 h-6 rounded-full bg-red-500 flex items-center justify-center shadow-md">
-                      <span className="text-xs">💪</span>
+                  <div className="grid grid-cols-5 gap-2 pt-2 pb-1">
+                    <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
+                      <div className="absolute -top-2 w-6 h-6 rounded-full bg-red-500 flex items-center justify-center shadow-md">
+                        <Emoji emoji="💪" size={14} />
+                      </div>
+                      <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.strength}</span>
+                      <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.strength', 'Сила')}</span>
                     </div>
-                    <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.strength}</span>
-                    <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.strength', 'Сила')}</span>
-                  </div>
-                  <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
-                    <div className="absolute -top-2 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center shadow-md">
-                      <span className="text-xs">🛡️</span>
+                    <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
+                      <div className="absolute -top-2 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center shadow-md">
+                        <Emoji emoji="🛡️" size={14} />
+                      </div>
+                      <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.defense}</span>
+                      <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.defense', 'Защита')}</span>
                     </div>
-                    <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.defense}</span>
-                    <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.defense', 'Защита')}</span>
-                  </div>
-                  <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
-                    <div className="absolute -top-2 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center shadow-md">
-                      <span className="text-xs">⚡</span>
+                    <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
+                      <div className="absolute -top-2 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center shadow-md">
+                        <span className="text-xs">⚡</span>
+                      </div>
+                      <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.agility}</span>
+                      <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.agility', 'Ловкость')}</span>
                     </div>
-                    <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.agility}</span>
-                    <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.agility', 'Ловкость')}</span>
-                  </div>
-                  <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
-                    <div className="absolute -top-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow-md">
-                      <span className="text-xs">❤️</span>
+                    <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
+                      <div className="absolute -top-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow-md">
+                        <Emoji emoji="❤️" size={14} />
+                      </div>
+                      <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.stamina}</span>
+                      <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.stamina', 'Выносливость')}</span>
                     </div>
-                    <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.stamina}</span>
-                    <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.stamina', 'Выносливость')}</span>
-                  </div>
-                  <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
-                    <div className="absolute -top-2 w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center shadow-md">
-                      <span className="text-xs">🧠</span>
+                    <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
+                      <div className="absolute -top-2 w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center shadow-md">
+                        <Emoji emoji="🧠" size={14} />
+                      </div>
+                      <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.intelligence}</span>
+                      <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.intelligence', 'Интеллект')}</span>
                     </div>
-                    <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.intelligence}</span>
-                    <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.intelligence', 'Интеллект')}</span>
                   </div>
-                </div>
-              </motion.div>
-            )}
+                </motion.div>
+              )}
             </AnimatePresence>
 
             {/* Drag handle для раскрытия боевых статов (всегда внизу) */}
@@ -799,7 +795,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 onDragEnd={(e, info) => {
                   const velocity = info.velocity.y;
                   const offset = info.offset.y;
-                  
+
                   // Используем velocity для более естественного поведения
                   if (Math.abs(velocity) > 500) {
                     // Быстрый свайп
@@ -819,7 +815,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 }}
                 className="w-full py-1 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none"
               >
-                <motion.div 
+                <motion.div
                   animate={{ scaleX: isCombatStatsOpen ? 1.2 : 1 }}
                   className="w-8 h-0.5 bg-gray-300 dark:bg-gray-600 rounded-full"
                 />
@@ -836,20 +832,19 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className={`bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 rounded-2xl p-4 shadow-xl text-white relative overflow-hidden ${
-                timeLeft <= 5 ? 'ring-2 ring-yellow-300 ring-opacity-60' : ''
-              }`}
+              className={`bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 rounded-2xl p-4 shadow-xl text-white relative overflow-hidden ${timeLeft <= 5 ? 'ring-2 ring-yellow-300 ring-opacity-60' : ''
+                }`}
             >
               {/* Animated background */}
               <motion.div
-                animate={{ 
+                animate={{
                   scale: [1, 1.3, 1],
                   opacity: [0.15, 0.05, 0.15]
                 }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
                 className="absolute inset-0 bg-white rounded-full blur-3xl"
               />
-              
+
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-3">
                   {/* Icon */}
@@ -860,7 +855,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   >
                     {activityImages[currentActivity.activityId] || '⏳'}
                   </motion.div>
-                  
+
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="text-xs opacity-80 font-semibold mb-1">🎯 {t('dashboard.currentActivity')}</div>
@@ -868,9 +863,9 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       {t(`activities.${currentActivity.activityId}`)}
                     </div>
                   </div>
-                  
+
                   {/* Timer */}
-                  <motion.div 
+                  <motion.div
                     className={`text-3xl font-black ${timeLeft <= 5 ? 'text-yellow-300' : ''}`}
                     animate={timeLeft <= 5 ? { scale: [1, 1.15, 1] } : {}}
                     transition={timeLeft <= 5 ? { duration: 0.6, repeat: Infinity, ease: 'easeInOut' } : {}}
@@ -919,7 +914,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               {activities.filter(a => (!a.requiredLevel || playerState.level >= a.requiredLevel) && (!a.cost || playerState.soms >= a.cost)).length} / {activities.length}
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             {activities.map((activity, index) => {
               const activityName = getActivityName(activity);
@@ -940,21 +935,19 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   whileTap={isAvailable && !currentActivity ? { scale: 0.98 } : {}}
                   onClick={() => handleActivityClick(activity)}
                   disabled={!isAvailable || !!currentActivity}
-                  className={`relative rounded-2xl p-5 shadow-md transition-all border-2 ${
-                    !isAvailable
-                      ? 'bg-gray-100 dark:bg-gray-800/50 border-gray-300 dark:border-gray-700 opacity-50 cursor-not-allowed'
-                      : currentActivity
+                  className={`relative rounded-2xl p-5 shadow-md transition-all border-2 ${!isAvailable
+                    ? 'bg-gray-100 dark:bg-gray-800/50 border-gray-300 dark:border-gray-700 opacity-50 cursor-not-allowed'
+                    : currentActivity
                       ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-50 cursor-not-allowed'
                       : 'bg-white dark:bg-gray-800 border-green-200 dark:border-green-700 hover:shadow-lg hover:border-green-300 dark:hover:border-green-600'
-                  } overflow-hidden`}
+                    } overflow-hidden`}
                 >
                   {/* Duration badge - top left */}
                   {activity.duration && (
-                    <div className={`absolute top-2 left-2 px-2 py-1 rounded-lg font-bold text-xs flex items-center gap-1 shadow-sm ${
-                      !isAvailable 
-                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
-                        : 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
-                    }`}>
+                    <div className={`absolute top-2 left-2 px-2 py-1 rounded-lg font-bold text-xs flex items-center gap-1 shadow-sm ${!isAvailable
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
+                      : 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
+                      }`}>
                       <span>⏱️</span>
                       <span>{activity.duration < 60 ? `${activity.duration}с` : `${Math.floor(activity.duration / 60)}м`}</span>
                     </div>
@@ -975,25 +968,23 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
 
                   {!canAfford && !isLocked && hasEnoughStats && (
                     <div className="absolute top-2 right-2 px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded-lg shadow-md z-10">
-                      💰
+                      <Emoji emoji="💰" size={12} />
                     </div>
                   )}
-                  
+
                   <div className="relative z-10">
                     <div className={`text-5xl mb-3 text-center ${!isAvailable ? 'grayscale' : ''}`}>
                       {activityImage}
                     </div>
-                    
-                    <div className={`text-base font-bold mb-2 text-center line-clamp-2 min-h-[2.5rem] ${
-                      !isAvailable ? 'text-gray-500 dark:text-gray-500' : 'text-gray-900 dark:text-white'
-                    }`}>
+
+                    <div className={`text-base font-bold mb-2 text-center line-clamp-2 min-h-[2.5rem] ${!isAvailable ? 'text-gray-500 dark:text-gray-500' : 'text-gray-900 dark:text-white'
+                      }`}>
                       {activityName}
                     </div>
 
                     {activityDesc && (
-                      <div className={`text-xs mb-3 text-center line-clamp-2 min-h-[2rem] ${
-                        !isAvailable ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'
-                      }`}>
+                      <div className={`text-xs mb-3 text-center line-clamp-2 min-h-[2rem] ${!isAvailable ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'
+                        }`}>
                         {activityDesc}
                       </div>
                     )}
@@ -1003,20 +994,18 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       <div className="mb-2">
                         <div className="text-[9px] text-gray-500 dark:text-gray-400 mb-1 text-center font-semibold uppercase tracking-wide">{t('dashboard.rewards')}</div>
                         <div className="flex flex-wrap gap-1.5 justify-center">
-                          <div className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${
-                            !isAvailable 
-                              ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
-                              : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                          }`}>
-                            <span>⭐</span>
+                          <div className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${!isAvailable
+                            ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
+                            : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                            }`}>
+                            <Emoji emoji="⭐" size={12} />
                             <span>{activity.rewards.experience}</span>
                           </div>
-                          <div className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${
-                            !isAvailable 
-                              ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
-                              : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
-                          }`}>
-                            <span>💰</span>
+                          <div className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1 ${!isAvailable
+                            ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
+                            : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                            }`}>
+                            <Emoji emoji="💰" size={12} />
                             <span>{activity.rewards.soms}</span>
                           </div>
                         </div>
@@ -1030,32 +1019,30 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                         <div className="flex flex-wrap gap-1.5 justify-center">
                           {/* Cost as negative effect */}
                           {activity.cost && (
-                            <div className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 ${
-                              !canAfford 
-                                ? 'bg-red-500 dark:bg-red-600 text-white ring-2 ring-red-300 dark:ring-red-400'
-                                : !isAvailable
+                            <div className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 ${!canAfford
+                              ? 'bg-red-500 dark:bg-red-600 text-white ring-2 ring-red-300 dark:ring-red-400'
+                              : !isAvailable
                                 ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
                                 : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-200 ring-1 ring-red-300 dark:ring-red-500'
-                            }`}>
-                              <span>💸</span>
+                              }`}>
+                              <Emoji emoji="💸" size={12} />
                               <span>-{activity.cost}</span>
                             </div>
                           )}
-                          
+
                           {/* Stat modifiers */}
                           {activity.statModifiers && Object.entries(activity.statModifiers).map(([stat, value]) => {
                             const statConf = statConfig[stat as keyof typeof statConfig];
                             if (!statConf) return null;
                             return (
-                              <div 
+                              <div
                                 key={stat}
-                                className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 ${
-                                  !isAvailable 
-                                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
-                                    : value > 0 
-                                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' 
+                                className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 ${!isAvailable
+                                  ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500'
+                                  : value > 0
+                                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
                                     : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-200 ring-1 ring-red-300 dark:ring-red-500'
-                                }`}
+                                  }`}
                                 title={t(statConf.labelKey)}
                               >
                                 <span>{statConf.icon}</span>
@@ -1087,20 +1074,20 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               whileTap={{ scale: 0.98 }}
               className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center"
             >
-              <div className="text-3xl mb-1">🏠</div>
+              <div className="text-3xl mb-1"><Emoji emoji="🏠" size={28} /></div>
               <div className="text-xs font-bold text-gray-900 dark:text-white truncate">{t('menu.home', 'Главная')}</div>
             </motion.button>
-            
+
             <motion.button
               onClick={() => navigate('/shop')}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-center"
             >
-              <div className="text-3xl mb-1">🛍️</div>
+              <div className="text-3xl mb-1"><Emoji emoji="🛍️" size={28} /></div>
               <div className="text-xs font-bold text-gray-900 dark:text-white truncate">{t('menu.shop', 'Магазин')}</div>
             </motion.button>
-            
+
             <motion.button
               onClick={() => navigate('/classes')}
               whileHover={{ scale: 1.02 }}
@@ -1109,11 +1096,11 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
             >
               <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 to-pink-400/10 animate-pulse" />
               <div className="relative">
-                <div className="text-3xl mb-1">🏛️</div>
+                <div className="text-3xl mb-1"><Emoji emoji="🏛️" size={28} /></div>
                 <div className="text-xs font-bold text-purple-900 dark:text-purple-200 truncate">{t('menu.classes', 'Классы')}</div>
               </div>
             </motion.button>
-            
+
             <motion.button
               onClick={() => navigate('/settings')}
               whileHover={{ scale: 1.02 }}
@@ -1135,161 +1122,160 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
             const duration = modifiedActivity.duration || 0;
             const minutes = Math.floor(duration / 60);
             const seconds = duration % 60;
-            const timeText = minutes > 0 
+            const timeText = minutes > 0
               ? `${minutes} ${t('common.minutes', 'хв')}${seconds > 0 ? ` ${seconds} ${t('common.seconds', 'с')}` : ''}`
               : `${seconds} ${t('common.seconds', 'с')}`;
 
             return (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedActivity(null)}
-                className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100]"
-              />
-              
-              <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
+              <>
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                  onClick={(e) => e.stopPropagation()}
-                  className="bg-white dark:bg-gray-800 rounded-[32px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden pointer-events-auto"
-                >
-              {/* Animated Background */}
-              <motion.div
-                animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full blur-3xl"
-              />
-              <motion.div
-                animate={{ rotate: -360, scale: [1.2, 1, 1.2] }}
-                transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-                className="absolute -bottom-20 -left-20 w-60 h-60 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-full blur-3xl"
-              />
-              
-              <div className="relative z-10 text-center">
-                <motion.div 
-                  animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="text-8xl mb-4"
-                >
-                  {activityImages[selectedActivity.id] || selectedActivity.icon}
-                </motion.div>
-                
-                <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3">
-                  {getActivityName(selectedActivity)}
-                </h3>
-                
-                {getActivityDescription(selectedActivity) && (
-                  <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm leading-relaxed">
-                    {getActivityDescription(selectedActivity)}
-                  </p>
-                )}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setSelectedActivity(null)}
+                  className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100]"
+                />
 
-                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-5 mb-6 space-y-3 border border-indigo-200 dark:border-indigo-800">
-                  {modifiedActivity.rewards && (
-                    <>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-700 dark:text-gray-300 font-bold flex items-center gap-2">
-                          <span className="text-xl">⭐</span>
-                          <span>{t('activity.experience')}:</span>
-                        </span>
-                        <span className="text-xl font-black text-green-600 dark:text-green-400">
-                          +{modifiedActivity.rewards.experience} XP
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-700 dark:text-gray-300 font-bold flex items-center gap-2">
-                          <span className="text-xl">💰</span>
-                          <span>{t('activity.soms')}:</span>
-                        </span>
-                        <span className="text-xl font-black text-yellow-600 dark:text-yellow-400">
-                          +{modifiedActivity.rewards.soms}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                  
-                  {modifiedActivity.cost && (
-                    <div className="flex justify-between items-center pt-3 border-t border-indigo-200 dark:border-indigo-700">
-                      <span className="text-sm text-gray-700 dark:text-gray-300 font-bold flex items-center gap-2">
-                        <span className="text-xl">💸</span>
-                        <span>{t('dashboard.cost')}:</span>
-                      </span>
-                      <span className="text-xl font-black text-red-600 dark:text-red-400">
-                        -{modifiedActivity.cost}
-                      </span>
-                    </div>
-                  )}
-
-                  {modifiedActivity.statModifiers && Object.keys(modifiedActivity.statModifiers).length > 0 && (
-                    <div className="pt-3 border-t border-indigo-200 dark:border-indigo-700">
-                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-2 font-bold">{t('dashboard.statChanges')}</div>
-                      <div className="flex flex-wrap gap-2 justify-center">
-                        {Object.entries(modifiedActivity.statModifiers).map(([stat, value]) => {
-                          const statConf = statConfig[stat as keyof typeof statConfig];
-                          if (!statConf) return null;
-                          return (
-                            <div 
-                              key={stat}
-                              className={`px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1 ${
-                                value > 0 
-                                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' 
-                                  : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-                              }`}
-                            >
-                              <span>{statConf.icon}</span>
-                              <span>{t(statConf.labelKey)}: {value > 0 ? '+' : ''}{value}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm font-bold">
-                  ⏰ {t('dashboard.takesTime')}: {timeText}
-                </p>
-                
-                <div className="flex gap-3">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setSelectedActivity(null)}
-                    className="flex-1 px-6 py-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-2xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
+                <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="bg-white dark:bg-gray-800 rounded-[32px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden pointer-events-auto"
                   >
-                    {t('dashboard.cancel')}
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={confirmActivity}
-                    className="flex-1 px-6 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-2xl hover:shadow-xl transition-all relative overflow-hidden group"
-                  >
+                    {/* Animated Background */}
                     <motion.div
-                      animate={{ x: ['-100%', '200%'] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                      animate={{ rotate: 360, scale: [1, 1.2, 1] }}
+                      transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                      className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full blur-3xl"
                     />
-                    <span className="relative flex items-center justify-center gap-2">
-                      <span>{t('dashboard.start')}</span>
-                      <span>🚀</span>
-                    </span>
-                  </motion.button>
+                    <motion.div
+                      animate={{ rotate: -360, scale: [1.2, 1, 1.2] }}
+                      transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+                      className="absolute -bottom-20 -left-20 w-60 h-60 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-full blur-3xl"
+                    />
+
+                    <div className="relative z-10 text-center">
+                      <motion.div
+                        animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="text-8xl mb-4"
+                      >
+                        {activityImages[selectedActivity.id] || selectedActivity.icon}
+                      </motion.div>
+
+                      <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3">
+                        {getActivityName(selectedActivity)}
+                      </h3>
+
+                      {getActivityDescription(selectedActivity) && (
+                        <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm leading-relaxed">
+                          {getActivityDescription(selectedActivity)}
+                        </p>
+                      )}
+
+                      <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-5 mb-6 space-y-3 border border-indigo-200 dark:border-indigo-800">
+                        {modifiedActivity.rewards && (
+                          <>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-700 dark:text-gray-300 font-bold flex items-center gap-2">
+                                <span className="text-xl">⭐</span>
+                                <span>{t('activity.experience')}:</span>
+                              </span>
+                              <span className="text-xl font-black text-green-600 dark:text-green-400">
+                                +{modifiedActivity.rewards.experience} XP
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-700 dark:text-gray-300 font-bold flex items-center gap-2">
+                                <span className="text-xl">💰</span>
+                                <span>{t('activity.soms')}:</span>
+                              </span>
+                              <span className="text-xl font-black text-yellow-600 dark:text-yellow-400">
+                                +{modifiedActivity.rewards.soms}
+                              </span>
+                            </div>
+                          </>
+                        )}
+
+                        {modifiedActivity.cost && (
+                          <div className="flex justify-between items-center pt-3 border-t border-indigo-200 dark:border-indigo-700">
+                            <span className="text-sm text-gray-700 dark:text-gray-300 font-bold flex items-center gap-2">
+                              <span className="text-xl">💸</span>
+                              <span>{t('dashboard.cost')}:</span>
+                            </span>
+                            <span className="text-xl font-black text-red-600 dark:text-red-400">
+                              -{modifiedActivity.cost}
+                            </span>
+                          </div>
+                        )}
+
+                        {modifiedActivity.statModifiers && Object.keys(modifiedActivity.statModifiers).length > 0 && (
+                          <div className="pt-3 border-t border-indigo-200 dark:border-indigo-700">
+                            <div className="text-xs text-gray-600 dark:text-gray-400 mb-2 font-bold">{t('dashboard.statChanges')}</div>
+                            <div className="flex flex-wrap gap-2 justify-center">
+                              {Object.entries(modifiedActivity.statModifiers).map(([stat, value]) => {
+                                const statConf = statConfig[stat as keyof typeof statConfig];
+                                if (!statConf) return null;
+                                return (
+                                  <div
+                                    key={stat}
+                                    className={`px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1 ${value > 0
+                                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                                      : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                                      }`}
+                                  >
+                                    <span>{statConf.icon}</span>
+                                    <span>{t(statConf.labelKey)}: {value > 0 ? '+' : ''}{value}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm font-bold">
+                        ⏰ {t('dashboard.takesTime')}: {timeText}
+                      </p>
+
+                      <div className="flex gap-3">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setSelectedActivity(null)}
+                          className="flex-1 px-6 py-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-2xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
+                        >
+                          {t('dashboard.cancel')}
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={confirmActivity}
+                          className="flex-1 px-6 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-2xl hover:shadow-xl transition-all relative overflow-hidden group"
+                        >
+                          <motion.div
+                            animate={{ x: ['-100%', '200%'] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                          />
+                          <span className="relative flex items-center justify-center gap-2">
+                            <span>{t('dashboard.start')}</span>
+                            <span>🚀</span>
+                          </span>
+                        </motion.button>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
-              </div>
-            </motion.div>
-          </div>
-        </>
-      );
-    })()}
-    </AnimatePresence>,
-    document.body
-  )}
+              </>
+            );
+          })()}
+        </AnimatePresence>,
+        document.body
+      )}
 
       {/* Level Warning Modal - ПОРТАЛ В ЦЕНТР ЭКРАНА */}
       {createPortal(
@@ -1303,7 +1289,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 onClick={() => setShowLevelWarning(false)}
                 className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100]"
               />
-              
+
               <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
                 <motion.div
                   initial={{ scale: 0.8 }}
@@ -1313,67 +1299,67 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   onClick={(e) => e.stopPropagation()}
                   className="bg-white dark:bg-gray-800 rounded-[32px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden pointer-events-auto"
                 >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-full blur-3xl"
-              />
-              
-              <div className="relative z-10 text-center">
-                <motion.div
-                  animate={{ 
-                    rotate: [0, -10, 10, -10, 10, 0],
-                    scale: [1, 1.1, 1]
-                  }}
-                  transition={{ duration: 0.5, repeat: 3 }}
-                  className="text-8xl mb-4"
-                >
-                  🔒
-                </motion.div>
-                <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3">
-                  {t('dashboard.levelTooLow')}!
-                </h3>
-                <div className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-5 mb-6 border border-red-200 dark:border-red-800">
-                  <p className="text-gray-700 dark:text-gray-300 mb-3 text-lg">
-                    <span className="font-bold">{getActivityName(warningActivity)}</span>
-                  </p>
-                  <div className="flex items-center justify-center gap-4 text-sm">
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('ui.level_required')}</div>
-                      <div className="text-2xl font-black text-red-600 dark:text-red-400">
-                        {warningActivity.requiredLevel}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                    className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-full blur-3xl"
+                  />
+
+                  <div className="relative z-10 text-center">
+                    <motion.div
+                      animate={{
+                        rotate: [0, -10, 10, -10, 10, 0],
+                        scale: [1, 1.1, 1]
+                      }}
+                      transition={{ duration: 0.5, repeat: 3 }}
+                      className="text-8xl mb-4"
+                    >
+                      🔒
+                    </motion.div>
+                    <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3">
+                      {t('dashboard.levelTooLow')}!
+                    </h3>
+                    <div className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-5 mb-6 border border-red-200 dark:border-red-800">
+                      <p className="text-gray-700 dark:text-gray-300 mb-3 text-lg">
+                        <span className="font-bold">{getActivityName(warningActivity)}</span>
+                      </p>
+                      <div className="flex items-center justify-center gap-4 text-sm">
+                        <div className="text-center">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('ui.level_required')}</div>
+                          <div className="text-2xl font-black text-red-600 dark:text-red-400">
+                            {warningActivity.requiredLevel}
+                          </div>
+                        </div>
+                        <div className="text-3xl text-gray-400">→</div>
+                        <div className="text-center">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('character.level')}</div>
+                          <div className="text-2xl font-black text-gray-600 dark:text-gray-400">
+                            {playerState.level}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-3xl text-gray-400">→</div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('character.level')}</div>
-                      <div className="text-2xl font-black text-gray-600 dark:text-gray-400">
-                        {playerState.level}
-                      </div>
-                    </div>
+
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setShowLevelWarning(false)}
+                      className="w-full px-6 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-2xl hover:shadow-xl transition-all"
+                    >
+                      {t('dashboard.understood')}
+                    </motion.button>
                   </div>
-                </div>
-                
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowLevelWarning(false)}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-2xl hover:shadow-xl transition-all"
-                >
-                  {t('dashboard.understood')}
-                </motion.button>
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
-        </>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
-    </AnimatePresence>,
-    document.body
-  )}
 
       {/* Combat Stats Modal */}
-      <CombatStatsModal 
-        isOpen={showCombatStats} 
+      <CombatStatsModal
+        isOpen={showCombatStats}
         onClose={() => setShowCombatStats(false)}
         onStatsUpdated={() => {
           // Закрываем модалку

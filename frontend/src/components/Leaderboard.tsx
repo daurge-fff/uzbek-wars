@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Emoji from './Emoji';
 
-type LeaderboardCategory = 
-  | 'level' | 'soms' | 'crystals' 
-  | 'cityPower' | 'totalExp' | 'referrals' 
+type LeaderboardCategory =
+  | 'level' | 'soms' | 'crystals'
+  | 'cityPower' | 'totalExp' | 'referrals'
   | 'activityStreak';
 
 interface LeaderboardPlayer {
@@ -68,7 +68,7 @@ export const Leaderboard = () => {
 
       if (response.ok) {
         const data = await response.json();
-        
+
         if (selectedCategory === 'cityPower') {
           // Special handling for city power
           setPlayers(data.data.leaderboard.map((city: any) => ({
@@ -86,7 +86,7 @@ export const Leaderboard = () => {
           // Map leaderboard entries
           const mappedPlayers = data.data.leaderboard.map((entry: any) => {
             const isCurrentPlayer = currentPlayer?.id === entry.player.id;
-            
+
             return {
               rank: entry.rank,
               userId: entry.player.id,
@@ -98,7 +98,7 @@ export const Leaderboard = () => {
               isCurrentPlayer
             };
           });
-          
+
           setPlayers(mappedPlayers);
           setPlayerRank(data.data.playerRank || data.data.currentPlayerRank || null);
         }
@@ -162,14 +162,13 @@ export const Leaderboard = () => {
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`relative py-3 px-2 rounded-[16px] font-bold text-xs transition-all overflow-hidden ${
-                  selectedCategory === category.id
+                className={`relative py-3 px-2 rounded-[16px] font-bold text-xs transition-all overflow-hidden ${selectedCategory === category.id
                     ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl'
                     : 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                }`}
+                  }`}
               >
                 <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-xl">{category.emoji}</span>
+                  <Emoji emoji={category.emoji} size={20} />
                   <span className="text-[9px] leading-tight text-center">
                     {t(category.labelKey, category.id)}
                   </span>
@@ -191,14 +190,13 @@ export const Leaderboard = () => {
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`relative py-3 px-2 rounded-[16px] font-bold text-xs transition-all overflow-hidden ${
-                  selectedCategory === category.id
+                className={`relative py-3 px-2 rounded-[16px] font-bold text-xs transition-all overflow-hidden ${selectedCategory === category.id
                     ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl'
                     : 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                }`}
+                  }`}
               >
                 <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-xl">{category.emoji}</span>
+                  <Emoji emoji={category.emoji} size={20} />
                   <span className="text-[9px] leading-tight text-center">
                     {t(category.labelKey, category.id)}
                   </span>
@@ -247,28 +245,26 @@ export const Leaderboard = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
                 whileHover={{ scale: 1.01, x: 2 }}
-                className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[16px] p-3 shadow-lg border-2 transition-all ${
-                  player.isCurrentPlayer
+                className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[16px] p-3 shadow-lg border-2 transition-all ${player.isCurrentPlayer
                     ? 'border-amber-500 dark:border-amber-400 shadow-amber-500/30 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-900/20 dark:to-orange-900/20'
                     : 'border-gray-200 dark:border-gray-700'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2">
                   {/* Rank */}
-                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-black shadow-lg ${
-                    player.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white' :
-                    player.rank === 2 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white' :
-                    player.rank === 3 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
-                    'bg-gradient-to-br from-indigo-500 to-purple-500 text-white'
-                  }`}>
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-black shadow-lg ${player.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white' :
+                      player.rank === 2 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white' :
+                        player.rank === 3 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
+                          'bg-gradient-to-br from-indigo-500 to-purple-500 text-white'
+                    }`}>
                     {player.rank <= 3 ? <Emoji emoji={medals[player.rank - 1]} size={20} /> : <span className="text-sm">{player.rank}</span>}
                   </div>
 
                   {/* Avatar */}
                   <div className="flex-shrink-0">
                     {player.avatar && player.avatar.startsWith('http') ? (
-                      <img 
-                        src={player.avatar} 
+                      <img
+                        src={player.avatar}
                         alt={player.username}
                         className="w-10 h-10 rounded-full object-cover"
                       />

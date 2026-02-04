@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import Emoji from './Emoji';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -204,7 +205,7 @@ const CityMigration: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-black flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">🏙️</div>
+          <div className="mb-4"><Emoji emoji="🏙️" size={72} /></div>
           <div className="text-gray-900 dark:text-white text-2xl font-bold">
             {t('common.loading', 'Завантаження...')}
           </div>
@@ -236,7 +237,7 @@ const CityMigration: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-black flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">❌</div>
+          <div className="mb-4"><Emoji emoji="❌" size={72} /></div>
           <div className="text-gray-900 dark:text-white text-2xl font-bold">
             {t('city.noData', 'Немає даних')}
           </div>
@@ -261,7 +262,7 @@ const CityMigration: React.FC = () => {
         >
           <div className="relative flex items-center justify-center">
             <h1 className="text-2xl font-black text-gray-900 dark:text-white">
-              🗺️ {t('city.migration', 'Переїзд до іншого міста')}
+              <Emoji emoji="🗺️" size={24} className="inline" /> {t('city.migration', 'Переїзд до іншого міста')}
             </h1>
           </div>
         </motion.div>
@@ -273,11 +274,11 @@ const CityMigration: React.FC = () => {
           className="flex items-center justify-center gap-3"
         >
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-yellow-400/20 to-orange-500/20 border border-yellow-400/30 backdrop-blur-xl">
-            <span className="text-lg">💰</span>
+            <Emoji emoji="💰" size={20} />
             <span className="text-gray-900 dark:text-white font-bold text-sm">{migrationInfo.playerBalance.soms.toLocaleString()}</span>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-cyan-400/20 to-blue-500/20 border border-cyan-400/30 backdrop-blur-xl">
-            <span className="text-lg">💎</span>
+            <Emoji emoji="💎" size={20} />
             <span className="text-gray-900 dark:text-white font-bold text-sm">{migrationInfo.playerBalance.crystals}</span>
           </div>
         </motion.div>
@@ -343,7 +344,7 @@ const CityMigration: React.FC = () => {
                     className="space-y-2.5"
                   >
                     <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 px-4 py-2.5 rounded-[16px] border border-purple-200 dark:border-purple-700 transition-colors">
-                      <span className="text-gray-700 dark:text-gray-300 font-medium text-sm transition-colors">👥 {t('cities.players')}</span>
+                      <span className="text-gray-700 dark:text-gray-300 font-medium text-sm transition-colors"><Emoji emoji="👥" size={16} className="inline" /> {t('cities.players')}</span>
                       <span className="font-black text-gray-900 dark:text-white transition-colors">{currentCity.playerCount}</span>
                     </div>
 
@@ -440,7 +441,7 @@ const CityMigration: React.FC = () => {
                                 : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300'
                             }`}
                           >
-                            <div className="text-3xl mb-1">💎</div>
+                            <div className="mb-1"><Emoji emoji="💎" size={36} /></div>
                             <div className="text-lg font-black">{selectedCity.migrationCost?.crystals || 0}</div>
                             <div className="text-xs mt-1 opacity-70">
                               {t('common.have', 'Є')}: {migrationInfo.playerBalance.crystals}
@@ -455,7 +456,7 @@ const CityMigration: React.FC = () => {
                                 : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300'
                             }`}
                           >
-                            <div className="text-3xl mb-1">💰</div>
+                            <div className="mb-1"><Emoji emoji="💰" size={36} /></div>
                             <div className="text-lg font-black">{selectedCity.migrationCost?.soms.toLocaleString() || 0}</div>
                             <div className="text-xs mt-1 opacity-70">
                               {t('common.have', 'Є')}: {migrationInfo.playerBalance.soms.toLocaleString()}

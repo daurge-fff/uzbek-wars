@@ -62,8 +62,8 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
     item: CosmeticItem | null;
   }>({ isOpen: false, item: null });
 
-  const filteredItems = items ? (filter === 'all' 
-    ? items 
+  const filteredItems = items ? (filter === 'all'
+    ? items
     : items.filter(item => item.type === filter)) : [];
 
   const getItemName = (item: CosmeticItem): string => {
@@ -117,7 +117,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
             <h1 className="text-xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
               {t('cosmetic.shopTitle', 'Магазин')}
             </h1>
-            
+
             {/* Currency Display */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full text-white font-black shadow-lg text-sm">
@@ -139,11 +139,10 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setFilter(type)}
-                className={`px-3 py-1.5 rounded-full font-bold whitespace-nowrap transition-all text-xs ${
-                  filter === type
+                className={`px-3 py-1.5 rounded-full font-bold whitespace-nowrap transition-all text-xs ${filter === type
                     ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
+                  }`}
               >
                 {t(`cosmetic.filter.${type}`)}
               </motion.button>
@@ -164,117 +163,121 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
             {filteredItems.map((item, index) => {
               const isThirdItem = filteredItems.length === 3 && index === 2;
               return (
-              <div
-                key={item.id}
-                className={`${isThirdItem ? 'col-span-2 lg:col-span-1' : ''}`}
-              >
-                <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 relative overflow-hidden w-full"
-                style={{ borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' : 
-                         rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
-                         rarityBorders[item.rarity].includes('purple-400') ? '#c084fc' : '#fbbf24' }}
-              >
-                {/* Rarity Badge */}
-                <div className="absolute top-2 right-2 z-10">
-                  <span className="text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r text-white shadow-lg uppercase tracking-wide"
-                        style={{ backgroundImage: `linear-gradient(to right, ${
-                          rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
-                          rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
-                          rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
-                        })` }}>
-                    {t(`cosmetic.rarity.${item.rarity}`)}
-                  </span>
-                </div>
-
-                {/* Type Emoji */}
-                <div className="absolute top-2 left-2 z-10">
-                  <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center">
-                    <Emoji emoji={typeEmojis[item.type]} size={20} />
-                  </div>
-                </div>
-
-                {/* Owned Badge */}
-                {item.owned && (
-                  <div className="absolute top-11 left-2 z-10">
-                    <div className="w-6 h-6 rounded-full bg-green-500 shadow-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-black">✓</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Item Icon */}
-                <div className="w-full aspect-square max-h-64 rounded-2xl bg-gradient-to-br flex items-center justify-center mb-3 shadow-inner relative overflow-hidden mx-auto"
-                     style={{ backgroundImage: `linear-gradient(to bottom right, ${
-                       rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
-                       rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
-                       rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
-                     })` }}>
+                <div
+                  key={item.id}
+                  className={`${isThirdItem ? 'col-span-2 lg:col-span-1' : ''}`}
+                >
                   <motion.div
-                    animate={{ rotate: item.equipped ? [0, 5, -5, 0] : 0 }}
-                    transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 relative overflow-hidden w-full"
+                    style={{
+                      borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' :
+                        rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
+                          rarityBorders[item.rarity].includes('purple-400') ? '#c084fc' : '#fbbf24'
+                    }}
                   >
-                    <Emoji emoji={item.icon} size={72} />
+                    {/* Rarity Badge */}
+                    <div className="absolute top-2 right-2 z-10">
+                      <span className="text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r text-white shadow-lg uppercase tracking-wide"
+                        style={{
+                          backgroundImage: `linear-gradient(to right, ${rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
+                              rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
+                                rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
+                            })`
+                        }}>
+                        {t(`cosmetic.rarity.${item.rarity}`)}
+                      </span>
+                    </div>
+
+                    {/* Type Emoji */}
+                    <div className="absolute top-2 left-2 z-10">
+                      <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center">
+                        <Emoji emoji={typeEmojis[item.type]} size={20} />
+                      </div>
+                    </div>
+
+                    {/* Owned Badge */}
+                    {item.owned && (
+                      <div className="absolute top-11 left-2 z-10">
+                        <div className="w-6 h-6 rounded-full bg-green-500 shadow-lg flex items-center justify-center">
+                          <span className="text-white text-xs font-black">✓</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Item Icon */}
+                    <div className="w-full aspect-square max-h-64 rounded-2xl bg-gradient-to-br flex items-center justify-center mb-3 shadow-inner relative overflow-hidden mx-auto"
+                      style={{
+                        backgroundImage: `linear-gradient(to bottom right, ${rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
+                            rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
+                              rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
+                          })`
+                      }}>
+                      <motion.div
+                        animate={{ rotate: item.equipped ? [0, 5, -5, 0] : 0 }}
+                        transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
+                      >
+                        <Emoji emoji={item.icon} size={72} />
+                      </motion.div>
+                      {item.equipped && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-green-500/30 to-transparent" />
+                      )}
+                    </div>
+
+                    {/* Item Name */}
+                    <h3 className="font-black text-gray-900 dark:text-white text-base mb-3 text-center line-clamp-2 min-h-[2.5rem]">
+                      {getItemName(item)}
+                    </h3>
+
+                    {/* Price Display */}
+                    {!item.owned && (
+                      <div className="mb-3 flex gap-2 justify-center">
+                        {item.priceSoms && (
+                          <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-black text-sm shadow-lg">
+                            <Emoji emoji="💰" size={20} />
+                            <span>{item.priceSoms.toLocaleString()}</span>
+                          </div>
+                        )}
+                        {item.priceCrystals && (
+                          <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl text-white font-black text-sm shadow-lg">
+                            <Emoji emoji="💎" size={20} />
+                            <span>{item.priceCrystals}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Action Button */}
+                    {item.owned ? (
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleEquip(item.id)}
+                        disabled={item.equipped || loading === item.id}
+                        className={`w-full py-3 rounded-xl font-black text-sm transition-all ${item.equipped
+                            ? 'bg-green-500 text-white shadow-lg'
+                            : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg'
+                          }`}
+                      >
+                        {item.equipped ? <div className="flex items-center justify-center gap-2"><Emoji emoji="✅" size={16} /> <span>{t('cosmetic.equipped')}</span></div> : t('cosmetic.equip')}
+                      </motion.button>
+                    ) : (
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => openPurchaseModal(item)}
+                        disabled={loading === item.id}
+                        className="w-full py-3 rounded-xl font-black text-sm transition-all bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg"
+                      >
+                        {t('cosmetic.buy', 'Купить')}
+                      </motion.button>
+                    )}
                   </motion.div>
-                  {item.equipped && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-green-500/30 to-transparent" />
-                  )}
                 </div>
-
-                {/* Item Name */}
-                <h3 className="font-black text-gray-900 dark:text-white text-base mb-3 text-center line-clamp-2 min-h-[2.5rem]">
-                  {getItemName(item)}
-                </h3>
-
-                {/* Price Display */}
-                {!item.owned && (
-                  <div className="mb-3 flex gap-2 justify-center">
-                    {item.priceSoms && (
-                      <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-black text-sm shadow-lg">
-                        <Emoji emoji="💰" size={20} />
-                        <span>{item.priceSoms.toLocaleString()}</span>
-                      </div>
-                    )}
-                    {item.priceCrystals && (
-                      <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl text-white font-black text-sm shadow-lg">
-                        <Emoji emoji="💎" size={20} />
-                        <span>{item.priceCrystals}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Action Button */}
-                {item.owned ? (
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleEquip(item.id)}
-                    disabled={item.equipped || loading === item.id}
-                    className={`w-full py-3 rounded-xl font-black text-sm transition-all ${
-                      item.equipped
-                        ? 'bg-green-500 text-white shadow-lg'
-                        : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg'
-                    }`}
-                  >
-                    {item.equipped ? '✓ ' + t('cosmetic.equipped') : t('cosmetic.equip')}
-                  </motion.button>
-                ) : (
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => openPurchaseModal(item)}
-                    disabled={loading === item.id}
-                    className="w-full py-3 rounded-xl font-black text-sm transition-all bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg"
-                  >
-                    {t('cosmetic.buy', 'Купить')}
-                  </motion.button>
-                )}
-                </motion.div>
-              </div>
-            )})}
+              )
+            })}
           </div>
         )}
 

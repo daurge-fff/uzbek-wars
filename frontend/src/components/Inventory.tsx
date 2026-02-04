@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import Emoji from './Emoji';
 
 type CosmeticType = 'clothing' | 'background' | 'accessory';
 type CosmeticRarity = 'common' | 'rare' | 'epic' | 'legendary';
@@ -40,10 +41,10 @@ const rarityBorders = {
   legendary: 'border-yellow-400 dark:border-orange-500'
 };
 
-const typeEmojis = {
+const typeEmojis: Record<CosmeticType, string> = {
   clothing: '👕',
   background: '🖼️',
-  accessory: '💎'
+  accessory: '✨'
 };
 
 export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
@@ -52,8 +53,8 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
   const [loading, setLoading] = useState<string | null>(null);
 
   const ownedItems = items ? items.filter(item => item.owned) : [];
-  const filteredItems = filter === 'all' 
-    ? ownedItems 
+  const filteredItems = filter === 'all'
+    ? ownedItems
     : ownedItems.filter(item => item.type === filter);
 
   const getItemName = (item: CosmeticItem): string => {
@@ -95,10 +96,10 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
             <h1 className="text-xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
               {t('inventory.title', 'Инвентарь')}
             </h1>
-            
+
             {/* Items Count */}
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full text-white font-black shadow-lg text-sm">
-              <span className="text-base">📦</span>
+              <Emoji emoji="📦" size={16} />
               <span>{ownedItems.length}</span>
             </div>
           </div>
@@ -107,7 +108,7 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
           {equippedItems.length > 0 && (
             <div className="mb-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl border border-green-200 dark:border-green-800">
               <h2 className="text-sm font-black text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                <span className="text-lg">✨</span>
+                <Emoji emoji="✨" size={18} />
                 {t('inventory.equipped', 'Надето')}
               </h2>
               <div className="flex gap-2 flex-wrap">
@@ -115,11 +116,13 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
                   <div
                     key={item.id}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border-2 shadow-md text-xs font-bold"
-                    style={{ borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' : 
-                             rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
-                             rarityBorders[item.rarity].includes('purple-400') ? '#c084fc' : '#fbbf24' }}
+                    style={{
+                      borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' :
+                        rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
+                          rarityBorders[item.rarity].includes('purple-400') ? '#c084fc' : '#fbbf24'
+                    }}
                   >
-                    <span className="text-lg">{item.icon}</span>
+                    <Emoji emoji={item.icon} size={18} />
                     <span className="text-gray-900 dark:text-white">{getItemName(item)}</span>
                   </div>
                 ))}
@@ -135,11 +138,10 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setFilter(type)}
-                className={`px-3 py-1.5 rounded-full font-bold whitespace-nowrap transition-all text-xs ${
-                  filter === type
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
+                className={`px-3 py-1.5 rounded-full font-bold whitespace-nowrap transition-all text-xs ${filter === type
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                  }`}
               >
                 {t(`cosmetic.filter.${type}`)}
               </motion.button>
@@ -150,7 +152,7 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
         {/* Items Grid */}
         {filteredItems.length === 0 ? (
           <div className="text-center py-20">
-            <div className="text-6xl mb-4">📦</div>
+            <div className="mb-4"><Emoji emoji="🛍️" size={72} /></div>
             <p className="text-xl font-bold text-gray-600 dark:text-gray-400">
               {t('inventory.empty', 'Инвентарь пуст')}
             </p>
@@ -163,96 +165,100 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
             {filteredItems.map((item, index) => {
               const isThirdItem = filteredItems.length === 3 && index === 2;
               return (
-              <div
-                key={item.id}
-                className={`${isThirdItem ? 'col-span-2 lg:col-span-1' : ''}`}
-              >
-                <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 relative overflow-hidden w-full"
-                style={{ borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' : 
-                         rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
-                         rarityBorders[item.rarity].includes('purple-400') ? '#c084fc' : '#fbbf24' }}
-              >
-                {/* Rarity Badge */}
-                <div className="absolute top-2 right-2 z-10">
-                  <span className="text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r text-white shadow-lg uppercase tracking-wide"
-                        style={{ backgroundImage: `linear-gradient(to right, ${
-                          rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
-                          rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
-                          rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
-                        })` }}>
-                    {t(`cosmetic.rarity.${item.rarity}`)}
-                  </span>
-                </div>
-
-                {/* Type Emoji */}
-                <div className="absolute top-2 left-2 z-10">
-                  <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center">
-                    <span className="text-lg">{typeEmojis[item.type]}</span>
-                  </div>
-                </div>
-
-                {/* Equipped Badge */}
-                {item.equipped && (
-                  <div className="absolute top-11 left-2 z-10">
-                    <div className="w-6 h-6 rounded-full bg-green-500 shadow-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-black">✓</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Item Icon */}
-                <div className="w-full aspect-square max-h-64 rounded-2xl bg-gradient-to-br flex items-center justify-center text-6xl mb-3 shadow-inner relative overflow-hidden mx-auto"
-                     style={{ backgroundImage: `linear-gradient(to bottom right, ${
-                       rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
-                       rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
-                       rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
-                     })` }}>
-                  <motion.div
-                    animate={{ rotate: item.equipped ? [0, 5, -5, 0] : 0 }}
-                    transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
-                  >
-                    {item.icon}
-                  </motion.div>
-                  {item.equipped && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-green-500/30 to-transparent" />
-                  )}
-                </div>
-
-                {/* Item Name */}
-                <h3 className="font-black text-gray-900 dark:text-white text-base mb-3 text-center line-clamp-2 min-h-[2.5rem]">
-                  {getItemName(item)}
-                </h3>
-
-                {/* Bonus Display */}
-                {item.bonus && (
-                  <div className="mb-3 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
-                    <p className="text-xs text-center font-bold text-amber-700 dark:text-amber-300">
-                      {getBonusDescription(item)}
-                    </p>
-                  </div>
-                )}
-
-                {/* Equip/Unequip Button */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleToggleEquip(item)}
-                  disabled={loading === item.id}
-                  className={`w-full py-3 rounded-xl font-black text-sm transition-all ${
-                    item.equipped
-                      ? 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg'
-                      : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg'
-                  }`}
+                <div
+                  key={item.id}
+                  className={`${isThirdItem ? 'col-span-2 lg:col-span-1' : ''}`}
                 >
-                  {item.equipped ? t('inventory.unequip', 'Снять') : t('inventory.equip', 'Надеть')}
-                </motion.button>
-                </motion.div>
-              </div>
-            )})}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 relative overflow-hidden w-full"
+                    style={{
+                      borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' :
+                        rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
+                          rarityBorders[item.rarity].includes('purple-400') ? '#c084fc' : '#fbbf24'
+                    }}
+                  >
+                    {/* Rarity Badge */}
+                    <div className="absolute top-2 right-2 z-10">
+                      <span className="text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r text-white shadow-lg uppercase tracking-wide"
+                        style={{
+                          backgroundImage: `linear-gradient(to right, ${rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
+                            rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
+                              rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
+                            })`
+                        }}>
+                        {t(`cosmetic.rarity.${item.rarity}`)}
+                      </span>
+                    </div>
+
+                    {/* Type Emoji */}
+                    <div className="absolute top-2 left-2 z-10">
+                      <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center">
+                        <Emoji emoji={typeEmojis[item.type]} size={20} />
+                      </div>
+                    </div>
+
+                    {/* Equipped Badge */}
+                    {item.equipped && (
+                      <div className="absolute top-11 left-2 z-10">
+                        <div className="w-6 h-6 rounded-full bg-green-500 shadow-lg flex items-center justify-center">
+                          <Emoji emoji="✅" size={14} />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Item Icon */}
+                    <div className="w-full aspect-square max-h-64 rounded-2xl bg-gradient-to-br flex items-center justify-center text-6xl mb-3 shadow-inner relative overflow-hidden mx-auto"
+                      style={{
+                        backgroundImage: `linear-gradient(to bottom right, ${rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
+                          rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
+                            rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
+                          })`
+                      }}>
+                      <motion.div
+                        animate={{ rotate: item.equipped ? [0, 5, -5, 0] : 0 }}
+                        transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
+                      >
+                        <Emoji emoji={item.icon} size={72} />
+                      </motion.div>
+                      {item.equipped && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-green-500/30 to-transparent" />
+                      )}
+                    </div>
+
+                    {/* Item Name */}
+                    <h3 className="font-black text-gray-900 dark:text-white text-base mb-3 text-center line-clamp-2 min-h-[2.5rem]">
+                      {getItemName(item)}
+                    </h3>
+
+                    {/* Bonus Display */}
+                    {item.bonus && (
+                      <div className="mb-3 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
+                        <p className="text-xs text-center font-bold text-amber-700 dark:text-amber-300">
+                          {getBonusDescription(item)}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Equip/Unequip Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleToggleEquip(item)}
+                      disabled={loading === item.id}
+                      className={`w-full py-3 rounded-xl font-black text-sm transition-all ${item.equipped
+                        ? 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg'
+                        : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg'
+                        }`}
+                    >
+                      {item.equipped ? <><Emoji emoji="✅" size={14} className="mr-1" /> {t('cosmetic.equipped')}</> : t('cosmetic.equip')}
+                    </motion.button>
+                  </motion.div>
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

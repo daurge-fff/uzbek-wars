@@ -28,6 +28,7 @@ import { HealthCheck } from './components/HealthCheck';
 import { ReferralLanding } from './components/ReferralLanding';
 import { TermsOfService } from './components/TermsOfService';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
+import Emoji from './components/Emoji';
 import { OnboardingFlow } from './components/OnboardingFlow';
 import { BottomNavBar } from './components/BottomNavBar';
 import ClassHall from './components/ClassHall';
@@ -63,9 +64,9 @@ function LogoutPage() {
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        className="text-8xl mb-6"
+        className="mb-6"
       >
-        👋
+        <Emoji emoji="👋" size={96} />
       </motion.div>
       <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-4">
         {t('auth.loggingOut', 'Выход из системы...')}
@@ -405,7 +406,7 @@ const CosmeticShopWithData = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black">
-        <div className="text-6xl animate-bounce">🛍️</div>
+        <div className="animate-bounce"><Emoji emoji="🛍️" size={72} /></div>
       </div>
     );
   }
@@ -492,7 +493,7 @@ const InventoryWithData = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black">
-        <div className="text-6xl animate-bounce">📦</div>
+        <div className="animate-bounce"><Emoji emoji="📦" size={72} /></div>
       </div>
     );
   }

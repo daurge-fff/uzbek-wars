@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import Emoji from './Emoji';
 
 type Language = 'ru' | 'uz' | 'uk' | 'en';
 
@@ -70,7 +71,7 @@ export const LanguageSwitcher = ({
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             />
           )}
-          <span className="relative text-base">{languageFlags[lang]}</span>
+          <span className="relative"><Emoji emoji={languageFlags[lang]} size={20} /></span>
         </motion.button>
       ))}
     </div>

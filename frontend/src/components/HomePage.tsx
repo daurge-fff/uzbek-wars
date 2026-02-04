@@ -24,11 +24,11 @@ const formatNumber = (num: number): string => {
 // Простая и красивая карусель с карточками
 function FeaturesCarousel({ features }: { features: any[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  
+
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % features.length);
   };
-  
+
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + features.length) % features.length);
   };
@@ -68,7 +68,7 @@ function FeaturesCarousel({ features }: { features: any[] }) {
           </motion.div>
         ))}
       </div>
-      
+
       {/* Навигация */}
       <div className="flex items-center justify-center gap-4">
         <motion.button
@@ -79,7 +79,7 @@ function FeaturesCarousel({ features }: { features: any[] }) {
         >
           ←
         </motion.button>
-        
+
         <div className="flex gap-2">
           {features.map((_, index) => (
             <motion.button
@@ -87,15 +87,14 @@ function FeaturesCarousel({ features }: { features: any[] }) {
               onClick={() => setCurrentIndex(index)}
               whileHover={{ scale: 1.2 }}
               whileTap={{ scale: 0.9 }}
-              className={`h-2 rounded-full transition-all ${
-                index === currentIndex 
-                  ? 'w-8 bg-indigo-600 dark:bg-indigo-400' 
-                  : 'w-2 bg-gray-300 dark:bg-gray-600'
-              }`}
+              className={`h-2 rounded-full transition-all ${index === currentIndex
+                ? 'w-8 bg-indigo-600 dark:bg-indigo-400'
+                : 'w-2 bg-gray-300 dark:bg-gray-600'
+                }`}
             />
           ))}
         </div>
-        
+
         <motion.button
           onClick={nextSlide}
           whileHover={{ scale: 1.1 }}
@@ -118,13 +117,13 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showDeveloperModal, setShowDeveloperModal] = useState(false);
-  
+
   // Обновляем время каждую секунду
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-  
+
   const isDark = theme === 'dark';
 
   const menuItems = [
@@ -137,25 +136,25 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
   ];
 
   const dockItems = [
-    { 
-      id: 'tutorial', 
-      icon: '🎓', 
+    {
+      id: 'tutorial',
+      icon: '🎓',
       label: t('menu.tutorial', 'Обучение'),
-      action: () => toast(t('donation.inDevelopment', 'В разработке'), { 
-        duration: 2000 
+      action: () => toast(t('donation.inDevelopment', 'В разработке'), {
+        duration: 2000
       })
     },
-    { 
-      id: 'changelog', 
-      icon: '📋', 
+    {
+      id: 'changelog',
+      icon: '📋',
       label: t('menu.changelog', 'История версий'),
-      action: () => toast(t('donation.inDevelopment', 'В разработке'), { 
-        duration: 2000 
+      action: () => toast(t('donation.inDevelopment', 'В разработке'), {
+        duration: 2000
       })
     },
-    { 
-      id: 'developer', 
-      icon: '👨‍💻', 
+    {
+      id: 'developer',
+      icon: '👨‍💻',
       label: t('menu.developer', 'Разработчик'),
       action: () => setShowDeveloperModal(true)
     },
@@ -189,25 +188,21 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
             </div>
           </div>
         </div>
-        
+
         {/* Экран */}
         <div className="relative bg-black rounded-[3rem] overflow-hidden aspect-[9/19.5] shadow-inner">
           {/* Обои - градиент (меняется мгновенно с темой) */}
-          <div className={`absolute inset-0 transition-none ${
-            isDark 
-              ? 'bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900' 
-              : 'bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600'
-          }`}>
+          <div className={`absolute inset-0 transition-none ${isDark
+            ? 'bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900'
+            : 'bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600'
+            }`}>
             {/* Абстрактные формы на обоях */}
-            <div className={`absolute top-10 right-10 w-40 h-40 rounded-full blur-3xl transition-none ${
-              isDark ? 'bg-blue-500/30' : 'bg-white/10'
-            }`} />
-            <div className={`absolute bottom-20 left-10 w-60 h-60 rounded-full blur-3xl transition-none ${
-              isDark ? 'bg-indigo-500/30' : 'bg-blue-400/10'
-            }`} />
-            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl transition-none ${
-              isDark ? 'bg-purple-500/30' : 'bg-purple-400/10'
-            }`} />
+            <div className={`absolute top-10 right-10 w-40 h-40 rounded-full blur-3xl transition-none ${isDark ? 'bg-blue-500/30' : 'bg-white/10'
+              }`} />
+            <div className={`absolute bottom-20 left-10 w-60 h-60 rounded-full blur-3xl transition-none ${isDark ? 'bg-indigo-500/30' : 'bg-blue-400/10'
+              }`} />
+            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl transition-none ${isDark ? 'bg-purple-500/30' : 'bg-purple-400/10'
+              }`} />
           </div>
 
           {/* Статус бар */}
@@ -216,16 +211,16 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
             <div className="flex items-center gap-1.5">
               {/* Сигнал сети - столбики */}
               <svg className="w-4 h-3" viewBox="0 0 17 12" fill="white">
-                <rect x="0" y="8" width="3" height="4" rx="0.5"/>
-                <rect x="4.5" y="5" width="3" height="7" rx="0.5"/>
-                <rect x="9" y="2" width="3" height="10" rx="0.5"/>
-                <rect x="13.5" y="0" width="3" height="12" rx="0.5"/>
+                <rect x="0" y="8" width="3" height="4" rx="0.5" />
+                <rect x="4.5" y="5" width="3" height="7" rx="0.5" />
+                <rect x="9" y="2" width="3" height="10" rx="0.5" />
+                <rect x="13.5" y="0" width="3" height="12" rx="0.5" />
               </svg>
               {/* Батарейка */}
               <svg className="w-6 h-3" viewBox="0 0 27 13" fill="none">
-                <rect x="0" y="0" width="22" height="13" rx="2.5" stroke="white" strokeWidth="1" fill="none"/>
-                <rect x="2" y="2" width="18" height="9" rx="1" fill="white"/>
-                <rect x="23" y="4" width="4" height="5" rx="1.5" fill="white"/>
+                <rect x="0" y="0" width="22" height="13" rx="2.5" stroke="white" strokeWidth="1" fill="none" />
+                <rect x="2" y="2" width="18" height="9" rx="1" fill="white" />
+                <rect x="23" y="4" width="4" height="5" rx="1.5" fill="white" />
               </svg>
             </div>
           </div>
@@ -258,7 +253,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                     <Emoji emoji={item.icon} size={48} />
                     <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-[1.3rem] pointer-events-none" />
                   </button>
-                  
+
                   <span className="text-xs text-white font-medium text-center drop-shadow-lg px-1 line-clamp-1 max-w-[80px]">
                     {item.label}
                   </span>
@@ -300,7 +295,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
       {activeTooltip && (() => {
         const item = menuItems.find(i => i.id === activeTooltip);
         if (!item) return null;
-        
+
         return (
           <div
             className="fixed z-[9999] pointer-events-none"
@@ -319,7 +314,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                 </div>
               </div>
               {/* Arrow */}
-              <div 
+              <div
                 className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-900/95 rotate-45 border-r border-b border-white/10"
                 style={{ bottom: '-6px' }}
               />
@@ -340,7 +335,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                 onClick={() => setShowAboutModal(false)}
                 className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
               />
-              
+
               <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -399,7 +394,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                 onClick={() => setShowDeveloperModal(false)}
                 className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
               />
-              
+
               <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -410,83 +405,83 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                 >
                   <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-2xl">
                     <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
-                  <div className="text-center mb-6">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 500, delay: 0.2 }}
-                      className="mb-4"
-                    >
-                      <Emoji emoji="👨‍💻" size={96} />
-                    </motion.div>
-                    <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
-                      German Vitiaz
-                    </h2>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">
-                      Full-Stack Developer
-                    </p>
-                    <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-500">
-                      <span className="flex items-center gap-1"><Emoji emoji="🚀" size={14} /> React</span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1"><Emoji emoji="⚡" size={14} /> Node.js</span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1"><Emoji emoji="🎨" size={14} /> TypeScript</span>
+                      <div className="text-center mb-6">
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: 'spring', stiffness: 500, delay: 0.2 }}
+                          className="mb-4"
+                        >
+                          <Emoji emoji="👨‍💻" size={96} />
+                        </motion.div>
+                        <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
+                          German Vitiaz
+                        </h2>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">
+                          Full-Stack Developer
+                        </p>
+                        <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-500">
+                          <span className="flex items-center gap-1"><Emoji emoji="🚀" size={14} /> React</span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1"><Emoji emoji="⚡" size={14} /> Node.js</span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1"><Emoji emoji="🎨" size={14} /> TypeScript</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 mb-6">
+                        <motion.a
+                          whileHover={{ scale: 1.02, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
+                          href="https://t.me/daurge"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-[20px] font-bold shadow-lg hover:shadow-xl transition-all"
+                        >
+                          <span className="text-3xl">✈️</span>
+                          <div className="flex-1 text-left">
+                            <div className="text-sm opacity-90">Telegram</div>
+                            <div className="text-lg">@daurge</div>
+                          </div>
+                          <span className="text-xl">→</span>
+                        </motion.a>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="p-3 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-[16px] text-center">
+                            <div className="mb-1"><Emoji emoji="⭐" size={24} /></div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('about.codeQuality', 'Качество кода')}</div>
+                          </div>
+                          <div className="p-3 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-[16px] text-center">
+                            <div className="mb-1"><Emoji emoji="🎯" size={24} /></div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('about.fastWork', 'Быстрая работа')}</div>
+                          </div>
+                        </div>
+
+                        <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-[20px] border border-yellow-200 dark:border-yellow-800">
+                          <p className="text-xs text-gray-700 dark:text-gray-300 text-center">
+                            <Emoji emoji="💝" size={14} className="inline" /> {t('app.thankYou', 'Спасибо за использование Узбек Варс!')}<br />
+                            {t('app.starOnGithub', 'Если нравится игра - поставь')} <Emoji emoji="⭐" size={14} className="inline" /> {t('app.starOnGithub', 'на GitHub')}
+                          </p>
+                        </div>
+                      </div>
+
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setShowDeveloperModal(false)}
+                        className="w-full py-3 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-white font-bold rounded-full shadow-lg"
+                      >
+                        {t('ui.close', 'Закрыть')}
+                      </motion.button>
                     </div>
                   </div>
-
-                  <div className="space-y-3 mb-6">
-                    <motion.a
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      href="https://t.me/daurge"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-[20px] font-bold shadow-lg hover:shadow-xl transition-all"
-                    >
-                      <span className="text-3xl">✈️</span>
-                      <div className="flex-1 text-left">
-                        <div className="text-sm opacity-90">Telegram</div>
-                        <div className="text-lg">@daurge</div>
-                      </div>
-                      <span className="text-xl">→</span>
-                    </motion.a>
-                    
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="p-3 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-[16px] text-center">
-                        <div className="mb-1"><Emoji emoji="⭐" size={24} /></div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">{t('about.codeQuality', 'Качество кода')}</div>
-                      </div>
-                      <div className="p-3 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-[16px] text-center">
-                        <div className="mb-1"><Emoji emoji="🎯" size={24} /></div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">{t('about.fastWork', 'Быстрая работа')}</div>
-                      </div>
-                    </div>
-
-                    <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-[20px] border border-yellow-200 dark:border-yellow-800">
-                      <p className="text-xs text-gray-700 dark:text-gray-300 text-center">
-                        <Emoji emoji="💝" size={14} className="inline" /> {t('app.thankYou', 'Спасибо за использование Узбек Варс!')}<br/>
-                        {t('app.starOnGithub', 'Если нравится игра - поставь')} <Emoji emoji="⭐" size={14} className="inline" /> {t('app.starOnGithub', 'на GitHub')}
-                      </p>
-                    </div>
-                  </div>
-
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setShowDeveloperModal(false)}
-                    className="w-full py-3 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-white font-bold rounded-full shadow-lg"
-                  >
-                    {t('ui.close', 'Закрыть')}
-                  </motion.button>
-                </div>
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
-        </>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
-    </AnimatePresence>,
-    document.body
-  )}
     </div>
   );
 }
@@ -553,10 +548,10 @@ export function HomePage() {
           deviceId: localStorage.getItem('deviceId') || Math.random().toString(36)
         }
       });
-      
+
       const { token, user, player } = response.data;
       login(token, user, player);
-      
+
       // Check if player needs onboarding
       if (!player || !player.characterId || !player.cityId || player.characterId === 'default' || player.cityId === 'default') {
         // New user needs to complete onboarding
@@ -636,9 +631,9 @@ export function HomePage() {
             className="flex items-center gap-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all cursor-pointer"
           >
             {user.avatar && user.avatar.startsWith('http') ? (
-              <img 
-                src={user.avatar} 
-                alt={user.displayName} 
+              <img
+                src={user.avatar}
+                alt={user.displayName}
                 className="w-8 h-8 rounded-full object-cover"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
@@ -656,7 +651,7 @@ export function HomePage() {
         )}
         <ThemeToggle />
       </div>
-      
+
       <main className="relative container mx-auto px-4 py-12 pt-24">
         {/* Hero Section */}
         <motion.div
@@ -671,7 +666,7 @@ export function HomePage() {
             transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
             className="text-8xl mb-4 inline-block"
           >
-            🏛️
+            <Emoji emoji="🏛️" size={96} />
           </motion.div>
 
           {/* Title */}
@@ -702,8 +697,8 @@ export function HomePage() {
             transition={{ delay: 0.4 }}
             className="mb-8 flex justify-center"
           >
-            <LanguageSwitcher 
-              currentLanguage={i18n.language as 'ru' | 'uz' | 'uk' | 'en'} 
+            <LanguageSwitcher
+              currentLanguage={i18n.language as 'ru' | 'uz' | 'uk' | 'en'}
               onLanguageChange={handleLanguageChange}
             />
           </motion.div>
@@ -718,14 +713,14 @@ export function HomePage() {
             >
               <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[28px] p-6 shadow-2xl border border-gray-200 dark:border-gray-700 max-w-md mx-auto relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-500/5 dark:via-purple-500/5 dark:to-pink-500/5" />
-                
+
                 <div className="relative">
-                  <motion.div 
+                  <motion.div
                     animate={{ rotate: [0, 10, -10, 0] }}
                     transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                     className="text-6xl mb-3"
                   >
-                    🚀
+                    <Emoji emoji="🚀" size={64} />
                   </motion.div>
                   <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">
                     {t('app.startAdventure', 'Начать приключение')}
@@ -751,26 +746,26 @@ export function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-[28px] p-[2px]">
                 <div className="absolute inset-[2px] bg-white dark:bg-gray-900 rounded-[26px]" />
               </div>
-              
+
               {/* Button content */}
               <div className="relative px-10 py-5 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-500/20 dark:via-purple-500/20 dark:to-pink-500/20 backdrop-blur-xl rounded-[26px] flex items-center gap-4">
                 {/* Animated gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-purple-500/20 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[26px]" />
-                
+
                 {/* Icon */}
                 <motion.div
                   key={randomEmoji}
                   initial={{ scale: 0, rotate: -180 }}
-                  animate={{ 
-                    scale: 1, 
+                  animate={{
+                    scale: 1,
                     rotate: 0,
                   }}
                   transition={{ type: 'spring', stiffness: 200 }}
                   className="relative text-4xl emoji-font"
                 >
-                  {randomEmoji}
+                  <Emoji emoji={randomEmoji} size={48} />
                 </motion.div>
-                
+
                 {/* Text */}
                 <div className="relative">
                   <div className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold mb-1">
@@ -780,7 +775,7 @@ export function HomePage() {
                     {t('home.continuePlaying', 'Продолжить игру')}
                   </div>
                 </div>
-                
+
                 {/* Arrow */}
                 <motion.div
                   animate={{ x: [0, 5, 0] }}
@@ -836,37 +831,33 @@ export function HomePage() {
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="text-center p-3 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-2xl">
-                  <div className="text-2xl mb-1">⭐</div>
-                  <div className={`font-black text-gray-900 dark:text-white mb-1 ${
-                    player.level >= 1000 ? 'text-xl' : 'text-2xl'
-                  }`}>
+                  <div className="mb-1"><Emoji emoji="⭐" size={24} /></div>
+                  <div className={`font-black text-gray-900 dark:text-white mb-1 ${player.level >= 1000 ? 'text-xl' : 'text-2xl'
+                    }`}>
                     {formatNumber(player.level)}
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-300">{t('dashboard.level', 'Уровень')}</div>
                 </div>
                 <div className="text-center p-3 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl">
-                  <div className="text-2xl mb-1">💰</div>
-                  <div className={`font-black text-gray-900 dark:text-white mb-1 ${
-                    player.soms >= 1000 ? 'text-xl' : 'text-2xl'
-                  }`}>
+                  <div className="text-2xl mb-1"><Emoji emoji="💰" size={24} /></div>
+                  <div className={`font-black text-gray-900 dark:text-white mb-1 ${player.soms >= 1000 ? 'text-xl' : 'text-2xl'
+                    }`}>
                     {formatNumber(player.soms)}
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-300">{t('dashboard.soms', 'Сомы')}</div>
                 </div>
                 <div className="text-center p-3 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl">
-                  <div className="text-2xl mb-1">💎</div>
-                  <div className={`font-black text-gray-900 dark:text-white mb-1 ${
-                    player.donationCurrency >= 1000 ? 'text-xl' : 'text-2xl'
-                  }`}>
+                  <div className="text-2xl mb-1"><Emoji emoji="💎" size={24} /></div>
+                  <div className={`font-black text-gray-900 dark:text-white mb-1 ${player.donationCurrency >= 1000 ? 'text-xl' : 'text-2xl'
+                    }`}>
                     {formatNumber(player.donationCurrency)}
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-300">{t('dashboard.crystals', 'Кристаллы')}</div>
                 </div>
                 <div className="text-center p-3 bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-2xl">
                   <div className="text-2xl mb-1">✨</div>
-                  <div className={`font-black text-gray-900 dark:text-white mb-1 ${
-                    player.experience >= 1000 ? 'text-xl' : 'text-2xl'
-                  }`}>
+                  <div className={`font-black text-gray-900 dark:text-white mb-1 ${player.experience >= 1000 ? 'text-xl' : 'text-2xl'
+                    }`}>
                     {formatNumber(player.experience)}
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-300">{t('dashboard.xp', 'Опыт')}</div>

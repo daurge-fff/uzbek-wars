@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import Emoji from './Emoji';
 
 interface NavItem {
   id: string;
@@ -35,10 +36,10 @@ export const BottomNavBar = () => {
 
   // Don't show navbar on certain pages
   const hideNavbarPaths = ['/', '/onboarding', '/logout', '/auth', '/terms', '/privacy'];
-  const shouldHide = hideNavbarPaths.some(path => 
+  const shouldHide = hideNavbarPaths.some(path =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path)
   );
-  
+
   if (shouldHide) {
     return null;
   }
@@ -63,7 +64,7 @@ export const BottomNavBar = () => {
             <div className="relative flex items-center justify-around px-1.5 py-2">
               {navItems.map((item, index) => {
                 const isActive = index === activeIndex;
-                
+
                 return (
                   <NavButton
                     key={item.id}
@@ -104,18 +105,11 @@ const NavButton = ({ item, isActive, onClick }: NavButtonProps) => {
       )}
 
       {/* Icon */}
-      <motion.div
-        animate={{
-          scale: isActive ? 1 : 0.9,
-        }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-        className="relative z-10 text-[28px]"
-        style={{
-          filter: isActive ? 'none' : 'grayscale(100%) opacity(0.5)',
-        }}
-      >
-        {item.icon}
-      </motion.div>
+      <Emoji
+        emoji={item.icon}
+        size={28}
+        className={isActive ? '' : 'grayscale opacity-50'}
+      />
 
       {/* Active indicator dot */}
       {isActive && (

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Carousel3D } from './Carousel3D';
+import Emoji from './Emoji';
 
 interface ClassData {
   id: string;
@@ -128,13 +129,13 @@ const ClassHall: React.FC = () => {
       >
         {isLocked && (
           <div className="absolute top-4 right-4 px-3 py-1 bg-red-500 text-white text-sm font-bold rounded-xl shadow-lg flex items-center gap-1">
-            <span>🔒</span>
+            <Emoji emoji="🔒" size={16} />
             <span>LVL {classData.requiredLevel}</span>
           </div>
         )}
         {isCurrent && (
           <div className="absolute top-4 right-4 px-3 py-1 bg-green-500 text-white text-lg font-bold rounded-xl shadow-lg">
-            ✓
+            <Emoji emoji="✅" size={18} />
           </div>
         )}
 
@@ -174,16 +175,14 @@ const ClassHall: React.FC = () => {
         </div>
 
         <div className="flex gap-2 justify-center flex-shrink-0">
-          <div className={`px-3 py-1 rounded-lg font-bold text-sm flex items-center gap-1 ${
-            playerSoms < cost.soms ? 'bg-red-500 text-white' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
-          }`}>
-            <span>💰</span>
+          <div className={`px-3 py-1 rounded-lg font-bold text-sm flex items-center gap-1 ${playerSoms < cost.soms ? 'bg-red-500 text-white' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+            }`}>
+            <Emoji emoji="💰" size={14} />
             <span>{cost.soms.toLocaleString()}</span>
           </div>
-          <div className={`px-3 py-1 rounded-lg font-bold text-sm flex items-center gap-1 ${
-            playerCrystals < cost.crystals ? 'bg-red-500 text-white' : 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300'
-          }`}>
-            <span>💎</span>
+          <div className={`px-3 py-1 rounded-lg font-bold text-sm flex items-center gap-1 ${playerCrystals < cost.crystals ? 'bg-red-500 text-white' : 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300'
+            }`}>
+            <Emoji emoji="💎" size={14} />
             <span>{cost.crystals}</span>
           </div>
         </div>
@@ -197,7 +196,7 @@ const ClassHall: React.FC = () => {
 
   const renderTierCarousel = (tierClasses: ClassData[], tier: number) => {
     const tierBadge = getTierBadge(tier);
-    
+
     const currentClassIndex = tierClasses.findIndex(c => c.id === currentClass);
     const initialIndex = currentClassIndex >= 0 ? currentClassIndex : 0;
 
@@ -265,7 +264,7 @@ const ClassHall: React.FC = () => {
         >
           <div className="relative flex items-center justify-center">
             <h1 className="text-2xl font-black text-gray-900 dark:text-white">
-              🏛️ {t('character.classHall')}
+              <Emoji emoji="🏛️" size={24} className="inline mr-2" /> {t('character.classHall')}
             </h1>
           </div>
         </motion.div>
@@ -277,21 +276,21 @@ const ClassHall: React.FC = () => {
         >
           <div className="flex items-center justify-center gap-4">
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-yellow-400/30 to-orange-500/30 border border-yellow-400/40">
-              <span className="text-2xl">💰</span>
+              <Emoji emoji="💰" size={24} />
               <div>
                 <div className="text-gray-900 dark:text-white font-bold text-lg">{playerSoms.toLocaleString()}</div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">{t('currency.soms')}</div>
               </div>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400/30 to-blue-500/30 border border-cyan-400/40">
-              <span className="text-2xl">💎</span>
+              <Emoji emoji="💎" size={24} />
               <div>
                 <div className="text-gray-900 dark:text-white font-bold text-lg">{playerCrystals}</div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">{t('currency.crystals')}</div>
               </div>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-400/30 to-pink-500/30 border border-purple-400/40">
-              <span className="text-2xl">📊</span>
+              <Emoji emoji="📊" size={24} />
               <div>
                 <div className="text-gray-900 dark:text-white font-bold text-lg">{currentLevel}</div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">{t('character.level')}</div>
@@ -342,19 +341,17 @@ const ClassHall: React.FC = () => {
                         </div>
                         <div className="flex items-center justify-center gap-6">
                           <div className="text-center">
-                            <div className="text-3xl mb-1">💰</div>
-                            <div className={`font-bold text-lg ${
-                              playerSoms >= getChangeCost(selectedClass.tier).soms ? 'text-green-600' : 'text-red-600'
-                            }`}>
+                            <Emoji emoji="💰" size={32} />
+                            <div className={`font-bold text-lg ${playerSoms >= getChangeCost(selectedClass.tier).soms ? 'text-green-600' : 'text-red-600'
+                              }`}>
                               {getChangeCost(selectedClass.tier).soms.toLocaleString()}
                             </div>
                             <div className="text-xs text-gray-500">{t('common.have')}: {playerSoms.toLocaleString()}</div>
                           </div>
                           <div className="text-center">
-                            <div className="text-3xl mb-1">💎</div>
-                            <div className={`font-bold text-lg ${
-                              playerCrystals >= getChangeCost(selectedClass.tier).crystals ? 'text-green-600' : 'text-red-600'
-                            }`}>
+                            <Emoji emoji="💎" size={32} />
+                            <div className={`font-bold text-lg ${playerCrystals >= getChangeCost(selectedClass.tier).crystals ? 'text-green-600' : 'text-red-600'
+                              }`}>
                               {getChangeCost(selectedClass.tier).crystals}
                             </div>
                             <div className="text-xs text-gray-500">{t('common.have')}: {playerCrystals}</div>
@@ -376,11 +373,10 @@ const ClassHall: React.FC = () => {
                           whileTap={canAffordClass(selectedClass) ? { scale: 0.98 } : {}}
                           onClick={confirmClassChange}
                           disabled={!canAffordClass(selectedClass)}
-                          className={`flex-1 py-3 font-bold rounded-full shadow-lg ${
-                            canAffordClass(selectedClass)
+                          className={`flex-1 py-3 font-bold rounded-full shadow-lg ${canAffordClass(selectedClass)
                               ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white'
                               : 'bg-gray-400 text-gray-200 opacity-50 cursor-not-allowed'
-                          }`}
+                            }`}
                         >
                           {t('common.confirm')}
                         </motion.button>
