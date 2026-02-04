@@ -616,71 +616,72 @@
         "title": "17. Aloqa va bildirishnomalar",
         "text": "Ushbu Foydalanish shartlari bilan bog'liq savollar bo'yicha quyidagi ma'lumotlar orqali biz bilan bog'lanishingiz mumkin. Biz so'rovlarga javob berish majburiyatiga ega emasmiz. Siz uchun barcha bildirishnomalar o'z ixtiyorimizga ko'ra xizmat orqali yoki elektron pochta orqali taqdim etiladi:"
       }
-    }
-  },
-  "privacy": {
-    "title": "Maxfiylik siyosati",
-    "intro": {
-      "title": "Kirish",
-      "text": "Xush kelibsiz! Biz sizning maxfiyligingiz haqida g'amxo'rlik qilamiz va ma'lumotlaringizni qanday qayta ishlashimizni tushunishingizni xohlaymiz. Ushbu siyosat hamma narsani oddiy so'zlar bilan tushuntiradi. Uzbek Wars'dan foydalanish orqali siz bizga ma'lumotlaringizni ishonib topshirasiz va biz buni jiddiy qabul qilamiz. Shaxsiy loyiha sifatida biz standart amaliyotlarga amal qilamiz va ma'lumotlarni qayta ishlashda shaffof bo'lamiz."
     },
-    "dataCollection": {
-      "title": "1. Biz to'playdigan ma'lumotlar",
-      "intro": "Sizga shaxsiylashtirilgan o'yin tajribasini taqdim etish uchun biz quyidagilarni to'playmiz:",
-      "item1": "Kirish paytida hisob haqida asosiy ma'lumotlar, bu bizga sizni tanishga va taraqqiyotingizni xavfsiz saqlashga yordam beradi.",
-      "item2": "Sizning o'yin taraqqiyotingiz va yutuqlaringiz, shunda siz to'xtagan joydan davom etishingiz mumkin.",
-      "item3": "Qurilmangiz uchun ishlashni optimallashtirish va foydalanish modellarini o'rganishga yordam beradigan texnik ma'lumotlar.",
-      "item4": "Qanday o'ynashni yoqtirishingizni eslab qolish uchun afzalliklar va sozlamalar.",
-      "item5": "Do'stlarni taklif qilganingizda referal aloqalar, shunda ikkalangizni ham mukofotlashimiz mumkin."
-    },
-    "dataUsage": {
-      "title": "2. Ma'lumotlaringizni qanday ishlatamiz",
-      "item1": "Siz uchun moslashtirilgan silliq va yoqimli o'yin tajribasini taqdim etish.",
-      "item2": "Hisobingiz xavfsizligini ta'minlash va taraqqiyotingizni saqlash.",
-      "item3": "Odamlar qanday o'ynashiga asoslanib loyihani qanday yaxshilashni tushunish.",
-      "item4": "O'rganish jarayoni doirasida ishlashni doimiy yaxshilash va xususiyatlar qo'shish.",
-      "item5": "Ta'lim maqsadlari va loyihani rivojlantirish uchun foydalanish modellarini tahlil qilish."
-    },
-    "dataSharing": {
-      "title": "3. Ma'lumotlar almashish va uchinchi tomonlar",
-      "text": "Notijorat loyiha sifatida biz xususiyatlarni taqdim etish uchun turli uchinchi tomon xizmat ko'rsatuvchilar bilan ishlaymiz (autentifikatsiya, hosting, analitika, to'lovlarni qayta ishlash va boshqalar). Ushbu hamkorlar o'z siyosatlari bilan mustaqil ishlaydilar. Biz funksionallikni ta'minlash uchun ushbu xizmatlar bilan zarur ma'lumotlarni almashishimiz mumkin. Biz shuningdek, ta'lim maqsadlari va loyihani yaxshilash uchun yig'ilgan, anonim ma'lumotlarni tahlil qilishimiz mumkin. Har qanday onlayn platforma kabi, zarurat tug'ilganda biz huquqiy talablarga rioya qilishimiz kerak bo'lishi mumkin."
-    },
-    "thirdParty": {
-      "title": "4. Bizning ishonchli hamkorlarimiz",
-      "intro": "Sizga uzluksiz tajriba taqdim etish uchun biz turli texnologik hamkorlar bilan ishlaymiz:",
-      "google": "Hisobingizga kirishni osonlashtiradigan xavfsiz va qulay autentifikatsiya uchun.",
-      "telegram": "Kerak bo'lganda jamiyat bilan aloqa va qo'llab-quvvatlash uchun ixtiyoriy aloqa. Biz ushbu notijorat loyiha uchun zarurat bo'yicha boshqa xizmatlardan foydalanishimiz mumkin."
-    },
-    "dataSecurity": {
-      "title": "5. Ma'lumotlaringiz xavfsizligini ta'minlash",
-      "text": "Sizning xavfsizligingiz biz uchun muhim. Shaxsiy loyiha sifatida biz ma'lumotlaringizni himoya qilish uchun sanoat standartlari amaliyotlari va ishonchli xizmat ko'rsatuvchilardan foydalanamiz. Biz mustahkam xavfsizlik choralarini joriy qilsak va obro'li hamkorlar bilan ishlasak ham, hech bir onlayn xizmat 100% xavfsizlikka kafolat bera olmasligini bilishingizni xohlaymiz - bu barcha internet xizmatlari, ayniqsa shaxsiy notijorat loyihalar uchun to'g'ri. Biz ma'lumotlaringizni maksimal darajada himoya qilish uchun ushbu ta'lim tashabbusi doirasida xavfsizlik amaliyotlarimizni doimiy kuzatib boramiz va yangilaymiz."
-    },
-    "cookies": {
-      "title": "6. Cookies va saqlash",
-      "text": "Biz afzalliklaringizni eslab qolish va sizni tizimda saqlash uchun cookies va mahalliy saqlash kabi standart veb-texnologiyalardan foydalanamiz. Ko'pgina zamonaviy veb-saytlar shunday ishlaydi va bu uzluksiz tajribani ta'minlashga yordam beradi. Agar xohlasangiz, brauzer sozlamalarini sozlashingiz mumkin, garchi ba'zi xususiyatlar ularsiz unchalik silliq ishlamasligi mumkin. Bu veb-ilovalar va ta'lim loyihalari uchun standart amaliyot."
-    },
-    "userRights": {
-      "title": "7. Sizning nazorat huquqingiz",
-      "item1": "Siz istalgan vaqtda profilingiz orqali o'yin ma'lumotlaringizni ko'rishingiz mumkin.",
-      "item2": "Agar ketmoqchi bo'lsangiz, biz bilan bog'lanib hisob o'chirishni so'rashingiz mumkin.",
-      "item3": "Xohlagan vaqtingizda personaj nomini va afzalliklarni yangilang.",
-      "item4": "Agar kerak bo'lsa, o'yin ma'lumotlaringizning nusxasini so'rang. Notijorat loyiha sifatida biz so'rovlarni qondirish uchun qo'limizdan kelganini qilamiz."
-    },
-    "dataRetention": {
-      "title": "8. Ma'lumotlarni saqlash",
-      "text": "Biz taraqqiyotingiz va yutuqlaringizni saqlash uchun siz faol o'ynayotgan vaqtingizda ma'lumotlaringizni saqlaymiz. Agar hisob uzoq vaqt (taxminan 12 oy) ishlatilmasa, biz tizimlarimizning samarali ishlashi uchun uni arxivlashimiz yoki o'chirishimiz mumkin. Bu onlayn o'yin platformalari uchun standart amaliyot va ushbu shaxsiy ta'lim loyihasini barqaror saqlashga yordam beradi."
-    },
-    "children": {
-      "title": "9. Yoshga mos o'yinlar",
-      "text": "Bizning xizmatimiz 13 yosh va undan katta o'yinchilar uchun mo'ljallangan. Biz ongli ravishda yosh bolalardan ma'lumot to'plamaymiz. Agar siz ota-ona bo'lsangiz va xavotirlaringiz bo'lsa, iltimos biz bilan bog'laning."
-    },
-    "changes": {
-      "title": "10. Siyosatni yangilash",
-      "text": "Ushbu ta'lim loyihasi o'sib, rivojlanib borar ekan, biz yangi xususiyatlar, o'rganish tajribasi yoki amaliyotlarni aks ettirish uchun ushbu siyosatni yangilashimiz mumkin. Biz har qanday o'zgarishlarni bu yerda e'lon qilamiz va davom etib foydalanishingiz yangilanishlar bilan rozi ekanligingizni anglatadi. Biz ushbu notijorat ta'lim tashabbusida ma'lumotlaringizni qanday qayta ishlashimiz haqida shaffof bo'lishga intilamiz."
-    },
-    "contact": {
-      "title": "11. Savollar?",
-      "text": "Biz yordam berish uchun shu yerdamiz! Agar maxfiylik yoki ushbu ta'lim loyihasida ma'lumotlaringizni qanday qayta ishlashimiz haqida savollaringiz bo'lsa:"
+    "privacy": {
+      "title": "Maxfiylik siyosati",
+      "intro": {
+        "title": "Kirish",
+        "text": "Xush kelibsiz! Biz sizning maxfiyligingiz haqida g'amxo'rlik qilamiz va ma'lumotlaringizni qanday qayta ishlashimizni tushunishingizni xohlaymiz. Ushbu siyosat hamma narsani oddiy so'zlar bilan tushuntiradi. Uzbek Wars'dan foydalanish orqali siz bizga ma'lumotlaringizni ishonib topshirasiz va biz buni jiddiy qabul qilamiz. Shaxsiy loyiha sifatida biz standart amaliyotlarga amal qilamiz va ma'lumotlarni qayta ishlashda shaffof bo'lamiz."
+      },
+      "dataCollection": {
+        "title": "1. Biz to'playdigan ma'lumotlar",
+        "intro": "Sizga shaxsiylashtirilgan o'yin tajribasini taqdim etish uchun biz quyidagilarni to'playmiz:",
+        "item1": "Kirish paytida hisob haqida asosiy ma'lumotlar, bu bizga sizni tanishga va taraqqiyotingizni xavfsiz saqlashga yordam beradi.",
+        "item2": "Sizning o'yin taraqqiyotingiz va yutuqlaringiz, shunda siz to'xtagan joydan davom etishingiz mumkin.",
+        "item3": "Qurilmangiz uchun ishlashni optimallashtirish va foydalanish modellarini o'rganishga yordam beradigan texnik ma'lumotlar.",
+        "item4": "Qanday o'ynashni yoqtirishingizni eslab qolish uchun afzalliklar va sozlamalar.",
+        "item5": "Do'stlarni taklif qilganingizda referal aloqalar, shunda ikkalangizni ham mukofotlashimiz mumkin.",
+        "item6": "Ushbu ta'lim loyihasini yaxshilashga yordam beradigan standart veb-analitika."
+      },
+      "dataUsage": {
+        "title": "2. Ma'lumotlaringizni qanday ishlatamiz",
+        "item1": "Siz uchun moslashtirilgan silliq va yoqimli o'yin tajribasini taqdim etish.",
+        "item2": "Hisobingiz xavfsizligini ta'minlash va taraqqiyotingizni saqlash.",
+        "item3": "Odamlar qanday o'ynashiga asoslanib loyihani qanday yaxshilashni tushunish.",
+        "item4": "O'rganish jarayoni doirasida ishlashni doimiy yaxshilash va xususiyatlar qo'shish.",
+        "item5": "Ta'lim maqsadlari va loyihani rivojlantirish uchun foydalanish modellarini tahlil qilish."
+      },
+      "dataSharing": {
+        "title": "3. Ma'lumotlar almashish va uchinchi tomonlar",
+        "text": "Notijorat loyiha sifatida biz xususiyatlarni taqdim etish uchun turli uchinchi tomon xizmat ko'rsatuvchilar bilan ishlaymiz (autentifikatsiya, hosting, analitika, to'lovlarni qayta ishlash va boshqalar). Ushbu hamkorlar o'z siyosatlari bilan mustaqil ishlaydilar. Biz funksionallikni ta'minlash uchun ushbu xizmatlar bilan zarur ma'lumotlarni almashishimiz mumkin. Biz shuningdek, ta'lim maqsadlari va loyihani yaxshilash uchun yig'ilgan, anonim ma'lumotlarni tahlil qilishimiz mumkin. Har qanday onlayn platforma kabi, zarurat tug'ilganda biz huquqiy talablarga rioya qilishimiz kerak bo'lishi mumkin."
+      },
+      "thirdParty": {
+        "title": "4. Bizning ishonchli hamkorlarimiz",
+        "intro": "Sizga uzluksiz tajriba taqdim etish uchun biz turli texnologik hamkorlar bilan ishlaymiz:",
+        "google": "Hisobingizga kirishni osonlashtiradigan xavfsiz va qulay autentifikatsiya uchun.",
+        "telegram": "Kerak bo'lganda jamiyat bilan aloqa va qo'llab-quvvatlash uchun ixtiyoriy aloqa. Biz ushbu notijorat loyiha uchun zarurat bo'yicha boshqa xizmatlardan foydalanishimiz mumkin."
+      },
+      "dataSecurity": {
+        "title": "5. Ma'lumotlaringiz xavfsizligini ta'minlash",
+        "text": "Sizning xavfsizligingiz biz uchun muhim. Shaxsiy loyiha sifatida biz ma'lumotlaringizni himoya qilish uchun sanoat standartlari amaliyotlari va ishonchli xizmat ko'rsatuvchilardan foydalanamiz. Biz mustahkam xavfsizlik choralarini joriy qilsak va obro'li hamkorlar bilan ishlasak ham, hech bir onlayn xizmat 100% xavfsizlikka kafolat bera olmasligini bilishingizni xohlaymiz - bu barcha internet xizmatlari, ayniqsa shaxsiy notijorat loyihalar uchun to'g'ri. Biz ma'lumotlaringizni maksimal darajada himoya qilish uchun ushbu ta'lim tashabbusi doirasida xavfsizlik amaliyotlarimizni doimiy kuzatib boramiz va yangilaymiz."
+      },
+      "cookies": {
+        "title": "6. Cookies va saqlash",
+        "text": "Biz afzalliklaringizni eslab qolish va sizni tizimda saqlash uchun cookies va mahalliy saqlash kabi standart veb-texnologiyalardan foydalanamiz. Ko'pgina zamonaviy veb-saytlar shunday ishlaydi va bu uzluksiz tajribani ta'minlashga yordam beradi. Agar xohlasangiz, brauzer sozlamalarini sozlashingiz mumkin, garchi ba'zi xususiyatlar ularsiz unchalik silliq ishlamasligi mumkin. Bu veb-ilovalar va ta'lim loyihalari uchun standart amaliyot."
+      },
+      "userRights": {
+        "title": "7. Sizning nazorat huquqingiz",
+        "item1": "Siz istalgan vaqtda profilingiz orqali o'yin ma'lumotlaringizni ko'rishingiz mumkin.",
+        "item2": "Agar ketmoqchi bo'lsangiz, biz bilan bog'lanib hisob o'chirishni so'rashingiz mumkin.",
+        "item3": "Xohlagan vaqtingizda personaj nomini va afzalliklarni yangilang.",
+        "item4": "Agar kerak bo'lsa, o'yin ma'lumotlaringizning nusxasini so'rang. Notijorat loyiha sifatida biz so'rovlarni qondirish uchun qo'limizdan kelganini qilamiz."
+      },
+      "dataRetention": {
+        "title": "8. Ma'lumotlarni saqlash",
+        "text": "Biz taraqqiyotingiz va yutuqlaringizni saqlash uchun siz faol o'ynayotgan vaqtingizda ma'lumotlaringizni saqlaymiz. Agar hisob uzoq vaqt (taxminan 12 oy) ishlatilmasa, biz tizimlarimizning samarali ishlashi uchun uni arxivlashimiz yoki o'chirishimiz mumkin. Bu onlayn o'yin platformalari uchun standart amaliyot va ushbu shaxsiy ta'lim loyihasini barqaror saqlashga yordam beradi."
+      },
+      "children": {
+        "title": "9. Yoshga mos o'yinlar",
+        "text": "Bizning xizmatimiz 13 yosh va undan katta o'yinchilar uchun mo'ljallangan. Biz ongli ravishda yosh bolalardan ma'lumot to'plamaymiz. Agar siz ota-ona bo'lsangiz va xavotirlaringiz bo'lsa, iltimos biz bilan bog'laning."
+      },
+      "changes": {
+        "title": "10. Siyosatni yangilash",
+        "text": "Ushbu ta'lim loyihasi o'sib, rivojlanib borar ekan, biz yangi xususiyatlar, o'rganish tajribasi yoki amaliyotlarni aks ettirish uchun ushbu siyosatni yangilashimiz mumkin. Biz har qanday o'zgarishlarni bu yerda e'lon qilamiz va davom etib foydalanishingiz yangilanishlar bilan rozi ekanligingizni anglatadi. Biz ushbu notijorat ta'lim tashabbusida ma'lumotlaringizni qanday qayta ishlashimiz haqida shaffof bo'lishga intilamiz."
+      },
+      "contact": {
+        "title": "11. Savollar?",
+        "text": "Biz yordam berish uchun shu yerdamiz! Agar maxfiylik yoki ushbu ta'lim loyihasida ma'lumotlaringizni qanday qayta ishlashimiz haqida savollaringiz bo'lsa:"
+      }
     }
   },
   "city": {
