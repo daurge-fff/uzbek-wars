@@ -4,7 +4,7 @@ import { Schema, model, Document } from 'mongoose';
  * Cosmetic item type
  * Determines where the item can be equipped or how it can be used
  */
-export type CosmeticType = 'clothing' | 'background' | 'backpack' | 'consumable';
+export type CosmeticType = 'clothing' | 'background' | 'backpack' | 'consumable' | 'equipment';
 
 /**
  * Equipment slot for clothing items
@@ -84,6 +84,14 @@ export interface ICosmeticItem extends Document {
   rarity: CosmeticRarity;
   bonus?: IItemBonus;
   effects?: IConsumableEffects;
+  stats?: {
+    strength?: number;
+    defense?: number;
+    agility?: number;
+    stamina?: number;
+    intelligence?: number;
+    luck?: number;
+  };
 }
 
 /**
@@ -152,6 +160,14 @@ const CosmeticItemSchema = new Schema<ICosmeticItem>({
     health: { type: Number },
     mood: { type: Number },
     energy: { type: Number },
+  },
+  stats: {
+    strength: { type: Number, default: 0 },
+    defense: { type: Number, default: 0 },
+    agility: { type: Number, default: 0 },
+    stamina: { type: Number, default: 0 },
+    intelligence: { type: Number, default: 0 },
+    luck: { type: Number, default: 0 },
   },
 });
 

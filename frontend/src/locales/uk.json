@@ -217,7 +217,8 @@
       "all": "Всі",
       "clothing": "Одяг",
       "background": "Фони",
-      "accessory": "Аксесуари"
+      "accessory": "Аксесуари",
+      "combat": "⚔️ Бій"
     },
     "rarity": {
       "common": "Звичайний",
@@ -705,5 +706,78 @@
     "insufficientFunds": "Недостатньо коштів",
     "migrationInProgress": "Переїзд у процесі...",
     "migrationTime": "Час переїзду: 60 хвилин"
+  },
+  "tasks": {
+    "title": "Завдання та Квести",
+    "streak": "Серія",
+    "days": "днів",
+    "dailyTitle": "Щоденні завдання",
+    "questsTitle": "Доступні квести",
+    "noQuests": "Немає доступних квестів",
+    "startQuest": "Почати квест",
+    "streakBonus": "Бонус за серію отримано!"
+  },
+  "quests": {
+    "started": "Квест розпочато!",
+    "error": "Помилка початку квесту",
+    "completed": "Квест завершено!"
+  },
+  "arena": {
+    "title": "ПВП АРЕНА",
+    "matchmaking": "ПІДБІР СУПЕРНИКА",
+    "matchmakingDesc": "Оберіть гідного суперника для бою",
+    "fighting": "ЙДЕ БИТВА...",
+    "victory": "ПЕРЕМОГА!",
+    "defeat": "ПОРАЗКА",
+    "showLog": "Показати лог бою",
+    "hideLog": "Приховати лог бою",
+    "backToArena": "ПОВЕРНУТИСЯ В АРЕНУ",
+    "attack": "АТАКУВАТИ",
+    "fightComplete": "Бій завершено!",
+    "errorFetch": "Помилка пошуку суперників",
+    "errorFight": "Помилка під час бою",
+    "rating": "Рейтинг",
+    "statsPreserved": "Ситість, здоров'я та енергія не витрачені",
+    "you": "Ви",
+    "opponent": "Суперник",
+    "preparing": "Бійці виходять на арену...",
+    "skipFight": "Пропустити анімацію ⏩",
+    "selectDifficulty": "Оберіть складність",
+    "difficulty_easy": "Легкий",
+    "difficulty_medium": "Середній",
+    "difficulty_hard": "Складний",
+    "notAvailable": "Недоступно",
+    "notEnoughEnergy": "Недостатньо енергії! Відпочиньте.",
+    "notEnoughSoms": "Недостатньо сомів для бою!",
+    "opponentPower": "Сила",
+    "energyCost": "Енергія",
+    "healthCost": "Здоров'я"
+  },
+  "battle": {
+    "event_attack": "{{attacker}} завдає удару по {{defender}} на {{damage}} шкоди",
+    "event_crit": "💥 КРИТ! {{attacker}} пробиває захист {{defender}} на {{damage}} шкоди!",
+    "event_dodge": "💨 {{defender}} спритно ухиляється від удару {{attacker}}!",
+    "event_counter": "⚡ {{attacker}} завдає контрудар на {{damage}} шкоди!",
+    "event_block": "🛡️ {{defender}} блокує частину атаки! Отримує {{damage}} шкоди",
+    "event_miss": "❌ {{attacker}} промахується!",
+    "event_stun": "💫 {{defender}} оглушений і пропускає хід!",
+    "event_poison": "☠️ {{defender}} отруєний! Втрачає здоров'я",
+    "event_finish": "⚡ {{attacker}} завдає вирішального удару!",
+    "costEnergy": "Витрачено енергії",
+    "costHealth": "Втрачено здоров'я",
+    "costSoms": "Вартість входу",
+    "turns": "Ходів",
+    "damageDealt": "Шкоди завдано",
+    "damageReceived": "Шкоди отримано",
+    "crits": "Критів",
+    "dodges": "Ухилень",
+    "combos": "Комбо",
+    "battleStats": "Статистика бою"
+  },
+  "achievements": {
+    "title": "ДОСЯГНЕННЯ",
+    "unlocked": "Розблоковано",
+    "inProgress": "У процесі",
+    "errorFetch": "Помилка завантаження досягнень"
   }
 }

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="sky-khv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6e2e07"/>
+      <stop offset="55%" stop-color="#E67E22"/>
+      <stop offset="100%" stop-color="#ffd7ad"/>
+    </linearGradient>
+    <linearGradient id="minaret-khv" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1c8f9e"/>
+      <stop offset="50%" stop-color="#28b7c9"/>
+      <stop offset="100%" stop-color="#1c8f9e"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#sky-khv)"/>
+  <circle cx="120" cy="90" r="44" fill="#ffe9c9" opacity="0.9"/>
+
+  <!-- clay city wall -->
+  <rect x="0" y="330" width="800" height="60" fill="#c97a3f"/>
+  <g fill="#b5692f">
+    <rect x="20" y="310" width="24" height="24"/>
+    <rect x="70" y="310" width="24" height="24"/>
+    <rect x="120" y="310" width="24" height="24"/>
+    <rect x="640" y="310" width="24" height="24"/>
+    <rect x="690" y="310" width="24" height="24"/>
+    <rect x="740" y="310" width="24" height="24"/>
+  </g>
+
+  <!-- Kalta Minor style short wide turquoise minaret -->
+  <g>
+    <rect x="365" y="200" width="70" height="190" fill="url(#minaret-khv)"/>
+    <ellipse cx="400" cy="200" rx="35" ry="16" fill="#28b7c9"/>
+    <g stroke="#e8f9fb" stroke-width="3" opacity="0.7">
+      <path d="M365 230 H435"/>
+      <path d="M365 260 H435"/>
+      <path d="M365 290 H435"/>
+      <path d="M365 320 H435"/>
+      <path d="M365 350 H435"/>
+    </g>
+    <g fill="#e8f9fb" opacity="0.6">
+      <circle cx="380" cy="245" r="4"/><circle cx="400" cy="245" r="4"/><circle cx="420" cy="245" r="4"/>
+      <circle cx="380" cy="275" r="4"/><circle cx="400" cy="275" r="4"/><circle cx="420" cy="275" r="4"/>
+    </g>
+  </g>
+
+  <!-- flanking smaller domed roofs -->
+  <ellipse cx="230" cy="330" rx="60" ry="30" fill="#c97a3f"/>
+  <ellipse cx="230" cy="300" rx="34" ry="30" fill="#28b7c9"/>
+  <ellipse cx="570" cy="330" rx="60" ry="30" fill="#c97a3f"/>
+  <ellipse cx="570" cy="300" rx="34" ry="30" fill="#28b7c9"/>
+
+  <!-- gate arch -->
+  <path d="M370 390 V350 Q370 330 400 330 Q430 330 430 350 V390 Z" fill="#5a2e12"/>
+
+  <g>
+    <rect x="0" y="410" width="800" height="40" fill="#5a2e0f"/>
+    <g fill="#E67E22">
+      <path d="M0 410 l20 40 l20 -40 Z"/><path d="M60 410 l20 40 l20 -40 Z"/>
+      <path d="M120 410 l20 40 l20 -40 Z"/><path d="M180 410 l20 40 l20 -40 Z"/>
+      <path d="M240 410 l20 40 l20 -40 Z"/><path d="M300 410 l20 40 l20 -40 Z"/>
+      <path d="M360 410 l20 40 l20 -40 Z"/><path d="M420 410 l20 40 l20 -40 Z"/>
+      <path d="M480 410 l20 40 l20 -40 Z"/><path d="M540 410 l20 40 l20 -40 Z"/>
+      <path d="M600 410 l20 40 l20 -40 Z"/><path d="M660 410 l20 40 l20 -40 Z"/>
+      <path d="M720 410 l20 40 l20 -40 Z"/><path d="M780 410 l20 40 l20 -40 Z"/>
+    </g>
+  </g>
+</svg>

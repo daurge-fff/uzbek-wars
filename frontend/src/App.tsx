@@ -23,6 +23,7 @@ import { Inventory } from './components/Inventory';
 import { Leaderboard } from './components/Leaderboard';
 import { ReferralPanel } from './components/ReferralPanel';
 import { PlayerProfile } from './components/PlayerProfile';
+import { TasksPage } from './components/TasksPage';
 import { Settings } from './components/Settings';
 import { HealthCheck } from './components/HealthCheck';
 import { ReferralLanding } from './components/ReferralLanding';
@@ -33,6 +34,9 @@ import { OnboardingFlow } from './components/OnboardingFlow';
 import { BottomNavBar } from './components/BottomNavBar';
 import ClassHall from './components/ClassHall';
 import CityMigration from './components/CityMigration';
+import { ArenaPage } from './components/ArenaPage';
+import { AchievementsPage } from './components/AchievementsPage';
+import { CraftingPage } from './components/CraftingPage';
 import { cosmeticItems } from './data/cosmeticItems';
 
 const queryClient = new QueryClient({
@@ -80,20 +84,20 @@ function LogoutPage() {
 
 function AnimatedRoutes() {
   const location = useLocation();
-  
+
   // Smooth page transitions
   const pageVariants = {
     initial: { opacity: 0, scale: 0.98, y: 10 },
     animate: { opacity: 1, scale: 1, y: 0 },
     exit: { opacity: 0, scale: 0.98, y: -10 }
   };
-  
+
   const pageTransition = {
     type: 'tween',
     ease: 'anticipate',
     duration: 0.3
   };
-  
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
@@ -290,12 +294,7 @@ function AnimatedRoutes() {
             transition={pageTransition}
             className="relative"
           >
-            <ClassHall 
-              currentClass={'char_trader'}
-              currentLevel={1}
-              playerSoms={0}
-              playerCrystals={0}
-            />
+            <ClassHall />
           </motion.div>
         } />
         <Route path="/cities" element={
@@ -310,6 +309,54 @@ function AnimatedRoutes() {
             <CityMigration />
           </motion.div>
         } />
+        <Route path="/tasks" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="relative"
+          >
+            <TasksPage />
+          </motion.div>
+        } />
+        <Route path="/arena" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="relative"
+          >
+            <ArenaPage />
+          </motion.div>
+        } />
+        <Route path="/achievements" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="relative"
+          >
+            <AchievementsPage />
+          </motion.div>
+        } />
+        <Route path="/crafting" element={
+          <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="relative"
+          >
+            <CraftingPage />
+          </motion.div>
+        } />
       </Routes>
     </AnimatePresence>
   );
@@ -318,11 +365,11 @@ function AnimatedRoutes() {
 // Redirect /auth to home for proper onboarding
 function AuthRedirect() {
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     navigate('/');
   }, [navigate]);
-  
+
   return null;
 }
 
@@ -331,12 +378,12 @@ const CosmeticShopWithData = () => {
   const { player, updatePlayer, token, refreshPlayer } = useAuth();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const fetchCosmetics = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/cosmetics`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token || localStorage.getItem('auth_token')}` }
         });
         setItems(response.data.items);
       } catch (error) {
@@ -347,7 +394,7 @@ const CosmeticShopWithData = () => {
         setLoading(false);
       }
     };
-    
+
     if (token) {
       fetchCosmetics();
     } else {
@@ -355,7 +402,7 @@ const CosmeticShopWithData = () => {
       setLoading(false);
     }
   }, [token]);
-  
+
   const handlePurchase = async (id: string, currency: 'soms' | 'crystals') => {
     try {
       const response = await axios.post(
@@ -363,22 +410,22 @@ const CosmeticShopWithData = () => {
         { itemId: id, currency },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       // Update player balance
       updatePlayer({
         soms: response.data.player.soms,
         donationCurrency: response.data.player.donationCurrency
       });
-      
+
       // Update items to mark as owned
-      setItems(prev => prev.map(item => 
+      setItems(prev => prev.map(item =>
         item.id === id ? { ...item, owned: true } : item
       ));
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Purchase failed');
     }
   };
-  
+
   const handleEquip = async (id: string) => {
     try {
       await axios.post(
@@ -386,7 +433,7 @@ const CosmeticShopWithData = () => {
         { itemId: id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       // Update items to mark as equipped
       const item = items.find(i => i.id === id);
       if (item) {
@@ -395,14 +442,14 @@ const CosmeticShopWithData = () => {
           equipped: i.id === id ? true : (i.type === item.type ? false : i.equipped)
         })));
       }
-      
+
       // Refresh player data to get updated cosmetics
       await refreshPlayer();
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Equip failed');
     }
   };
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black">
@@ -410,7 +457,7 @@ const CosmeticShopWithData = () => {
       </div>
     );
   }
-  
+
   return (
     <CosmeticShop
       items={items}
@@ -426,7 +473,7 @@ const InventoryWithData = () => {
   const { token, refreshPlayer } = useAuth();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const fetchCosmetics = async () => {
       try {
@@ -441,7 +488,7 @@ const InventoryWithData = () => {
         setLoading(false);
       }
     };
-    
+
     if (token) {
       fetchCosmetics();
     } else {
@@ -449,7 +496,7 @@ const InventoryWithData = () => {
       setLoading(false);
     }
   }, [token]);
-  
+
   const handleEquip = async (id: string) => {
     try {
       await axios.post(
@@ -457,7 +504,7 @@ const InventoryWithData = () => {
         { itemId: id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       const item = items.find(i => i.id === id);
       if (item) {
         setItems(prev => prev.map(i => ({
@@ -465,13 +512,13 @@ const InventoryWithData = () => {
           equipped: i.id === id ? true : (i.type === item.type ? false : i.equipped)
         })));
       }
-      
+
       await refreshPlayer();
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Equip failed');
     }
   };
-  
+
   const handleUnequip = async (id: string) => {
     try {
       await axios.post(
@@ -479,17 +526,17 @@ const InventoryWithData = () => {
         { itemId: id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      setItems(prev => prev.map(i => 
+
+      setItems(prev => prev.map(i =>
         i.id === id ? { ...i, equipped: false } : i
       ));
-      
+
       await refreshPlayer();
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Unequip failed');
     }
   };
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black">
@@ -497,7 +544,7 @@ const InventoryWithData = () => {
       </div>
     );
   }
-  
+
   return (
     <Inventory
       items={items}
@@ -514,7 +561,7 @@ const LeaderboardWithData = () => {
 const ReferralPanelWithData = () => {
   const [referrals, setReferrals] = useState<any[]>([]);
   const [bonus, setBonus] = useState({ crystals: 0, soms: 0 });
-  
+
   useEffect(() => {
     const fetchReferrals = async () => {
       try {
@@ -525,13 +572,13 @@ const ReferralPanelWithData = () => {
         console.error('Failed to fetch referrals:', error);
       }
     };
-    
+
     fetchReferrals();
   }, []);
-  
+
   const referralCode = 'LOADING';
   const referralLink = `${window.location.origin}/ref/${referralCode}`;
-  
+
   return (
     <ReferralPanel
       referralCode={referralCode}
@@ -545,7 +592,7 @@ const ReferralPanelWithData = () => {
 const PlayerProfileWithData = () => {
   const { user, player } = useAuth();
   const [stats, setStats] = useState<any>(null);
-  
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -564,10 +611,10 @@ const PlayerProfileWithData = () => {
         console.error('Failed to fetch profile:', error);
       }
     };
-    
+
     fetchProfile();
   }, [player]);
-  
+
   const playerInfo = {
     username: user?.displayName || 'Player',
     avatar: user?.avatar || '👤',
@@ -576,7 +623,7 @@ const PlayerProfileWithData = () => {
     joinedDate: new Date().toISOString(),
     referralCode: ''
   };
-  
+
   return (
     <PlayerProfile
       playerInfo={playerInfo}
@@ -598,7 +645,7 @@ function App() {
             <AnimatedRoutes />
             <BottomNavBar />
           </BrowserRouter>
-          
+
           <Toaster
             position="top-center"
             toastOptions={{
@@ -624,11 +671,11 @@ const SettingsWithI18n = () => {
   const { i18n } = useTranslation();
   const { player, token, user } = useAuth();
   const [appStats, setAppStats] = useState<any>(null);
-  
+
   useEffect(() => {
     const fetchAppStats = async () => {
       if (!token) return;
-      
+
       try {
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
         const response = await axios.get(`${API_URL}/api/stats/app`, {
@@ -648,14 +695,14 @@ const SettingsWithI18n = () => {
         });
       }
     };
-    
+
     fetchAppStats();
   }, [token, player?.cityId]);
-  
+
   const handleLanguageChange = async (lang: 'ru' | 'uz' | 'uk' | 'en') => {
     // Change language in i18n
     i18n.changeLanguage(lang);
-    
+
     // Save to backend
     if (token) {
       try {
@@ -665,7 +712,7 @@ const SettingsWithI18n = () => {
           { language: lang },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        
+
         // Update user in localStorage
         if (user) {
           const updatedUser = { ...user, language: lang };
@@ -676,7 +723,7 @@ const SettingsWithI18n = () => {
       }
     }
   };
-  
+
   return (
     <Settings
       currentLanguage={i18n.language as 'ru' | 'uz' | 'uk' | 'en'}

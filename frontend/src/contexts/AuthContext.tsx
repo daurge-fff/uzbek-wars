@@ -75,16 +75,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(storedToken);
       setUser(parsedUser);
       setPlayer(JSON.parse(storedPlayer));
-      
+
       // Set axios default header
       axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-      
+
       // Sync language from user profile
       if (parsedUser.language && ['ru', 'uz', 'uk', 'en'].includes(parsedUser.language)) {
         i18n.changeLanguage(parsedUser.language);
       }
     }
-    
+
     setIsLoading(false);
   }, [i18n]);
 
@@ -92,15 +92,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(newToken);
     setUser(newUser);
     setPlayer(newPlayer);
-    
+
     // Persist to localStorage
     localStorage.setItem('auth_token', newToken);
     localStorage.setItem('auth_user', JSON.stringify(newUser));
     localStorage.setItem('auth_player', JSON.stringify(newPlayer));
-    
+
     // Set axios default header
     axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-    
+
     // Sync language from user profile
     if (newUser.language && ['ru', 'uz', 'uk', 'en'].includes(newUser.language)) {
       i18n.changeLanguage(newUser.language);
@@ -111,12 +111,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     setUser(null);
     setPlayer(null);
-    
+
     // Clear localStorage
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
     localStorage.removeItem('auth_player');
-    
+
     // Remove axios default header
     delete axios.defaults.headers.common['Authorization'];
   };
@@ -136,12 +136,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshPlayer = async () => {
     if (!token) return;
-    
+
     try {
       const response = await axios.get(`${API_URL}/api/player/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       if (response.data.player) {
         const updatedPlayer = {
           id: response.data.player.userId,
@@ -161,8 +161,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('auth_player', JSON.stringify(updatedPlayer));
         console.log('Player refreshed successfully:', updatedPlayer);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to refresh player:', error);
+      // If player not found (404), logout to clear stale token
+      if (error.response?.status === 404) {
+        console.warn('Player not found, logging out...');
+        logout();
+      }
     }
   };
 

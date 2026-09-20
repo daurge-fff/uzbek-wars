@@ -7,6 +7,8 @@ import { User } from '../models/User';
 import { Player } from '../models/Player';
 import { logger } from '../utils/logger';
 import { CHARACTERS } from '../data/characters';
+import { Quest } from '../models/Quest';
+import { DailyTask } from '../models/DailyTask';
 
 /**
  * City definitions with exact data from design document
@@ -24,7 +26,7 @@ const CITIES = [
     maxPlayers: 1000,
     theme: {
       primaryColor: '#4A90E2',
-      backgroundImage: '/assets/cities/samarkand.jpg',
+      backgroundImage: '/assets/cities/samarkand.svg',
       description: {
         ru: 'Жемчужина Востока. Древний город на Великом шелковом пути с величественным Регистаном',
         uz: 'Sharqning gavhari. Buyuk Ipak yo\'lidagi qadimiy shahar, ulug\'vor Registon bilan',
@@ -44,7 +46,7 @@ const CITIES = [
     maxPlayers: 1000,
     theme: {
       primaryColor: '#50C878',
-      backgroundImage: '/assets/cities/tashkent.jpg',
+      backgroundImage: '/assets/cities/tashkent.svg',
       description: {
         ru: 'Каменный город. Современная столица с древней историей и знаменитым базаром Чорсу',
         uz: 'Tosh shahar. Qadimiy tarixga ega zamonaviy poytaxt va mashhur Chorsu bozori',
@@ -64,7 +66,7 @@ const CITIES = [
     maxPlayers: 1000,
     theme: {
       primaryColor: '#DAA520',
-      backgroundImage: '/assets/cities/bukhara.jpg',
+      backgroundImage: '/assets/cities/bukhara.svg',
       description: {
         ru: 'Благородная Бухара. Священный город с 140 архитектурными памятниками и древней крепостью Арк',
         uz: 'Sharif Buxoro. 140 ta me\'moriy yodgorlik va qadimiy Ark qal\'asi bilan muqaddas shahar',
@@ -84,7 +86,7 @@ const CITIES = [
     maxPlayers: 1000,
     theme: {
       primaryColor: '#E67E22',
-      backgroundImage: '/assets/cities/khiva.jpg',
+      backgroundImage: '/assets/cities/khiva.svg',
       description: {
         ru: 'Город-музей. Ичан-Кала - живая средневековая крепость под открытым небом',
         uz: 'Muzey shahar. Ichan-Qal\'a - ochiq osmondagi tirik o\'rta asr qal\'asi',
@@ -104,7 +106,7 @@ const CITIES = [
     maxPlayers: 1000,
     theme: {
       primaryColor: '#9B59B6',
-      backgroundImage: '/assets/cities/andijan.jpg',
+      backgroundImage: '/assets/cities/andijan.svg',
       description: {
         ru: 'Сердце Ферганы. Родина Бабура - основателя империи Великих Моголов',
         uz: 'Farg\'ona qalbi. Bobur - Buyuk Mug\'allar imperiyasi asoschisining vatani',
@@ -161,7 +163,7 @@ const COSMETIC_CLOTHING = [
     imageUrl: '/assets/cosmetics/doppi_gold.png',
     rarity: 'epic' as const,
   },
-  
+
   // Верхняя одежда
   {
     itemId: 'clothing_chapan_blue',
@@ -243,7 +245,7 @@ const COSMETIC_CLOTHING = [
     imageUrl: '/assets/cosmetics/modern_suit.png',
     rarity: 'rare' as const,
   },
-  
+
   // Обувь
   {
     itemId: 'clothing_ichigi',
@@ -694,7 +696,7 @@ const CONSUMABLE_ITEMS = [
       hunger: 25,
     },
   },
-  
+
   // Напитки
   {
     itemId: 'drink_green_tea',
@@ -746,7 +748,7 @@ const CONSUMABLE_ITEMS = [
       health: 10,
     },
   },
-  
+
   // Медицина
   {
     itemId: 'medicine_first_aid',
@@ -943,6 +945,252 @@ async function seedDevUser(): Promise<void> {
 }
 
 /**
+ * Seeds initial quests into the database
+ */
+async function seedQuests(): Promise<void> {
+  logger.info('Seeding quests...');
+
+  const quests = [
+    {
+      id: 'quest_village_hero',
+      name: {
+        ru: 'Герой махалли',
+        uz: 'Mahalla qahramoni',
+        uk: 'Герой махаллі',
+        en: 'Village Hero'
+      },
+      description: {
+        ru: 'Начни свой путь великого воина. Выполни свои первые поручения.',
+        uz: 'Buyuk jangchi yo\'lingni boshla. Birinchi topshiriqlaringni bajar.',
+        uk: 'Почни свій шлях великого воїна. Виконай свої перші доручення.',
+        en: 'Start your journey as a great warrior. Complete your first tasks.'
+      },
+      requirements: { level: 1 },
+      steps: [
+        {
+          id: 'step_1',
+          description: {
+            ru: 'Выполни 3 любые активности',
+            uz: 'Har qanday 3 ta faoliyatni bajar',
+            uk: 'Виконай 3 будь-які активності',
+            en: 'Complete any 3 activities'
+          },
+          targetValue: 3,
+          type: 'activity_count'
+        }
+      ],
+      rewards: {
+        experience: 500,
+        soms: 2000,
+        crystals: 10
+      },
+      isGlobal: true
+    },
+    {
+      id: 'quest_arena_novice',
+      name: {
+        ru: 'Новичок арены',
+        uz: 'Arena yangi ishtirokchisi',
+        uk: 'Новачок арени',
+        en: 'Arena Novice'
+      },
+      description: {
+        ru: 'Покажи свою силу в честном бою на арене.',
+        uz: 'Arenada halol jangda o\'z kuchingni ko\'rsat.',
+        uk: 'Покажи свою силу в чесному бою на арені.',
+        en: 'Show your strength in a fair fight in the arena.'
+      },
+      requirements: { level: 2 },
+      steps: [
+        {
+          id: 'step_1',
+          description: {
+            ru: 'Одержи 1 победу на арене',
+            uz: 'Arenada 1 ta g\'alabaga erish',
+            uk: 'Здобудь 1 перемогу на арені',
+            en: 'Win 1 fight in the arena'
+          },
+          targetValue: 1,
+          type: 'pvp_win'
+        }
+      ],
+      rewards: {
+        experience: 1000,
+        soms: 5000,
+        crystals: 50
+      },
+      isGlobal: true
+    }
+  ];
+
+  for (const questData of quests) {
+    await Quest.findOneAndUpdate(
+      { id: questData.id },
+      questData,
+      { upsert: true, new: true }
+    );
+  }
+  logger.info(`Successfully seeded ${quests.length} quests`);
+}
+
+/**
+ * Seeds daily tasks into the database
+ */
+async function seedDailyTasks(): Promise<void> {
+  logger.info('Seeding daily tasks...');
+
+  const tasks = [
+    {
+      id: 'daily_login',
+      name: {
+        ru: 'Ежедневный визит',
+        uz: 'Kunlik tashrif',
+        uk: 'Щоденний візит',
+        en: 'Daily Visit'
+      },
+      description: {
+        ru: 'Просто зайди в игру сегодня',
+        uz: 'Bugun shunchaki o\'yinga kir',
+        uk: 'Просто зайди в гру сьогодні',
+        en: 'Just log in to the game today'
+      },
+      type: 'login',
+      targetValue: 1,
+      rewards: {
+        experience: 100,
+        soms: 500
+      },
+      requiredLevel: 1,
+      isActive: true
+    },
+    {
+      id: 'daily_activities',
+      name: {
+        ru: 'Трудолюбие',
+        uz: 'Mehnatsevarlik',
+        uk: 'Працьовитість',
+        en: 'Diligence'
+      },
+      description: {
+        ru: 'Выполни 5 активностей за день',
+        uz: 'Kun davomida 5 ta faoliyatni bajar',
+        uk: 'Виконай 5 активностей за день',
+        en: 'Complete 5 activities in a day'
+      },
+      type: 'activity_count',
+      targetValue: 5,
+      rewards: {
+        experience: 300,
+        soms: 1500
+      },
+      requiredLevel: 1,
+      isActive: true
+    },
+    {
+      id: 'daily_arena',
+      name: {
+        ru: 'Гладиатор',
+        uz: 'Gladiator',
+        uk: 'Гладіатор',
+        en: 'Gladiator'
+      },
+      description: {
+        ru: 'Проведи 3 боя на арене',
+        uz: 'Arenada 3 ta jang o\'tkaz',
+        uk: 'Проведи 3 бої на арені',
+        en: 'Conduct 3 fights in the arena'
+      },
+      type: 'pvp_battle',
+      targetValue: 3,
+      rewards: {
+        experience: 500,
+        soms: 2500
+      },
+      requiredLevel: 2,
+      isActive: true
+    }
+  ];
+
+  for (const taskData of tasks) {
+    await DailyTask.findOneAndUpdate(
+      { id: taskData.id },
+      taskData,
+      { upsert: true, new: true }
+    );
+  }
+  logger.info(`Successfully seeded ${tasks.length} daily tasks`);
+}
+
+/**
+ * Seeds arena opponents (bot players)
+ */
+async function seedArenaOpponents(): Promise<void> {
+  logger.info('Seeding arena opponents...');
+
+  const bots = [
+    {
+      username: 'bot_alisher',
+      displayName: 'Alisher (Bot)',
+      level: 1,
+      power: 10,
+      characterId: 'char_student'
+    },
+    {
+      username: 'bot_bekzod',
+      displayName: 'Bekzod (Bot)',
+      level: 5,
+      power: 65,
+      characterId: 'char_merchant'
+    },
+    {
+      username: 'bot_dilshod',
+      displayName: 'Dilshod (Bot)',
+      level: 10,
+      power: 150,
+      characterId: 'char_warrior'
+    }
+  ];
+
+  for (const bot of bots) {
+    let user = await User.findOne({ googleId: `bot_${bot.username}` });
+    if (!user) {
+      user = await User.create({
+        googleId: `bot_${bot.username}`,
+        email: `${bot.username}@bot.local`,
+        displayName: bot.displayName,
+        language: 'uz',
+        ipAddress: '127.0.0.1',
+        deviceInfo: { userAgent: 'Bot', platform: 'server', deviceId: `bot_${bot.username}` }
+      });
+    }
+
+    await Player.findOneAndUpdate(
+      { userId: user._id },
+      {
+        userId: user._id,
+        characterId: bot.characterId,
+        cityId: 'samarkand',
+        level: bot.level,
+        experience: 0,
+        soms: 1000,
+        donationCurrency: 0,
+        referralCode: `BOT${bot.username.toUpperCase()}`,
+        combatStats: {
+          combatPower: bot.power,
+          strength: bot.level * 2,
+          defense: bot.level,
+          agility: bot.level,
+          stamina: bot.level * 5,
+          luck: 0.1
+        }
+      },
+      { upsert: true, new: true }
+    );
+  }
+  logger.info(`Successfully seeded ${bots.length} arena opponents`);
+}
+
+/**
  * Main seed function
  * Executes all seeding operations in sequence
  */
@@ -954,21 +1202,24 @@ async function seed(): Promise<void> {
     // Connect to database directly
     const mongoUri = process.env.MONGODB_URI;
     const dbName = process.env.DB_NAME;
-    
+
     if (!mongoUri || !dbName) {
       throw new Error('MONGODB_URI and DB_NAME must be set in environment');
     }
-    
+
     await mongoose.connect(mongoUri, {
       dbName,
     });
-    
+
     logger.info(`Connected to MongoDB database: ${dbName}`);
 
     // Execute seeding operations
     await seedCities();
     await seedCosmeticItems();
     await seedDevUser();
+    await seedQuests();
+    await seedDailyTasks();
+    await seedArenaOpponents();
 
     logger.info('='.repeat(50));
     logger.info('✓ Database seed completed successfully!');

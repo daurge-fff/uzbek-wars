@@ -46,7 +46,7 @@ export const Leaderboard = () => {
   const [selectedCategory, setSelectedCategory] = useState<LeaderboardCategory>('level');
   const [players, setPlayers] = useState<LeaderboardPlayer[]>([]);
   const [loading, setLoading] = useState(false);
-  const [playerRank, setPlayerRank] = useState<number | null>(null);
+  const [, setPlayerRank] = useState<number | null>(null);
 
   const currentCategory = categories.find(c => c.id === selectedCategory)!;
 
@@ -62,7 +62,7 @@ export const Leaderboard = () => {
 
       const response = await fetch(`${category.apiEndpoint}?limit=10`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         }
       });
 
@@ -163,8 +163,8 @@ export const Leaderboard = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedCategory(category.id)}
                 className={`relative py-3 px-2 rounded-[16px] font-bold text-xs transition-all overflow-hidden ${selectedCategory === category.id
-                    ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl'
-                    : 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl'
+                  : 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
               >
                 <div className="flex flex-col items-center gap-0.5">
@@ -191,8 +191,8 @@ export const Leaderboard = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedCategory(category.id)}
                 className={`relative py-3 px-2 rounded-[16px] font-bold text-xs transition-all overflow-hidden ${selectedCategory === category.id
-                    ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl'
-                    : 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl'
+                  : 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
               >
                 <div className="flex flex-col items-center gap-0.5">
@@ -246,16 +246,16 @@ export const Leaderboard = () => {
                 transition={{ delay: index * 0.05 }}
                 whileHover={{ scale: 1.01, x: 2 }}
                 className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[16px] p-3 shadow-lg border-2 transition-all ${player.isCurrentPlayer
-                    ? 'border-amber-500 dark:border-amber-400 shadow-amber-500/30 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-900/20 dark:to-orange-900/20'
-                    : 'border-gray-200 dark:border-gray-700'
+                  ? 'border-amber-500 dark:border-amber-400 shadow-amber-500/30 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-900/20 dark:to-orange-900/20'
+                  : 'border-gray-200 dark:border-gray-700'
                   }`}
               >
                 <div className="flex items-center gap-2">
                   {/* Rank */}
                   <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-black shadow-lg ${player.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white' :
-                      player.rank === 2 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white' :
-                        player.rank === 3 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
-                          'bg-gradient-to-br from-indigo-500 to-purple-500 text-white'
+                    player.rank === 2 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white' :
+                      player.rank === 3 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
+                        'bg-gradient-to-br from-indigo-500 to-purple-500 text-white'
                     }`}>
                     {player.rank <= 3 ? <Emoji emoji={medals[player.rank - 1]} size={20} /> : <span className="text-sm">{player.rank}</span>}
                   </div>

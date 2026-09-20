@@ -10,6 +10,7 @@ import { User } from '../models/User';
 import { Player } from '../models/Player';
 import { env } from '../config/environment';
 import { logger } from '../utils/logger';
+import { updateLoginStreak } from './TaskService';
 
 // Debug: Log JWT_SECRET status at module load time
 logger.info(`[AuthService] Module loaded - JWT_SECRET type: ${typeof env.JWT_SECRET}, exists: ${!!env.JWT_SECRET}, length: ${env.JWT_SECRET ? env.JWT_SECRET.length : 0}`);
@@ -42,7 +43,7 @@ interface AuthResult {
  */
 function generateToken(userId: string): string {
   const secret = env.JWT_SECRET;
-  
+
   logger.debug(`Generating JWT token for user: ${userId}`);
   logger.debug(`JWT_SECRET exists: ${!!secret}`);
   logger.debug(`JWT_SECRET type: ${typeof secret}`);
@@ -52,7 +53,7 @@ function generateToken(userId: string): string {
   logger.debug(`process.env.JWT_SECRET length: ${process.env.JWT_SECRET ? process.env.JWT_SECRET.length : 0}`);
   logger.debug(`process.env.JWT_SECRET: ${process.env.JWT_SECRET ? '[REDACTED]' : 'EMPTY/UNDEFINED'}`);
   logger.debug(`JWT_EXPIRES_IN: ${env.JWT_EXPIRES_IN}`);
-  
+
   if (!secret) {
     logger.error('JWT_SECRET not configured! Check .env file');
     logger.error(`All env keys: ${Object.keys(process.env).filter(k => k.includes('JWT')).join(', ')}`);
@@ -64,9 +65,9 @@ function generateToken(userId: string): string {
     secret,
     { expiresIn: env.JWT_EXPIRES_IN as any }
   );
-  
+
   logger.info(`JWT token generated successfully for user: ${userId}`);
-  
+
   return token;
 }
 
@@ -148,6 +149,11 @@ export async function authenticateWithGoogle(
     // Check for existing player
     let player = await Player.findOne({ userId: user._id });
 
+    if (player) {
+      // Update login streak
+      await updateLoginStreak(player);
+    }
+
     // Don't create player automatically - let them complete onboarding first
     if (!player && isNewUser) {
       logger.info(`New user registered, player will be created during onboarding: ${user.email}`);
@@ -208,7 +214,7 @@ export async function authenticateDevLogin(
 
   // Find or create dev user
   let user = await User.findOne({ email: 'dev@uzbekwars.local' });
-  
+
   if (!user) {
     user = await User.create({
       googleId: 'dev-user',
@@ -227,10 +233,10 @@ export async function authenticateDevLogin(
 
   // Find or create dev player
   let player = await Player.findOne({ userId: user._id });
-  
+
   if (!player) {
     const referralCode = await generateReferralCode();
-    
+
     player = await Player.create({
       userId: user._id,
       characterId: 'char1', // Default character for dev
@@ -238,8 +244,13 @@ export async function authenticateDevLogin(
       referralCode,
       level: 10, // Start at level 10 for testing
       soms: 10000, // Start with 10k soms for testing
-      donationCurrency: 1000 // Start with 1k crystals for testing
+      donationCurrency: 1000, // Start with 1k crystals for testing
+      lastLoginDate: new Date()
     });
+    await updateLoginStreak(player);
+  } else {
+    // Update login streak for dev
+    await updateLoginStreak(player);
   }
 
   const token = generateToken(user._id.toString());

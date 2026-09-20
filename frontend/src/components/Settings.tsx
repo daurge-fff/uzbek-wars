@@ -58,7 +58,7 @@ export const Settings = ({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl p-6"
+          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 border border-white/50 dark:border-gray-700/50 glass-premium"
         >
           <h1 className="text-3xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-6">
             {t('settings.title', 'Настройки')}
@@ -188,7 +188,7 @@ export const Settings = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl p-6"
+          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 border border-white/50 dark:border-gray-700/50 glass-premium"
         >
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
             {t('settings.about', 'О приложении')}
@@ -260,9 +260,14 @@ export const Settings = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setShowDeveloperModal(true)}
-              className="w-full p-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-[20px] shadow-lg"
+              className="relative overflow-hidden w-full p-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-[20px] shadow-lg"
             >
-              <Emoji emoji="👨‍💻" size={20} className="inline" /> {t('settings.developer')}
+              <div className="absolute inset-0 z-0 pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer-fast" />
+              </div>
+              <span className="relative z-10">
+                <Emoji emoji="👨‍💻" size={20} className="inline mr-2" /> {t('settings.developer')}
+              </span>
             </motion.button>
 
             <div className="grid grid-cols-2 gap-3">

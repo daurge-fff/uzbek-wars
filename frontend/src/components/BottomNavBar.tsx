@@ -15,10 +15,10 @@ export const BottomNavBar = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const navItems: NavItem[] = [
-    { id: 'leaderboard', icon: '🏆', path: '/leaderboard' },
+    { id: 'arena', icon: '⚔️', path: '/arena' },
     { id: 'shop', icon: '🛍️', path: '/shop' },
     { id: 'home', icon: '🏠', path: '/dashboard' },
-    { id: 'friends', icon: '👥', path: '/referral' },
+    { id: 'tasks', icon: '📜', path: '/tasks' },
     { id: 'settings', icon: '⚙️', path: '/settings' },
   ];
 
@@ -56,8 +56,8 @@ export const BottomNavBar = () => {
           {/* Floating pill container */}
           <div className="relative rounded-full overflow-hidden">
             {/* Border wrapper */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-b from-gray-300/60 to-gray-200/40 dark:from-white/10 dark:to-transparent p-[1px]">
-              <div className="w-full h-full rounded-full bg-white/50 dark:bg-gray-900/50 backdrop-blur-3xl" />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-b from-gray-300/30 to-gray-200/10 dark:from-white/10 dark:to-transparent p-[1.5px] glass-premium">
+              <div className="w-full h-full rounded-full bg-white/40 dark:bg-black/40 backdrop-blur-3xl" />
             </div>
 
             {/* Content */}

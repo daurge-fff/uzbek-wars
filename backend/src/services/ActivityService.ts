@@ -16,15 +16,17 @@
 import { IPlayer } from '../models/Player';
 import { StatModifiers, updatePlayerStats } from './StatsService';
 import { processLevelUp } from './ProgressionService';
-import { 
-  applyIncomeBonus, 
+import {
+  applyIncomeBonus,
   applyExperienceBonus,
   applyMoodFromWork,
-  applyEnergyRecovery,
   applyFoodRecovery,
   applyHealthFromFood,
+  applyEnergyRecovery
 } from './CharacterBonusService';
 import { logger } from '../utils/logger';
+import { CosmeticBonusService } from './CosmeticBonusService';
+import * as AchievementService from './AchievementService';
 
 /**
  * Activity definition with all gameplay parameters
@@ -291,7 +293,7 @@ export function isActivityOnCooldown(player: IPlayer, activity: Activity): boole
   const now = Date.now();
   const lastActivity = player.lastActivityTime.getTime();
   const timeSinceLastActivity = (now - lastActivity) / 1000; // Convert to seconds
-  
+
   return timeSinceLastActivity < activity.cooldown;
 }
 
@@ -307,7 +309,7 @@ export function getRemainingCooldown(player: IPlayer, activity: Activity): numbe
   const lastActivity = player.lastActivityTime.getTime();
   const timeSinceLastActivity = (now - lastActivity) / 1000;
   const remaining = activity.cooldown - timeSinceLastActivity;
-  
+
   return Math.max(0, Math.ceil(remaining));
 }
 
@@ -334,7 +336,7 @@ export function validateActivityExecution(
       error: `Level ${activity.requiredLevel} required. Current level: ${player.level}`,
     };
   }
-  
+
   // Check cooldown
   if (isActivityOnCooldown(player, activity)) {
     const remaining = getRemainingCooldown(player, activity);
@@ -343,7 +345,7 @@ export function validateActivityExecution(
       error: `Activity on cooldown. Wait ${remaining} seconds`,
     };
   }
-  
+
   // Check soms cost
   if (activity.cost && player.soms < activity.cost) {
     return {
@@ -351,7 +353,7 @@ export function validateActivityExecution(
       error: `Insufficient soms. Required: ${activity.cost}, Available: ${player.soms}`,
     };
   }
-  
+
   return { valid: true };
 }
 
@@ -374,25 +376,29 @@ export function validateActivityExecution(
  * @returns Activity execution result with rewards and stat changes
  * @throws Error if validation fails
  */
-export function executeActivity(player: IPlayer, activity: Activity): ActivityResult {
+export async function executeActivity(player: IPlayer, activity: Activity): Promise<ActivityResult> {
   // Validate prerequisites
   const validation = validateActivityExecution(player, activity);
   if (!validation.valid) {
     throw new Error(validation.error);
   }
-  
+
   // Initialize result
   let experienceGained = activity.rewards.experience;
   let somsGained = activity.rewards.soms;
   let penaltyApplied = false;
-  
+
   // Apply character class bonuses
   experienceGained = applyExperienceBonus(experienceGained, player.characterId);
   somsGained = applyIncomeBonus(somsGained, player.characterId);
-  
+
+  // Apply cosmetic/equipment bonuses
+  experienceGained = await CosmeticBonusService.applyXPBonus(player, experienceGained);
+  somsGained = await CosmeticBonusService.applySomsBonus(player, somsGained);
+
   // Apply stat modifiers with character bonuses
-  const modifiedStats = { ...activity.statModifiers };
-  
+  let modifiedStats = { ...activity.statModifiers };
+
   // Apply character-specific stat modifiers
   if (modifiedStats.mood && modifiedStats.mood > 0) {
     modifiedStats.mood = applyMoodFromWork(modifiedStats.mood, player.characterId);
@@ -406,41 +412,50 @@ export function executeActivity(player: IPlayer, activity: Activity): ActivityRe
   if (modifiedStats.energy && modifiedStats.energy > 0) {
     modifiedStats.energy = applyEnergyRecovery(modifiedStats.energy, player.characterId);
   }
-  
+
+  // Apply cosmetic/equipment stat bonuses to activity effects
+  modifiedStats = await CosmeticBonusService.applyStatBonuses(player, modifiedStats);
+
   updatePlayerStats(player, modifiedStats);
-  
+
   // Check for risk-based penalty
   if (activity.risks && Math.random() < activity.risks.probability) {
     somsGained -= activity.risks.penalty;
     penaltyApplied = true;
-    
+
     logger.info(
       `Player ${player._id} triggered penalty in activity ${activity.id}: -${activity.risks.penalty} soms`
     );
   }
-  
+
   // Apply rewards
   player.experience += experienceGained;
   player.soms = Math.max(0, player.soms + somsGained);
-  
+
   // Deduct cost if applicable
   if (activity.cost) {
     player.soms -= activity.cost;
   }
-  
+
   // Update last activity time
   player.lastActivityTime = new Date();
-  
+
+  // Track achievements
+  await AchievementService.trackProgress(player._id.toString(), 'activity_master_1', 1);
+  if (somsGained > 0) {
+    await AchievementService.trackProgress(player._id.toString(), 'soms_collector_1', somsGained);
+  }
+
   // Check for level-up
   const levelsGained = processLevelUp(player);
   const levelUp = levelsGained > 0;
-  
+
   logger.info(
     `Player ${player._id} executed activity ${activity.id}: ` +
     `+${experienceGained} XP, ${somsGained >= 0 ? '+' : ''}${somsGained} soms` +
     (levelUp ? `, leveled up to ${player.level}` : '')
   );
-  
+
   return {
     success: true,
     experienceGained,
@@ -468,10 +483,10 @@ export function getActivityStats(activity: Activity): {
   const expectedSoms = activity.risks
     ? activity.rewards.soms - activity.risks.probability * activity.risks.penalty
     : activity.rewards.soms;
-  
+
   const cost = activity.cost || 0;
   const netSoms = expectedSoms - cost;
-  
+
   return {
     expectedValue: netSoms,
     riskAdjustedValue: netSoms,
@@ -513,25 +528,25 @@ export async function performActivity(
   newLevel?: number;
 }> {
   const { Player } = await import('../models/Player');
-  
+
   // Find player by user ID
   const player = await Player.findOne({ userId });
   if (!player) {
     throw new Error('Player not found');
   }
-  
+
   // Find activity
   const activity = getActivityById(activityId);
   if (!activity) {
     throw new Error(`Invalid activity ID: ${activityId}`);
   }
-  
+
   // Execute activity
-  const result = executeActivity(player, activity);
-  
+  const result = await executeActivity(player, activity);
+
   // Save player
   await player.save();
-  
+
   return {
     player,
     leveledUp: result.levelUp,

@@ -15,6 +15,7 @@ import authRoutes from './routes/auth';
 import citiesRoutes from './routes/cities';
 import characterRoutes from './routes/characters';
 import activitiesRoutes from './routes/activities';
+import taskRoutes from './routes/tasks';
 import referralRoutes from './routes/referral';
 import donationsRoutes from './routes/donations';
 import cosmeticsRoutes from './routes/cosmetics';
@@ -25,6 +26,9 @@ import testsRoutes from './routes/tests';
 import statsRoutes from './routes/stats';
 import combatStatsRoutes from './routes/combatStats';
 import cityMigrationRoutes from './routes/cityMigration';
+import arenaRoutes from './routes/arena';
+import achievementRoutes from './routes/achievements';
+import craftingRoutes from './routes/crafting';
 
 /**
  * Creates and configures Express application
@@ -40,7 +44,7 @@ import cityMigrationRoutes from './routes/cityMigration';
  */
 export function createServer(): Application {
   const app = express();
-  
+
   // Security headers - must be first
   app.use(helmet({
     contentSecurityPolicy: {
@@ -57,7 +61,7 @@ export function createServer(): Application {
       preload: true
     }
   }));
-  
+
   // CORS configuration for frontend
   app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
@@ -65,14 +69,14 @@ export function createServer(): Application {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma']
   }));
-  
+
   // Request parsing with size limits to prevent DoS
   app.use(express.json({ limit: '10kb' }));
   app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-  
+
   // Response compression for better performance
   app.use(compression());
-  
+
   // Request logging in development
   if (process.env.NODE_ENV === 'development') {
     app.use((req, _res, next) => {
@@ -80,12 +84,12 @@ export function createServer(): Application {
       next();
     });
   }
-  
+
   // Health check endpoint
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
-  
+
   // API routes - order matters! More specific routes first
   app.use('/api/health', healthRoutes);
   app.use('/api/tests', testsRoutes);
@@ -101,9 +105,13 @@ export function createServer(): Application {
   app.use('/api/city-migration', cityMigrationRoutes);
   app.use('/api/leaderboard', leaderboardRoutes);
   app.use('/api/player', playerRoutes); // All /player/* endpoints
-  
+  app.use('/api/tasks', taskRoutes);
+  app.use('/api/arena', arenaRoutes);
+  app.use('/api/achievements', achievementRoutes);
+  app.use('/api/crafting', craftingRoutes);
+
   // Error handling must be last
   app.use(errorHandler);
-  
+
   return app;
 }

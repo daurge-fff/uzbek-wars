@@ -184,7 +184,10 @@
       "all": "Все",
       "clothing": "Одежда",
       "background": "Фоны",
-      "accessory": "Аксессуары"
+      "accessory": "Аксессуары",
+      "equipment": "Снаряжение",
+      "backpack": "Рюкзаки",
+      "combat": "⚔️ Бой"
     },
     "rarity": {
       "common": "Обычный",
@@ -231,6 +234,12 @@
     "settingsDesc": "Параметры",
     "donate": "Донат",
     "donateDesc": "Поддержка",
+    "arena": "Арена",
+    "arenaDesc": "Сражайся с другими",
+    "achievements": "Достижения",
+    "achievementsDesc": "Твои цели",
+    "crafting": "Ремесло",
+    "craftingDesc": "Создавай вещи",
     "about": "О игре",
     "aboutText": "Стань легендой Великого Шёлкового пути! Исследуй древние города Узбекистана, развивай своего персонажа, торгуй, сражайся и соревнуйся с другими игроками.",
     "version": "Версия",
@@ -730,5 +739,96 @@
     "insufficientFunds": "Недостаточно средств",
     "migrationInProgress": "Переезд в процессе...",
     "migrationTime": "Время переезда: 60 минут"
+  },
+  "tasks": {
+    "title": "Задания и Квесты",
+    "streak": "Стрик",
+    "days": "дн.",
+    "dailyTitle": "Ежедневные задания",
+    "questsTitle": "Доступные квесты",
+    "noQuests": "Нет доступных квестов",
+    "startQuest": "Начать квест",
+    "streakBonus": "Бонус за стрик получен!"
+  },
+  "quests": {
+    "started": "Квест начат!",
+    "error": "Ошибка при старте квеста",
+    "completed": "Квест завершен!"
+  },
+  "arena": {
+    "title": "ПВП АРЕНА",
+    "matchmaking": "ПОИСК ПРОТИВНИКОВ",
+    "matchmakingDesc": "Выберите достойного оппонента для битвы",
+    "fighting": "ИДЕТ БИТВА...",
+    "victory": "ПОБЕДА!",
+    "defeat": "ПОРАЖЕНИЕ",
+    "showLog": "Показать лог боя",
+    "hideLog": "Скрыть лог боя",
+    "backToArena": "ВЕРНУТЬСЯ В АРЕНУ",
+    "attack": "АТАКА",
+    "fightComplete": "Бой завершен!",
+    "errorFetch": "Ошибка при поиске противников",
+    "errorFight": "Ошибка во время боя",
+    "rating": "Рейтинг",
+    "statsPreserved": "Сытость, здоровье и энергия не потрачены",
+    "you": "Вы",
+    "opponent": "Соперник",
+    "preparing": "Бойцы выходят на арену...",
+    "skipFight": "Пропустить анимацию ⏩",
+    "selectDifficulty": "Выберите сложность",
+    "difficulty_easy": "Лёгкий",
+    "difficulty_medium": "Средний",
+    "difficulty_hard": "Сложный",
+    "notAvailable": "Недоступно",
+    "notEnoughEnergy": "Недостаточно энергии! Отдохните.",
+    "notEnoughSoms": "Недостаточно сомов для боя!",
+    "opponentPower": "Сила",
+    "energyCost": "Энергия",
+    "healthCost": "Здоровье"
+  },
+  "battle": {
+    "event_attack": "{{attacker}} наносит удар по {{defender}} на {{damage}} урона",
+    "event_crit": "💥 КРИТ! {{attacker}} пробивает защиту {{defender}} на {{damage}} урона!",
+    "event_dodge": "💨 {{defender}} ловко уворачивается от выпада {{attacker}}!",
+    "event_counter": "⚡ {{attacker}} наносит контрудар на {{damage}} урона!",
+    "event_block": "🛡️ {{defender}} блокирует часть атаки! Получает {{damage}} урона",
+    "event_miss": "❌ {{attacker}} промахивается!",
+    "event_stun": "💫 {{defender}} оглушён и пропускает ход!",
+    "event_poison": "☠️ {{defender}} отравлен! Теряет здоровье",
+    "event_finish": "⚡ {{attacker}} наносит решающий удар!",
+    "costEnergy": "Потрачено энергии",
+    "costHealth": "Потрачено здоровья",
+    "costSoms": "Стоимость входа",
+    "turns": "Ходов",
+    "damageDealt": "Урона нанесено",
+    "damageReceived": "Урона получено",
+    "crits": "Критов",
+    "dodges": "Уклонений",
+    "combos": "Комбо",
+    "battleStats": "Статистика боя"
+  },
+  "achievements": {
+    "title": "ДОСТИЖЕНИЯ",
+    "unlocked": "Разблокировано",
+    "inProgress": "В процессе",
+    "errorFetch": "Ошибка при загрузке достижений"
+  },
+  "crafting": {
+    "title": "РЕМЕСЛО",
+    "workshop": "МАСТЕРСКАЯ",
+    "workshopDesc": "Создавайте редкое снаряжение из материалов",
+    "requirements": "ТРЕБОВАНИЯ",
+    "success": "Предмет успешно создан!",
+    "fail": "Не удалось создать предмет",
+    "error": "Ошибка при создании",
+    "errorFetch": "Ошибка при загрузке рецептов",
+    "processing": "СОЗДАНИЕ...",
+    "craftAction": "РЕМЕСЛО"
+  },
+  "item": {
+    "elite_sword_1": {
+      "name": "Элитный Меч",
+      "description": "Мощное оружие для воина"
+    }
   }
 }

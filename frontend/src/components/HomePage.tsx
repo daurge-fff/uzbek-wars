@@ -129,10 +129,10 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
   const menuItems = [
     { id: 'leaderboard', icon: '🏆', path: '/leaderboard', label: t('menu.leaderboard'), desc: t('menu.leaderboardDesc') },
     { id: 'shop', icon: '🛍️', path: '/shop', label: t('menu.shop'), desc: t('menu.shopDesc') },
-    { id: 'referral', icon: '👥', path: '/referral', label: t('menu.referral'), desc: t('menu.referralDesc') },
-    { id: 'inventory', icon: '📦', path: '/inventory', label: t('menu.inventory'), desc: t('menu.inventoryDesc') },
+    { id: 'arena', icon: '⚔️', path: '/arena', label: t('menu.arena', 'Арена'), desc: t('menu.arenaDesc', 'Сражайся с другими') },
+    { id: 'achievements', icon: '⭐', path: '/achievements', label: t('menu.achievements', 'Достижения'), desc: t('menu.achievementsDesc', 'Твои цели') },
+    { id: 'crafting', icon: '⚒️', path: '/crafting', label: t('menu.crafting', 'Ремесло'), desc: t('menu.craftingDesc', 'Создавай вещи') },
     { id: 'settings', icon: '⚙️', path: '/settings', label: t('menu.settings'), desc: t('menu.settingsDesc') },
-    { id: 'donate', icon: '💎', path: '/donate', label: t('menu.donate'), desc: t('menu.donateDesc') },
   ];
 
   const dockItems = [
@@ -438,7 +438,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                           rel="noopener noreferrer"
                           className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-[20px] font-bold shadow-lg hover:shadow-xl transition-all"
                         >
-                          <span className="text-3xl">✈️</span>
+                          <div className="text-3xl"><Emoji emoji="✈️" size={32} /></div>
                           <div className="flex-1 text-left">
                             <div className="text-sm opacity-90">Telegram</div>
                             <div className="text-lg">@daurge</div>
@@ -642,7 +642,7 @@ export function HomePage() {
                 }}
               />
             ) : (
-              <span className="text-2xl">{user.avatar || '👤'}</span>
+              <Emoji emoji={user.avatar || '👤'} size={32} />
             )}
             <span className="font-semibold text-gray-900 dark:text-white hidden sm:inline text-sm">
               {user.displayName}
@@ -748,7 +748,11 @@ export function HomePage() {
               </div>
 
               {/* Button content */}
-              <div className="relative px-10 py-5 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-500/20 dark:via-purple-500/20 dark:to-pink-500/20 backdrop-blur-xl rounded-[26px] flex items-center gap-4">
+              <div className="relative px-10 py-5 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-500/20 dark:via-purple-500/20 dark:to-pink-500/20 backdrop-blur-xl rounded-[26px] flex items-center gap-4 overflow-hidden">
+                {/* Shimmer Effect */}
+                <div className="absolute inset-0 z-0 pointer-events-none">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer-fast" />
+                </div>
                 {/* Animated gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-purple-500/20 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[26px]" />
 

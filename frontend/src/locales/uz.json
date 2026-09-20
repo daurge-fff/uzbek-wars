@@ -216,7 +216,8 @@
       "all": "Hammasi",
       "clothing": "Kiyim",
       "background": "Fonlar",
-      "accessory": "Aksessuarlar"
+      "accessory": "Aksessuarlar",
+      "combat": "⚔️ Jang"
     },
     "rarity": {
       "common": "Oddiy",
@@ -705,5 +706,78 @@
     "insufficientFunds": "Mablag' yetarli emas",
     "migrationInProgress": "Ko'chish jarayonida...",
     "migrationTime": "Ko'chish vaqti: 60 daqiqa"
+  },
+  "tasks": {
+    "title": "Topshiriqlar va Kvestlar",
+    "streak": "Seriya",
+    "days": "kun",
+    "dailyTitle": "Kunlik topshiriqlar",
+    "questsTitle": "Mavjud kvestlar",
+    "noQuests": "Mavjud kvestlar yo'q",
+    "startQuest": "Kvestni boshlash",
+    "streakBonus": "Seriya bonusi olindi!"
+  },
+  "quests": {
+    "started": "Kvest boshlandi!",
+    "error": "Kvestni boshlashda xato",
+    "completed": "Kvest tugallandi!"
+  },
+  "arena": {
+    "title": "PVP ARENA",
+    "matchmaking": "RAQIB QIDIRISH",
+    "matchmakingDesc": "Jang uchun munosib raqibni tanlang",
+    "fighting": "JANG KETMOQDA...",
+    "victory": "G'ALABA!",
+    "defeat": "MAG'LUBIYAT",
+    "showLog": "Jang jurnalini ko'rsat",
+    "hideLog": "Jang jurnalini yashirish",
+    "backToArena": "ARENAGA QAYTISH",
+    "attack": "HUJUM",
+    "fightComplete": "Jang yakunlandi!",
+    "errorFetch": "Raqiblarni topishda xato",
+    "errorFight": "Jang paytida xato",
+    "rating": "Reyting",
+    "statsPreserved": "To'qlik, sog'liq va energiya sarflanmadi",
+    "you": "Siz",
+    "opponent": "Raqib",
+    "preparing": "Jangchilar maydonga tushmoqda...",
+    "skipFight": "Animatsiyani o'tkazib yuborish ⏩",
+    "selectDifficulty": "Qiyinlikni tanlang",
+    "difficulty_easy": "Oson",
+    "difficulty_medium": "O'rtacha",
+    "difficulty_hard": "Qiyin",
+    "notAvailable": "Mavjud emas",
+    "notEnoughEnergy": "Energiya yetarli emas! Dam oling.",
+    "notEnoughSoms": "Jang uchun so'm yetarli emas!",
+    "opponentPower": "Kuch",
+    "energyCost": "Energiya",
+    "healthCost": "Sog'liq"
+  },
+  "battle": {
+    "event_attack": "{{attacker}} {{defender}} ga {{damage}} zarar yetkazdi",
+    "event_crit": "💥 KRIT! {{attacker}} {{defender}} himoyasini yorib, {{damage}} zarar yetkazdi!",
+    "event_dodge": "💨 {{defender}} {{attacker}} ning zarbasidan mahorat bilan qochdi!",
+    "event_counter": "⚡ {{attacker}} {{damage}} zarar bilan qarshi hujum qildi!",
+    "event_block": "🛡️ {{defender}} hujumning bir qismini blokladi! {{damage}} zarar oldi",
+    "event_miss": "❌ {{attacker}} o'zini o'tkazib yubordi!",
+    "event_stun": "💫 {{definder}} o'girib qo'yildi va navbatini o'tkazib yubordi!",
+    "event_poison": "☠️ {{defender}} zaharlandi! Sog'liqni yo'qotadi",
+    "event_finish": "⚡ {{attacker}} hal qiluvchi zarba berdi!",
+    "costEnergy": "Sarflangan energiya",
+    "costHealth": "Yo'qotilgan sog'liq",
+    "costSoms": "Kirish narxi",
+    "turns": "Navbatlar",
+    "damageDealt": "Berilgan zarar",
+    "damageReceived": "Olingan zarar",
+    "crits": "Kritlar",
+    "dodges": "Qochishlar",
+    "combos": "Kombo",
+    "battleStats": "Jang statistikasi"
+  },
+  "achievements": {
+    "title": "YUTUQLAR",
+    "unlocked": "Ochildi",
+    "inProgress": "Jarayonda",
+    "errorFetch": "Yutuqlarni yuklashda xato"
   }
 }

@@ -23,6 +23,7 @@ interface PlayerStats {
   luck?: number;
   statPoints?: number;
   combatPower?: number;
+  loginStreak?: number;
 }
 
 interface PlayerInfo {
@@ -56,6 +57,7 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
     { label: t('profile.totalActivities', 'Всего активностей'), value: stats.totalActivities, icon: <Emoji emoji="🎯" size={32} />, gradient: 'from-blue-500 to-cyan-500' },
     { label: t('profile.daysPlayed', 'Дней в игре'), value: stats.daysPlayed, icon: <Emoji emoji="📅" size={32} />, gradient: 'from-green-500 to-emerald-500' },
     { label: t('profile.achievements', 'Достижений'), value: stats.achievements, icon: <Emoji emoji="🏆" size={32} />, gradient: 'from-yellow-500 to-orange-500' },
+    { label: t('tasks.streak', 'Стрик'), value: stats.loginStreak || 0, icon: <Emoji emoji="🔥" size={32} />, gradient: 'from-orange-600 to-red-600' },
     { label: t('profile.level', 'Уровень'), value: stats.level, icon: <Emoji emoji="⭐" size={32} />, gradient: 'from-purple-500 to-pink-500' }
   ];
 
@@ -261,7 +263,7 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
               </motion.div>
             ))}
           </div>
-          {stats.statPoints > 0 && (
+          {stats.statPoints !== undefined && stats.statPoints > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

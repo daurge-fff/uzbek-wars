@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { PurchaseConfirmModal } from './PurchaseConfirmModal';
 import Emoji from './Emoji';
 
-type CosmeticType = 'clothing' | 'background' | 'accessory';
+type CosmeticType = 'clothing' | 'background' | 'accessory' | 'combat';
 type CosmeticRarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 interface CosmeticItem {
@@ -18,8 +18,16 @@ interface CosmeticItem {
   icon: string;
   owned: boolean;
   equipped: boolean;
+  stats?: {
+    strength?: number;
+    defense?: number;
+    agility?: number;
+    stamina?: number;
+    intelligence?: number;
+    luck?: number;
+  };
   bonus?: {
-    type: 'xp' | 'soms' | 'stats';
+    type: 'xp' | 'soms' | 'stats' | 'combat';
     value: number;
     description: string | { ru: string; en: string; uz: string; uk: string };
   };
@@ -50,7 +58,8 @@ const rarityBorders = {
 const typeEmojis: Record<CosmeticType, string> = {
   clothing: '👕',
   background: '🖼️',
-  accessory: '💎'
+  accessory: '💎',
+  combat: '⚔️'
 };
 
 export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, onEquip }: CosmeticShopProps) => {
@@ -64,7 +73,9 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
 
   const filteredItems = items ? (filter === 'all'
     ? items
-    : items.filter(item => item.type === filter)) : [];
+    : filter === 'combat'
+      ? items.filter(item => item.stats && (item.stats.strength || item.stats.defense || item.stats.agility || item.stats.stamina || item.stats.intelligence || item.stats.luck))
+      : items.filter(item => item.type === filter)) : [];
 
   const getItemName = (item: CosmeticItem): string => {
     if (typeof item.name === 'object') {
@@ -133,15 +144,15 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
 
           {/* Filters */}
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            {(['all', 'clothing', 'background', 'accessory'] as const).map((type) => (
+            {(['all', 'clothing', 'background', 'accessory', 'combat'] as const).map((type) => (
               <motion.button
                 key={type}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setFilter(type)}
                 className={`px-3 py-1.5 rounded-full font-bold whitespace-nowrap transition-all text-xs ${filter === type
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                   }`}
               >
                 {t(`cosmetic.filter.${type}`)}
@@ -171,20 +182,25 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.05 }}
-                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 relative overflow-hidden w-full"
+                    className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 relative overflow-hidden w-full ${item.rarity === 'legendary' ? 'shadow-[0_0_20px_rgba(251,191,36,0.2)]' : ''}`}
                     style={{
                       borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' :
                         rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
                           rarityBorders[item.rarity].includes('purple-400') ? '#c084fc' : '#fbbf24'
                     }}
                   >
+                    {item.rarity === 'legendary' && (
+                      <div className="absolute inset-0 z-0 pointer-events-none">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
+                      </div>
+                    )}
                     {/* Rarity Badge */}
                     <div className="absolute top-2 right-2 z-10">
-                      <span className="text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r text-white shadow-lg uppercase tracking-wide"
+                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r text-white shadow-lg uppercase tracking-wide ${item.rarity === 'legendary' ? 'text-glow-gold' : ''}`}
                         style={{
                           backgroundImage: `linear-gradient(to right, ${rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
-                              rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
-                                rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
+                            rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
+                              rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
                             })`
                         }}>
                         {t(`cosmetic.rarity.${item.rarity}`)}
@@ -211,13 +227,19 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                     <div className="w-full aspect-square max-h-64 rounded-2xl bg-gradient-to-br flex items-center justify-center mb-3 shadow-inner relative overflow-hidden mx-auto"
                       style={{
                         backgroundImage: `linear-gradient(to bottom right, ${rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
-                            rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
-                              rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
+                          rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
+                            rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
                           })`
                       }}>
+                      {item.rarity === 'legendary' && (
+                        <div className="absolute inset-0 z-0 pointer-events-none">
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
+                        </div>
+                      )}
                       <motion.div
                         animate={{ rotate: item.equipped ? [0, 5, -5, 0] : 0 }}
                         transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
+                        className="relative z-10"
                       >
                         <Emoji emoji={item.icon} size={72} />
                       </motion.div>
@@ -227,9 +249,21 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                     </div>
 
                     {/* Item Name */}
-                    <h3 className="font-black text-gray-900 dark:text-white text-base mb-3 text-center line-clamp-2 min-h-[2.5rem]">
+                    <h3 className="font-black text-gray-900 dark:text-white text-base mb-2 text-center line-clamp-2 min-h-[2.5rem]">
                       {getItemName(item)}
                     </h3>
+
+                    {/* Combat Stats */}
+                    {item.stats && (
+                      <div className="flex flex-wrap gap-1 justify-center mb-2">
+                        {item.stats.strength ? <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">⚔️+{item.stats.strength}</span> : null}
+                        {item.stats.defense ? <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">🛡️+{item.stats.defense}</span> : null}
+                        {item.stats.agility ? <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">💨+{item.stats.agility}</span> : null}
+                        {item.stats.stamina ? <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">❤️+{item.stats.stamina}</span> : null}
+                        {item.stats.intelligence ? <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">🧠+{item.stats.intelligence}</span> : null}
+                        {item.stats.luck ? <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400">🍀+{item.stats.luck}</span> : null}
+                      </div>
+                    )}
 
                     {/* Price Display */}
                     {!item.owned && (
@@ -257,8 +291,8 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                         onClick={() => handleEquip(item.id)}
                         disabled={item.equipped || loading === item.id}
                         className={`w-full py-3 rounded-xl font-black text-sm transition-all ${item.equipped
-                            ? 'bg-green-500 text-white shadow-lg'
-                            : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg'
+                          ? 'bg-green-500 text-white shadow-lg'
+                          : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg'
                           }`}
                       >
                         {item.equipped ? <div className="flex items-center justify-center gap-2"><Emoji emoji="✅" size={16} /> <span>{t('cosmetic.equipped')}</span></div> : t('cosmetic.equip')}

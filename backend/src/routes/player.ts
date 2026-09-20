@@ -55,6 +55,13 @@ router.get(
       const { ensureValidCharacter } = await import('../services/CharacterService');
       await ensureValidCharacter(player);
 
+      // Check and process level up if player has enough XP
+      const { processLevelUp } = await import('../services/ProgressionService');
+      const levelsGained = processLevelUp(player);
+      if (levelsGained > 0) {
+        await player.save();
+      }
+
       res.status(200).json({
         player: {
           userId: player.userId,

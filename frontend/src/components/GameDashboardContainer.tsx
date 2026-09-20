@@ -15,7 +15,7 @@ export const GameDashboardContainer = () => {
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentActivity, setCurrentActivity] = useState<any>(null);
-  const [cooldownInfo, setCooldownInfo] = useState<{activityName: string; seconds: number} | null>(null);
+  const [cooldownInfo, setCooldownInfo] = useState<{ activityName: string; seconds: number } | null>(null);
 
   // Логируем изменения статов для отладки
   useEffect(() => {
@@ -27,7 +27,7 @@ export const GameDashboardContainer = () => {
   // Очищаем битые данные при монтировании
   useEffect(() => {
     setCurrentActivity(null);
-    
+
     // Очищаем из localStorage если там что-то есть
     try {
       localStorage.removeItem('currentActivity');
@@ -47,7 +47,7 @@ export const GameDashboardContainer = () => {
     loadActivities();
     loadCurrentActivity();
     refreshPlayer();  // Обновляем данные игрока включая боевые статы
-    
+
     // Проверяем активность каждые 5 секунд
     const interval = setInterval(checkActivityCompletion, 5000);
     return () => clearInterval(interval);
@@ -59,7 +59,7 @@ export const GameDashboardContainer = () => {
       const response = await axios.get(`${API_URL}/api/activities`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       // Backend returns { activities: [...], count: number }
       const activitiesData = response.data.activities || [];
       setActivities(activitiesData);
@@ -78,14 +78,14 @@ export const GameDashboardContainer = () => {
       const response = await axios.get(`${API_URL}/api/player/current-activity`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       if (response.data.activity) {
         const activity = response.data.activity;
-        
+
         // Проверяем что все данные валидные
         const startTime = activity.startTime;
         const endTime = activity.endTime;
-        
+
         if (!endTime || isNaN(endTime) || !startTime || isNaN(startTime) || endTime <= Date.now()) {
           // Битые данные или активность уже завершена - очищаем на сервере
           await axios.post(`${API_URL}/api/player/cancel-activity`, {}, {
@@ -94,7 +94,7 @@ export const GameDashboardContainer = () => {
           setCurrentActivity(null);
           return;
         }
-        
+
         // Преобразуем данные с сервера в нужный формат
         setCurrentActivity({
           activityId: activity.activityId || activity.id,
@@ -112,7 +112,7 @@ export const GameDashboardContainer = () => {
 
   const checkActivityCompletion = async () => {
     if (!currentActivity) return;
-    
+
     // Проверяем валидность данных
     if (!currentActivity.endTime || isNaN(currentActivity.endTime)) {
       setCurrentActivity(null);
@@ -134,7 +134,7 @@ export const GameDashboardContainer = () => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       // Обновляем данные игрока напрямую из ответа (без перезагрузки!)
       if (response.data.player) {
         updatePlayer({
@@ -144,10 +144,10 @@ export const GameDashboardContainer = () => {
           stats: response.data.player.stats
         });
       }
-      
+
       // Очищаем текущую активность
       setCurrentActivity(null);
-      
+
       // Показываем тост с результатами
       if (response.data.leveledUp) {
         toast.success(
@@ -167,7 +167,7 @@ export const GameDashboardContainer = () => {
           { duration: 3000 }
         );
       }
-      
+
       // Если был штраф, показываем предупреждение
       if (response.data.penaltyApplied) {
         toast.error(t('notifications.penaltyApplied'), { duration: 2000 });
@@ -189,34 +189,34 @@ export const GameDashboardContainer = () => {
         { activityId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      const activityName = response.data.activityName || 'Активность';
+
+      // const activityName = response.data.activityName || 'Активность';
       const endTime = response.data.endTime;
       const durationSeconds = response.data.durationSeconds || 60;
-      
+
       // Вычисляем startTime на основе endTime и duration
       const startTime = endTime - (durationSeconds * 1000);
-      
+
       // Переводим название активности на текущий язык
       const translatedActivityName = t(`activities.${activityId}`);
       toast.success(t('notifications.activityStarted', { activity: translatedActivityName }));
-      
+
       // Обновляем текущую активность
       setCurrentActivity({
         activityId,
         startTime,
         endTime
       });
-      
+
       // Прокручиваем страницу наверх чтобы было видно карточку активности
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      
+
       // Перезагружаем активности
       loadActivities();
     } catch (error: any) {
       console.error('Activity failed:', error);
       const message = error.response?.data?.message || error.response?.data?.error || 'Ошибка выполнения активности';
-      
+
       // Проверяем если это кулдаун
       if (message.includes('cooldown') || message.includes('Wait')) {
         const match = message.match(/Wait (\d+) seconds/);
@@ -229,7 +229,7 @@ export const GameDashboardContainer = () => {
           return;
         }
       }
-      
+
       toast.error(message);
     }
   };
@@ -304,9 +304,9 @@ export const GameDashboardContainer = () => {
                 onClick={() => setCooldownInfo(null)}
                 className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100]"
               />
-              
+
               <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
-                <CooldownModalContent 
+                <CooldownModalContent
                   activityName={cooldownInfo.activityName}
                   initialSeconds={cooldownInfo.seconds}
                   onClose={() => setCooldownInfo(null)}
@@ -360,10 +360,10 @@ const CooldownModalContent = ({ activityName, initialSeconds, onClose }: { activ
         transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
         className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full blur-3xl"
       />
-      
+
       <div className="relative z-10 text-center">
         <motion.div
-          animate={{ 
+          animate={{
             rotate: [0, -10, 10, -10, 10, 0],
             scale: [1, 1.1, 1]
           }}
@@ -372,17 +372,17 @@ const CooldownModalContent = ({ activityName, initialSeconds, onClose }: { activ
         >
           ⏰
         </motion.div>
-        
+
         <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3">
           Подожди немного!
         </h3>
-        
+
         <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-2xl p-6 mb-6 border border-orange-200 dark:border-orange-800">
           <p className="text-gray-700 dark:text-gray-300 mb-4 text-lg">
             <span className="font-bold">{activityName}</span> еще на кулдауне
           </p>
           <div className="text-center">
-            <motion.div 
+            <motion.div
               key={seconds}
               initial={{ scale: 1.2, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -394,7 +394,7 @@ const CooldownModalContent = ({ activityName, initialSeconds, onClose }: { activ
               {seconds === 1 ? 'секунда' : seconds < 5 ? 'секунды' : 'секунд'} до следующего использования
             </div>
           </div>
-          
+
           {/* Progress bar */}
           <div className="mt-4 h-2 bg-white/50 dark:bg-gray-700/50 rounded-full overflow-hidden">
             <motion.div
@@ -405,7 +405,7 @@ const CooldownModalContent = ({ activityName, initialSeconds, onClose }: { activ
             />
           </div>
         </div>
-        
+
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

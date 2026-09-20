@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="sky-tsk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f3d2e"/>
+      <stop offset="55%" stop-color="#50C878"/>
+      <stop offset="100%" stop-color="#bdeecb"/>
+    </linearGradient>
+    <linearGradient id="dome-tsk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8fe0ac"/>
+      <stop offset="100%" stop-color="#2f9958"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#sky-tsk)"/>
+  <circle cx="140" cy="80" r="42" fill="#fff3c4" opacity="0.9"/>
+
+  <!-- modern skyline silhouette behind -->
+  <g fill="#1d5c40" opacity="0.55">
+    <rect x="40" y="230" width="40" height="160"/>
+    <rect x="90" y="190" width="34" height="200"/>
+    <rect x="640" y="210" width="36" height="180"/>
+    <rect x="690" y="170" width="30" height="220"/>
+    <rect x="730" y="240" width="40" height="150"/>
+  </g>
+
+  <!-- Chorsu bazaar rotunda -->
+  <g>
+    <rect x="260" y="300" width="280" height="90" fill="#cfe9d9"/>
+    <ellipse cx="400" cy="300" rx="200" ry="46" fill="#e4f4ea"/>
+    <ellipse cx="400" cy="230" rx="160" ry="90" fill="url(#dome-tsk)"/>
+    <path d="M400 230 L400 140" stroke="#2f9958" stroke-width="10"/>
+    <circle cx="400" cy="130" r="12" fill="#e4f4ea"/>
+
+    <!-- ribbing on dome -->
+    <g stroke="#2f9958" stroke-width="4" fill="none" opacity="0.7">
+      <path d="M260 230 Q400 140 540 230"/>
+      <path d="M290 260 Q400 175 510 260"/>
+      <path d="M320 285 Q400 210 480 285"/>
+    </g>
+
+    <!-- arched entrances -->
+    <g fill="#12351f">
+      <path d="M300 390 V340 Q300 320 320 320 Q340 320 340 340 V390 Z"/>
+      <path d="M380 390 V340 Q380 320 400 320 Q420 320 420 340 V390 Z"/>
+      <path d="M460 390 V340 Q460 320 480 320 Q500 320 500 340 V390 Z"/>
+    </g>
+  </g>
+
+  <!-- market stall roofs in front -->
+  <g>
+    <polygon points="120,390 190,390 200,350 110,350" fill="#e08b3d"/>
+    <polygon points="600,390 690,390 700,345 590,345" fill="#3d8fe0"/>
+  </g>
+
+  <g>
+    <rect x="0" y="410" width="800" height="40" fill="#123d29"/>
+    <g fill="#50C878">
+      <path d="M0 410 l20 40 l20 -40 Z"/><path d="M60 410 l20 40 l20 -40 Z"/>
+      <path d="M120 410 l20 40 l20 -40 Z"/><path d="M180 410 l20 40 l20 -40 Z"/>
+      <path d="M240 410 l20 40 l20 -40 Z"/><path d="M300 410 l20 40 l20 -40 Z"/>
+      <path d="M360 410 l20 40 l20 -40 Z"/><path d="M420 410 l20 40 l20 -40 Z"/>
+      <path d="M480 410 l20 40 l20 -40 Z"/><path d="M540 410 l20 40 l20 -40 Z"/>
+      <path d="M600 410 l20 40 l20 -40 Z"/><path d="M660 410 l20 40 l20 -40 Z"/>
+      <path d="M720 410 l20 40 l20 -40 Z"/><path d="M780 410 l20 40 l20 -40 Z"/>
+    </g>
+  </g>
+</svg>

@@ -5,6 +5,26 @@ import { createPortal } from 'react-dom';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import Emoji from './Emoji';
+import andijanSvg from '../assets/cities/andijan.svg';
+import bukharaSvg from '../assets/cities/bukhara.svg';
+import khivaSvg from '../assets/cities/khiva.svg';
+import samarkandSvg from '../assets/cities/samarkand.svg';
+import tashkentSvg from '../assets/cities/tashkent.svg';
+
+const citySvgMap: Record<string, string> = {
+  andijan: andijanSvg,
+  bukhara: bukharaSvg,
+  khiva: khivaSvg,
+  samarkand: samarkandSvg,
+  tashkent: tashkentSvg,
+};
+
+const getCityIllustration = (cityId: string, bgImage?: string): string => {
+  const normalized = (cityId || '').toLowerCase();
+  if (citySvgMap[normalized]) return citySvgMap[normalized];
+  if (bgImage && bgImage.endsWith('.svg')) return bgImage;
+  return `/assets/cities/${normalized}.svg`;
+};
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -318,14 +338,22 @@ const CityMigration: React.FC = () => {
                   className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-7 border-2 transition-colors border-blue-200 dark:border-blue-700"
                 >
                   <div className={`w-full h-64 bg-gradient-to-br ${getCityGradient(currentCity.cityId)} rounded-[24px] mb-5 flex flex-col items-center justify-center overflow-hidden shadow-inner relative`}>
-                    <motion.div
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
-                      className="text-8xl"
-                    >
+                    <motion.img
+                      key={currentCity.cityId}
+                      src={getCityIllustration(currentCity.cityId, currentCity.theme?.backgroundImage)}
+                      alt={currentCity.name[i18n.language as keyof typeof currentCity.name] || currentCity.name.ru}
+                      initial={{ opacity: 0, scale: 1.05 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute inset-0 w-full h-full object-cover z-10"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.opacity = '0';
+                      }}
+                    />
+                    <div className="text-8xl select-none pointer-events-none opacity-40 z-0">
                       {getCityEmoji(currentCity.cityId)}
-                    </motion.div>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none z-20" />
                   </div>
 
                   <motion.h2 
@@ -383,9 +411,9 @@ const CityMigration: React.FC = () => {
           <div className="mt-8 w-full max-w-sm">
             <motion.button
               onClick={() => handleCitySelect(currentCity)}
-              whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(99, 102, 241, 0.3)' }}
-              whileTap={{ scale: 0.95 }}
-              className="w-full text-white font-black py-4 px-8 rounded-[24px] shadow-2xl transition-all bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 cursor-pointer"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full text-white font-black py-4 px-8 rounded-[24px] shadow-none transition-all bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 cursor-pointer"
             >
               {t('city.migrate', 'Переїхати')}
             </motion.button>
@@ -416,8 +444,18 @@ const CityMigration: React.FC = () => {
                   <div className="bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 rounded-[32px] p-1 shadow-2xl">
                     <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
                       <div className="text-center mb-6">
-                        <div className="text-8xl mb-4">
-                          {getCityEmoji(selectedCity.cityId)}
+                        <div className="relative w-28 h-28 mx-auto mb-4 rounded-2xl overflow-hidden shadow-md flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                          <img
+                            src={getCityIllustration(selectedCity.cityId, selectedCity.theme?.backgroundImage)}
+                            alt={selectedCity.name[i18n.language as 'ru' | 'uz' | 'uk' | 'en'] || selectedCity.name.ru}
+                            className="w-full h-full object-cover z-10"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.opacity = '0';
+                            }}
+                          />
+                          <div className="text-5xl opacity-40 absolute z-0 pointer-events-none">
+                            {getCityEmoji(selectedCity.cityId)}
+                          </div>
                         </div>
                         <h2 className="text-3xl font-black bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 bg-clip-text text-transparent mb-2">
                           {t('city.confirmMigration', 'Підтвердіть переїзд')}

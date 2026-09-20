@@ -1,6 +1,19 @@
 import { useState } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import andijanSvg from '../assets/cities/andijan.svg';
+import bukharaSvg from '../assets/cities/bukhara.svg';
+import khivaSvg from '../assets/cities/khiva.svg';
+import samarkandSvg from '../assets/cities/samarkand.svg';
+import tashkentSvg from '../assets/cities/tashkent.svg';
+
+const citySvgMap: Record<string, string> = {
+  andijan: andijanSvg,
+  bukhara: bukharaSvg,
+  khiva: khivaSvg,
+  samarkand: samarkandSvg,
+  tashkent: tashkentSvg,
+};
 
 interface City {
   cityId: string;
@@ -141,16 +154,30 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
                 isAvailable ? 'border-green-200 dark:border-green-700' : 'border-red-200 dark:border-red-700'
               }`}
             >
-              <div className={`w-full h-64 bg-gradient-to-br ${getCityGradient(currentCity.cityId)} rounded-[24px] mb-5 flex flex-col items-center justify-center overflow-hidden shadow-inner relative`}>
+              <div className={`w-full h-64 bg-gradient-to-br ${getCityGradient(currentCity.cityId)} rounded-[24px] mb-5 overflow-hidden shadow-inner relative`}>
+                <motion.img
+                  key={currentCity.cityId}
+                  src={citySvgMap[currentCity.cityId.toLowerCase()] || currentCity.theme?.backgroundImage || `/assets/cities/${currentCity.cityId}.svg`}
+                  alt={currentCity.name[i18n.language as keyof typeof currentCity.name] || currentCity.name.ru}
+                  initial={{ opacity: 0, scale: 1.06 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0'; }}
+                />
+
+                {/* soft bottom gradient so any text/badges over the art stay readable */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/0" />
+
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
-                  className="text-8xl"
+                  className="absolute bottom-3 left-3 text-4xl drop-shadow-lg"
                 >
                   {getCityEmoji(currentCity.cityId)}
                 </motion.div>
-                
+
                 {!isAvailable && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}

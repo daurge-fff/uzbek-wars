@@ -14,6 +14,8 @@ import { Player } from '../models/Player';
 import { CosmeticItem } from '../models/CosmeticItem';
 import { logger } from '../utils/logger';
 import { applyShopDiscount } from './CharacterBonusService';
+import { calculateCombatPower } from './CombatStatsService';
+import { CosmeticBonusService } from './CosmeticBonusService';
 
 /**
  * Cosmetic purchase result
@@ -46,15 +48,15 @@ export async function getAllCosmetics(
 ): Promise<any[]> {
   try {
     const filter: any = {};
-    
+
     if (type) {
       filter.type = type;
     }
-    
+
     if (rarity) {
       filter.rarity = rarity;
     }
-    
+
     const cosmetics = await CosmeticItem.find(filter).sort({ price: 1 });
     return cosmetics;
   } catch (error) {
@@ -119,10 +121,10 @@ export async function purchaseCosmetic(
     }
 
     // Check if player already owns the item
-    const ownedItems = cosmetic.type === 'clothing' 
-      ? player.cosmetics.clothing 
+    const ownedItems = cosmetic.type === 'clothing'
+      ? player.cosmetics.clothing
       : player.cosmetics.backgrounds;
-    
+
     const alreadyOwned = ownedItems.includes(itemId);
     if (alreadyOwned) {
       return {
@@ -134,7 +136,7 @@ export async function purchaseCosmetic(
 
     // Apply character class discount
     const finalPrice = applyShopDiscount(cosmetic.price, player.characterId);
-    
+
     // Check if player has enough currency
     if (player.donationCurrency < finalPrice) {
       return {
@@ -217,10 +219,10 @@ export async function equipCosmetic(
     }
 
     // Check if player owns the item
-    const ownedItems = cosmetic.type === 'clothing' 
-      ? player.cosmetics.clothing 
+    const ownedItems = cosmetic.type === 'clothing'
+      ? player.cosmetics.clothing
       : player.cosmetics.backgrounds;
-    
+
     const ownsItem = ownedItems.includes(itemId);
     if (!ownsItem) {
       return {
@@ -229,11 +231,19 @@ export async function equipCosmetic(
       };
     }
 
-    // Equip item based on type
-    if (cosmetic.type === 'clothing') {
-      player.cosmetics.activeClothing = itemId;
+    // Equip item based on type and slot
+    if (cosmetic.type === 'clothing' || cosmetic.type === 'equipment') {
+      const slot = cosmetic.slot;
+      if (slot === 'head') player.cosmetics.equippedHead = itemId;
+      else if (slot === 'body') player.cosmetics.equippedBody = itemId;
+      else if (slot === 'feet') player.cosmetics.equippedFeet = itemId;
+      else if (slot === 'backpack') player.cosmetics.activeBackpack = itemId;
+      else if (slot === 'accessory') player.cosmetics.equippedAccessory = itemId;
+      else player.cosmetics.activeClothing = itemId; // Fallback
     } else if (cosmetic.type === 'background') {
       player.cosmetics.activeBackground = itemId;
+    } else if (cosmetic.type === 'backpack') {
+      player.cosmetics.activeBackpack = itemId;
     } else {
       return {
         success: false,
@@ -241,12 +251,28 @@ export async function equipCosmetic(
       };
     }
 
+    // Recalculate combat power after equipment change
+    const equipmentStats = await CosmeticBonusService.getTotalEquipmentStats(player);
+    const baseStats = player.combatStats;
+    const combinedStats = {
+      strength: baseStats.strength + equipmentStats.strength,
+      defense: baseStats.defense + equipmentStats.defense,
+      agility: baseStats.agility + equipmentStats.agility,
+      stamina: baseStats.stamina + equipmentStats.stamina,
+      intelligence: baseStats.intelligence + equipmentStats.intelligence,
+      luck: baseStats.luck + equipmentStats.luck,
+      statPoints: baseStats.statPoints
+    };
+
+    player.combatStats.combatPower = calculateCombatPower(combinedStats);
+
     await player.save();
 
-    logger.info(`Cosmetic equipped`, {
+    logger.info(`Item equipped and power recalculated`, {
       playerId,
       itemId,
-      type: cosmetic.type
+      type: cosmetic.type,
+      newPower: player.combatStats.combatPower
     });
 
     return { success: true };
@@ -278,14 +304,36 @@ export async function unequipCosmetic(
 
     if (type === 'clothing') {
       player.cosmetics.activeClothing = undefined;
+      player.cosmetics.equippedHead = undefined;
+      player.cosmetics.equippedBody = undefined;
+      player.cosmetics.equippedFeet = undefined;
     } else if (type === 'background') {
       player.cosmetics.activeBackground = undefined;
+    } else if ((type as string) === 'accessory') {
+      player.cosmetics.equippedAccessory = undefined;
+    } else if ((type as string) === 'backpack') {
+      player.cosmetics.activeBackpack = undefined;
     } else {
       return {
         success: false,
         error: 'Invalid cosmetic type'
       };
     }
+
+    // Recalculate combat power after equipment change
+    const equipmentStats = await CosmeticBonusService.getTotalEquipmentStats(player);
+    const baseStats = player.combatStats;
+    const combinedStats = {
+      strength: baseStats.strength + equipmentStats.strength,
+      defense: baseStats.defense + equipmentStats.defense,
+      agility: baseStats.agility + equipmentStats.agility,
+      stamina: baseStats.stamina + equipmentStats.stamina,
+      intelligence: baseStats.intelligence + equipmentStats.intelligence,
+      luck: baseStats.luck + equipmentStats.luck,
+      statPoints: baseStats.statPoints
+    };
+
+    player.combatStats.combatPower = calculateCombatPower(combinedStats);
 
     await player.save();
 
@@ -333,7 +381,7 @@ export async function getPlayerCosmetics(playerId: string): Promise<{
       ...player.cosmetics.clothing,
       ...player.cosmetics.backgrounds
     ];
-    
+
     const ownedCosmetics = await CosmeticItem.find({
       itemId: { $in: allOwnedIds }
     });

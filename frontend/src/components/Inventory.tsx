@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import Emoji from './Emoji';
 
-type CosmeticType = 'clothing' | 'background' | 'accessory';
+type CosmeticType = 'clothing' | 'background' | 'accessory' | 'equipment' | 'backpack';
 type CosmeticRarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 interface CosmeticItem {
@@ -18,6 +18,14 @@ interface CosmeticItem {
     type: 'xp' | 'soms' | 'stats';
     value: number;
     description: string | { ru: string; en: string; uz: string; uk: string };
+  };
+  stats?: {
+    strength?: number;
+    defense?: number;
+    agility?: number;
+    stamina?: number;
+    intelligence?: number;
+    luck?: number;
   };
 }
 
@@ -44,7 +52,9 @@ const rarityBorders = {
 const typeEmojis: Record<CosmeticType, string> = {
   clothing: '👕',
   background: '🖼️',
-  accessory: '✨'
+  accessory: '✨',
+  equipment: '⚔️',
+  backpack: '🎒'
 };
 
 export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
@@ -65,6 +75,16 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
   };
 
   const getBonusDescription = (item: CosmeticItem): string => {
+    if (item.stats) {
+      const stats = [];
+      if (item.stats.strength) stats.push(`${t('stats.strength', 'Сила')}: +${item.stats.strength}`);
+      if (item.stats.defense) stats.push(`${t('stats.defense', 'Защита')}: +${item.stats.defense}`);
+      if (item.stats.agility) stats.push(`${t('stats.agility', 'Ловкость')}: +${item.stats.agility}`);
+      if (item.stats.stamina) stats.push(`${t('stats.stamina', 'Выносливость')}: +${item.stats.stamina}`);
+      if (item.stats.intelligence) stats.push(`${t('stats.intelligence', 'Интеллект')}: +${item.stats.intelligence}`);
+      if (item.stats.luck) stats.push(`${t('stats.luck', 'Удача')}: +${item.stats.luck}`);
+      if (stats.length > 0) return stats.join(', ');
+    }
     if (!item.bonus) return '';
     if (typeof item.bonus.description === 'object') {
       return item.bonus.description[i18n.language as keyof typeof item.bonus.description] || item.bonus.description.ru;
@@ -115,15 +135,20 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
                 {equippedItems.map(item => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border-2 shadow-md text-xs font-bold"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border-2 shadow-md text-xs font-bold relative overflow-hidden"
                     style={{
                       borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' :
                         rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
                           rarityBorders[item.rarity].includes('purple-400') ? '#c084fc' : '#fbbf24'
                     }}
                   >
+                    {item.rarity === 'legendary' && (
+                      <div className="absolute inset-0 z-0 pointer-events-none">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
+                      </div>
+                    )}
                     <Emoji emoji={item.icon} size={18} />
-                    <span className="text-gray-900 dark:text-white">{getItemName(item)}</span>
+                    <span className="text-gray-900 dark:text-white relative z-10">{getItemName(item)}</span>
                   </div>
                 ))}
               </div>
@@ -132,7 +157,7 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
 
           {/* Filters */}
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            {(['all', 'clothing', 'background', 'accessory'] as const).map((type) => (
+            {(['all', 'clothing', 'background', 'equipment', 'accessory', 'backpack'] as const).map((type) => (
               <motion.button
                 key={type}
                 whileHover={{ scale: 1.05 }}
@@ -182,7 +207,7 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
                   >
                     {/* Rarity Badge */}
                     <div className="absolute top-2 right-2 z-10">
-                      <span className="text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r text-white shadow-lg uppercase tracking-wide"
+                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r text-white shadow-lg uppercase tracking-wide ${item.rarity === 'legendary' ? 'text-glow-gold' : ''}`}
                         style={{
                           backgroundImage: `linear-gradient(to right, ${rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
                             rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
@@ -217,9 +242,15 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
                             rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
                           })`
                       }}>
+                      {item.rarity === 'legendary' && (
+                        <div className="absolute inset-0 z-0 pointer-events-none">
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
+                        </div>
+                      )}
                       <motion.div
                         animate={{ rotate: item.equipped ? [0, 5, -5, 0] : 0 }}
                         transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
+                        className="relative z-10"
                       >
                         <Emoji emoji={item.icon} size={72} />
                       </motion.div>
@@ -234,11 +265,25 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
                     </h3>
 
                     {/* Bonus Display */}
-                    {item.bonus && (
-                      <div className="mb-3 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
-                        <p className="text-xs text-center font-bold text-amber-700 dark:text-amber-300">
-                          {getBonusDescription(item)}
-                        </p>
+                    {(item.bonus || item.stats) && (
+                      <div className="mb-3 px-3 py-1.5 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/40 dark:to-purple-900/40 rounded-xl border border-indigo-100 dark:border-indigo-800 shadow-sm">
+                        <div className="flex flex-wrap justify-center gap-2">
+                          {item.stats && Object.entries(item.stats).map(([stat, val]) => (
+                            <div key={stat} className="flex items-center gap-1 bg-white/50 dark:bg-black/20 px-1.5 py-0.5 rounded-lg border border-indigo-200/50 dark:border-indigo-700/50">
+                              <span className="text-[10px] uppercase font-black text-indigo-600 dark:text-indigo-400">
+                                {t(`stats.${stat}`)}
+                              </span>
+                              <span className="text-[10px] font-black text-gray-900 dark:text-white">
+                                +{val}
+                              </span>
+                            </div>
+                          ))}
+                          {item.bonus && (
+                            <p className="text-[10px] text-center font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-tight w-full mt-1">
+                              {getBonusDescription(item)}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     )}
 

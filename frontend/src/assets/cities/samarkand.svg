@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="sky-sam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e3a6e"/>
+      <stop offset="55%" stop-color="#4A90E2"/>
+      <stop offset="100%" stop-color="#a7d3f5"/>
+    </linearGradient>
+    <linearGradient id="dome-sam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7fc7e8"/>
+      <stop offset="100%" stop-color="#2f6fa8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#sky-sam)"/>
+  <circle cx="670" cy="90" r="46" fill="#ffe9a8" opacity="0.9"/>
+
+  <!-- distant hills -->
+  <path d="M0 300 Q200 260 400 290 T800 280 V450 H0 Z" fill="#2c5488" opacity="0.5"/>
+
+  <!-- main madrasah building -->
+  <g>
+    <rect x="230" y="230" width="340" height="160" fill="#e8c27a"/>
+    <rect x="230" y="230" width="340" height="14" fill="#c9a55f"/>
+
+    <!-- side minarets -->
+    <rect x="190" y="150" width="30" height="240" fill="#dcb772"/>
+    <rect x="580" y="150" width="30" height="240" fill="#dcb772"/>
+    <ellipse cx="205" cy="150" rx="18" ry="14" fill="url(#dome-sam)"/>
+    <ellipse cx="595" cy="150" rx="18" ry="14" fill="url(#dome-sam)"/>
+
+    <!-- central portal arch -->
+    <path d="M330 390 V270 Q330 200 400 200 Q470 200 470 270 V390 Z" fill="#1c3f63"/>
+    <path d="M350 390 V275 Q350 225 400 225 Q450 225 450 275 V390 Z" fill="#0f2a45"/>
+
+    <!-- big central dome -->
+    <ellipse cx="400" cy="150" rx="70" ry="55" fill="url(#dome-sam)"/>
+    <rect x="392" y="90" width="16" height="40" fill="#dcb772"/>
+
+    <!-- mosaic tile pattern strip -->
+    <g fill="#2f6fa8" opacity="0.8">
+      <rect x="230" y="248" width="340" height="8"/>
+    </g>
+    <g fill="#c9a55f">
+      <circle cx="260" cy="330" r="5"/><circle cx="290" cy="330" r="5"/><circle cx="320" cy="330" r="5"/>
+      <circle cx="480" cy="330" r="5"/><circle cx="510" cy="330" r="5"/><circle cx="540" cy="330" r="5"/>
+    </g>
+  </g>
+
+  <!-- ikat pattern strip -->
+  <g>
+    <rect x="0" y="410" width="800" height="40" fill="#173a63"/>
+    <g fill="#4A90E2">
+      <path d="M0 410 l20 40 l20 -40 Z"/>
+      <path d="M60 410 l20 40 l20 -40 Z"/>
+      <path d="M120 410 l20 40 l20 -40 Z"/>
+      <path d="M180 410 l20 40 l20 -40 Z"/>
+      <path d="M240 410 l20 40 l20 -40 Z"/>
+      <path d="M300 410 l20 40 l20 -40 Z"/>
+      <path d="M360 410 l20 40 l20 -40 Z"/>
+      <path d="M420 410 l20 40 l20 -40 Z"/>
+      <path d="M480 410 l20 40 l20 -40 Z"/>
+      <path d="M540 410 l20 40 l20 -40 Z"/>
+      <path d="M600 410 l20 40 l20 -40 Z"/>
+      <path d="M660 410 l20 40 l20 -40 Z"/>
+      <path d="M720 410 l20 40 l20 -40 Z"/>
+      <path d="M780 410 l20 40 l20 -40 Z"/>
+    </g>
+  </g>
+</svg>

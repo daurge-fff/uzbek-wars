@@ -15,10 +15,15 @@ interface PlayerState {
   soms: number;
   donationCurrency: number;
   stats: {
-    hunger: number;
-    health: number;
-    mood: number;
     energy: number;
+    strength?: number;
+    defense?: number;
+    agility?: number;
+    stamina?: number;
+    intelligence?: number;
+    luck?: number;
+    statPoints?: number;
+    combatPower?: number;
   };
 }
 
@@ -313,7 +318,8 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
 
     Object.entries(activity.statModifiers).forEach(([stat, change]) => {
       if (change < 0) { // Только негативные изменения (расход статов)
-        const currentValue = playerState.stats[stat as keyof typeof playerState.stats];
+        const value = playerState.stats[stat as keyof typeof playerState.stats];
+        const currentValue = typeof value === 'number' ? value : 0;
         const requiredValue = Math.abs(change);
 
         if (currentValue < requiredValue) {
@@ -528,18 +534,18 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               {/* Инфо и валюта */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+                  <h2 className="text-xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent text-glow">
                     {t('dashboard.level')} {playerState.level}
                   </h2>
                   <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 px-2 py-1 rounded-lg">
-                    {Math.round((playerState.experience / playerState.experienceToNextLevel) * 100)}%
+                    {Math.min(100, Math.round((playerState.experience / (playerState.experienceToNextLevel || 100)) * 100))}%
                   </span>
                 </div>
 
                 <div className="relative h-2 bg-gray-300/60 dark:bg-gray-600/60 rounded-full overflow-hidden mb-3">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${(playerState.experience / playerState.experienceToNextLevel) * 100}%` }}
+                    animate={{ width: `${Math.min(100, (playerState.experience / (playerState.experienceToNextLevel || 100)) * 100)}%` }}
                     transition={{ duration: 1, ease: 'easeOut' }}
                     className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
                   />
@@ -632,32 +638,31 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
 
             {/* Расходные статы */}
             <div className="grid grid-cols-4 gap-3 mt-3 mb-2">
-              {Object.entries(playerState.stats)
-                .filter(([key]) => ['hunger', 'health', 'mood', 'energy'].includes(key))
-                .map(([key, value], index) => {
-                  const config = statConfig[key as keyof typeof statConfig];
-                  const isLow = value < 30;
-                  const isCritical = value < 15;
-                  const isShaking = shakingStat === key;
-                  return (
-                    <motion.div
-                      key={key}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={
-                        isShaking
-                          ? {
-                            opacity: 1,
-                            scale: 1,
-                            x: [0, -10, 10, -10, 10, -5, 5, 0],
-                            rotate: [0, -5, 5, -5, 5, 0]
-                          }
-                          : { opacity: 1, scale: 1 }
-                      }
-                      transition={
-                        isShaking
-                          ? { duration: 0.6, ease: 'easeInOut' }
-                          : { delay: 0.1 + index * 0.05 }
-                      }
+              {(['hunger', 'health', 'mood', 'energy'] as const).map((key, index) => {
+                const value = (playerState.stats as any)?.[key] ?? 100;
+                const config = statConfig[key];
+                const isLow = value < 30;
+                const isCritical = value < 15;
+                const isShaking = shakingStat === key;
+                return (
+                  <motion.div
+                    key={key}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={
+                      isShaking
+                        ? {
+                          opacity: 1,
+                          scale: 1,
+                          x: [0, -10, 10, -10, 10, -5, 5, 0],
+                          rotate: [0, -5, 5, -5, 5, 0]
+                        }
+                        : { opacity: 1, scale: 1 }
+                    }
+                    transition={
+                      isShaking
+                        ? { duration: 0.6, ease: 'easeInOut' }
+                        : { duration: 0.3 }
+                    }
                       onHoverStart={() => setHoveredStat(key)}
                       onHoverEnd={() => setHoveredStat(null)}
                       className={`relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-xl p-3 shadow-md border-2 ${isCritical ? 'border-red-500 dark:border-red-400' :
@@ -761,7 +766,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     </div>
                     <div className="relative flex flex-col items-center justify-center px-2 pt-5 pb-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
                       <div className="absolute -top-2 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center shadow-md">
-                        <span className="text-xs">⚡</span>
+                        <Emoji emoji="⚡" size={14} />
                       </div>
                       <span className="text-lg font-black text-gray-900 dark:text-white">{playerState.stats.agility}</span>
                       <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold">{t('stats.agility', 'Ловкость')}</span>
@@ -792,7 +797,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 dragConstraints={{ top: 0, bottom: 0 }}
                 dragElastic={0.2}
                 dragMomentum={false}
-                onDragEnd={(e, info) => {
+                onDragEnd={(_, info) => {
                   const velocity = info.velocity.y;
                   const offset = info.offset.y;
 
@@ -1314,7 +1319,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       transition={{ duration: 0.5, repeat: 3 }}
                       className="text-8xl mb-4"
                     >
-                      🔒
+                      <Emoji emoji="🔒" size={96} />
                     </motion.div>
                     <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3">
                       {t('dashboard.levelTooLow')}!

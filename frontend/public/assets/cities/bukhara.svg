@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="sky-bhk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5c4207"/>
+      <stop offset="55%" stop-color="#DAA520"/>
+      <stop offset="100%" stop-color="#f6dfa0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#sky-bhk)"/>
+  <circle cx="600" cy="90" r="50" fill="#fff6da" opacity="0.85"/>
+
+  <!-- sloped fortress base (Ark citadel look) -->
+  <path d="M60 390 L120 240 Q400 190 680 240 L740 390 Z" fill="#8a5a24"/>
+  <path d="M60 390 L120 240 Q400 190 680 240 L740 390 Z" fill="#8a5a24" opacity="0.001"/>
+
+  <!-- crenellated top wall -->
+  <g fill="#a9723a">
+    <rect x="110" y="220" width="30" height="24"/>
+    <rect x="160" y="212" width="30" height="24"/>
+    <rect x="210" y="206" width="30" height="24"/>
+    <rect x="260" y="202" width="30" height="24"/>
+    <rect x="310" y="198" width="30" height="24"/>
+    <rect x="360" y="196" width="30" height="24"/>
+    <rect x="410" y="196" width="30" height="24"/>
+    <rect x="460" y="198" width="30" height="24"/>
+    <rect x="510" y="202" width="30" height="24"/>
+    <rect x="560" y="206" width="30" height="24"/>
+    <rect x="610" y="212" width="30" height="24"/>
+    <rect x="660" y="220" width="30" height="24"/>
+  </g>
+
+  <!-- twin entrance towers -->
+  <g>
+    <rect x="330" y="230" width="60" height="160" fill="#7a4c1c"/>
+    <rect x="410" y="230" width="60" height="160" fill="#7a4c1c"/>
+    <polygon points="330,230 360,190 390,230" fill="#5c3712"/>
+    <polygon points="410,230 440,190 470,230" fill="#5c3712"/>
+    <path d="M360 390 V320 Q360 300 380 300 Q400 300 400 320 V390 Z" fill="#2a1706"/>
+  </g>
+
+  <!-- corner round towers -->
+  <ellipse cx="115" cy="300" rx="24" ry="90" fill="#7a4c1c"/>
+  <ellipse cx="685" cy="300" rx="24" ry="90" fill="#7a4c1c"/>
+
+  <g>
+    <rect x="0" y="410" width="800" height="40" fill="#4a3306"/>
+    <g fill="#DAA520">
+      <path d="M0 410 l20 40 l20 -40 Z"/><path d="M60 410 l20 40 l20 -40 Z"/>
+      <path d="M120 410 l20 40 l20 -40 Z"/><path d="M180 410 l20 40 l20 -40 Z"/>
+      <path d="M240 410 l20 40 l20 -40 Z"/><path d="M300 410 l20 40 l20 -40 Z"/>
+      <path d="M360 410 l20 40 l20 -40 Z"/><path d="M420 410 l20 40 l20 -40 Z"/>
+      <path d="M480 410 l20 40 l20 -40 Z"/><path d="M540 410 l20 40 l20 -40 Z"/>
+      <path d="M600 410 l20 40 l20 -40 Z"/><path d="M660 410 l20 40 l20 -40 Z"/>
+      <path d="M720 410 l20 40 l20 -40 Z"/><path d="M780 410 l20 40 l20 -40 Z"/>
+    </g>
+  </g>
+</svg>

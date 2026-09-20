@@ -186,7 +186,8 @@
       "all": "All",
       "clothing": "Clothing",
       "background": "Backgrounds",
-      "accessory": "Accessories"
+      "accessory": "Accessories",
+      "combat": "⚔️ Combat"
     },
     "rarity": {
       "common": "Common",
@@ -715,5 +716,78 @@
     "insufficientFunds": "Insufficient funds",
     "migrationInProgress": "Migration in progress...",
     "migrationTime": "Migration time: 60 minutes"
+  },
+  "tasks": {
+    "title": "Tasks and Quests",
+    "streak": "Streak",
+    "days": "days",
+    "dailyTitle": "Daily Tasks",
+    "questsTitle": "Available Quests",
+    "noQuests": "No available quests",
+    "startQuest": "Start Quest",
+    "streakBonus": "Streak bonus received!"
+  },
+  "quests": {
+    "started": "Quest started!",
+    "error": "Error starting quest",
+    "completed": "Quest completed!"
+  },
+  "arena": {
+    "title": "PVP ARENA",
+    "matchmaking": "MATCHMAKING",
+    "matchmakingDesc": "Choose a worthy opponent for battle",
+    "fighting": "BATTLE IN PROGRESS...",
+    "victory": "VICTORY!",
+    "defeat": "DEFEAT",
+    "showLog": "Show Battle Log",
+    "hideLog": "Hide Battle Log",
+    "backToArena": "BACK TO ARENA",
+    "attack": "ATTACK",
+    "fightComplete": "Battle finished!",
+    "errorFetch": "Error finding opponents",
+    "errorFight": "Error during battle",
+    "rating": "Rating",
+    "statsPreserved": "Hunger, health, and energy are preserved",
+    "you": "You",
+    "opponent": "Opponent",
+    "preparing": "Fighters entering the arena...",
+    "skipFight": "Skip animation ⏩",
+    "selectDifficulty": "Select Difficulty",
+    "difficulty_easy": "Easy",
+    "difficulty_medium": "Medium",
+    "difficulty_hard": "Hard",
+    "notAvailable": "Unavailable",
+    "notEnoughEnergy": "Not enough energy! Rest first.",
+    "notEnoughSoms": "Not enough soms for battle!",
+    "opponentPower": "Power",
+    "energyCost": "Energy",
+    "healthCost": "Health"
+  },
+  "battle": {
+    "event_attack": "{{attacker}} strikes {{defender}} for {{damage}} damage",
+    "event_crit": "💥 CRIT! {{attacker}} breaks through {{defender}}'s defense for {{damage}} damage!",
+    "event_dodge": "💨 {{defender}} nimbly dodges {{attacker}}'s strike!",
+    "event_counter": "⚡ {{attacker}} counter-attacks for {{damage}} damage!",
+    "event_block": "🛡️ {{defender}} blocks part of the attack! Takes {{damage}} damage",
+    "event_miss": "❌ {{attacker}} misses!",
+    "event_stun": "💫 {{defender}} is stunned and skips a turn!",
+    "event_poison": "☠️ {{defender}} is poisoned! Loses health",
+    "event_finish": "⚡ {{attacker}} lands the finishing blow!",
+    "costEnergy": "Energy spent",
+    "costHealth": "Health lost",
+    "costSoms": "Entry cost",
+    "turns": "Turns",
+    "damageDealt": "Damage dealt",
+    "damageReceived": "Damage taken",
+    "crits": "Crits",
+    "dodges": "Dodges",
+    "combos": "Combos",
+    "battleStats": "Battle Stats"
+  },
+  "achievements": {
+    "title": "ACHIEVEMENTS",
+    "unlocked": "Unlocked",
+    "inProgress": "In Progress",
+    "errorFetch": "Error loading achievements"
   }
 }
