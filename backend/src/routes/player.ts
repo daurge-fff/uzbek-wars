@@ -431,6 +431,11 @@ router.post(
 
       await player.save();
 
+      // Track daily tasks and quests for completed activities
+      const TaskService = await import('../services/TaskService');
+      await TaskService.updateTaskProgress(player, 'activity_count', 1);
+      await TaskService.updateQuestProgress(player, 'activity_count', 1);
+
       logger.info(
         `Player ${userId} completed activity ${activity.id}: ` +
         `+${experienceGained} XP, ${somsGained >= 0 ? '+' : ''}${somsGained} soms` +

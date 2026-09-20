@@ -67,12 +67,29 @@ router.get(
 
             const globalQuests = await Quest.find({ isGlobal: true, 'requirements.level': { $lte: player.level } });
 
+            // Enrich active quests with full quest details for the UI
+            const activeQuestsWithDetails = await Promise.all(
+                (player.activeQuests || []).map(async (aq) => {
+                    const quest = await Quest.findOne({ id: aq.questId });
+                    return {
+                        questId: aq.questId,
+                        progress: aq.progress,
+                        completed: aq.completed,
+                        name: quest?.name,
+                        description: quest?.description,
+                        steps: quest?.steps,
+                        rewards: quest?.rewards,
+                    };
+                })
+            );
+
             res.status(200).json({
                 dailyTasks: dailyTasks.map(task => ({
                     ...task.toObject(),
-                    completed: (player.completedDailyTasks || []).includes(task.id)
+                    completed: (player.completedDailyTasks || []).includes(task.id),
+                    progress: player.dailyTaskProgress?.get(task.id) || 0
                 })),
-                activeQuests: player.activeQuests || [],
+                activeQuests: activeQuestsWithDetails,
                 completedQuests: player.completedQuests || [],
                 globalAvailableQuests: globalQuests.filter(q => !(player.completedQuests || []).includes(q.id) && !(player.activeQuests || []).find(aq => aq.questId === q.id)),
                 streak: player.loginStreak || 1

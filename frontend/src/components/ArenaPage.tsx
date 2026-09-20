@@ -79,6 +79,7 @@ export const ArenaPage = () => {
     const handleFight = async (opponentId: string) => {
         setFighting(true);
         setCurrentLogIndex(0);
+        setMatchResult(null);
         try {
             const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
             const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/arena/fight`,
@@ -155,7 +156,7 @@ export const ArenaPage = () => {
     };
 
     // === BATTLE ANIMATION VIEW ===
-    if (fighting) {
+    if (fighting && matchResult) {
         const currentEvent = matchResult?.matchLog?.[currentLogIndex];
         const challengerMax = (matchResult as any)?.challengerMaxHealth || 55;
         const opponentMax = (matchResult as any)?.opponentMaxHealth || 55;
@@ -254,6 +255,22 @@ export const ArenaPage = () => {
                         {t('arena.skipFight', 'Пропустить анимацию ⏩')}
                     </button>
                 </div>
+            </div>
+        );
+    }
+
+    // === LOADING STATE (fighting but no result yet) ===
+    if (fighting && !matchResult) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-gray-950 via-black to-gray-900 flex flex-col items-center justify-center p-4 text-center">
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="text-4xl mb-4"
+                >
+                    <Emoji emoji="🌀" size={48} />
+                </motion.div>
+                <p className="text-gray-400 text-sm font-bold">{t('arena.loading', 'Подготовка боя...')}</p>
             </div>
         );
     }
@@ -450,9 +467,7 @@ export const ArenaPage = () => {
                                         ⚡{info.energyCost} ❤️{info.healthCostWin}-{info.healthCostLose} 💰{info.somsCost}
                                     </div>
                                     {!canAfford && (
-                                        <div className="absolute inset-0 rounded-2xl bg-black/40 flex items-center justify-center">
-                                            <span className="text-[10px] font-bold text-red-300">{t('arena.notAvailable', 'Недоступно')}</span>
-                                        </div>
+                                        <div className="absolute inset-0 rounded-2xl bg-black/50" />
                                     )}
                                 </motion.button>
                             );
@@ -486,36 +501,39 @@ export const ArenaPage = () => {
                             <motion.div
                                 key={opp._id}
                                 whileHover={{ scale: 1.02 }}
-                                className="bg-white dark:bg-gray-800 rounded-3xl p-5 shadow-lg border border-gray-100 dark:border-gray-700 flex items-center gap-4"
+                                className="bg-white dark:bg-gray-800 rounded-3xl p-4 shadow-lg border border-gray-100 dark:border-gray-700"
                             >
-                                <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-4xl shadow-inner">
-                                    <Emoji emoji={opp.characterId === 'char_warrior' ? '⚔️' : '👤'} size={32} />
-                                </div>
-                                <div className="flex-1">
-                                    <h3 className="font-black text-gray-900 dark:text-white text-lg uppercase">
-                                        {opp.userId?.displayName || opp.characterId.split('_')[1]}
-                                    </h3>
-                                    <div className="flex items-center gap-3 text-sm font-bold text-gray-500">
-                                        <span>Lvl {opp.level}</span>
-                                        <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                                        <span className="text-indigo-500">⚔️ {opp.combatStats.combatPower}</span>
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-2xl shadow-inner shrink-0">
+                                        <Emoji emoji={opp.characterId === 'char_warrior' ? '⚔️' : '👤'} size={24} />
                                     </div>
-                                    {/* Show difficulty stats preview */}
-                                    <div className="text-[10px] text-gray-400 mt-1">
-                                        {t('arena.opponentPower', 'Сила')}: ×{diffInfo.somsCost === 50 ? '0.7' : diffInfo.somsCost === 150 ? '1.0' : '1.4'}
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-black text-gray-900 dark:text-white text-sm uppercase truncate">
+                                            {opp.userId?.displayName || opp.characterId.split('_')[1]}
+                                        </h3>
+                                        <div className="flex items-center gap-2 text-xs font-bold text-gray-500">
+                                            <span>Lvl {opp.level}</span>
+                                            <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                                            <span className="text-indigo-500">⚔️ {opp.combatStats.combatPower}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={() => handleFight(opp._id)}
-                                    className={`relative overflow-hidden w-full py-3 bg-gradient-to-r ${diffInfo.bgColor} text-white font-black rounded-xl hover:shadow-xl active:scale-95 transition-all`}
-                                >
-                                    <div className="absolute inset-0 z-0 pointer-events-none">
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer-fast" />
+                                <div className="flex items-center justify-between gap-2">
+                                    <div className="text-[10px] text-gray-400 font-mono">
+                                        ×{diffInfo.somsCost === 50 ? '0.7' : diffInfo.somsCost === 150 ? '1.0' : '1.4'}
                                     </div>
-                                    <span className="relative z-10 uppercase tracking-wider">
-                                        {t('arena.attack', 'АТАКА')} {diffInfo.emoji}
-                                    </span>
-                                </button>
+                                    <button
+                                        onClick={() => handleFight(opp._id)}
+                                        className={`relative overflow-hidden flex-1 py-2.5 bg-gradient-to-r ${diffInfo.bgColor} text-white font-black rounded-xl hover:shadow-xl active:scale-95 transition-all text-sm`}
+                                    >
+                                        <div className="absolute inset-0 z-0 pointer-events-none">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer-fast" />
+                                        </div>
+                                        <span className="relative z-10 uppercase tracking-wider">
+                                            {t('arena.attack', 'АТАКА')} {diffInfo.emoji}
+                                        </span>
+                                    </button>
+                                </div>
                             </motion.div>
                         ))}
                     </div>

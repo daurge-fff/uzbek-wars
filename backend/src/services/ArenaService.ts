@@ -3,6 +3,7 @@ import { ArenaMatch } from '../models/ArenaMatch';
 import { logger } from '../utils/logger';
 import { processLevelUp } from './ProgressionService';
 import * as AchievementService from './AchievementService';
+import * as TaskService from './TaskService';
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -163,9 +164,10 @@ export async function startFight(
             } else {
                 // Poison damage
                 if (challengerPoison > 0) {
-                    const poisonDmg = Math.floor(maxChallengerHP * 0.03);
+                    const poisonDmg = Math.floor(maxChallengerHP * 0.05);
                     challengerHP = Math.max(1, challengerHP - poisonDmg);
                     challengerPoison--;
+                    events.push(createEvent('poison', turn, challenger._id.toString(), challengerName, opponentName, poisonDmg, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
                 }
 
                 // Combo tracking
@@ -194,7 +196,6 @@ export async function startFight(
                         critCount++;
                         events.push(createEvent('crit', turn, challenger._id.toString(), challengerName, opponentName, hit.damage, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
                     } else {
-                        // Combo tracking
                         if (challengerCombo >= 2) {
                             comboCount++;
                         }
@@ -202,8 +203,8 @@ export async function startFight(
                         events.push(createEvent('attack', turn, challenger._id.toString(), challengerName, opponentName, hit.damage, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
                     }
 
-                    // Stun chance (6% if crit, 2% otherwise)
-                    const stunChance = hit.isCrit ? 0.06 : 0.02;
+                    // Stun chance (8% if crit, 4% otherwise)
+                    const stunChance = hit.isCrit ? 0.08 : 0.04;
                     if (Math.random() < stunChance && opponentStun === 0) {
                         opponentStun = 1;
                         events.push(createEvent('stun', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
@@ -211,9 +212,9 @@ export async function startFight(
 
                     // Poison chance from intelligence
                     const intStat = challenger.combatStats?.intelligence || 1;
-                    const poisonChance = Math.min(0.10, intStat / 50);
+                    const poisonChance = Math.min(0.20, intStat / 25);
                     if (Math.random() < poisonChance && opponentPoison === 0) {
-                        opponentPoison = 2;
+                        opponentPoison = 3;
                         events.push(createEvent('poison', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
                     }
                 }
@@ -231,9 +232,10 @@ export async function startFight(
                 opponentStun--;
             } else {
                 if (opponentPoison > 0) {
-                    const poisonDmg = Math.floor(maxOpponentHP * 0.03);
+                    const poisonDmg = Math.floor(maxOpponentHP * 0.05);
                     opponentHP = Math.max(1, opponentHP - poisonDmg);
                     opponentPoison--;
+                    events.push(createEvent('poison', turn, opponent._id.toString(), opponentName, challengerName, poisonDmg, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
                 }
 
                 const hit2 = calculateDamageRaw(opponent, challenger, opponentStats, challenger.combatStats);
@@ -262,7 +264,7 @@ export async function startFight(
 
                     // Counter-attack chance from agility
                     const agiStat = challenger.combatStats?.agility || 1;
-                    const counterChance = Math.min(0.20, agiStat / 15);
+                    const counterChance = Math.min(0.30, agiStat / 10);
                     if (Math.random() < counterChance) {
                         const counterDmg = calculateCounterDamage(challenger, hit2.damage);
                         opponentHP = Math.max(0, opponentHP - counterDmg);
@@ -314,6 +316,13 @@ export async function startFight(
 
         if (isChallengerWinner) {
             await AchievementService.trackProgress(challengerId, 'arena_warrior_1', 1);
+        }
+
+        // Track daily task progress for arena fights
+        await TaskService.updateTaskProgress(challenger, 'pvp_battle', 1);
+        if (isChallengerWinner) {
+            await TaskService.updateTaskProgress(challenger, 'pvp_win', 1);
+            await TaskService.updateQuestProgress(challenger, 'pvp_win', 1);
         }
 
         // Create match record
@@ -372,12 +381,12 @@ export async function startFight(
 
 function calculateMaxHP(combatStats: any): number {
     const stamina = combatStats?.stamina || 5;
-    return Math.floor(40 + stamina * 3);
+    return Math.floor(60 + stamina * 8);
 }
 
 function calculateMaxHPRaw(stats: any): number {
     const stamina = stats?.stamina || 5;
-    return Math.floor(40 + stamina * 3);
+    return Math.floor(60 + stamina * 8);
 }
 
 function applyDifficultyMultiplier(combatStats: any, multiplier: number) {
@@ -402,38 +411,38 @@ function calculateDamage(
     const def = defenderStats.defense || 1;
     const luck = attacker.combatStats?.luck || 0;
 
-    const missChance = Math.max(0.03, 0.10 - agi / 15);
+    const missChance = Math.max(0.03, 0.08 - agi / 12);
     if (Math.random() < missChance) {
         return { damage: 0, isCrit: false, isDodge: false, isBlock: false, isMiss: true };
     }
 
     const defAgi = defender.combatStats?.agility || 1;
     const defLuck = defender.combatStats?.luck || 0;
-    const dodgeChance = Math.min(0.25, defAgi / 35 + defLuck * 0.03);
+    const dodgeChance = Math.min(0.30, defAgi / 15 + defLuck * 0.05);
     if (Math.random() < dodgeChance) {
         return { damage: 0, isCrit: false, isDodge: true, isBlock: false, isMiss: false };
     }
 
-    const blockChance = Math.min(0.20, def / 30);
+    const blockChance = Math.min(0.25, def / 15);
     if (Math.random() < blockChance) {
-        const baseDmg = str * 3 + 5;
-        const defReduction = def / (def + 30);
+        const baseDmg = str * 1.5 + 5;
+        const defReduction = def / (def + 20);
         const rawDmg = Math.floor(baseDmg * (1 - defReduction));
-        return { damage: Math.max(3, rawDmg), isCrit: false, isDodge: false, isBlock: true, isMiss: false };
+        return { damage: Math.max(2, rawDmg), isCrit: false, isDodge: false, isBlock: true, isMiss: false };
     }
 
-    const critChance = Math.min(0.30, agi / 30 + luck * 0.03);
+    const critChance = Math.min(0.40, agi / 15 + luck * 0.05);
     const isCrit = Math.random() < critChance;
 
-    const baseDmg = str * 3 + 5;
-    const defReduction = def / (def + 30);
+    const baseDmg = str * 1.5 + 5;
+    const defReduction = def / (def + 20);
     const int = attacker.combatStats?.intelligence || 1;
-    const critMult = isCrit ? (1.5 + Math.min(0.5, int / 50)) : 1.0;
-    const comboMult = comboLevel > 1 ? 1 + (comboLevel - 1) * 0.12 : 1.0;
-    const intBonus = Math.floor(int * 0.5);
+    const critMult = isCrit ? (1.5 + Math.min(0.5, int / 30)) : 1.0;
+    const comboMult = comboLevel > 1 ? 1 + (comboLevel - 1) * 0.15 : 1.0;
+    const intBonus = Math.floor(int * 0.8);
 
     const rawDmg = Math.floor((baseDmg + intBonus) * critMult * comboMult * (1 - defReduction));
-    const finalDmg = Math.max(3, rawDmg);
+    const finalDmg = Math.max(2, rawDmg);
 
     return { damage: finalDmg, isCrit, isDodge: false, isBlock: false, isMiss: false };
 }
@@ -449,37 +458,37 @@ function calculateDamageRaw(
     const def = defenderStats.defense || 1;
     const luck = attackerStats.luck || 0;
 
-    const missChance = Math.max(0.03, 0.10 - agi / 15);
+    const missChance = Math.max(0.03, 0.08 - agi / 12);
     if (Math.random() < missChance) {
         return { damage: 0, isCrit: false, isDodge: false, isBlock: false, isMiss: true };
     }
 
     const defAgi = defender.combatStats?.agility || 1;
     const defLuck = defender.combatStats?.luck || 0;
-    const dodgeChance = Math.min(0.25, defAgi / 35 + defLuck * 0.03);
+    const dodgeChance = Math.min(0.30, defAgi / 15 + defLuck * 0.05);
     if (Math.random() < dodgeChance) {
         return { damage: 0, isCrit: false, isDodge: true, isBlock: false, isMiss: false };
     }
 
-    const blockChance = Math.min(0.20, def / 30);
+    const blockChance = Math.min(0.25, def / 15);
     if (Math.random() < blockChance) {
-        const baseDmg = str * 3 + 5;
-        const defReduction = def / (def + 30);
+        const baseDmg = str * 1.5 + 5;
+        const defReduction = def / (def + 20);
         const rawDmg = Math.floor(baseDmg * (1 - defReduction));
-        return { damage: Math.max(3, rawDmg), isCrit: false, isDodge: false, isBlock: true, isMiss: false };
+        return { damage: Math.max(2, rawDmg), isCrit: false, isDodge: false, isBlock: true, isMiss: false };
     }
 
-    const critChance = Math.min(0.30, agi / 30 + luck * 0.03);
+    const critChance = Math.min(0.40, agi / 15 + luck * 0.05);
     const isCrit = Math.random() < critChance;
 
-    const baseDmg = str * 3 + 5;
-    const defReduction = def / (def + 30);
+    const baseDmg = str * 1.5 + 5;
+    const defReduction = def / (def + 20);
     const int = attackerStats.intelligence || 1;
-    const critMult = isCrit ? (1.5 + Math.min(0.5, int / 50)) : 1.0;
-    const intBonus = Math.floor(int * 0.5);
+    const critMult = isCrit ? (1.5 + Math.min(0.5, int / 30)) : 1.0;
+    const intBonus = Math.floor(int * 0.8);
 
     const rawDmg = Math.floor((baseDmg + intBonus) * critMult * (1 - defReduction));
-    const finalDmg = Math.max(3, rawDmg);
+    const finalDmg = Math.max(2, rawDmg);
 
     return { damage: finalDmg, isCrit, isDodge: false, isBlock: false, isMiss: false };
 }
@@ -487,9 +496,9 @@ function calculateDamageRaw(
 function calculateCounterDamage(counterAttacker: IPlayer, originalDamage: number): number {
     const agi = counterAttacker.combatStats?.agility || 1;
     const str = counterAttacker.combatStats?.strength || 1;
-    const counterMult = 0.4 + Math.min(0.3, agi / 25);
+    const counterMult = 0.5 + Math.min(0.3, agi / 20);
     const baseCounter = Math.floor(originalDamage * counterMult);
-    const agiBonus = Math.floor(str * 0.3);
+    const agiBonus = Math.floor(str * 0.4);
     return Math.max(2, baseCounter + agiBonus);
 }
 

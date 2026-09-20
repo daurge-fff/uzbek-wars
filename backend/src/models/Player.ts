@@ -88,6 +88,7 @@ export interface IPlayer extends Document {
   loginStreak: number;
   lastLoginDate?: Date;
   completedDailyTasks: string[]; // Task IDs
+  dailyTaskProgress: Map<string, number>; // taskId -> cumulative progress count
   activeQuests: Array<{
     questId: string;
     progress: number;
@@ -282,6 +283,11 @@ const PlayerSchema = new Schema<IPlayer>(
     completedDailyTasks: [{
       type: String,
     }],
+    dailyTaskProgress: {
+      type: Map,
+      of: Number,
+      default: () => new Map(),
+    },
     activeQuests: [{
       questId: { type: String, required: true },
       progress: { type: Number, default: 0 },

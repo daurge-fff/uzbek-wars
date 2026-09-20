@@ -1,5 +1,6 @@
 import { IPlayer } from '../models/Player';
 import { DailyTask } from '../models/DailyTask';
+import { Quest } from '../models/Quest';
 import { logger } from '../utils/logger';
 
 /**
@@ -34,8 +35,9 @@ export async function updateLoginStreak(player: IPlayer): Promise<void> {
         now.getDate() === lastLogin.getDate();
 
     if (!isSameDay) {
-        // Reset completed daily tasks for the new calendar day
+        // Reset completed daily tasks and progress for the new calendar day
         player.completedDailyTasks = [];
+        player.dailyTaskProgress = new Map();
 
         const dNow = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
         const dLast = new Date(lastLogin.getFullYear(), lastLogin.getMonth(), lastLogin.getDate()).getTime();
@@ -73,6 +75,9 @@ export async function updateTaskProgress(
         if (!player.completedDailyTasks) {
             player.completedDailyTasks = [];
         }
+        if (!player.dailyTaskProgress) {
+            player.dailyTaskProgress = new Map();
+        }
 
         // Find active daily tasks of this type
         const activeTasks = await DailyTask.find({ type, isActive: true });
@@ -88,12 +93,67 @@ export async function updateTaskProgress(
         for (const task of activeTasks) {
             if (player.completedDailyTasks.includes(task.id)) continue;
 
-            if (value >= task.targetValue) {
+            // Increment cumulative progress
+            const currentProgress = player.dailyTaskProgress.get(task.id) || 0;
+            const newProgress = currentProgress + value;
+            player.dailyTaskProgress.set(task.id, newProgress);
+
+            if (newProgress >= task.targetValue) {
                 await completeDailyTask(player, task.id);
             }
         }
+
+        await player.save();
     } catch (error) {
         logger.error('Error updating task progress:', error);
+    }
+}
+
+/**
+ * Update progress for active quests matching a step type
+ * Completes the quest and grants rewards when the target is reached.
+ */
+export async function updateQuestProgress(
+    player: IPlayer,
+    stepType: string,
+    value: number
+): Promise<void> {
+    try {
+        if (!player.activeQuests || player.activeQuests.length === 0) return;
+
+        for (const activeQuest of player.activeQuests) {
+            if (activeQuest.completed) continue;
+
+            const quest = await Quest.findOne({ id: activeQuest.questId });
+            if (!quest) continue;
+
+            const step = quest.steps.find(s => s.type === stepType);
+            if (!step) continue;
+
+            activeQuest.progress += value;
+
+            if (activeQuest.progress >= step.targetValue) {
+                activeQuest.completed = true;
+
+                if (!player.completedQuests) player.completedQuests = [];
+                if (!player.completedQuests.includes(quest.id)) {
+                    player.completedQuests.push(quest.id);
+                    player.experience += quest.rewards.experience || 0;
+                    player.soms += quest.rewards.soms || 0;
+                    if (quest.rewards.crystals) {
+                        player.donationCurrency = (player.donationCurrency || 0) + quest.rewards.crystals;
+                    }
+
+                    const { processLevelUp } = await import('./ProgressionService');
+                    processLevelUp(player);
+                    logger.info(`Player ${player._id} completed quest ${quest.id}`);
+                }
+            }
+        }
+
+        await player.save();
+    } catch (error) {
+        logger.error('Error updating quest progress:', error);
     }
 }
 

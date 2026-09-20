@@ -1,6 +1,6 @@
 import { Schema, model, Document } from 'mongoose';
 
-export type TaskType = 'login' | 'activity_count' | 'soms_earned' | 'pvp_battle';
+export type TaskType = 'login' | 'activity_count' | 'soms_earned' | 'pvp_battle' | 'pvp_win';
 
 export interface IDailyTask extends Document {
     id: string; // Machine-readable ID (e.g., 'daily_login')
@@ -44,7 +44,7 @@ const DailyTaskSchema = new Schema<IDailyTask>(
         },
         type: {
             type: String,
-            enum: ['login', 'activity_count', 'soms_earned', 'pvp_battle'],
+            enum: ['login', 'activity_count', 'soms_earned', 'pvp_battle', 'pvp_win'],
             required: true,
         },
         targetValue: { type: Number, default: 1 },

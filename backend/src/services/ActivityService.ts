@@ -27,6 +27,7 @@ import {
 import { logger } from '../utils/logger';
 import { CosmeticBonusService } from './CosmeticBonusService';
 import * as AchievementService from './AchievementService';
+import * as TaskService from './TaskService';
 
 /**
  * Activity definition with all gameplay parameters
@@ -546,6 +547,10 @@ export async function performActivity(
 
   // Save player
   await player.save();
+
+  // Track daily tasks and quests for completed activities
+  await TaskService.updateTaskProgress(player, 'activity_count', 1);
+  await TaskService.updateQuestProgress(player, 'activity_count', 1);
 
   return {
     player,
