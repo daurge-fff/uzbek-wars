@@ -13,8 +13,12 @@ process.env.DB_NAME = 'uzbek_wars_test';
 process.env.JWT_SECRET = 'test-secret-key';
 process.env.NODE_ENV = 'test';
 
-if (!process.env.MONGODB_URI || process.env.MONGODB_URI === 'mongodb://localhost:27017') {
-  process.env.MONGODB_URI = 'mongodb+srv://daurge:OJ4zQI5UXKItJMRD@github.hb9s83g.mongodb.net/?retryWrites=true&w=majority';
+// Test database URI comes from the environment (loaded above from .env).
+// Credentials must never be hard-coded in test files.
+if (!process.env.MONGODB_URI) {
+  throw new Error(
+    'MONGODB_URI is not set. Provide it via .env (see .env.example) before running tests.',
+  );
 }
 
 import request from 'supertest';

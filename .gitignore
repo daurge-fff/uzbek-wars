@@ -9,6 +9,10 @@ pnpm-debug.log*
 .env
 .env.local
 .env.*.local
+.env.production
+.env.staging
+.env.development
+.env.test
 
 # Build outputs
 dist/
@@ -17,7 +21,6 @@ build/
 
 # IDE
 .vscode/
-.kiro/
 .idea/
 *.swp
 *.swo
@@ -35,10 +38,15 @@ coverage/
 logs/
 *.log
 
-# Docker
-.dockerignore
-
 # Temporary files
 tmp/
 temp/
 *.tmp
+
+# OpenClaw agent workspace (service files — not part of Uzbek Wars)
+# Anchored to repo root on purpose: does not affect project documentation.
+/AGENTS.md
+/IDENTITY.md
+/SOUL.md
+/USER.md
+/memory/

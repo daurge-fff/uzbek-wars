@@ -296,17 +296,18 @@ chore(scope): update dependencies
 
 ## 📄 License
 
-MIT License - see LICENSE file
+This project is licensed under the PolyForm Noncommercial License 1.0.0.
+
+Copyright (c) 2026 German Vitiaz.
+
+Commercial use, sale, or other commercial exploitation of this project
+is not permitted without separate permission from the copyright holder.
+
+See LICENSE for the complete license terms.
 
 ## 👥 Team
 
 Uzbek Wars Development Team
-
-## 🔗 Links
-
-- [Design Document](.kiro/specs/uzbek-wars-game/design.md)
-- [Requirements](.kiro/specs/uzbek-wars-game/requirements.md)
-- [Tasks](.kiro/specs/uzbek-wars-game/tasks.md)
 
 ## 🆘 Troubleshooting
 
@@ -345,10 +346,6 @@ lsof -ti:3060 | xargs kill -9
 - **First Contentful Paint**: < 1.5s
 - **Time to Interactive**: < 3.5s
 - **Bundle Size**: < 200KB (gzipped)
-
-## 🎯 Roadmap
-
-See [tasks.md](.kiro/specs/uzbek-wars-game/tasks.md) for detailed implementation plan.
 
 ---
 
