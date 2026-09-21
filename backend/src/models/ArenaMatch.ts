@@ -32,6 +32,10 @@ export interface IArenaMatch extends Document {
         defenderHealth: number;
         attackerMaxHealth: number;
         defenderMaxHealth: number;
+        challengerHealth?: number;
+        challengerMaxHealth?: number;
+        opponentHealth?: number;
+        opponentMaxHealth?: number;
     }>;
     stats: {
         totalTurns: number;
@@ -78,6 +82,10 @@ const ArenaMatchSchema = new Schema<IArenaMatch>(
                 defenderHealth: { type: Number },
                 attackerMaxHealth: { type: Number },
                 defenderMaxHealth: { type: Number },
+                challengerHealth: { type: Number },
+                challengerMaxHealth: { type: Number },
+                opponentHealth: { type: Number },
+                opponentMaxHealth: { type: Number },
             }
         ],
         stats: {

@@ -431,11 +431,6 @@ router.post(
 
       await player.save();
 
-      // Track daily tasks and quests for completed activities
-      const TaskService = await import('../services/TaskService');
-      await TaskService.updateTaskProgress(player, 'activity_count', 1);
-      await TaskService.updateQuestProgress(player, 'activity_count', 1);
-
       logger.info(
         `Player ${userId} completed activity ${activity.id}: ` +
         `+${experienceGained} XP, ${somsGained >= 0 ? '+' : ''}${somsGained} soms` +
@@ -458,6 +453,22 @@ router.post(
           stats: player.stats
         }
       });
+
+      // Track daily tasks and quests for the completed activity.
+      // Runs after the response: rewards are already saved, and these extra DB reads/writes
+      // must not delay the credits the player sees. Игрока перечитываем, чтобы не
+      // перезаписать устаревшим документом чужие изменения (уровни, статы).
+      void Promise.resolve()
+        .then(async () => {
+          const TaskService = await import('../services/TaskService');
+          const freshPlayer = await Player.findById(player._id);
+          if (!freshPlayer) return;
+          await TaskService.updateTaskProgress(freshPlayer, 'activity_count', 1);
+          await TaskService.updateQuestProgress(freshPlayer, 'activity_count', 1);
+        })
+        .catch((error) => {
+          logger.error('Error updating task/quest progress after activity:', error);
+        });
     } catch (error) {
       logger.error('Error completing activity:', error);
       res.status(500).json({ error: 'Internal server error' });

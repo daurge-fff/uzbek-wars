@@ -178,7 +178,9 @@ export const Settings = ({
                   {t('settings.resetApp', 'Сбросить настройки')}
                 </span>
               </div>
-              <span className="text-xs text-gray-500 dark:text-gray-400">~40 MB</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 text-right max-w-[45%]">
+                {t('settings.resetAppHint', 'Очистить кэш и локальные данные приложения')}
+              </span>
             </motion.button>
           </div>
         </motion.div>
@@ -247,7 +249,7 @@ export const Settings = ({
                 <div className="group relative">
                   <span className="text-xs cursor-help"><Emoji emoji="ℹ️" size={12} /></span>
                   <div className="absolute bottom-full right-0 mb-2 w-56 p-3 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
-                    <div className="font-bold mb-1"><Emoji emoji="🔒" size={14} className="inline" /> {t('settings.licenseType')}</div>
+                    <div className="font-bold mb-1"><Emoji emoji="📜" size={14} className="inline" /> {t('settings.licenseType')}</div>
                     {t('settings.licenseHint')}
                   </div>
                 </div>

@@ -47,8 +47,8 @@ const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
     },
 };
 
-interface BattleEvent {
-    type: 'attack' | 'crit' | 'dodge' | 'counter' | 'block' | 'combo' | 'miss' | 'finish' | 'stun' | 'poison' | 'heal';
+export interface BattleEvent {
+    type: 'attack' | 'crit' | 'dodge' | 'counter' | 'block' | 'combo' | 'miss' | 'finish' | 'stun' | 'stun_skip' | 'poison' | 'poison_tick' | 'heal';
     turn: number;
     attackerId: string;
     attackerName: string;
@@ -65,6 +65,15 @@ interface BattleEvent {
     defenderHealth: number;
     attackerMaxHealth: number;
     defenderMaxHealth: number;
+    /**
+     * Здоровье бойцов, приведённое к ролям (challenger/opponent), а не к "кто бьёт":
+     * attacker/defender меняют смысл в зависимости от хода, из-за этого полоски HP
+     * на фронте прыгали между бойцами.
+     */
+    challengerHealth?: number;
+    challengerMaxHealth?: number;
+    opponentHealth?: number;
+    opponentMaxHealth?: number;
     effect?: string;
 }
 
@@ -159,7 +168,9 @@ export async function startFight(
         while (challengerHP > 0 && opponentHP > 0 && turn <= 25) {
             // === Challenger turn ===
             if (challengerStun > 0) {
-                events.push(createEvent('stun', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
+                // Именно претендент пропускает ход, поэтому событие помечаем stun_skip,
+                // иначе сообщение называет оглушённым противника.
+                events.push(createEvent('stun_skip', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
                 challengerStun--;
             } else {
                 // Poison damage
@@ -167,7 +178,7 @@ export async function startFight(
                     const poisonDmg = Math.floor(maxChallengerHP * 0.05);
                     challengerHP = Math.max(1, challengerHP - poisonDmg);
                     challengerPoison--;
-                    events.push(createEvent('poison', turn, challenger._id.toString(), challengerName, opponentName, poisonDmg, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
+                    events.push(createEvent('poison_tick', turn, challenger._id.toString(), challengerName, opponentName, poisonDmg, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
                 }
 
                 // Combo tracking
@@ -181,13 +192,13 @@ export async function startFight(
                     events.push(createEvent('miss', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
                 } else if (hit.isDodge) {
                     dodgeCount++;
-                    events.push(createEvent('dodge', turn, opponent._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
+                    events.push(createEvent('dodge', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
                 } else if (hit.isBlock) {
                     const blockedDmg = Math.floor(hit.damage * 0.6);
                     const actualDmg = hit.damage - blockedDmg;
                     opponentHP = Math.max(0, opponentHP - actualDmg);
                     totalChallengerDmgDealt += actualDmg;
-                    events.push(createEvent('block', turn, opponent._id.toString(), challengerName, opponentName, actualDmg, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
+                    events.push(createEvent('block', turn, challenger._id.toString(), challengerName, opponentName, actualDmg, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
                 } else {
                     opponentHP = Math.max(0, opponentHP - hit.damage);
                     totalChallengerDmgDealt += hit.damage;
@@ -204,8 +215,9 @@ export async function startFight(
                     }
 
                     // Stun chance (8% if crit, 4% otherwise)
+                    // Мёртвый противник не может быть оглушён или отравлен
                     const stunChance = hit.isCrit ? 0.08 : 0.04;
-                    if (Math.random() < stunChance && opponentStun === 0) {
+                    if (opponentHP > 0 && Math.random() < stunChance && opponentStun === 0) {
                         opponentStun = 1;
                         events.push(createEvent('stun', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
                     }
@@ -213,7 +225,7 @@ export async function startFight(
                     // Poison chance from intelligence
                     const intStat = challenger.combatStats?.intelligence || 1;
                     const poisonChance = Math.min(0.20, intStat / 25);
-                    if (Math.random() < poisonChance && opponentPoison === 0) {
+                    if (opponentHP > 0 && Math.random() < poisonChance && opponentPoison === 0) {
                         opponentPoison = 3;
                         events.push(createEvent('poison', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
                     }
@@ -228,14 +240,14 @@ export async function startFight(
 
             // === Opponent counter-turn ===
             if (opponentStun > 0) {
-                events.push(createEvent('stun', turn, opponent._id.toString(), opponentName, challengerName, 0, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
+                events.push(createEvent('stun_skip', turn, opponent._id.toString(), opponentName, challengerName, 0, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
                 opponentStun--;
             } else {
                 if (opponentPoison > 0) {
                     const poisonDmg = Math.floor(maxOpponentHP * 0.05);
                     opponentHP = Math.max(1, opponentHP - poisonDmg);
                     opponentPoison--;
-                    events.push(createEvent('poison', turn, opponent._id.toString(), opponentName, challengerName, poisonDmg, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
+                    events.push(createEvent('poison_tick', turn, opponent._id.toString(), opponentName, challengerName, poisonDmg, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
                 }
 
                 const hit2 = calculateDamageRaw(opponent, challenger, opponentStats, challenger.combatStats);
@@ -244,13 +256,13 @@ export async function startFight(
                     events.push(createEvent('miss', turn, opponent._id.toString(), opponentName, challengerName, 0, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
                 } else if (hit2.isDodge) {
                     dodgeCount++;
-                    events.push(createEvent('dodge', turn, challenger._id.toString(), opponentName, challengerName, 0, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
+                    events.push(createEvent('dodge', turn, opponent._id.toString(), opponentName, challengerName, 0, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
                 } else if (hit2.isBlock) {
                     const blockedDmg = Math.floor(hit2.damage * 0.6);
                     const actualDmg = hit2.damage - blockedDmg;
                     challengerHP = Math.max(0, challengerHP - actualDmg);
                     totalOpponentDmgDealt += actualDmg;
-                    events.push(createEvent('block', turn, challenger._id.toString(), opponentName, challengerName, actualDmg, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
+                    events.push(createEvent('block', turn, opponent._id.toString(), opponentName, challengerName, actualDmg, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
                 } else {
                     challengerHP = Math.max(0, challengerHP - hit2.damage);
                     totalOpponentDmgDealt += hit2.damage;
@@ -263,13 +275,23 @@ export async function startFight(
                     }
 
                     // Counter-attack chance from agility
+                    // Контрудар только если боец ещё жив: раньше убитый игрок бил в ответ,
+                    // и лог боя заканчивался не «finish», а «counter»
                     const agiStat = challenger.combatStats?.agility || 1;
                     const counterChance = Math.min(0.30, agiStat / 10);
-                    if (Math.random() < counterChance) {
+                    if (challengerHP > 0 && Math.random() < counterChance) {
                         const counterDmg = calculateCounterDamage(challenger, hit2.damage);
                         opponentHP = Math.max(0, opponentHP - counterDmg);
                         totalChallengerDmgDealt += counterDmg;
                         events.push(createEvent('counter', turn, challenger._id.toString(), challengerName, opponentName, counterDmg, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
+
+                        // Контрудар мог добить противника: закрываем бой здесь же,
+                        // иначе лог заканчивался событием counter без finish
+                        if (opponentHP <= 0) {
+                            winnerId = challenger._id;
+                            events.push(createEvent('finish', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, 0, maxOpponentHP));
+                            break;
+                        }
                     }
                 }
 
@@ -325,6 +347,9 @@ export async function startFight(
             await TaskService.updateQuestProgress(challenger, 'pvp_win', 1);
         }
 
+        // Приводим здоровье в логе к ролям бойцов (challenger/opponent).
+        const normalizedEvents = toRoleBasedLog(events, challenger._id.toString());
+
         // Create match record
         const match = new ArenaMatch({
             challengerId,
@@ -340,7 +365,7 @@ export async function startFight(
                 combatPower: opponent.combatStats?.combatPower || 10
             },
             rewards,
-            matchLog: events,
+            matchLog: normalizedEvents,
             stats: {
                 totalTurns: turn - 1,
                 totalDamageDealt: totalChallengerDmgDealt,
@@ -363,7 +388,7 @@ export async function startFight(
             opponentMaxHealth: maxOpponentHP,
             difficulty,
             rewards,
-            matchLog: events,
+            matchLog: normalizedEvents,
             stats: {
                 totalTurns: turn - 1,
                 totalDamageDealt: totalChallengerDmgDealt,
@@ -528,4 +553,24 @@ function createEvent(
         attackerMaxHealth: attackerMaxHP,
         defenderMaxHealth: defenderMaxHP,
     };
+}
+
+/**
+ * Приводит здоровье в логе боя к ролям бойцов (challenger/opponent).
+ *
+ * В событиях поля attacker/defender зависят от того, кто бьёт в этом ходу, поэтому
+ * клиент не мог однозначно понять, чья полоска здоровья, и HP «прыгал» между бойцами.
+ * Ожидает, что attackerId в событии — тот, кто бьёт (striker).
+ */
+export function toRoleBasedLog(events: BattleEvent[], challengerId: string): BattleEvent[] {
+    return events.map((event) => {
+        const challengerIsStriker = event.attackerId === challengerId;
+        return {
+            ...event,
+            challengerHealth: challengerIsStriker ? event.attackerHealth : event.defenderHealth,
+            challengerMaxHealth: challengerIsStriker ? event.attackerMaxHealth : event.defenderMaxHealth,
+            opponentHealth: challengerIsStriker ? event.defenderHealth : event.attackerHealth,
+            opponentMaxHealth: challengerIsStriker ? event.defenderMaxHealth : event.attackerMaxHealth,
+        };
+    });
 }

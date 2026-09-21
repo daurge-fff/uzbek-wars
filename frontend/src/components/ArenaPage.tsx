@@ -19,7 +19,7 @@ interface Opponent {
 }
 
 interface MatchEvent {
-    type: 'attack' | 'crit' | 'dodge' | 'counter' | 'block' | 'combo' | 'miss' | 'finish' | 'stun' | 'poison' | 'heal';
+    type: 'attack' | 'crit' | 'dodge' | 'counter' | 'block' | 'combo' | 'miss' | 'finish' | 'stun' | 'stun_skip' | 'poison' | 'poison_tick' | 'heal';
     turn: number;
     attackerId: string;
     attackerName: string;
@@ -29,6 +29,11 @@ interface MatchEvent {
     defenderHealth: number;
     attackerMaxHealth: number;
     defenderMaxHealth: number;
+    /** HP в ролях бойцов — не зависят от того, кто бьёт */
+    challengerHealth?: number;
+    challengerMaxHealth?: number;
+    opponentHealth?: number;
+    opponentMaxHealth?: number;
 }
 
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -48,6 +53,10 @@ export const ArenaPage = () => {
     const [matchResult, setMatchResult] = useState<{
         winnerId: string;
         isWinner?: boolean;
+        challengerName?: string;
+        opponentName?: string;
+        challengerMaxHealth?: number;
+        opponentMaxHealth?: number;
         difficulty: Difficulty;
         rewards: { soms: number; experience: number; ratingPoints: number; energyCost: number; healthCost: number; somsCost: number };
         matchLog: MatchEvent[];
@@ -120,21 +129,25 @@ export const ArenaPage = () => {
             case 'attack':
                 return t('battle.event_attack', '{{attacker}} наносит удар по {{defender}} на {{damage}} урона', { attacker: attackerName, defender: defenderName, damage });
             case 'crit':
-                return t('battle.event_crit', '💥 КРИТ! {{attacker}} пробивает защиту {{defender}} на {{damage}} урона!', { attacker: attackerName, defender: defenderName, damage });
+                return t('battle.event_crit', 'КРИТ! {{attacker}} пробивает защиту {{defender}} на {{damage}} урона!', { attacker: attackerName, defender: defenderName, damage });
             case 'dodge':
-                return t('battle.event_dodge', '💨 {{defender}} ловко уворачивается от выпада {{attacker}}!', { attacker: attackerName, defender: defenderName });
+                return t('battle.event_dodge', '{{defender}} ловко уворачивается от выпада {{attacker}}!', { attacker: attackerName, defender: defenderName });
             case 'counter':
-                return t('battle.event_counter', '⚡ {{attacker}} наносит контрудар на {{damage}} урона!', { attacker: attackerName, defender: defenderName, damage });
+                return t('battle.event_counter', '{{attacker}} наносит контрудар на {{damage}} урона!', { attacker: attackerName, defender: defenderName, damage });
             case 'block':
-                return t('battle.event_block', '🛡️ {{defender}} блокирует часть атаки! Получает {{damage}} урона', { attacker: attackerName, defender: defenderName, damage });
+                return t('battle.event_block', '{{defender}} блокирует часть атаки! Получает {{damage}} урона', { attacker: attackerName, defender: defenderName, damage });
             case 'miss':
-                return t('battle.event_miss', '❌ {{attacker}} промахивается!', { attacker: attackerName, defender: defenderName });
+                return t('battle.event_miss', '{{attacker}} промахивается!', { attacker: attackerName, defender: defenderName });
             case 'stun':
-                return t('battle.event_stun', '💫 {{defender}} оглушён и пропускает ход!', { attacker: attackerName, defender: defenderName });
+                return t('battle.event_stun', '{{defender}} оглушён и пропускает ход!', { attacker: attackerName, defender: defenderName });
+            case 'stun_skip':
+                return t('battle.event_stun_skip', '{{attacker}} оглушён и пропускает ход!', { attacker: attackerName, defender: defenderName });
             case 'poison':
-                return t('battle.event_poison', '☠️ {{defender}} отравлен! Теряет здоровье', { attacker: attackerName, defender: defenderName });
+                return t('battle.event_poison', '{{defender}} отравлен! Теряет здоровье', { attacker: attackerName, defender: defenderName });
+            case 'poison_tick':
+                return t('battle.event_poison_tick', '{{attacker}} теряет здоровье от яда', { attacker: attackerName, defender: defenderName });
             case 'finish':
-                return t('battle.event_finish', '⚡ {{attacker}} наносит решающий удар!', { attacker: attackerName, defender: defenderName });
+                return t('battle.event_finish', '{{attacker}} наносит решающий удар!', { attacker: attackerName, defender: defenderName });
             default:
                 return '';
         }
@@ -149,7 +162,9 @@ export const ArenaPage = () => {
             case 'block': return '🛡️';
             case 'miss': return '❌';
             case 'stun': return '💫';
+            case 'stun_skip': return '💫';
             case 'poison': return '☠️';
+            case 'poison_tick': return '☠️';
             case 'finish': return '💀';
             default: return '⚔️';
         }
@@ -158,22 +173,16 @@ export const ArenaPage = () => {
     // === BATTLE ANIMATION VIEW ===
     if (fighting && matchResult) {
         const currentEvent = matchResult?.matchLog?.[currentLogIndex];
-        const challengerMax = (matchResult as any)?.challengerMaxHealth || 55;
-        const opponentMax = (matchResult as any)?.opponentMaxHealth || 55;
-        const challengerName = (matchResult as any)?.challengerName || (player as any)?.displayName || t('arena.you', 'Вы');
-        const opponentNameVal = (matchResult as any)?.opponentName || t('arena.opponent', 'Соперник');
+        const challengerMax = matchResult?.challengerMaxHealth || currentEvent?.challengerMaxHealth || 55;
+        const opponentMax = matchResult?.opponentMaxHealth || currentEvent?.opponentMaxHealth || 55;
+        const challengerName = matchResult?.challengerName || t('arena.you', 'Вы');
+        const opponentNameVal = matchResult?.opponentName || t('arena.opponent', 'Соперник');
 
-        // Use event HP values or fall back to max
-        const playerHP = currentEvent
-            ? (currentEvent.attackerId === player?.id || currentEvent.attackerId === (player as any)?._id)
-                ? currentEvent.attackerHealth
-                : currentEvent.defenderHealth
-            : challengerMax;
-        const opponentHPVal = currentEvent
-            ? (currentEvent.attackerId === player?.id || currentEvent.attackerId === (player as any)?._id)
-                ? currentEvent.defenderHealth
-                : currentEvent.attackerHealth
-            : opponentMax;
+        // HP берём в ролях бойцов (challenger/opponent): бой всегда начинает игрок,
+        // поэтому слева он, справа — противник. Поля attacker*/defender* меняют смысл
+        // каждый ход, из-за этого полоски здоровья прыгали между бойцами.
+        const playerHP = currentEvent?.challengerHealth ?? challengerMax;
+        const opponentHPVal = currentEvent?.opponentHealth ?? opponentMax;
 
         const challengerPercent = Math.max(0, Math.min(100, Math.round((playerHP / challengerMax) * 100)));
         const opponentPercent = Math.max(0, Math.min(100, Math.round((opponentHPVal / opponentMax) * 100)));
@@ -240,7 +249,7 @@ export const ArenaPage = () => {
                                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                                 className="text-gray-200 font-medium text-sm leading-relaxed"
                             >
-                                {currentEvent ? getEventMessage(currentEvent) : t('arena.preparing', 'Бойцы выходят на арену...')}
+                                {currentEvent ? `${getEventEmoji(currentEvent.type)} ${getEventMessage(currentEvent)}` : t('arena.preparing', 'Бойцы выходят на арену...')}
                             </motion.p>
                         </AnimatePresence>
                     </div>
@@ -503,37 +512,35 @@ export const ArenaPage = () => {
                                 whileHover={{ scale: 1.02 }}
                                 className="bg-white dark:bg-gray-800 rounded-3xl p-4 shadow-lg border border-gray-100 dark:border-gray-700"
                             >
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-2xl shadow-inner shrink-0">
-                                        <Emoji emoji={opp.characterId === 'char_warrior' ? '⚔️' : '👤'} size={24} />
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/15 to-purple-500/15 dark:from-indigo-500/25 dark:to-purple-500/25 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center shadow-inner shrink-0">
+                                        <Emoji emoji={opp.characterId === 'char_warrior' ? '⚔️' : '👤'} size={28} />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-black text-gray-900 dark:text-white text-sm uppercase truncate">
+                                        <h3 className="font-black text-gray-900 dark:text-white text-base truncate">
                                             {opp.userId?.displayName || opp.characterId.split('_')[1]}
                                         </h3>
-                                        <div className="flex items-center gap-2 text-xs font-bold text-gray-500">
-                                            <span>Lvl {opp.level}</span>
-                                            <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                                            <span className="text-indigo-500">⚔️ {opp.combatStats.combatPower}</span>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[10px] font-black">
+                                                LVL {opp.level}
+                                            </span>
+                                            <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-black">
+                                                ⚔️ {opp.combatStats.combatPower}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between gap-2">
-                                    <div className="text-[10px] text-gray-400 font-mono">
-                                        ×{diffInfo.somsCost === 50 ? '0.7' : diffInfo.somsCost === 150 ? '1.0' : '1.4'}
+                                <button
+                                    onClick={() => handleFight(opp._id)}
+                                    className={`relative overflow-hidden w-full py-3 bg-gradient-to-r ${diffInfo.bgColor} text-white font-black rounded-xl hover:shadow-xl active:scale-95 transition-all text-sm`}
+                                >
+                                    <div className="absolute inset-0 z-0 pointer-events-none">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer-fast" />
                                     </div>
-                                    <button
-                                        onClick={() => handleFight(opp._id)}
-                                        className={`relative overflow-hidden flex-1 py-2.5 bg-gradient-to-r ${diffInfo.bgColor} text-white font-black rounded-xl hover:shadow-xl active:scale-95 transition-all text-sm`}
-                                    >
-                                        <div className="absolute inset-0 z-0 pointer-events-none">
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer-fast" />
-                                        </div>
-                                        <span className="relative z-10 uppercase tracking-wider">
-                                            {t('arena.attack', 'АТАКА')} {diffInfo.emoji}
-                                        </span>
-                                    </button>
-                                </div>
+                                    <span className="relative z-10 uppercase tracking-wider">
+                                        {t('arena.attack', 'АТАКА')} · {t(`arena.difficulty_${selectedDifficulty}`, selectedDifficulty === 'easy' ? 'Лёгкий' : selectedDifficulty === 'medium' ? 'Средний' : 'Сложный')} {diffInfo.emoji}
+                                    </span>
+                                </button>
                             </motion.div>
                         ))}
                     </div>

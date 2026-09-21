@@ -276,12 +276,11 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       if (remaining <= 0) {
         setTimeLeft(0);
         setProgress(100);
-        // Небольшая задержка перед вызовом callback для плавного исчезновения
-        setTimeout(() => {
-          if (onActivityComplete) {
-            onActivityComplete();
-          }
-        }, 300);
+        // Награду запрашиваем сразу, как только таймер дошёл до нуля:
+        // любая задержка здесь видна игроку как «активность закончилась, а награду не дали».
+        if (onActivityComplete) {
+          onActivityComplete();
+        }
         return false; // Останавливаем таймер
       } else {
         setTimeLeft(Math.ceil(remaining / 1000));
