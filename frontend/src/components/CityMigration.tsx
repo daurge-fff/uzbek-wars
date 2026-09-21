@@ -278,7 +278,7 @@ const CityMigration: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative rounded-3xl p-4 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-2xl border border-white/50 dark:border-gray-700/50"
+          className="relative rounded-3xl p-4 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-sm border border-white/50 dark:border-gray-700/50"
         >
           <div className="relative flex items-center justify-center">
             <h1 className="text-2xl font-black text-gray-900 dark:text-white">
@@ -335,7 +335,7 @@ const CityMigration: React.FC = () => {
                 <motion.div 
                   whileHover={{ scale: 1.02, y: -8 }}
                   whileTap={{ scale: 0.98 }}
-                  className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-7 border-2 transition-colors border-blue-200 dark:border-blue-700"
+                  className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-sm p-7 border-2 transition-colors border-blue-200 dark:border-blue-700"
                 >
                   <div className={`w-full h-64 bg-gradient-to-br ${getCityGradient(currentCity.cityId)} rounded-[24px] mb-5 flex flex-col items-center justify-center overflow-hidden shadow-inner relative`}>
                     <motion.img
@@ -441,7 +441,7 @@ const CityMigration: React.FC = () => {
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   className="w-full max-w-[450px] pointer-events-auto"
                 >
-                  <div className="bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 rounded-[32px] p-1 shadow-2xl">
+                  <div className="bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 rounded-[32px] p-1 shadow-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
                       <div className="text-center mb-6">
                         <div className="relative w-28 h-28 mx-auto mb-4 rounded-2xl overflow-hidden shadow-md flex items-center justify-center bg-gray-100 dark:bg-gray-800">

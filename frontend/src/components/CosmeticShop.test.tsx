@@ -4,10 +4,16 @@ import { CosmeticShop } from './CosmeticShop';
 import '../i18n';
 
 const mockItems = [
-  { id: '1', name: 'Tubeteyka', type: 'clothing' as const, rarity: 'common' as const, price: 50, icon: '🎩', owned: false, equipped: false },
-  { id: '2', name: 'Golden Crown', type: 'clothing' as const, rarity: 'legendary' as const, price: 500, icon: '👑', owned: false, equipped: false },
-  { id: '3', name: 'Registan', type: 'background' as const, rarity: 'epic' as const, price: 200, icon: '🕌', owned: true, equipped: true }
+  { id: '1', name: 'Tubeteyka', type: 'clothing' as const, rarity: 'common' as const, priceCrystals: 50, icon: '🎩', owned: false, equipped: false },
+  { id: '2', name: 'Golden Crown', type: 'clothing' as const, rarity: 'legendary' as const, priceCrystals: 500, icon: '👑', owned: false, equipped: false },
+  { id: '3', name: 'Registan', type: 'background' as const, rarity: 'epic' as const, priceCrystals: 200, icon: '🕌', owned: true, equipped: true }
 ];
+
+/** Confirms a purchase through the confirmation modal opened by the item's buy button. */
+const confirmCrystalPurchaseForFirstItem = () => {
+  fireEvent.click(screen.getAllByText('Buy')[0].closest('button')!);
+  return screen.getByText('Buy with crystals').closest('button')!;
+};
 
 describe('CosmeticShop', () => {
   it('renders all cosmetic items', () => {
@@ -70,10 +76,10 @@ describe('CosmeticShop', () => {
       />
     );
 
-    const purchaseButton = screen.getAllByText('💎 50')[0].closest('button');
-    fireEvent.click(purchaseButton!);
+    const purchaseButton = confirmCrystalPurchaseForFirstItem();
+    fireEvent.click(purchaseButton);
 
-    expect(onPurchase).toHaveBeenCalledWith('1');
+    expect(onPurchase).toHaveBeenCalledWith('1', 'crystals');
   });
 
   it('disables purchase button when not enough crystals', () => {
@@ -87,7 +93,7 @@ describe('CosmeticShop', () => {
       />
     );
 
-    const purchaseButton = screen.getAllByText('💎 50')[0].closest('button');
+    const purchaseButton = confirmCrystalPurchaseForFirstItem();
     expect(purchaseButton).toBeDisabled();
   });
 

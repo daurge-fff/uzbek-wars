@@ -3,7 +3,8 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
+import { renderWithProviders as render } from '../test/renderWithProviders';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import '../i18n'; // Initialize i18n for tests
 
@@ -11,11 +12,11 @@ describe('LanguageSwitcher', () => {
   it('renders all language flags', () => {
     render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={vi.fn()} />);
     
-    // Check all flags are visible
-    expect(screen.getByText('🇷🇺')).toBeInTheDocument();
-    expect(screen.getByText('🇺🇿')).toBeInTheDocument();
-    expect(screen.getByText('🇺🇦')).toBeInTheDocument();
-    expect(screen.getByText('🇬🇧')).toBeInTheDocument();
+    // Flags are rendered by the Emoji component as <img alt="<flag>">
+    expect(screen.getByAltText('🇷🇺')).toBeInTheDocument();
+    expect(screen.getByAltText('🇺🇿')).toBeInTheDocument();
+    expect(screen.getByAltText('🇺🇦')).toBeInTheDocument();
+    expect(screen.getByAltText('🇬🇧')).toBeInTheDocument();
   });
 
   it('highlights current language', () => {
@@ -31,7 +32,7 @@ describe('LanguageSwitcher', () => {
     render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={onLanguageChange} />);
     
     // Click on English flag
-    const enButton = screen.getByText('🇬🇧').closest('button');
+    const enButton = screen.getByAltText('🇬🇧').closest('button');
     fireEvent.click(enButton!);
     
     expect(onLanguageChange).toHaveBeenCalledWith('en');
@@ -42,7 +43,7 @@ describe('LanguageSwitcher', () => {
     render(<LanguageSwitcher currentLanguage="ru" onLanguageChange={onLanguageChange} />);
     
     // Click on Uzbek flag
-    const uzButton = screen.getByText('🇺🇿').closest('button');
+    const uzButton = screen.getByAltText('🇺🇿').closest('button');
     fireEvent.click(uzButton!);
     
     expect(onLanguageChange).toHaveBeenCalledWith('uz');

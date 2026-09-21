@@ -39,7 +39,7 @@ export const ActivityResult = ({ isOpen, onClose, result }: ActivityResultProps)
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 50 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-x-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-xl rounded-[32px] shadow-2xl z-50 p-6 max-w-sm mx-auto border border-gray-100"
+            className="fixed inset-x-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-xl rounded-[32px] shadow-sm z-50 p-6 max-w-sm mx-auto border border-gray-100"
           >
             {result.levelUp && (
               <div className="text-center mb-4">

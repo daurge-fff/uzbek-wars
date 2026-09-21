@@ -71,7 +71,7 @@ export const ActivityCard = ({ activity, playerLevel, isAvailable, onExecute }: 
       whileTap={!isDisabled ? { scale: 0.95 } : {}}
       whileHover={!isDisabled ? { scale: 1.02, y: -4 } : {}}
       className={`min-h-touch w-full bg-white/90 backdrop-blur-xl rounded-[24px] shadow-lg p-4 transition-all border border-gray-100 ${
-        isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-2xl'
+        isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-sm'
       }`}
     >
       <div className="mb-2"><Emoji emoji={activity.icon} size={48} /></div>

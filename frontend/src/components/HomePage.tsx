@@ -49,7 +49,7 @@ function FeaturesCarousel({ features }: { features: any[] }) {
             transition={{ duration: 0.3 }}
             className="absolute inset-0"
           >
-            <div className="h-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] p-8 shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center text-center">
+            <div className="h-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] p-8 shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: index === currentIndex ? 1 : 0 }}
@@ -172,10 +172,10 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
   return (
     <div className="relative max-w-md mx-auto">
       {/* iPhone корпус */}
-      <div className="relative bg-gradient-to-b from-gray-800 via-gray-900 to-black rounded-[3.5rem] p-3.5 shadow-2xl">
+      <div className="relative bg-gradient-to-b from-gray-800 via-gray-900 to-black rounded-[3.5rem] p-3.5 shadow-sm">
         {/* Dynamic Island - опущен ниже и серый */}
         <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20">
-          <div className="relative w-[126px] h-[37px] bg-gray-900 rounded-[2rem] shadow-2xl">
+          <div className="relative w-[126px] h-[37px] bg-gray-900 rounded-[2rem] shadow-sm">
             {/* Внутренние элементы Dynamic Island */}
             <div className="absolute inset-0 flex items-center justify-between px-4">
               {/* Камера */}
@@ -197,11 +197,11 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
             : 'bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600'
             }`}>
             {/* Абстрактные формы на обоях */}
-            <div className={`absolute top-10 right-10 w-40 h-40 rounded-full blur-3xl transition-none ${isDark ? 'bg-blue-500/30' : 'bg-white/10'
+            <div className={`absolute top-10 right-10 w-40 h-40 rounded-full hidden transition-none ${isDark ? 'bg-blue-500/30' : 'bg-white/10'
               }`} />
-            <div className={`absolute bottom-20 left-10 w-60 h-60 rounded-full blur-3xl transition-none ${isDark ? 'bg-indigo-500/30' : 'bg-blue-400/10'
+            <div className={`absolute bottom-20 left-10 w-60 h-60 rounded-full hidden transition-none ${isDark ? 'bg-indigo-500/30' : 'bg-blue-400/10'
               }`} />
-            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl transition-none ${isDark ? 'bg-purple-500/30' : 'bg-purple-400/10'
+            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full hidden transition-none ${isDark ? 'bg-purple-500/30' : 'bg-purple-400/10'
               }`} />
           </div>
 
@@ -245,7 +245,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                     onMouseEnter={(e) => handleMouseEnter(item.id, e)}
                     onMouseLeave={() => setActiveTooltip(null)}
                     onClick={() => onNavigate(item.path)}
-                    className="relative w-20 h-20 bg-white/20 backdrop-blur-xl rounded-[1.3rem] shadow-2xl flex items-center justify-center border border-white/30 mb-2 active:bg-white/40 transition-colors duration-100"
+                    className="relative w-20 h-20 bg-white/20 backdrop-blur-xl rounded-[1.3rem] shadow-sm flex items-center justify-center border border-white/30 mb-2 active:bg-white/40 transition-colors duration-100"
                     style={{
                       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
                     }}
@@ -263,7 +263,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
 
             {/* Dock - 3 иконки в ряд как у iPhone */}
             <div className="absolute bottom-8 left-6 right-6">
-              <div className="bg-white/20 backdrop-blur-2xl rounded-[2rem] px-4 py-3 border border-white/30 shadow-2xl">
+              <div className="bg-white/20 backdrop-blur-2xl rounded-[2rem] px-4 py-3 border border-white/30 shadow-sm">
                 <div className="flex justify-around items-center gap-2">
                   {dockItems.map((item) => (
                     <button
@@ -305,7 +305,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
               transform: 'translate(-50%, -100%)',
             }}
           >
-            <div className="bg-gray-900/95 backdrop-blur-xl text-white rounded-xl px-4 py-3 shadow-2xl border border-white/10 whitespace-nowrap">
+            <div className="bg-gray-900/95 backdrop-blur-xl text-white rounded-xl px-4 py-3 shadow-sm border border-white/10 whitespace-nowrap">
               <div className="flex items-center gap-2">
                 <Emoji emoji={item.icon} size={24} />
                 <div>
@@ -345,7 +345,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                   onClick={(e) => e.stopPropagation()}
                   className="w-full max-w-[450px] pointer-events-auto"
                 >
-                  <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-2xl">
+                  <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
                       <div className="text-center mb-4">
                         <div className="mb-3"><Emoji emoji="🏛️" size={72} /></div>
@@ -403,7 +403,7 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   className="w-full max-w-[450px] pointer-events-auto"
                 >
-                  <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-2xl">
+                  <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
                       <div className="text-center mb-6">
                         <motion.div
@@ -605,7 +605,7 @@ export function HomePage() {
             y: [0, -100, 0]
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-40 -left-40 w-96 h-96 bg-gradient-to-br from-purple-400/30 to-pink-400/30 dark:from-purple-600/20 dark:to-pink-600/20 rounded-full blur-3xl"
+          className="absolute -top-40 -left-40 w-96 h-96 bg-gradient-to-br from-purple-400/30 to-pink-400/30 dark:from-purple-600/20 dark:to-pink-600/20 rounded-full hidden"
         />
         <motion.div
           animate={{
@@ -615,20 +615,22 @@ export function HomePage() {
             y: [0, 100, 0]
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-400/30 to-cyan-400/30 dark:from-blue-600/20 dark:to-cyan-600/20 rounded-full blur-3xl"
+          className="absolute -bottom-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-400/30 to-cyan-400/30 dark:from-blue-600/20 dark:to-cyan-600/20 rounded-full hidden"
         />
       </div>
 
       {/* Top Right Controls */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
         {isAuthenticated && user && (
-          <motion.a
-            href="/profile"
+          <motion.button
+            type="button"
+            onClick={() => navigate('/dashboard')}
+            title={t('menu.home', 'Главная')}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all cursor-pointer"
+            className="flex items-center gap-3 bg-white/90 dark:bg-gray-800/90 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 transition-colors cursor-pointer"
           >
             {user.avatar && user.avatar.startsWith('http') ? (
               <img
@@ -647,7 +649,7 @@ export function HomePage() {
             <span className="font-semibold text-gray-900 dark:text-white hidden sm:inline text-sm">
               {user.displayName}
             </span>
-          </motion.a>
+          </motion.button>
         )}
         <ThemeToggle />
       </div>
@@ -711,7 +713,7 @@ export function HomePage() {
               transition={{ delay: 0.5 }}
               className="mb-12"
             >
-              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[28px] p-6 shadow-2xl border border-gray-200 dark:border-gray-700 max-w-md mx-auto relative overflow-hidden">
+              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[28px] p-6 shadow-sm border border-gray-200 dark:border-gray-700 max-w-md mx-auto relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-500/5 dark:via-purple-500/5 dark:to-pink-500/5" />
 
                 <div className="relative">
@@ -829,7 +831,7 @@ export function HomePage() {
             transition={{ delay: 1 }}
             className="max-w-4xl mx-auto"
           >
-            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[28px] p-6 shadow-2xl border border-gray-200 dark:border-gray-700">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[28px] p-6 shadow-sm border border-gray-200 dark:border-gray-700">
               <h3 className="text-xl font-black text-gray-900 dark:text-white mb-4 text-center">
                 {t('home.yourProgress', 'Ваш прогресс')}
               </h3>

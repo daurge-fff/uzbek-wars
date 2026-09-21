@@ -74,7 +74,7 @@ export const ReferralLanding = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 border border-gray-100 dark:border-gray-700"
+        className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-sm p-8 border border-gray-100 dark:border-gray-700"
       >
         {/* Referrer Info */}
         {referrerInfo && (

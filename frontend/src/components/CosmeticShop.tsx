@@ -4,8 +4,10 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { PurchaseConfirmModal } from './PurchaseConfirmModal';
 import Emoji from './Emoji';
+import CosmeticIcon from './CosmeticIcon';
+import { mergeCosmeticItems } from '../utils/cosmetics';
 
-type CosmeticType = 'clothing' | 'background' | 'accessory' | 'combat';
+type CosmeticType = 'clothing' | 'background' | 'accessory' | 'combat' | 'equipment' | 'backpack';
 type CosmeticRarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 interface CosmeticItem {
@@ -16,6 +18,8 @@ interface CosmeticItem {
   priceSoms?: number;
   priceCrystals?: number;
   icon: string;
+  /** Картинка предмета /assets/cosmetics/<id>.png (если файла нет — показываем эмодзи) */
+  imageSrc?: string;
   owned: boolean;
   equipped: boolean;
   stats?: {
@@ -59,7 +63,9 @@ const typeEmojis: Record<CosmeticType, string> = {
   clothing: '👕',
   background: '🖼️',
   accessory: '💎',
-  combat: '⚔️'
+  combat: '⚔️',
+  equipment: '⚔️',
+  backpack: '🎒'
 };
 
 export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, onEquip }: CosmeticShopProps) => {
@@ -71,11 +77,11 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
     item: CosmeticItem | null;
   }>({ isOpen: false, item: null });
 
-  const filteredItems = items ? (filter === 'all'
+  const filteredItems = mergeCosmeticItems(items ? (filter === 'all'
     ? items
     : filter === 'combat'
       ? items.filter(item => item.stats && (item.stats.strength || item.stats.defense || item.stats.agility || item.stats.stamina || item.stats.intelligence || item.stats.luck))
-      : items.filter(item => item.type === filter)) : [];
+      : items.filter(item => item.type === filter)) : []);
 
   const getItemName = (item: CosmeticItem): string => {
     if (typeof item.name === 'object') {
@@ -123,7 +129,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4 pb-32">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-2xl p-6 mb-6 border border-white/50 dark:border-gray-700/50">
+        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-sm p-6 mb-6 border border-white/50 dark:border-gray-700/50">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
               {t('cosmetic.shopTitle', 'Магазин')}
@@ -144,7 +150,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
 
           {/* Filters */}
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            {(['all', 'clothing', 'background', 'accessory', 'combat'] as const).map((type) => (
+            {(['all', 'clothing', 'background', 'accessory', 'equipment', 'backpack', 'combat'] as const).map((type) => (
               <motion.button
                 key={type}
                 whileHover={{ scale: 1.05 }}
@@ -182,7 +188,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.05 }}
-                    className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 relative overflow-hidden w-full ${item.rarity === 'legendary' ? 'shadow-[0_0_20px_rgba(251,191,36,0.2)]' : ''}`}
+                    className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 relative overflow-hidden w-full ${item.rarity === 'legendary' ? '' : ''}`}
                     style={{
                       borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' :
                         rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
@@ -241,7 +247,7 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
                         transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
                         className="relative z-10"
                       >
-                        <Emoji emoji={item.icon} size={72} />
+                        <CosmeticIcon emoji={item.icon} imageSrc={item.imageSrc} size={72} />
                       </motion.div>
                       {item.equipped && (
                         <div className="absolute inset-0 bg-gradient-to-t from-green-500/30 to-transparent" />

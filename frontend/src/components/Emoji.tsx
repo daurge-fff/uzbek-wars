@@ -7,7 +7,7 @@ interface EmojiProps {
   style?: 'apple' | 'google' | 'twitter' | 'facebook' | 'microsoft';
 }
 
-// Маппинг популярных эмодзи на локальные файлы
+// Маппинг популярных эмодзи на локальные файлы (не зависят от сети)
 const emojiToLocalFile: Record<string, string> = {
   '🏆': '/emoji-fallback/trophy.png',
   '👤': '/emoji-fallback/user.png',
@@ -66,44 +66,28 @@ const emojiToLocalFile: Record<string, string> = {
   '🛡️': '/emoji-fallback/shield.png',
 };
 
+/**
+ * Эмодзи как картинка с гарантированным откатом.
+ *
+ * Порядок: локальный файл → CDN → системный эмодзи текстом. Раньше при пустом
+ * значке рендерилась битая картинка (карточка выглядела пустой), а `crossOrigin`
+ * ломал загрузку с CDN, поэтому теперь эмодзи никогда не «пропадает».
+ */
 const Emoji = memo(({ emoji, size = 24, className = '', style = 'apple' }: EmojiProps) => {
-  const [imageError, setImageError] = useState(false);
-  const [fallbackError, setFallbackError] = useState(false);
-  const [useLocal, setUseLocal] = useState(false);
+  const [failedLocal, setFailedLocal] = useState(false);
+  const [failedCdn, setFailedCdn] = useState(false);
 
-  // Локальный fallback файл
-  const localFallback = emojiToLocalFile[emoji];
+  const localFallback = emoji ? emojiToLocalFile[emoji] : undefined;
 
-  // Генерируем URL с использованием emojicdn.elk.sh
-  const imageUrl = useMemo(() => {
-    return `https://emojicdn.elk.sh/${emoji}?style=${style}`;
+  const cdnUrl = useMemo(() => {
+    return `https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=${style}`;
   }, [emoji, style]);
 
-  // Проверяем наличие локального файла при монтировании
-  useMemo(() => {
-    if (localFallback) {
-      // Если есть локальный файл, проверяем его доступность
-      const img = new Image();
-      img.onload = () => setUseLocal(true);
-      img.onerror = () => setUseLocal(false);
-      img.src = localFallback;
-    }
-  }, [localFallback]);
-
-  // Если обе загрузки не удались, показываем текстовый эмодзи
-  if (imageError && (fallbackError || !localFallback)) {
-    return (
-      <span
-        className={`inline-block ${className}`}
-        style={{ fontSize: `${size}px`, lineHeight: 1, verticalAlign: 'middle' }}
-      >
-        {emoji}
-      </span>
-    );
+  if (!emoji) {
+    return null;
   }
 
-  // Если есть локальный файл и он доступен, используем его
-  if (localFallback && (useLocal || imageError)) {
+  if (localFallback && !failedLocal) {
     return (
       <img
         src={localFallback}
@@ -114,25 +98,37 @@ const Emoji = memo(({ emoji, size = 24, className = '', style = 'apple' }: Emoji
         style={{ verticalAlign: 'middle' }}
         loading="lazy"
         decoding="async"
-        onError={() => setFallbackError(true)}
+        onError={() => setFailedLocal(true)}
       />
     );
   }
 
-  // Основная загрузка с CDN (только если нет локального файла)
+  if (!failedCdn) {
+    return (
+      <img
+        src={cdnUrl}
+        alt={emoji}
+        width={size}
+        height={size}
+        className={`inline-block ${className}`}
+        style={{ verticalAlign: 'middle' }}
+        loading="lazy"
+        decoding="async"
+        onError={() => setFailedCdn(true)}
+      />
+    );
+  }
+
+  // Последний уровень: системный эмодзи (работает без картинок вообще)
   return (
-    <img
-      src={imageUrl}
-      alt={emoji}
-      width={size}
-      height={size}
+    <span
+      role="img"
+      aria-label={emoji}
       className={`inline-block ${className}`}
-      style={{ verticalAlign: 'middle' }}
-      loading="lazy"
-      decoding="async"
-      crossOrigin="anonymous"
-      onError={() => setImageError(true)}
-    />
+      style={{ fontSize: `${size}px`, lineHeight: 1, verticalAlign: 'middle' }}
+    >
+      {emoji}
+    </span>
   );
 });
 

@@ -38,7 +38,7 @@ export const LevelUpModal = ({ isOpen, onClose, level, statPoints = 5 }: LevelUp
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               className="w-full max-w-[450px] pointer-events-auto"
             >
-              <div className="bg-gradient-to-br from-yellow-400 via-orange-500 to-pink-500 rounded-[32px] p-1 shadow-2xl">
+              <div className="bg-gradient-to-br from-yellow-400 via-orange-500 to-pink-500 rounded-[32px] p-1 shadow-sm">
                 <div className="bg-white dark:bg-gray-900 rounded-[28px] p-8 relative overflow-hidden">
                   {/* Animated background particles */}
                   <div className="absolute inset-0 overflow-hidden">
@@ -163,7 +163,7 @@ export const LevelUpModal = ({ isOpen, onClose, level, statPoints = 5 }: LevelUp
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={onClose}
-                      className="w-full py-4 bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 text-white font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group"
+                      className="w-full py-4 bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 text-white font-black text-lg rounded-2xl shadow-xl hover:shadow-sm transition-all relative overflow-hidden group"
                     >
                       <motion.div
                         animate={{ x: ['-100%', '200%'] }}

@@ -128,7 +128,10 @@
     "loadingGoogle": "Google yuklanmoqda...",
     "loginRequired": "Iltimos, tizimga kiring",
     "loginToPlay": "O'ynashni boshlash uchun kiring",
-    "loginError": "Kirish xatosi"
+    "loginError": "Kirish xatosi",
+    "confirmLogout": "Chiqishni xohlaysizmi?",
+    "loggingOut": "Tizimdan chiqish...",
+    "redirectingHome": "Bosh sahifaga yo'naltirilmoqda..."
   },
   "cities": {
     "select": "Shaharni tanlang",
@@ -217,7 +220,9 @@
       "clothing": "Kiyim",
       "background": "Fonlar",
       "accessory": "Aksessuarlar",
-      "combat": "⚔️ Jang"
+      "combat": "⚔️ Jang",
+      "backpack": "Ryukzaklar",
+      "equipment": "Jihozlar"
     },
     "rarity": {
       "common": "Oddiy",
@@ -263,7 +268,35 @@
     "settings": "Sozlamalar",
     "settingsDesc": "Parametrlar",
     "donate": "Donat",
-    "donateDesc": "Qo'llab-quvvatlash"
+    "donateDesc": "Qo'llab-quvvatlash",
+    "about": "O'yin haqida",
+    "aboutText": "Buyuk ipak yo'lining afsonasiga aylan! O'zbekistonning qadimiy shaharlarini kashf et, qahramoningni rivojlantir, savdo qil, jang qil va boshqalar bilan raqobatlash.",
+    "achievements": "Yutuqlar",
+    "achievementsDesc": "Sening maqsadlaring",
+    "allRightsReserved": "Barcha huquqlar himoyalangan",
+    "arena": "Arena",
+    "arenaDesc": "Boshqalar bilan jang qil",
+    "changelog": "Versiyalar tarixi",
+    "contact": "Aloqa",
+    "crafting": "Hunarmandchilik",
+    "craftingDesc": "Buyumlar yarat",
+    "developer": "Dasturchi",
+    "developerText": "O'yin O'zbekiston tarixi va madaniyatiga muhabbat bilan yaratilgan.",
+    "developerTitle": "Dasturchi",
+    "releaseDate": "Chiqarilgan sana",
+    "tutorial": "Qo'llanma",
+    "tutorialStep1": "Google orqali kir",
+    "tutorialStep1Desc": "Kirish tugmasini bosib, Google akkaunt bilan tasdiqlang",
+    "tutorialStep2": "Ism tanla",
+    "tutorialStep2Desc": "Qahramoningizga noyob ism o'ylab toping",
+    "tutorialStep3": "Shahar tanla",
+    "tutorialStep3Desc": "Samarqand, Buxoro, Toshkent - har bir shahar o'ziga xos",
+    "tutorialStep4": "Faoliyatlarni bajar",
+    "tutorialStep4Desc": "Savdo qil, ishlа, osh tayyorla - tajriba va so'm ol",
+    "tutorialStep5": "Raqobatlash",
+    "tutorialStep5Desc": "Reytingda ko'tarilib, eng yaxshi o'yinchi bo'l",
+    "version": "Versiya",
+    "website": "Veb-sayt"
   },
   "common": {
     "cancel": "Bekor qilish",
@@ -274,7 +307,10 @@
     "close": "Yopish",
     "have": "Sizda",
     "minutes": "daq",
-    "seconds": "son"
+    "seconds": "son",
+    "daysShort": "kun",
+    "hoursShort": "soat",
+    "minutesShort": "daq"
   },
   "name": {
     "title": "Ismingiz nima?",
@@ -319,7 +355,7 @@
     "about": "Ilova haqida",
     "onlineTotal": "Jami onlayn",
     "onlineTotalHint": "Hozir barcha shaharlarda onlayn o'yinchilar",
-    "onlineCity": "Shaharda",
+    "onlineCity": "Shahringizdagi o'yinchilar",
     "onlineCityHint": "Sizning shahringizda onlayn o'yinchilar",
     "uptime": "Ish vaqti",
     "uptimeHint": "Oxirgi server qayta ishga tushirilganidan beri vaqt",
@@ -333,7 +369,9 @@
     "qualityCode": "Kod sifati",
     "fastWork": "Tez ish",
     "thankYou": "Uzbek Wars'dan foydalanganingiz uchun rahmat!",
-    "starOnGithub": "Agar o'yin yoqsa - GitHub'da ⭐ qo'ying"
+    "starOnGithub": "Agar o'yin yoqsa - GitHub'da ⭐ qo'ying",
+    "resetAppConfirm": "Sozlamalarni tiklab, ilova keshini tozalaymizmi? Akkaunt saqlanadi.",
+    "resetAppDone": "Tayyor"
   },
   "language": {
     "select": "Tilni tanlang",
@@ -506,7 +544,9 @@
     "feature4": "Raqobatlashing",
     "feature4Desc": "Reytingda eng yaxshi bo'ling",
     "explore": "Dunyoni kashf eting",
-    "yourProgress": "Sizning progressingiz"
+    "yourProgress": "Sizning progressingiz",
+    "inUzbekistan": "O'zbekistonda",
+    "madeWith": "Muhabbat bilan yaratildi"
   },
   "welcome": {
     "title": "Xush kelibsiz!",
@@ -519,7 +559,8 @@
     "dataLoadingDesc": "Ilova to'g'ri ishlashi uchun 42 MB zarur resurslar yuklanadi",
     "continue": "Davom etish",
     "loading": "Yuklanmoqda...",
-    "preparing": "Ilova tayyorlanmoqda"
+    "preparing": "Ilova tayyorlanmoqda",
+    "oneTime": "Yuklash bir marta bajariladi"
   },
   "legal": {
     "lastUpdated": "Oxirgi yangilanish",
@@ -775,12 +816,31 @@
     "combos": "Kombo",
     "battleStats": "Jang statistikasi",
     "event_stun_skip": "{{attacker}} gangib qoldi va navbatini o'tkazib yubordi!",
-    "event_poison_tick": "{{attacker}} zahar ta'siridan sog'liqni yo'qotdi"
+    "event_poison_tick": "{{attacker}} zahar ta'siridan sog'liqni yo'qotdi",
+    "event_heal": "{{attacker}} {{damage}} sog'liqni tiklaydi!"
   },
   "achievements": {
     "title": "YUTUQLAR",
     "unlocked": "Ochildi",
     "inProgress": "Jarayonda",
     "errorFetch": "Yutuqlarni yuklashda xato"
+  },
+  "crafting": {
+    "craftAction": "HUNARMANDLIK",
+    "error": "Yaratishda xatolik",
+    "errorFetch": "Retseptlarni yuklashda xatolik",
+    "fail": "Buyumni yaratib bo'lmadi",
+    "processing": "YARATILMOQDA...",
+    "requirements": "TALABLAR",
+    "success": "Buyum muvaffaqiyatli yaratildi!",
+    "title": "HUNARMANDLIK",
+    "workshop": "USTAXONA",
+    "workshopDesc": "Materiallardan noyob jihozlar yasang"
+  },
+  "item": {
+    "elite_sword_1": {
+      "description": "Jangchi uchun qudratli qurol",
+      "name": "Elita qilichi"
+    }
   }
 }

@@ -121,7 +121,7 @@ const CharacterCarousel = ({ characters, onSelect }: { characters: any[], onSele
             <motion.div 
               whileHover={{ scale: 1.02, y: -8 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 border-2 border-green-200 dark:border-green-700 transition-colors"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-sm p-6 border-2 border-green-200 dark:border-green-700 transition-colors"
             >
               <div className={`w-full h-60 bg-gradient-to-br ${getCharacterGradient(currentCharacter.id)} dark:bg-gray-700 rounded-[24px] mb-4 flex flex-col items-center justify-center overflow-hidden shadow-inner relative transition-colors`}>
                 <motion.div
@@ -508,7 +508,7 @@ export const OnboardingFlow = () => {
             exit={{ opacity: 0, scale: 0.9 }}
             className="w-full max-w-md"
           >
-            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] p-8 shadow-2xl border border-gray-200 dark:border-gray-700">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] p-8 shadow-sm border border-gray-200 dark:border-gray-700">
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}

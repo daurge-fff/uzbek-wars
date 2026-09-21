@@ -150,7 +150,7 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
             <motion.div 
               whileHover={{ scale: 1.02, y: -8 }}
               whileTap={{ scale: 0.98 }}
-              className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-7 border-2 transition-colors ${
+              className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-sm p-7 border-2 transition-colors ${
                 isAvailable ? 'border-green-200 dark:border-green-700' : 'border-red-200 dark:border-red-700'
               }`}
             >
@@ -258,7 +258,7 @@ export const CitySelection = ({ cities, onSelect }: CitySelectionProps) => {
           disabled={!isAvailable}
           whileHover={isAvailable ? { scale: 1.05, boxShadow: '0 20px 40px rgba(99, 102, 241, 0.3)' } : {}}
           whileTap={isAvailable ? { scale: 0.95 } : {}}
-          className={`w-full text-white font-black py-4 px-8 rounded-[24px] shadow-2xl transition-all ${
+          className={`w-full text-white font-black py-4 px-8 rounded-[24px] shadow-sm transition-all ${
             isAvailable
               ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 cursor-pointer'
               : 'bg-gray-400 cursor-not-allowed opacity-50'

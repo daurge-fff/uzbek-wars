@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
+import { renderWithProviders as render } from '../test/renderWithProviders';
 import { Leaderboard } from './Leaderboard';
-import '../i18n';
+import i18n from '../i18n';
 
 // Mock fetch
 global.fetch = vi.fn();
@@ -49,13 +50,13 @@ describe('Leaderboard', () => {
     render(<Leaderboard />);
     
     await waitFor(() => {
-      expect(screen.getByText(/Рейтинги/i)).toBeInTheDocument();
+      expect(screen.getByText(i18n.t('leaderboard.title'))).toBeInTheDocument();
     });
   });
 
   it('shows loading state initially', () => {
     render(<Leaderboard />);
-    expect(screen.getByText(/Загрузка/i)).toBeInTheDocument();
+    expect(screen.getByText(i18n.t('common.loading'))).toBeInTheDocument();
   });
 
   it('displays players after loading', async () => {
@@ -71,8 +72,9 @@ describe('Leaderboard', () => {
     render(<Leaderboard />);
     
     await waitFor(() => {
-      expect(screen.getByText('🥇')).toBeInTheDocument();
-      expect(screen.getByText('🥈')).toBeInTheDocument();
+      // Medals are rendered by the Emoji component as <img alt="<medal>">
+      expect(screen.getByAltText('🥇')).toBeInTheDocument();
+      expect(screen.getByAltText('🥈')).toBeInTheDocument();
     });
   });
 
@@ -80,9 +82,12 @@ describe('Leaderboard', () => {
     render(<Leaderboard />);
     
     await waitFor(() => {
-      expect(screen.getByText('🏆')).toBeInTheDocument();
-      expect(screen.getByText('💰')).toBeInTheDocument();
-      expect(screen.getByText('💎')).toBeInTheDocument();
+      const categoryButton = (labelKey: string) =>
+        screen.getByText(i18n.t(labelKey)).closest('button')!;
+
+      expect(within(categoryButton('leaderboard.categories.level')).getByAltText('🏆')).toBeInTheDocument();
+      expect(within(categoryButton('leaderboard.categories.soms')).getByAltText('💰')).toBeInTheDocument();
+      expect(within(categoryButton('leaderboard.categories.crystals')).getByAltText('💎')).toBeInTheDocument();
     });
   });
 });

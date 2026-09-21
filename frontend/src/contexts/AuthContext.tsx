@@ -144,7 +144,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.data.player) {
         const updatedPlayer = {
-          id: response.data.player.userId,
+          // id = документ Player (а не userId): именно его сравнивают логи боя
+          // и таблица рейтинга, раньше сравнения всегда были ложными
+          id: response.data.player.id || response.data.player.userId,
           level: response.data.player.level,
           experience: response.data.player.experience,
           soms: response.data.player.soms,

@@ -591,29 +591,27 @@ const ReferralPanelWithData = () => {
 
 const PlayerProfileWithData = () => {
   const { user, player } = useAuth();
-  const [stats, setStats] = useState<any>(null);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        // TODO: GET /api/player/profile
-        setStats({
-          level: player?.level || 1,
-          experience: player?.experience || 0,
-          experienceToNextLevel: 100,
-          soms: player?.soms || 0,
-          crystals: player?.donationCurrency || 0,
-          totalActivities: 0,
-          daysPlayed: 0,
-          achievements: 0
-        });
-      } catch (error) {
-        console.error('Failed to fetch profile:', error);
-      }
-    };
-
-    fetchProfile();
-  }, [player]);
+  // Статы считаем сразу из данных игрока. Раньше они приходили из useEffect,
+  // первый рендер был со stats=null → страница профиля падала в белый экран.
+  const stats = {
+    level: player?.level || 1,
+    experience: player?.experience || 0,
+    experienceToNextLevel: 100,
+    soms: player?.soms || 0,
+    crystals: player?.donationCurrency || 0,
+    totalActivities: 0,
+    daysPlayed: 0,
+    achievements: 0,
+    strength: player?.stats?.strength,
+    defense: player?.stats?.defense,
+    agility: player?.stats?.agility,
+    stamina: player?.stats?.stamina,
+    intelligence: player?.stats?.intelligence,
+    luck: player?.stats?.luck,
+    statPoints: player?.stats?.statPoints,
+    combatPower: player?.stats?.combatPower,
+  };
 
   const playerInfo = {
     username: user?.displayName || 'Player',
@@ -684,15 +682,8 @@ const SettingsWithI18n = () => {
         setAppStats(response.data);
       } catch (error) {
         console.error('Failed to fetch app stats:', error);
-        // Fallback данные
-        setAppStats({
-          uptime: 0,
-          lastRestart: new Date().toISOString(),
-          onlinePlayersTotal: 0,
-          onlinePlayersCity: 0,
-          cityName: player?.cityId || 'samarkand',
-          version: '1.2.1'
-        });
+        // Честно показываем «—», а не нули: раньше ошибка выглядела как «0 игроков онлайн»
+        setAppStats(null);
       }
     };
 

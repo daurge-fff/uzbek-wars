@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { renderWithProviders as render } from '../test/renderWithProviders';
 import { GameDashboard } from './GameDashboard';
+import i18n from '../i18n';
 
 const mockPlayerState = {
   characterId: 'char1',
@@ -34,7 +36,7 @@ describe('GameDashboard', () => {
       />
     );
     
-    expect(screen.getByText('5')).toBeDefined();
+    expect(screen.getByText(`${i18n.t('dashboard.level')} ${mockPlayerState.level}`)).toBeDefined();
   });
 
   it('displays player experience', () => {
@@ -47,7 +49,11 @@ describe('GameDashboard', () => {
       />
     );
     
-    expect(screen.getByText(/450\/506/)).toBeDefined();
+    // Experience is rendered as progress towards the next level.
+    const expectedPercent = `${Math.round(
+      (mockPlayerState.experience / mockPlayerState.experienceToNextLevel) * 100
+    )}%`;
+    expect(screen.getByText(expectedPercent)).toBeDefined();
   });
 
   it('displays soms amount', () => {
@@ -60,6 +66,6 @@ describe('GameDashboard', () => {
       />
     );
     
-    expect(screen.getByText(/1250/)).toBeDefined();
+    expect(screen.getByText(mockPlayerState.soms.toLocaleString())).toBeDefined();
   });
 });

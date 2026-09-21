@@ -78,7 +78,7 @@ function mockPlayers() {
     return { challenger, opponent };
 }
 
-function assertMonotonic(log: BattleEvent[], challengerMax: number, opponentMax: number) {
+function assertHpInvariants(log: BattleEvent[], challengerMax: number, opponentMax: number) {
     let prevChallenger = challengerMax;
     let prevOpponent = opponentMax;
 
@@ -86,11 +86,19 @@ function assertMonotonic(log: BattleEvent[], challengerMax: number, opponentMax:
         expect(typeof event.challengerHealth).toBe('number');
         expect(typeof event.opponentHealth).toBe('number');
 
-        // HP никогда не больше максимума и не растёт
+        // HP никогда не больше максимума
         expect(event.challengerHealth!).toBeLessThanOrEqual(challengerMax);
         expect(event.opponentHealth!).toBeLessThanOrEqual(opponentMax);
-        expect(event.challengerHealth!).toBeLessThanOrEqual(prevChallenger);
-        expect(event.opponentHealth!).toBeLessThanOrEqual(prevOpponent);
+
+        // Второе дыхание (heal) — единственное событие, которое поднимает здоровье,
+        // и только своему бойцу. Всё остальное здоровье только уменьшает.
+        const healedIsChallenger = event.type === 'heal' && event.attackerId === CHALLENGER_ID;
+        const healedIsOpponent = event.type === 'heal' && event.attackerId !== CHALLENGER_ID;
+
+        expect(event.challengerHealth!).toBeLessThanOrEqual(healedIsChallenger ? challengerMax : prevChallenger);
+        expect(event.opponentHealth!).toBeLessThanOrEqual(healedIsOpponent ? opponentMax : prevOpponent);
+        if (healedIsChallenger) expect(event.challengerHealth!).toBeGreaterThanOrEqual(prevChallenger);
+        if (healedIsOpponent) expect(event.opponentHealth!).toBeGreaterThanOrEqual(prevOpponent);
 
         // Значения должны совпадать с HP того, кто бьёт, без перестановок
         const challengerIsStriker = event.attackerId === CHALLENGER_ID;
@@ -107,14 +115,14 @@ function assertMonotonic(log: BattleEvent[], challengerMax: number, opponentMax:
 }
 
 describe('ArenaService battle log', () => {
-    it('returns role-based HP that decreases monotonically (many random battles)', async () => {
+    it('returns role-based HP with no unexplained jumps (many random battles)', async () => {
         for (let battle = 0; battle < 200; battle++) {
             mockPlayers();
 
             const result = await startFight(CHALLENGER_ID, OPPONENT_ID, 'medium');
 
             expect(result.matchLog.length).toBeGreaterThan(0);
-            assertMonotonic(
+            assertHpInvariants(
                 result.matchLog as BattleEvent[],
                 result.challengerMaxHealth,
                 result.opponentMaxHealth

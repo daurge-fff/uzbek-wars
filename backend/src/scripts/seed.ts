@@ -8,6 +8,7 @@ import { Player } from '../models/Player';
 import { logger } from '../utils/logger';
 import { CHARACTERS } from '../data/characters';
 import { Quest } from '../models/Quest';
+import { GLOBAL_QUESTS } from '../data/quests';
 import { DailyTask } from '../models/DailyTask';
 
 /**
@@ -950,78 +951,7 @@ async function seedDevUser(): Promise<void> {
 async function seedQuests(): Promise<void> {
   logger.info('Seeding quests...');
 
-  const quests = [
-    {
-      id: 'quest_village_hero',
-      name: {
-        ru: 'Герой махалли',
-        uz: 'Mahalla qahramoni',
-        uk: 'Герой махаллі',
-        en: 'Village Hero'
-      },
-      description: {
-        ru: 'Начни свой путь великого воина. Выполни свои первые поручения.',
-        uz: 'Buyuk jangchi yo\'lingni boshla. Birinchi topshiriqlaringni bajar.',
-        uk: 'Почни свій шлях великого воїна. Виконай свої перші доручення.',
-        en: 'Start your journey as a great warrior. Complete your first tasks.'
-      },
-      requirements: { level: 1 },
-      steps: [
-        {
-          id: 'step_1',
-          description: {
-            ru: 'Выполни 3 любые активности',
-            uz: 'Har qanday 3 ta faoliyatni bajar',
-            uk: 'Виконай 3 будь-які активності',
-            en: 'Complete any 3 activities'
-          },
-          targetValue: 3,
-          type: 'activity_count'
-        }
-      ],
-      rewards: {
-        experience: 500,
-        soms: 2000,
-        crystals: 10
-      },
-      isGlobal: true
-    },
-    {
-      id: 'quest_arena_novice',
-      name: {
-        ru: 'Новичок арены',
-        uz: 'Arena yangi ishtirokchisi',
-        uk: 'Новачок арени',
-        en: 'Arena Novice'
-      },
-      description: {
-        ru: 'Покажи свою силу в честном бою на арене.',
-        uz: 'Arenada halol jangda o\'z kuchingni ko\'rsat.',
-        uk: 'Покажи свою силу в чесному бою на арені.',
-        en: 'Show your strength in a fair fight in the arena.'
-      },
-      requirements: { level: 2 },
-      steps: [
-        {
-          id: 'step_1',
-          description: {
-            ru: 'Одержи 1 победу на арене',
-            uz: 'Arenada 1 ta g\'alabaga erish',
-            uk: 'Здобудь 1 перемогу на арені',
-            en: 'Win 1 fight in the arena'
-          },
-          targetValue: 1,
-          type: 'pvp_win'
-        }
-      ],
-      rewards: {
-        experience: 1000,
-        soms: 5000,
-        crystals: 50
-      },
-      isGlobal: true
-    }
-  ];
+  const quests = GLOBAL_QUESTS;
 
   for (const questData of quests) {
     await Quest.findOneAndUpdate(

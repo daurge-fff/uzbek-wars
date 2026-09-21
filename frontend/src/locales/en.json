@@ -98,7 +98,8 @@
     "googleNotConfigured": "Google OAuth not configured. Add VITE_GOOGLE_CLIENT_ID to .env",
     "userInfoError": "Failed to get user information",
     "tokenError": "Token error",
-    "oauthError": "OAuth error"
+    "oauthError": "OAuth error",
+    "confirmLogout": "Are you sure you want to log out?"
   },
   "cities": {
     "select": "Select City",
@@ -187,7 +188,9 @@
       "clothing": "Clothing",
       "background": "Backgrounds",
       "accessory": "Accessories",
-      "combat": "⚔️ Combat"
+      "combat": "⚔️ Combat",
+      "backpack": "Backpacks",
+      "equipment": "Equipment"
     },
     "rarity": {
       "common": "Common",
@@ -233,7 +236,35 @@
     "settings": "Settings",
     "settingsDesc": "Parameters",
     "donate": "Donate",
-    "donateDesc": "Support"
+    "donateDesc": "Support",
+    "about": "About the game",
+    "aboutText": "Become a legend of the Great Silk Road! Explore the ancient cities of Uzbekistan, grow your character, trade, fight and compete with other players.",
+    "achievements": "Achievements",
+    "achievementsDesc": "Your goals",
+    "allRightsReserved": "All rights reserved",
+    "arena": "Arena",
+    "arenaDesc": "Fight other players",
+    "changelog": "Version history",
+    "contact": "Contact",
+    "crafting": "Crafting",
+    "craftingDesc": "Create items",
+    "developer": "Developer",
+    "developerText": "The game is made with love for the history and culture of Uzbekistan.",
+    "developerTitle": "Developer",
+    "releaseDate": "Release date",
+    "tutorial": "Tutorial",
+    "tutorialStep1": "Sign in with Google",
+    "tutorialStep1Desc": "Press the login button and authorise with your Google account",
+    "tutorialStep2": "Pick a name",
+    "tutorialStep2Desc": "Come up with a unique name for your character",
+    "tutorialStep3": "Pick a city",
+    "tutorialStep3Desc": "Samarkand, Bukhara, Tashkent — every city is unique",
+    "tutorialStep4": "Run activities",
+    "tutorialStep4Desc": "Trade, work, cook plov — earn experience and soms",
+    "tutorialStep5": "Compete",
+    "tutorialStep5Desc": "Climb the leaderboard and become the best player",
+    "version": "Version",
+    "website": "Website"
   },
   "common": {
     "cancel": "Cancel",
@@ -244,7 +275,10 @@
     "close": "Close",
     "have": "You have",
     "minutes": "min",
-    "seconds": "sec"
+    "seconds": "sec",
+    "daysShort": "d",
+    "hoursShort": "h",
+    "minutesShort": "m"
   },
   "name": {
     "title": "What's your name?",
@@ -289,7 +323,7 @@
     "about": "About",
     "onlineTotal": "Online total",
     "onlineTotalHint": "Players online right now in all cities",
-    "onlineCity": "In",
+    "onlineCity": "Players in your city",
     "onlineCityHint": "Players online in your city",
     "uptime": "Uptime",
     "uptimeHint": "Time since last server restart",
@@ -303,7 +337,9 @@
     "qualityCode": "Code quality",
     "fastWork": "Fast work",
     "thankYou": "Thank you for using Uzbek Wars!",
-    "starOnGithub": "If you like the game - give us a ⭐ on GitHub"
+    "starOnGithub": "If you like the game - give us a ⭐ on GitHub",
+    "resetAppConfirm": "Reset settings and clear the app cache? You will stay signed in.",
+    "resetAppDone": "Done"
   },
   "language": {
     "select": "Select Language",
@@ -529,7 +565,8 @@
     "dataLoadingDesc": "42 MB of necessary resources will be downloaded for the app to work correctly",
     "continue": "Continue",
     "loading": "Loading...",
-    "preparing": "Preparing the app"
+    "preparing": "Preparing the app",
+    "oneTime": "The download happens only once"
   },
   "legal": {
     "lastUpdated": "Last updated",
@@ -785,12 +822,31 @@
     "combos": "Combos",
     "battleStats": "Battle Stats",
     "event_stun_skip": "{{attacker}} is stunned and skips a turn!",
-    "event_poison_tick": "{{attacker}} loses health from poison"
+    "event_poison_tick": "{{attacker}} loses health from poison",
+    "event_heal": "{{attacker}} recovers {{damage}} health!"
   },
   "achievements": {
     "title": "ACHIEVEMENTS",
     "unlocked": "Unlocked",
     "inProgress": "In Progress",
     "errorFetch": "Error loading achievements"
+  },
+  "crafting": {
+    "craftAction": "CRAFT",
+    "error": "Creation error",
+    "errorFetch": "Failed to load recipes",
+    "fail": "Could not create the item",
+    "processing": "CREATING...",
+    "requirements": "REQUIREMENTS",
+    "success": "Item created successfully!",
+    "title": "CRAFTING",
+    "workshop": "WORKSHOP",
+    "workshopDesc": "Craft rare gear from materials"
+  },
+  "item": {
+    "elite_sword_1": {
+      "description": "A powerful weapon for a warrior",
+      "name": "Elite Sword"
+    }
   }
 }

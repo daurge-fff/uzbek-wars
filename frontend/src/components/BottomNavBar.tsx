@@ -57,7 +57,7 @@ export const BottomNavBar = () => {
           <div className="relative rounded-full overflow-hidden">
             {/* Border wrapper */}
             <div className="absolute inset-0 rounded-full bg-gradient-to-b from-gray-300/30 to-gray-200/10 dark:from-white/10 dark:to-transparent p-[1.5px] glass-premium">
-              <div className="w-full h-full rounded-full bg-white/40 dark:bg-black/40 backdrop-blur-3xl" />
+              <div className="w-full h-full rounded-full bg-white/40 dark:bg-black/40 backdrop-blur-md" />
             </div>
 
             {/* Content */}

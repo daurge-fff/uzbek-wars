@@ -272,7 +272,10 @@
     "close": "Закрыть",
     "have": "У вас",
     "minutes": "мин",
-    "seconds": "сек"
+    "seconds": "сек",
+    "daysShort": "д",
+    "hoursShort": "ч",
+    "minutesShort": "м"
   },
   "name": {
     "title": "Как вас зовут?",
@@ -340,7 +343,7 @@
     "about": "О приложении",
     "onlineTotal": "Онлайн всего",
     "onlineTotalHint": "Игроки онлайн прямо сейчас во всех городах",
-    "onlineCity": "В",
+    "onlineCity": "Игроки в городе",
     "onlineCityHint": "Игроки онлайн в твоем городе",
     "uptime": "Время работы",
     "uptimeHint": "Время с последнего перезапуска сервера",
@@ -354,7 +357,9 @@
     "qualityCode": "Качество кода",
     "fastWork": "Быстрая работа",
     "thankYou": "Спасибо за использование Uzbek Wars!",
-    "starOnGithub": "Если нравится игра - поставь ⭐ на GitHub"
+    "starOnGithub": "Если нравится игра - поставь ⭐ на GitHub",
+    "resetAppConfirm": "Сбросить настройки и очистить кэш приложения? Вы останетесь в аккаунте.",
+    "resetAppDone": "Готово"
   },
   "language": {
     "select": "Выберите язык",
@@ -808,7 +813,8 @@
     "combos": "Комбо",
     "battleStats": "Статистика боя",
     "event_stun_skip": "{{attacker}} оглушён и пропускает ход!",
-    "event_poison_tick": "{{attacker}} теряет здоровье от яда"
+    "event_poison_tick": "{{attacker}} теряет здоровье от яда",
+    "event_heal": "{{attacker}} восстанавливает {{damage}} здоровья!"
   },
   "achievements": {
     "title": "ДОСТИЖЕНИЯ",

@@ -145,7 +145,7 @@ export const Leaderboard = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[24px] shadow-2xl p-4 mb-4 border border-gray-200 dark:border-gray-700"
+          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[24px] shadow-sm p-4 mb-4 border border-gray-200 dark:border-gray-700"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <Emoji emoji={currentCategory.emoji} size={36} />

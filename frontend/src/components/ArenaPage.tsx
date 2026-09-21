@@ -100,10 +100,12 @@ export const ArenaPage = () => {
             setMatchResult(data);
 
             // Animate battle log
+            // Бой стал длиннее (больше ходов и событий), поэтому шаг анимации меньше,
+            // иначе просмотр боя занимал бы десятки секунд
             const log = data.matchLog || [];
             for (let i = 0; i < log.length; i++) {
                 setCurrentLogIndex(i);
-                await new Promise(resolve => setTimeout(resolve, 400));
+                await new Promise(resolve => setTimeout(resolve, 250));
             }
 
             setFighting(false);
@@ -146,6 +148,8 @@ export const ArenaPage = () => {
                 return t('battle.event_poison', '{{defender}} отравлен! Теряет здоровье', { attacker: attackerName, defender: defenderName });
             case 'poison_tick':
                 return t('battle.event_poison_tick', '{{attacker}} теряет здоровье от яда', { attacker: attackerName, defender: defenderName });
+            case 'heal':
+                return t('battle.event_heal', '{{attacker}} восстанавливает {{damage}} здоровья!', { attacker: attackerName, defender: defenderName, damage });
             case 'finish':
                 return t('battle.event_finish', '{{attacker}} наносит решающий удар!', { attacker: attackerName, defender: defenderName });
             default:
@@ -165,6 +169,8 @@ export const ArenaPage = () => {
             case 'stun_skip': return '💫';
             case 'poison': return '☠️';
             case 'poison_tick': return '☠️';
+            case 'heal': return '💚';
+            case 'combo': return '🔥';
             case 'finish': return '💀';
             default: return '⚔️';
         }
@@ -311,7 +317,7 @@ export const ArenaPage = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`rounded-3xl p-8 text-center mb-6 shadow-2xl ${isWinner ? 'bg-gradient-to-br from-yellow-400 to-orange-600' : 'bg-gradient-to-br from-gray-600 to-gray-800'}`}
+                        className={`rounded-3xl p-8 text-center mb-6 shadow-sm ${isWinner ? 'bg-gradient-to-br from-yellow-400 to-orange-600' : 'bg-gradient-to-br from-gray-600 to-gray-800'}`}
                     >
                         <div className="text-8xl mb-4">
                             {isWinner ? <Emoji emoji="🏆" size={96} /> : <Emoji emoji="💀" size={96} />}

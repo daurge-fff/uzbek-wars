@@ -401,5 +401,57 @@ export const cosmeticItems = [
       value: 8,
       description: { ru: '+8 ко всем боевым статам', en: '+8 all combat stats', uz: '+8 barcha jangovar statlar', uk: '+8 до всіх бойових статів' }
     }
+  },
+  // === Снаряжение из API-каталога (id совпадают с backend/src/routes/cosmetics.ts) ===
+  {
+    id: '10',
+    name: { ru: 'Кинжал базара', en: 'Bazaar Dagger', uz: 'Bozor xanjari', uk: 'Кинджал базару' },
+    type: 'equipment' as const,
+    rarity: 'common' as const,
+    priceSoms: 1000,
+    priceCrystals: 20,
+    icon: '🗡️',
+    owned: false,
+    equipped: false,
+    stats: { strength: 5 },
+    bonus: {
+      type: 'combat' as const,
+      value: 5,
+      description: { ru: '+5 Сила', en: '+5 Strength', uz: '+5 Kuch', uk: '+5 Сила' }
+    }
+  },
+  {
+    id: '11',
+    name: { ru: 'Клинок Шёлкового пути', en: 'Silk Road Blade', uz: 'Buyuk ipak yo\'li qilichi', uk: 'Клинок Шовкового шляху' },
+    type: 'equipment' as const,
+    rarity: 'epic' as const,
+    priceSoms: 15000,
+    priceCrystals: 300,
+    icon: '⚔️',
+    owned: false,
+    equipped: false,
+    stats: { strength: 25, agility: 5 },
+    bonus: {
+      type: 'combat' as const,
+      value: 25,
+      description: { ru: '+25 Сила, +5 Ловкость', en: '+25 Strength, +5 Agility', uz: '+25 Kuch, +5 Chaqqonlik', uk: '+25 Сила, +5 Спритність' }
+    }
+  },
+  {
+    id: '12',
+    name: { ru: 'Стёганый чапан', en: 'Quilted Chapan', uz: 'Paxtali chopon', uk: 'Стьобаний чапан' },
+    type: 'clothing' as const,
+    rarity: 'rare' as const,
+    priceSoms: 5000,
+    priceCrystals: 100,
+    icon: '🧥',
+    owned: false,
+    equipped: false,
+    stats: { defense: 15, stamina: 10 },
+    bonus: {
+      type: 'combat' as const,
+      value: 15,
+      description: { ru: '+15 Защита, +10 Выносливость', en: '+15 Defense, +10 Stamina', uz: '+15 Himoya, +10 Chidamlilik', uk: '+15 Захист, +10 Витривалість' }
+    }
   }
 ];

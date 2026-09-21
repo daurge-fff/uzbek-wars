@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { GameDashboard } from './GameDashboard';
@@ -16,6 +16,15 @@ export const GameDashboardContainer = () => {
   const [loading, setLoading] = useState(true);
   const [currentActivity, setCurrentActivity] = useState<any>(null);
   const [cooldownInfo, setCooldownInfo] = useState<{ activityName: string; seconds: number } | null>(null);
+
+  // Актуальные значения для интервальной проверки: раньше замыкание первого рендера
+  // видело currentActivity = null, и запасной поллинг вообще не мог завершить активность.
+  const currentActivityRef = useRef<any>(null);
+  const completeActivityRef = useRef<() => Promise<void>>(async () => {});
+
+  useEffect(() => {
+    currentActivityRef.current = currentActivity;
+  }, [currentActivity]);
 
   // Логируем изменения статов для отладки
   useEffect(() => {
@@ -111,18 +120,17 @@ export const GameDashboardContainer = () => {
   };
 
   const checkActivityCompletion = async () => {
-    if (!currentActivity) return;
+    const activity = currentActivityRef.current;
 
     // Проверяем валидность данных
-    if (!currentActivity.endTime || isNaN(currentActivity.endTime)) {
-      setCurrentActivity(null);
+    if (!activity || !activity.endTime || isNaN(activity.endTime)) {
       return;
     }
 
     const now = Date.now();
-    if (now >= currentActivity.endTime) {
+    if (now >= activity.endTime) {
       // Активность завершена, получаем награды
-      await completeActivity();
+      await completeActivityRef.current();
     }
   };
 
@@ -180,6 +188,9 @@ export const GameDashboardContainer = () => {
       }
     }
   };
+
+  // Интервал должен звать самую свежую версию completeActivity (там зависят t и токен)
+  completeActivityRef.current = completeActivity;
 
   const handleActivitySelect = async (activityId: string) => {
     try {
@@ -352,13 +363,13 @@ const CooldownModalContent = ({ activityName, initialSeconds, onClose }: { activ
       exit={{ opacity: 0, scale: 0.8 }}
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       onClick={(e) => e.stopPropagation()}
-      className="bg-white dark:bg-gray-800 rounded-[32px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden pointer-events-auto"
+      className="bg-white dark:bg-gray-800 rounded-[32px] p-8 max-w-md w-full shadow-sm relative overflow-hidden pointer-events-auto"
     >
       {/* Animated Background */}
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-        className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full blur-3xl"
+        className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full hidden"
       />
 
       <div className="relative z-10 text-center">

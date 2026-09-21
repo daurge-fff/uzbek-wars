@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import Emoji from './Emoji';
+import CosmeticIcon from './CosmeticIcon';
+import { mergeCosmeticItems } from '../utils/cosmetics';
 
 type CosmeticType = 'clothing' | 'background' | 'accessory' | 'equipment' | 'backpack';
 type CosmeticRarity = 'common' | 'rare' | 'epic' | 'legendary';
@@ -12,6 +14,7 @@ interface CosmeticItem {
   type: CosmeticType;
   rarity: CosmeticRarity;
   icon: string;
+  imageSrc?: string;
   owned: boolean;
   equipped: boolean;
   bonus?: {
@@ -62,7 +65,7 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
   const [filter, setFilter] = useState<CosmeticType | 'all'>('all');
   const [loading, setLoading] = useState<string | null>(null);
 
-  const ownedItems = items ? items.filter(item => item.owned) : [];
+  const ownedItems = mergeCosmeticItems(items ? items.filter(item => item.owned) : []);
   const filteredItems = filter === 'all'
     ? ownedItems
     : ownedItems.filter(item => item.type === filter);
@@ -111,7 +114,7 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4 pb-32">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-2xl p-6 mb-6 border border-white/50 dark:border-gray-700/50">
+        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-sm p-6 mb-6 border border-white/50 dark:border-gray-700/50">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
               {t('inventory.title', 'Инвентарь')}
@@ -147,7 +150,7 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
                       </div>
                     )}
-                    <Emoji emoji={item.icon} size={18} />
+                    <CosmeticIcon emoji={item.icon} imageSrc={item.imageSrc} size={18} />
                     <span className="text-gray-900 dark:text-white relative z-10">{getItemName(item)}</span>
                   </div>
                 ))}
@@ -252,7 +255,7 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
                         transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
                         className="relative z-10"
                       >
-                        <Emoji emoji={item.icon} size={72} />
+                        <CosmeticIcon emoji={item.icon} imageSrc={item.imageSrc} size={72} />
                       </motion.div>
                       {item.equipped && (
                         <div className="absolute inset-0 bg-gradient-to-t from-green-500/30 to-transparent" />

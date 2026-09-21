@@ -2,13 +2,16 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import Emoji from './Emoji';
 
+/**
+ * Контракт Emoji: сначала локальный файл (если эмодзи есть в маппинге),
+ * потом CDN, и только если оба недоступны — системный эмодзи текстом.
+ * Тесты фиксируют именно этот порядок: карточки не должны оставаться пустыми.
+ */
 describe('Emoji Component', () => {
-  it('renders emoji image with correct src', () => {
+  it('uses a local file when the emoji is mapped', () => {
     render(<Emoji emoji="🎮" size={24} />);
     const img = screen.getByRole('img');
-    expect(img).toHaveAttribute('src');
-    expect(img.getAttribute('src')).toContain('emojicdn.elk.sh');
-    expect(img.getAttribute('src')).toContain('🎮');
+    expect(img.getAttribute('src')).toBe('/emoji-fallback/game.png');
   });
 
   it('renders with default size of 24', () => {
@@ -25,14 +28,15 @@ describe('Emoji Component', () => {
     expect(img).toHaveAttribute('height', '48');
   });
 
-  it('uses apple style by default', () => {
-    render(<Emoji emoji="⚡" />);
+  it('falls back to the CDN with the requested style for unmapped emojis', () => {
+    render(<Emoji emoji="🦊" />);
     const img = screen.getByRole('img');
+    expect(img.getAttribute('src')).toContain('emojicdn.elk.sh');
     expect(img.getAttribute('src')).toContain('style=apple');
   });
 
   it('supports custom style', () => {
-    render(<Emoji emoji="😊" style="google" />);
+    render(<Emoji emoji="🐫" style="google" />);
     const img = screen.getByRole('img');
     expect(img.getAttribute('src')).toContain('style=google');
   });
@@ -55,20 +59,24 @@ describe('Emoji Component', () => {
     expect(img).toHaveAttribute('loading', 'lazy');
   });
 
-  it('handles complex emojis correctly', () => {
+  it('maps complex emojis to their local file', () => {
     render(<Emoji emoji="👨‍💻" size={32} />);
     const img = screen.getByRole('img');
-    expect(img.getAttribute('src')).toContain('emojicdn.elk.sh');
-    expect(img.getAttribute('src')).toContain('👨‍💻');
+    expect(img.getAttribute('src')).toBe('/emoji-fallback/developer.png');
+  });
+
+  it('renders nothing for an empty emoji instead of a broken image', () => {
+    const { container } = render(<Emoji emoji="" />);
+    expect(container.querySelector('img')).toBeNull();
   });
 
   it('memoizes and does not re-render with same props', () => {
     const { rerender } = render(<Emoji emoji="🎮" size={24} />);
     const img1 = screen.getByRole('img');
-    
+
     rerender(<Emoji emoji="🎮" size={24} />);
     const img2 = screen.getByRole('img');
-    
+
     expect(img1).toBe(img2);
   });
 });

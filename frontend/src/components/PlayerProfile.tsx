@@ -91,7 +91,7 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-white to-indigo-50 dark:from-gray-800 dark:to-purple-900/50 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 border border-gray-100 dark:border-purple-500/30"
+          className="bg-gradient-to-br from-white to-indigo-50 dark:from-gray-800 dark:to-purple-900/50 backdrop-blur-xl rounded-[32px] shadow-sm p-6 border border-gray-100 dark:border-purple-500/30"
         >
           <div className="flex items-start gap-4 mb-6">
             <div className="relative">
@@ -195,7 +195,7 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 border border-gray-100 dark:border-gray-700"
+          className="bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-sm p-6 border border-gray-100 dark:border-gray-700"
         >
           <h2 className="text-xl font-black text-gray-900 dark:text-white mb-4">
             {t('profile.statistics', 'Статистика')}
@@ -226,7 +226,7 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 border-2 border-red-200 dark:border-red-800"
+          className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 backdrop-blur-xl rounded-[32px] shadow-sm p-6 border-2 border-red-200 dark:border-red-800"
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
@@ -282,7 +282,7 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-[32px] shadow-2xl p-6 text-white"
+          className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-[32px] shadow-sm p-6 text-white"
         >
           <h3 className="text-lg font-bold mb-2">
             {t('profile.referralCode', 'Твой реферальный код')}
@@ -315,7 +315,7 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9, y: 20 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  className="w-full max-w-[450px] bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 pointer-events-auto"
+                  className="w-full max-w-[450px] bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-sm p-6 pointer-events-auto"
                 >
                   <h2 className="text-2xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-6">
                     Редактировать профиль
@@ -406,7 +406,7 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   className="w-full max-w-[450px] pointer-events-auto"
                 >
-                  <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-2xl">
+                  <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
                       {verifying ? (
                         <div className="text-center py-8">
@@ -524,7 +524,7 @@ export const PlayerProfile = ({ playerInfo, stats, onEditProfile, isVerified = f
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   className="w-full max-w-[500px] pointer-events-auto"
                 >
-                  <div className="bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 rounded-[32px] p-1 shadow-2xl">
+                  <div className="bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 rounded-[32px] p-1 shadow-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-[28px] p-8">
                       <div className="text-center mb-6">
                         <motion.div

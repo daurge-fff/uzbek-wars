@@ -15,37 +15,69 @@ interface DifficultyConfig {
     somsCost: number;
     rewardMultiplier: number;
     xpMultiplier: number;
+    /** Потолок раундов: не даём бою закончиться за 4-5 ходов */
+    maxTurns: number;
 }
 
 const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
     easy: {
-        statMultiplier: 0.7,
+        statMultiplier: 0.8,
         energyCost: 10,
         healthCostWin: 3,
         healthCostLose: 10,
         somsCost: 50,
         rewardMultiplier: 0.5,
         xpMultiplier: 0.5,
+        maxTurns: 40,
     },
     medium: {
-        statMultiplier: 1.0,
+        statMultiplier: 1.15,
         energyCost: 20,
         healthCostWin: 8,
         healthCostLose: 20,
         somsCost: 150,
         rewardMultiplier: 1.0,
         xpMultiplier: 1.0,
+        maxTurns: 40,
     },
     hard: {
-        statMultiplier: 1.4,
+        statMultiplier: 1.7,
         energyCost: 30,
         healthCostWin: 15,
         healthCostLose: 35,
         somsCost: 300,
         rewardMultiplier: 2.0,
         xpMultiplier: 2.0,
+        maxTurns: 45,
     },
 };
+
+/** Максимум ударов в одной серии (первый удар + комбо) */
+const MAX_COMBO_HITS = 3;
+
+/**
+ * Боец внутри одного боя: эффективные статы, здоровье и состояния.
+ * Объект живёт только в рамках startFight, в БД не сохраняется.
+ */
+interface BattleFighter {
+    id: string;
+    name: string;
+    /** Эффективные статы (у соперника уже умножены на сложность боя) */
+    stats: Record<string, number | undefined>;
+    maxHP: number;
+    hp: number;
+    stun: number;
+    poison: { turns: number; damage: number } | null;
+    /** Второе дыхание (выносливость) срабатывает один раз за бой */
+    secondWindUsed: boolean;
+    damageDealt: number;
+}
+
+interface BattleCounters {
+    crits: number;
+    dodges: number;
+    combos: number;
+}
 
 export interface BattleEvent {
     type: 'attack' | 'crit' | 'dodge' | 'counter' | 'block' | 'combo' | 'miss' | 'finish' | 'stun' | 'stun_skip' | 'poison' | 'poison_tick' | 'heal';
@@ -144,173 +176,76 @@ export async function startFight(
 
         // HP from stamina
         const maxChallengerHP = calculateMaxHP(challenger.combatStats);
-        const maxOpponentHP = calculateMaxHPRaw(opponentStats);
+        const maxOpponentHP = calculateMaxHP(opponentStats);
 
-        let challengerHP = maxChallengerHP;
-        let opponentHP = maxOpponentHP;
+        const challengerFighter: BattleFighter = {
+            id: challenger._id.toString(),
+            name: challengerName,
+            stats: (challenger.combatStats || {}) as any,
+            maxHP: maxChallengerHP,
+            hp: maxChallengerHP,
+            stun: 0,
+            poison: null,
+            secondWindUsed: false,
+            damageDealt: 0,
+        };
 
-        // Status effects
-        let challengerStun = 0;
-        let opponentStun = 0;
-        let challengerPoison = 0;
-        let opponentPoison = 0;
-        let challengerCombo = 0;
+        const opponentFighter: BattleFighter = {
+            id: opponent._id.toString(),
+            name: opponentName,
+            stats: opponentStats,
+            maxHP: maxOpponentHP,
+            hp: maxOpponentHP,
+            stun: 0,
+            poison: null,
+            secondWindUsed: false,
+            damageDealt: 0,
+        };
 
+        const counters: BattleCounters = { crits: 0, dodges: 0, combos: 0 };
         const events: BattleEvent[] = [];
         let turn = 1;
-        let winnerId = null;
-        let totalChallengerDmgDealt = 0;
-        let totalOpponentDmgDealt = 0;
-        let critCount = 0;
-        let dodgeCount = 0;
-        let comboCount = 0;
+        let winnerId: any = null;
 
-        while (challengerHP > 0 && opponentHP > 0 && turn <= 25) {
-            // === Challenger turn ===
-            if (challengerStun > 0) {
-                // Именно претендент пропускает ход, поэтому событие помечаем stun_skip,
-                // иначе сообщение называет оглушённым противника.
-                events.push(createEvent('stun_skip', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
-                challengerStun--;
-            } else {
-                // Poison damage
-                if (challengerPoison > 0) {
-                    const poisonDmg = Math.floor(maxChallengerHP * 0.05);
-                    challengerHP = Math.max(1, challengerHP - poisonDmg);
-                    challengerPoison--;
-                    events.push(createEvent('poison_tick', turn, challenger._id.toString(), challengerName, opponentName, poisonDmg, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
-                }
+        const pushFinish = (winner: BattleFighter, loser: BattleFighter) => {
+            events.push(createEvent('finish', turn, winner.id, winner.name, loser.name, 0, winner.hp, winner.maxHP, 0, loser.maxHP));
+        };
 
-                // Combo tracking
-                if (challengerCombo > 0) {
-                    challengerCombo++;
-                }
+        while (challengerFighter.hp > 0 && opponentFighter.hp > 0 && turn <= config.maxTurns) {
+            // === Ход претендента ===
+            resolveTurn(challengerFighter, opponentFighter, turn, events, counters);
 
-                const hit = calculateDamage(challenger, opponent, opponentStats, challengerCombo);
-
-                if (hit.isMiss) {
-                    events.push(createEvent('miss', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
-                } else if (hit.isDodge) {
-                    dodgeCount++;
-                    events.push(createEvent('dodge', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
-                } else if (hit.isBlock) {
-                    const blockedDmg = Math.floor(hit.damage * 0.6);
-                    const actualDmg = hit.damage - blockedDmg;
-                    opponentHP = Math.max(0, opponentHP - actualDmg);
-                    totalChallengerDmgDealt += actualDmg;
-                    events.push(createEvent('block', turn, challenger._id.toString(), challengerName, opponentName, actualDmg, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
-                } else {
-                    opponentHP = Math.max(0, opponentHP - hit.damage);
-                    totalChallengerDmgDealt += hit.damage;
-
-                    if (hit.isCrit) {
-                        critCount++;
-                        events.push(createEvent('crit', turn, challenger._id.toString(), challengerName, opponentName, hit.damage, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
-                    } else {
-                        if (challengerCombo >= 2) {
-                            comboCount++;
-                        }
-                        challengerCombo = 1;
-                        events.push(createEvent('attack', turn, challenger._id.toString(), challengerName, opponentName, hit.damage, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
-                    }
-
-                    // Stun chance (8% if crit, 4% otherwise)
-                    // Мёртвый противник не может быть оглушён или отравлен
-                    const stunChance = hit.isCrit ? 0.08 : 0.04;
-                    if (opponentHP > 0 && Math.random() < stunChance && opponentStun === 0) {
-                        opponentStun = 1;
-                        events.push(createEvent('stun', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
-                    }
-
-                    // Poison chance from intelligence
-                    const intStat = challenger.combatStats?.intelligence || 1;
-                    const poisonChance = Math.min(0.20, intStat / 25);
-                    if (opponentHP > 0 && Math.random() < poisonChance && opponentPoison === 0) {
-                        opponentPoison = 3;
-                        events.push(createEvent('poison', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
-                    }
-                }
-
-                if (opponentHP <= 0) {
-                    winnerId = challenger._id;
-                    events.push(createEvent('finish', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, 0, maxOpponentHP));
-                    break;
-                }
+            // Ход мог закончиться смертью любого из бойцов: противника добили,
+            // либо претендент погиб от контрудара
+            if (opponentFighter.hp <= 0 || challengerFighter.hp <= 0) {
+                const challengerWon = opponentFighter.hp <= 0;
+                winnerId = challengerWon ? challenger._id : opponent._id;
+                pushFinish(challengerWon ? challengerFighter : opponentFighter, challengerWon ? opponentFighter : challengerFighter);
+                break;
             }
 
-            // === Opponent counter-turn ===
-            if (opponentStun > 0) {
-                events.push(createEvent('stun_skip', turn, opponent._id.toString(), opponentName, challengerName, 0, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
-                opponentStun--;
-            } else {
-                if (opponentPoison > 0) {
-                    const poisonDmg = Math.floor(maxOpponentHP * 0.05);
-                    opponentHP = Math.max(1, opponentHP - poisonDmg);
-                    opponentPoison--;
-                    events.push(createEvent('poison_tick', turn, opponent._id.toString(), opponentName, challengerName, poisonDmg, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
-                }
+            // === Ответный ход противника ===
+            resolveTurn(opponentFighter, challengerFighter, turn, events, counters);
 
-                const hit2 = calculateDamageRaw(opponent, challenger, opponentStats, challenger.combatStats);
-
-                if (hit2.isMiss) {
-                    events.push(createEvent('miss', turn, opponent._id.toString(), opponentName, challengerName, 0, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
-                } else if (hit2.isDodge) {
-                    dodgeCount++;
-                    events.push(createEvent('dodge', turn, opponent._id.toString(), opponentName, challengerName, 0, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
-                } else if (hit2.isBlock) {
-                    const blockedDmg = Math.floor(hit2.damage * 0.6);
-                    const actualDmg = hit2.damage - blockedDmg;
-                    challengerHP = Math.max(0, challengerHP - actualDmg);
-                    totalOpponentDmgDealt += actualDmg;
-                    events.push(createEvent('block', turn, opponent._id.toString(), opponentName, challengerName, actualDmg, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
-                } else {
-                    challengerHP = Math.max(0, challengerHP - hit2.damage);
-                    totalOpponentDmgDealt += hit2.damage;
-
-                    if (hit2.isCrit) {
-                        critCount++;
-                        events.push(createEvent('crit', turn, opponent._id.toString(), opponentName, challengerName, hit2.damage, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
-                    } else {
-                        events.push(createEvent('attack', turn, opponent._id.toString(), opponentName, challengerName, hit2.damage, opponentHP, maxOpponentHP, challengerHP, maxChallengerHP));
-                    }
-
-                    // Counter-attack chance from agility
-                    // Контрудар только если боец ещё жив: раньше убитый игрок бил в ответ,
-                    // и лог боя заканчивался не «finish», а «counter»
-                    const agiStat = challenger.combatStats?.agility || 1;
-                    const counterChance = Math.min(0.30, agiStat / 10);
-                    if (challengerHP > 0 && Math.random() < counterChance) {
-                        const counterDmg = calculateCounterDamage(challenger, hit2.damage);
-                        opponentHP = Math.max(0, opponentHP - counterDmg);
-                        totalChallengerDmgDealt += counterDmg;
-                        events.push(createEvent('counter', turn, challenger._id.toString(), challengerName, opponentName, counterDmg, challengerHP, maxChallengerHP, opponentHP, maxOpponentHP));
-
-                        // Контрудар мог добить противника: закрываем бой здесь же,
-                        // иначе лог заканчивался событием counter без finish
-                        if (opponentHP <= 0) {
-                            winnerId = challenger._id;
-                            events.push(createEvent('finish', turn, challenger._id.toString(), challengerName, opponentName, 0, challengerHP, maxChallengerHP, 0, maxOpponentHP));
-                            break;
-                        }
-                    }
-                }
-
-                if (challengerHP <= 0) {
-                    winnerId = opponent._id;
-                    events.push(createEvent('finish', turn, opponent._id.toString(), opponentName, challengerName, 0, opponentHP, maxOpponentHP, 0, maxChallengerHP));
-                    break;
-                }
+            if (challengerFighter.hp <= 0 || opponentFighter.hp <= 0) {
+                const challengerWon = opponentFighter.hp <= 0;
+                winnerId = challengerWon ? challenger._id : opponent._id;
+                pushFinish(challengerWon ? challengerFighter : opponentFighter, challengerWon ? opponentFighter : challengerFighter);
+                break;
             }
 
             turn++;
         }
 
-        // Determine winner by HP if timeout
+        // Determine winner by HP if timeout (сравниваем долю здоровья, а не абсолют)
         if (!winnerId) {
-            winnerId = challengerHP >= opponentHP ? challenger._id : opponent._id;
+            const challengerShare = challengerFighter.hp / challengerFighter.maxHP;
+            const opponentShare = opponentFighter.hp / opponentFighter.maxHP;
+            winnerId = challengerShare >= opponentShare ? challenger._id : opponent._id;
         }
 
         const isChallengerWinner = winnerId.toString() === challengerId;
+        const totalTurns = events.length > 0 ? events[events.length - 1].turn : turn;
 
         // Health costs based on difficulty and outcome
         const healthCost = isChallengerWinner ? config.healthCostWin : config.healthCostLose;
@@ -350,6 +285,15 @@ export async function startFight(
         // Приводим здоровье в логе к ролям бойцов (challenger/opponent).
         const normalizedEvents = toRoleBasedLog(events, challenger._id.toString());
 
+        const stats = {
+            totalTurns,
+            totalDamageDealt: challengerFighter.damageDealt,
+            totalDamageReceived: opponentFighter.damageDealt,
+            crits: counters.crits,
+            dodges: counters.dodges,
+            combos: counters.combos,
+        };
+
         // Create match record
         const match = new ArenaMatch({
             challengerId,
@@ -366,14 +310,7 @@ export async function startFight(
             },
             rewards,
             matchLog: normalizedEvents,
-            stats: {
-                totalTurns: turn - 1,
-                totalDamageDealt: totalChallengerDmgDealt,
-                totalDamageReceived: totalOpponentDmgDealt,
-                crits: critCount,
-                dodges: dodgeCount,
-                combos: comboCount,
-            }
+            stats
         });
 
         await match.save();
@@ -386,17 +323,12 @@ export async function startFight(
             opponentName,
             challengerMaxHealth: maxChallengerHP,
             opponentMaxHealth: maxOpponentHP,
+            challengerHealth: challengerFighter.hp,
+            opponentHealth: opponentFighter.hp,
             difficulty,
             rewards,
             matchLog: normalizedEvents,
-            stats: {
-                totalTurns: turn - 1,
-                totalDamageDealt: totalChallengerDmgDealt,
-                totalDamageReceived: totalOpponentDmgDealt,
-                crits: critCount,
-                dodges: dodgeCount,
-                combos: comboCount,
-            }
+            stats
         };
     } catch (error) {
         logger.error('Error starting fight:', error);
@@ -404,127 +336,235 @@ export async function startFight(
     }
 }
 
-function calculateMaxHP(combatStats: any): number {
-    const stamina = combatStats?.stamina || 5;
-    return Math.floor(60 + stamina * 8);
+/**
+ * Мягкий шанс от значения стата: base + weight * stat / (stat + scale), с потолком cap.
+ *
+ * Раньше шансы считались как stat / 15 (или stat / 25) с жёстким потолком, поэтому
+ * 4 и 10 очков в стате давали почти одинаковый результат, а вложение статов
+ * не ощущалось. Здесь отдача растёт с каждым очком, но с убыванием.
+ */
+function statChance(stat: number, scale: number, weight: number, base: number, cap: number): number {
+    const value = Math.max(0, stat || 0);
+    const soft = value / (value + scale);
+    return Math.min(cap, base + weight * soft);
 }
 
-function calculateMaxHPRaw(stats: any): number {
-    const stamina = stats?.stamina || 5;
-    return Math.floor(60 + stamina * 8);
+/** Доля урона, которую гасит защита (0..0.7) */
+function mitigation(defense: number): number {
+    const def = Math.max(0, defense || 0);
+    return Math.min(0.7, def / (def + 28));
+}
+
+function calculateMaxHP(combatStats: any): number {
+    const stamina = combatStats?.stamina ?? 5;
+    return Math.floor(80 + stamina * 20);
+}
+
+/** Урон яда: часть максимального здоровья жертвы + вклад интеллекта отравителя */
+function poisonTickDamage(defenderMaxHP: number, attackerIntelligence: number): number {
+    return Math.max(2, Math.floor(defenderMaxHP * 0.03) + Math.floor((attackerIntelligence || 0) * 0.7));
+}
+
+/** Шанс оглушить: растёт от силы, крит добавляет сверху */
+function stunChance(attackerStats: Record<string, number | undefined>, isCrit: boolean): number {
+    const chance = statChance(attackerStats.strength ?? 1, 45, 0.10, 0.02, 0.15) + (isCrit ? 0.10 : 0);
+    return Math.min(0.35, chance);
 }
 
 function applyDifficultyMultiplier(combatStats: any, multiplier: number) {
+    const scale = (value: number) => Math.min(200, Math.floor(value * multiplier));
     return {
-        strength: Math.min(100, Math.floor((combatStats?.strength || 10) * multiplier)),
-        defense: Math.min(100, Math.floor((combatStats?.defense || 10) * multiplier)),
-        agility: Math.min(100, Math.floor((combatStats?.agility || 10) * multiplier)),
-        stamina: Math.min(100, Math.floor((combatStats?.stamina || 10) * multiplier)),
-        intelligence: Math.min(100, Math.floor((combatStats?.intelligence || 10) * multiplier)),
-        luck: combatStats?.luck || 0,
+        strength: scale(combatStats?.strength || 10),
+        defense: scale(combatStats?.defense || 10),
+        agility: scale(combatStats?.agility || 10),
+        stamina: scale(combatStats?.stamina || 10),
+        intelligence: scale(combatStats?.intelligence || 10),
+        luck: scale(combatStats?.luck || 0),
     };
 }
 
-function calculateDamage(
-    attacker: IPlayer,
-    defender: IPlayer,
-    defenderStats: any,
-    comboLevel: number = 0
-): { damage: number; isCrit: boolean; isDodge: boolean; isBlock: boolean; isMiss: boolean } {
-    const str = attacker.combatStats?.strength || 1;
-    const agi = attacker.combatStats?.agility || 1;
-    const def = defenderStats.defense || 1;
-    const luck = attacker.combatStats?.luck || 0;
+interface AttackRoll {
+    damage: number;
+    isCrit: boolean;
+    isDodge: boolean;
+    isBlock: boolean;
+    isMiss: boolean;
+}
 
-    const missChance = Math.max(0.03, 0.08 - agi / 12);
+/**
+ * Один бросок атаки. Порядок: промах → уклонение → крит → блок.
+ * Крит пробивает блок, блок гасит 60% урона, защита сокращает урон постоянно.
+ */
+function rollAttack(attackerStats: any, defenderStats: any, comboLevel = 0): AttackRoll {
+    const str = attackerStats?.strength ?? 1;
+    const agi = attackerStats?.agility ?? 1;
+    const int = attackerStats?.intelligence ?? 1;
+    const luck = attackerStats?.luck ?? 0;
+
+    const def = defenderStats?.defense ?? 1;
+    const defAgi = defenderStats?.agility ?? 1;
+    const defLuck = defenderStats?.luck ?? 0;
+
+    const missChance = Math.max(0.02, 0.06 - 0.03 * (agi / (agi + 30)));
     if (Math.random() < missChance) {
         return { damage: 0, isCrit: false, isDodge: false, isBlock: false, isMiss: true };
     }
 
-    const defAgi = defender.combatStats?.agility || 1;
-    const defLuck = defender.combatStats?.luck || 0;
-    const dodgeChance = Math.min(0.30, defAgi / 15 + defLuck * 0.05);
+    const dodgeChance = statChance(defAgi, 40, 0.30, 0.02, 0.40) + statChance(defLuck, 25, 0.08, 0, 0.10);
     if (Math.random() < dodgeChance) {
         return { damage: 0, isCrit: false, isDodge: true, isBlock: false, isMiss: false };
     }
 
-    const blockChance = Math.min(0.25, def / 15);
-    if (Math.random() < blockChance) {
-        const baseDmg = str * 1.5 + 5;
-        const defReduction = def / (def + 20);
-        const rawDmg = Math.floor(baseDmg * (1 - defReduction));
-        return { damage: Math.max(2, rawDmg), isCrit: false, isDodge: false, isBlock: true, isMiss: false };
-    }
-
-    const critChance = Math.min(0.40, agi / 15 + luck * 0.05);
+    const critChance = statChance(agi, 40, 0.35, 0.05, 0.45) + statChance(luck, 25, 0.06, 0, 0.10);
     const isCrit = Math.random() < critChance;
 
-    const baseDmg = str * 1.5 + 5;
-    const defReduction = def / (def + 20);
-    const int = attacker.combatStats?.intelligence || 1;
-    const critMult = isCrit ? (1.5 + Math.min(0.5, int / 30)) : 1.0;
-    const comboMult = comboLevel > 1 ? 1 + (comboLevel - 1) * 0.15 : 1.0;
-    const intBonus = Math.floor(int * 0.8);
+    // Крит ломает защиту, обычный удар может быть заблокирован
+    const isBlock = !isCrit && Math.random() < statChance(def, 40, 0.30, 0.02, 0.35);
 
-    const rawDmg = Math.floor((baseDmg + intBonus) * critMult * comboMult * (1 - defReduction));
-    const finalDmg = Math.max(2, rawDmg);
+    const baseDamage = 4 + str * 1.5 + int * 0.8;
+    const critMult = isCrit ? 1.55 + Math.min(0.6, int / 60) : 1;
+    const comboMult = comboLevel > 1 ? 1 + (comboLevel - 1) * 0.12 : 1;
 
-    return { damage: finalDmg, isCrit, isDodge: false, isBlock: false, isMiss: false };
+    let damage = Math.max(3, Math.floor(baseDamage * critMult * comboMult * (1 - mitigation(def))));
+    if (isBlock) {
+        damage = Math.max(2, Math.floor(damage * 0.4));
+    }
+
+    return { damage, isCrit, isDodge: false, isBlock, isMiss: false };
 }
 
-function calculateDamageRaw(
-    _attacker: any,
-    defender: any,
-    attackerStats: any,
-    defenderStats: any
-): { damage: number; isCrit: boolean; isDodge: boolean; isBlock: boolean; isMiss: boolean } {
-    const str = attackerStats.strength || 1;
-    const agi = attackerStats.agility || 1;
-    const def = defenderStats.defense || 1;
-    const luck = attackerStats.luck || 0;
-
-    const missChance = Math.max(0.03, 0.08 - agi / 12);
-    if (Math.random() < missChance) {
-        return { damage: 0, isCrit: false, isDodge: false, isBlock: false, isMiss: true };
-    }
-
-    const defAgi = defender.combatStats?.agility || 1;
-    const defLuck = defender.combatStats?.luck || 0;
-    const dodgeChance = Math.min(0.30, defAgi / 15 + defLuck * 0.05);
-    if (Math.random() < dodgeChance) {
-        return { damage: 0, isCrit: false, isDodge: true, isBlock: false, isMiss: false };
-    }
-
-    const blockChance = Math.min(0.25, def / 15);
-    if (Math.random() < blockChance) {
-        const baseDmg = str * 1.5 + 5;
-        const defReduction = def / (def + 20);
-        const rawDmg = Math.floor(baseDmg * (1 - defReduction));
-        return { damage: Math.max(2, rawDmg), isCrit: false, isDodge: false, isBlock: true, isMiss: false };
-    }
-
-    const critChance = Math.min(0.40, agi / 15 + luck * 0.05);
-    const isCrit = Math.random() < critChance;
-
-    const baseDmg = str * 1.5 + 5;
-    const defReduction = def / (def + 20);
-    const int = attackerStats.intelligence || 1;
-    const critMult = isCrit ? (1.5 + Math.min(0.5, int / 30)) : 1.0;
-    const intBonus = Math.floor(int * 0.8);
-
-    const rawDmg = Math.floor((baseDmg + intBonus) * critMult * (1 - defReduction));
-    const finalDmg = Math.max(2, rawDmg);
-
-    return { damage: finalDmg, isCrit, isDodge: false, isBlock: false, isMiss: false };
+function calculateCounterDamage(counterAttackerStats: any, originalDamage: number): number {
+    const agi = counterAttackerStats?.agility ?? 1;
+    const str = counterAttackerStats?.strength ?? 1;
+    const counterMult = 0.45 + 0.25 * (agi / (agi + 25));
+    return Math.max(3, Math.floor(originalDamage * counterMult + str * 0.5));
 }
 
-function calculateCounterDamage(counterAttacker: IPlayer, originalDamage: number): number {
-    const agi = counterAttacker.combatStats?.agility || 1;
-    const str = counterAttacker.combatStats?.strength || 1;
-    const counterMult = 0.5 + Math.min(0.3, agi / 20);
-    const baseCounter = Math.floor(originalDamage * counterMult);
-    const agiBonus = Math.floor(str * 0.4);
-    return Math.max(2, baseCounter + agiBonus);
+function pushEvent(
+    events: BattleEvent[],
+    type: BattleEvent['type'],
+    turn: number,
+    attacker: BattleFighter,
+    defender: BattleFighter,
+    damage: number
+): void {
+    events.push(
+        createEvent(type, turn, attacker.id, attacker.name, defender.name, damage, attacker.hp, attacker.maxHP, defender.hp, defender.maxHP)
+    );
+}
+
+/**
+ * Один ход бойца: тик яда, второе дыхание, серия ударов с эффектами и контрудар.
+ *
+ * Все случайные события считаются от реальных статов бойцов: сила даёт урон и
+ * оглушение, защита — снижение урона и блок, ловкость — криты, уклонение, комбо и
+ * контрудар, выносливость — здоровье и второе дыхание, интеллект — силу крита и яд,
+ * удача — криты, уклонение и второе дыхание.
+ */
+function resolveTurn(
+    attacker: BattleFighter,
+    defender: BattleFighter,
+    turn: number,
+    events: BattleEvent[],
+    counters: BattleCounters
+): void {
+    // Оглушение: ход пропущен
+    if (attacker.stun > 0) {
+        pushEvent(events, 'stun_skip', turn, attacker, defender, 0);
+        attacker.stun--;
+        return;
+    }
+
+    // Яд тикает в начале хода
+    if (attacker.poison) {
+        const tickDamage = attacker.poison.damage;
+        attacker.hp = Math.max(1, attacker.hp - tickDamage);
+        attacker.poison.turns--;
+        if (attacker.poison.turns <= 0) attacker.poison = null;
+        pushEvent(events, 'poison_tick', turn, attacker, defender, tickDamage);
+    }
+
+    // Второе дыхание (выносливость + удача): один раз за бой при низком здоровье
+    if (!attacker.secondWindUsed && attacker.hp / attacker.maxHP <= 0.35) {
+        const stamina = attacker.stats.stamina ?? 5;
+        const luck = attacker.stats.luck ?? 0;
+        const healChance = statChance(stamina, 50, 0.30, 0.05, 0.35) + statChance(luck, 25, 0.10, 0, 0.10);
+        if (Math.random() < healChance) {
+            const heal = Math.max(1, Math.floor(attacker.maxHP * (0.12 + stamina * 0.004)));
+            attacker.hp = Math.min(attacker.maxHP, attacker.hp + heal);
+            attacker.secondWindUsed = true;
+            pushEvent(events, 'heal', turn, attacker, defender, heal);
+        }
+    }
+
+    // Серия ударов: попадание может продолжиться комбо
+    let turnDamage = 0;
+    for (let comboLevel = 1; comboLevel <= MAX_COMBO_HITS; comboLevel++) {
+        const hit = rollAttack(attacker.stats, defender.stats, comboLevel);
+
+        if (hit.isMiss) {
+            pushEvent(events, 'miss', turn, attacker, defender, 0);
+            break;
+        }
+
+        if (hit.isDodge) {
+            counters.dodges++;
+            pushEvent(events, 'dodge', turn, attacker, defender, 0);
+            break;
+        }
+
+        defender.hp = Math.max(0, defender.hp - hit.damage);
+        turnDamage += hit.damage;
+
+        if (hit.isBlock) {
+            pushEvent(events, 'block', turn, attacker, defender, hit.damage);
+        } else if (hit.isCrit) {
+            counters.crits++;
+            pushEvent(events, 'crit', turn, attacker, defender, hit.damage);
+        } else {
+            pushEvent(events, 'attack', turn, attacker, defender, hit.damage);
+        }
+
+        if (defender.hp <= 0) break;
+
+        // Оглушение (сила)
+        if (defender.stun === 0 && Math.random() < stunChance(attacker.stats, hit.isCrit)) {
+            defender.stun = 1;
+            pushEvent(events, 'stun', turn, attacker, defender, 0);
+        }
+
+        // Яд (интеллект)
+        const poisonChance = statChance(attacker.stats.intelligence ?? 1, 35, 0.30, 0.02, 0.35);
+        if (!defender.poison && Math.random() < poisonChance) {
+            defender.poison = {
+                turns: 3,
+                damage: poisonTickDamage(defender.maxHP, attacker.stats.intelligence ?? 1),
+            };
+            pushEvent(events, 'poison', turn, attacker, defender, 0);
+        }
+
+        if (comboLevel >= MAX_COMBO_HITS) break;
+
+        // Комбо (ловкость)
+        if (Math.random() >= statChance(attacker.stats.agility ?? 1, 45, 0.28, 0.04, 0.35)) break;
+        counters.combos++;
+        pushEvent(events, 'combo', turn, attacker, defender, 0);
+    }
+
+    attacker.damageDealt += turnDamage;
+
+    // Контрудар (ловкость защищающегося). Мёртвый не бьёт в ответ, иначе лог боя
+    // заканчивался событием counter вместо finish.
+    if (defender.hp > 0 && attacker.hp > 0) {
+        const counterChance = statChance(defender.stats.agility ?? 1, 40, 0.30, 0.03, 0.40);
+        if (Math.random() < counterChance) {
+            const counterDamage = calculateCounterDamage(defender.stats, Math.max(3, turnDamage));
+            attacker.hp = Math.max(0, attacker.hp - counterDamage);
+            defender.damageDealt += counterDamage;
+            // Контрудар наносит защищающийся, поэтому attacker/defender меняются местами
+            pushEvent(events, 'counter', turn, defender, attacker, counterDamage);
+        }
+    }
 }
 
 function createEvent(

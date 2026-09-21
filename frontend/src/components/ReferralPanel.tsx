@@ -44,7 +44,7 @@ export const ReferralPanel = ({
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4 pb-32">
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-[32px] shadow-2xl p-6">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-[32px] shadow-sm p-6">
           <h1 className="text-3xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-4">
             {t('referral.title', 'Пригласи друзей')}
           </h1>
@@ -83,7 +83,7 @@ export const ReferralPanel = ({
           </div>
         </div>
 
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-[32px] shadow-2xl p-6">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-[32px] shadow-sm p-6">
           <h2 className="text-xl font-black text-gray-900 dark:text-white mb-4">
             {t('referral.friends', 'Твои друзья')} ({referredFriends.length})
           </h2>

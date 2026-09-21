@@ -64,6 +64,9 @@ router.get(
 
       res.status(200).json({
         player: {
+          // id — идентификатор документа Player (совпадает с id в рейтинге и логах боя),
+          // userId остаётся отдельным полем
+          id: player._id.toString(),
           userId: player.userId,
           characterId: player.characterId,
           cityId: player.cityId,

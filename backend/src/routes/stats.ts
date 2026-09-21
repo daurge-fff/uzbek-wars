@@ -10,7 +10,9 @@ const router = Router();
  */
 router.get('/app', authenticate, async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?.userId;
+    // Middleware кладёт в req.user поле id (id пользователя), а не userId — из-за
+    // этого эндпоинт всегда отвечал 401 и настройки показывали нули.
+    const userId = (req as any).user?.id;
     
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });

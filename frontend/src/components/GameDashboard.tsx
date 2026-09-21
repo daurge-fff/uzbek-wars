@@ -461,7 +461,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative rounded-3xl px-4 pt-4 pb-2 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden"
+          className="relative rounded-3xl px-4 pt-4 pb-2 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-sm border border-white/50 dark:border-gray-700/50 overflow-hidden"
         >
           {/* Animated background blobs */}
           <div className="absolute inset-0 opacity-30 dark:opacity-20">
@@ -720,7 +720,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className={`absolute bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-xl shadow-2xl z-[200] max-w-[180px] text-center whitespace-normal pointer-events-none ${index >= 2 ? 'right-0' : 'left-1/2 transform -translate-x-1/2'
+                            className={`absolute bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-xl shadow-sm z-[200] max-w-[180px] text-center whitespace-normal pointer-events-none ${index >= 2 ? 'right-0' : 'left-1/2 transform -translate-x-1/2'
                               }`}
                           >
                             <div className="font-bold mb-1">{t(config.descKey)}</div>
@@ -846,7 +846,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   opacity: [0.15, 0.05, 0.15]
                 }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute inset-0 bg-white rounded-full blur-3xl"
+                className="absolute inset-0 bg-white rounded-full hidden"
               />
 
               <div className="relative z-10">
@@ -1147,18 +1147,18 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                     onClick={(e) => e.stopPropagation()}
-                    className="bg-white dark:bg-gray-800 rounded-[32px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden pointer-events-auto"
+                    className="bg-white dark:bg-gray-800 rounded-[32px] p-8 max-w-md w-full shadow-sm relative overflow-hidden pointer-events-auto"
                   >
                     {/* Animated Background */}
                     <motion.div
                       animate={{ rotate: 360, scale: [1, 1.2, 1] }}
                       transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                      className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full blur-3xl"
+                      className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full hidden"
                     />
                     <motion.div
                       animate={{ rotate: -360, scale: [1.2, 1, 1.2] }}
                       transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-                      className="absolute -bottom-20 -left-20 w-60 h-60 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-full blur-3xl"
+                      className="absolute -bottom-20 -left-20 w-60 h-60 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-full hidden"
                     />
 
                     <div className="relative z-10 text-center">
@@ -1301,12 +1301,12 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   exit={{ scale: 0.8 }}
                   transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                   onClick={(e) => e.stopPropagation()}
-                  className="bg-white dark:bg-gray-800 rounded-[32px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden pointer-events-auto"
+                  className="bg-white dark:bg-gray-800 rounded-[32px] p-8 max-w-md w-full shadow-sm relative overflow-hidden pointer-events-auto"
                 >
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                    className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-full blur-3xl"
+                    className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-full hidden"
                   />
 
                   <div className="relative z-10 text-center">

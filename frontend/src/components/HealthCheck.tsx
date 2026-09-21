@@ -155,7 +155,7 @@ export const HealthCheck = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white dark:bg-gray-800 rounded-[32px] shadow-2xl p-6"
+          className="bg-white dark:bg-gray-800 rounded-[32px] shadow-sm p-6"
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-black text-gray-900 dark:text-white">
@@ -223,7 +223,7 @@ export const HealthCheck = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-gray-800 rounded-[32px] shadow-2xl p-6"
+          className="bg-white dark:bg-gray-800 rounded-[32px] shadow-sm p-6"
         >
           <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
             {t('health.serviceStatus')}
@@ -264,7 +264,7 @@ export const HealthCheck = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white dark:bg-gray-800 rounded-[32px] shadow-2xl p-6"
+          className="bg-white dark:bg-gray-800 rounded-[32px] shadow-sm p-6"
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-black text-gray-900 dark:text-white">
@@ -364,7 +364,7 @@ export const HealthCheck = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-[32px] shadow-2xl p-6 text-white text-center"
+          className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-[32px] shadow-sm p-6 text-white text-center"
         >
           <div className="text-6xl mb-4">
             {services.every(s => s.status === 'healthy') ? '🎉' : '⚠️'}

@@ -122,7 +122,7 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
             <motion.div 
               whileHover={{ scale: 1.02, y: -8 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-8 border-2 border-green-200 dark:border-green-700 transition-colors"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-sm p-8 border-2 border-green-200 dark:border-green-700 transition-colors"
             >
               <div className={`w-full h-72 bg-gradient-to-br ${getCharacterGradient(currentCharacter.id)} rounded-[24px] mb-6 flex flex-col items-center justify-center overflow-hidden shadow-inner relative`}>
                 <motion.div
@@ -201,7 +201,7 @@ export const CharacterSelection = ({ characters, onSelect }: CharacterSelectionP
         onClick={() => onSelect(currentCharacter.id)}
         whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(99, 102, 241, 0.3)' }}
         whileTap={{ scale: 0.95 }}
-        className="min-h-touch w-full max-w-sm bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-black py-4 px-8 rounded-[24px] shadow-2xl transition-all cursor-pointer"
+        className="min-h-touch w-full max-w-sm bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-black py-4 px-8 rounded-[24px] shadow-sm transition-all cursor-pointer"
       >
         {t('ui.continue')}
       </motion.button>

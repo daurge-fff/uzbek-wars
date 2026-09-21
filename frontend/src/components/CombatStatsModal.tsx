@@ -206,7 +206,7 @@ export const CombatStatsModal = ({ isOpen, onClose, onStatsUpdated }: CombatStat
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               className="w-full max-w-[500px] pointer-events-auto max-h-[90vh] overflow-y-auto"
             >
-              <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-2xl">
+              <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[32px] p-1 shadow-sm">
                 <div className="bg-white dark:bg-gray-900 rounded-[28px] p-5">
                   {/* Header */}
                   <div className="text-center mb-4">

@@ -165,7 +165,7 @@ export const DonationModal = ({ isOpen, onClose }: DonationModalProps) => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="w-full max-w-[500px] max-h-[90vh] bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl pointer-events-auto overflow-hidden flex flex-col"
+              className="w-full max-w-[500px] max-h-[90vh] bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-sm pointer-events-auto overflow-hidden flex flex-col"
             >
               <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-4">
@@ -220,7 +220,7 @@ export const DonationModal = ({ isOpen, onClose }: DonationModalProps) => {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-700 rounded-[20px] shadow-2xl overflow-hidden z-10"
+                        className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-700 rounded-[20px] shadow-sm overflow-hidden z-10"
                       >
                         {(['USD', 'RUB', 'UZS', 'UAH'] as Currency[]).map((curr) => (
                           <motion.button
@@ -345,7 +345,7 @@ export const DonationModal = ({ isOpen, onClose }: DonationModalProps) => {
                     onClick={handleContinueToPayment}
                     disabled={!selectedOption}
                     className={`w-full py-4 rounded-full font-black text-lg transition-all ${selectedOption
-                      ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl hover:shadow-2xl'
+                      ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl hover:shadow-sm'
                       : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                       }`}
                   >
@@ -402,7 +402,7 @@ const ConfirmationModal = ({
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
-          className="bg-white dark:bg-gray-800 rounded-[24px] p-6 max-w-md w-full shadow-2xl"
+          className="bg-white dark:bg-gray-800 rounded-[24px] p-6 max-w-md w-full shadow-sm"
         >
           <h3 className="text-xl font-black text-gray-900 dark:text-white mb-4">
             {t('donation.confirmPayment', 'Подтвердите отправку заявки')}

@@ -24,7 +24,7 @@ export const TermsOfService = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-2xl p-8"
+          className="bg-white dark:bg-gray-800 backdrop-blur-xl rounded-[32px] shadow-sm p-8"
         >
           <h1 className="text-4xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-4">
             {t('legal.terms.title')}

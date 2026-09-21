@@ -125,7 +125,7 @@ const ClassHall: React.FC = () => {
       <motion.div
         whileHover={{ scale: 1.02, y: -8 }}
         whileTap={{ scale: 0.98 }}
-        className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 border-2 transition-colors border-green-200 dark:border-green-700 h-[580px] flex flex-col"
+        className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-[32px] shadow-sm p-6 border-2 transition-colors border-green-200 dark:border-green-700 h-[580px] flex flex-col"
       >
         {isLocked && (
           <div className="absolute top-4 right-4 px-3 py-1 bg-red-500 text-white text-sm font-bold rounded-xl shadow-lg flex items-center gap-1">
@@ -205,7 +205,7 @@ const ClassHall: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: tier * 0.1 }}
-        className="relative rounded-3xl p-6 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden"
+        className="relative rounded-3xl p-6 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-sm border border-white/50 dark:border-gray-700/50 overflow-hidden"
       >
         {/* Animated background blobs */}
         <div className="absolute inset-0 opacity-30 dark:opacity-20">
@@ -260,7 +260,7 @@ const ClassHall: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative rounded-3xl p-4 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-2xl border border-white/50 dark:border-gray-700/50"
+          className="relative rounded-3xl p-4 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-sm border border-white/50 dark:border-gray-700/50"
         >
           <div className="relative flex items-center justify-center">
             <h1 className="text-2xl font-black text-gray-900 dark:text-white">
@@ -272,7 +272,7 @@ const ClassHall: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative rounded-3xl p-4 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-2xl border border-white/50 dark:border-gray-700/50"
+          className="relative rounded-3xl p-4 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/70 shadow-sm border border-white/50 dark:border-gray-700/50"
         >
           <div className="flex items-center justify-center gap-4">
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-yellow-400/30 to-orange-500/30 border border-yellow-400/40">
@@ -323,7 +323,7 @@ const ClassHall: React.FC = () => {
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   className="w-full max-w-[450px] pointer-events-auto"
                 >
-                  <div className="bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-[32px] p-1 shadow-2xl">
+                  <div className="bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-[32px] p-1 shadow-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-[28px] p-6">
                       <div className="text-center mb-6">
                         <div className="text-8xl mb-4">{selectedClass.avatar}</div>

@@ -112,7 +112,7 @@ export const AchievementsPage = () => {
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${progressPercent}%` }}
                                                 className={`h-full rounded-full ${ach.unlocked
-                                                    ? 'bg-gradient-to-r from-yellow-400 to-orange-500 shadow-[0_0_10px_rgba(251,191,36,0.5)]'
+                                                    ? 'bg-gradient-to-r from-yellow-400 to-orange-500 '
                                                     : 'bg-gradient-to-r from-indigo-400 to-purple-500'
                                                     }`}
                                             />
