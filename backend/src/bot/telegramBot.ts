@@ -10,6 +10,10 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { User } from '../models/User';
 import { logger } from '../utils/logger';
+import { verificationSessions } from './verificationSessions';
+
+export { verificationSessions };
+export { createVerificationSession } from './verificationSessions';
 
 let bot: TelegramBot | null = null;
 
@@ -73,40 +77,6 @@ export const configureWebApp = async (
     logger.error('Failed to configure Telegram mini app menu button:', message);
     return { ok: false, url, error: message };
   }
-};
-
-interface VerificationSession {
-  userId: string;
-  code: string;
-  timestamp: number;
-}
-
-const verificationSessions = new Map<string, VerificationSession>();
-
-/** Exported for use by auth linking endpoints */
-export { verificationSessions };
-
-// Clean up old sessions (older than 5 minutes)
-setInterval(() => {
-  const now = Date.now();
-  for (const [code, session] of verificationSessions.entries()) {
-    if (now - session.timestamp > 5 * 60 * 1000) {
-      verificationSessions.delete(code);
-    }
-  }
-}, 60 * 1000);
-
-/**
- * Create verification session
- */
-export const createVerificationSession = (userId: string): string => {
-  const code = Math.random().toString(36).substring(2, 10).toUpperCase();
-  verificationSessions.set(code, {
-    userId,
-    code,
-    timestamp: Date.now()
-  });
-  return code;
 };
 
 /**

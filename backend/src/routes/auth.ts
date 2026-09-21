@@ -14,7 +14,7 @@ import jwt from 'jsonwebtoken';
 import { authenticateWithGoogle, authenticateDevLogin, authenticateWithTelegramWebApp, detectTwinks, linkTelegramToUser, linkGoogleToUser } from '../services/AuthService';
 import { validateInitData, mapTelegramLanguage } from '../services/TelegramWebAppService';
 import { logger } from '../utils/logger';
-import { createVerificationSession, verificationSessions } from '../bot/telegramBot';
+import { createVerificationSession, verificationSessions } from '../bot/verificationSessions';
 import { User } from '../models/User';
 import { authenticate } from '../middleware/auth';
 import { validateUsernameCheck, rateLimit } from '../middleware/validation';
