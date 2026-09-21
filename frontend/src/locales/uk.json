@@ -42,7 +42,9 @@
     "cook_plov": "Готувати плов",
     "trade_bazaar": "Торгувати на базарі",
     "rest": "Відпочити",
-    "eat": "Поїсти"
+    "eat": "Поїсти",
+    "work_shawarma": "Працювати в шаурмі",
+    "pray_namaz": "Читати намаз"
   },
   "notifications": {
     "level_up": "Вітаємо! Ви досягли рівня {{level}}!",
@@ -131,7 +133,14 @@
     "loginToPlay": "Увійдіть, щоб почати гру",
     "loginError": "Помилка входу",
     "loggingOut": "Вихід із системи...",
-    "redirectingHome": "Перенаправлення на головну..."
+    "redirectingHome": "Перенаправлення на головну...",
+    "telegramSubtitle": "Вхід через Telegram виконується автоматично",
+    "telegramSignIn": "Увійти через Telegram",
+    "telegramOpening": "Відкриваємо гру…",
+    "telegramError": "Не вдалося увійти через Telegram. Спробуйте ще раз.",
+    "telegramNotConfigured": "Вхід через Telegram не налаштовано на сервері",
+    "telegramSignedAs": "Telegram: @{{username}}",
+    "telegramHint": "Ім’я, username і фото беремо з вашого Telegram-профілю"
   },
   "cities": {
     "select": "Оберіть місто",
@@ -222,7 +231,8 @@
       "accessory": "Аксесуари",
       "combat": "⚔️ Бій",
       "backpack": "Рюкзаки",
-      "equipment": "Спорядження"
+      "equipment": "Спорядження",
+      "owned": "Інвентар"
     },
     "rarity": {
       "common": "Звичайний",
@@ -242,7 +252,16 @@
     "bonus": "Бонус",
     "yourBalance": "Ваш баланс",
     "buyWithSoms": "Купити за соми",
-    "buyWithCrystals": "Купити за кристали"
+    "buyWithCrystals": "Купити за кристали",
+    "noBonus": "Без бонусів",
+    "sell": "Продати",
+    "sellFor": "Продати за {{amount}} {{emoji}}",
+    "sellConfirm": "Продати «{{name}}»? Предмет зникне з інвентарю.",
+    "sellSuccess": "Продано!",
+    "sellFailed": "Не вдалося продати предмет",
+    "equipFailed": "Не вдалося вдягнути предмет",
+    "unequipSuccess": "Предмет знято",
+    "unequipFailed": "Не вдалося зняти предмет"
   },
   "inventory": {
     "title": "Інвентар",
@@ -405,7 +424,47 @@
     "issuesDetected": "Виявлено проблеми",
     "projectReady": "Проект готовий до роботи",
     "needsAttention": "Потрібна увага розробників",
-    "checking": "Перевірка..."
+    "checking": "Перевірка...",
+    "service": {
+      "api": "Backend API",
+      "database": "MongoDB",
+      "bot": "Telegram Bot",
+      "frontend": "Frontend",
+      "tests": "Фонові тести"
+    },
+    "autoRefreshIn": "Автооновлення через {{seconds}} с",
+    "botNotRunning": "Не запущено",
+    "botRunning": "Запущено",
+    "connected": "Підключення",
+    "connectedNo": "немає",
+    "connectedYes": "є",
+    "duration": "Тривалість",
+    "errorHint": "Значення «немає даних» нижче означають, що перевірка не пройшла, а не нульове навантаження.",
+    "errorTitle": "Не вдалося отримати статус сервісів",
+    "frontendDetail": "Сторінка відрендерена в браузері",
+    "lastUpdated": "Оновлено",
+    "latency": "Відгук",
+    "memory": "Пам'ять",
+    "noTestData": "Немає даних про тести",
+    "retry": "Повторити",
+    "runTests": "Запустити тести",
+    "status": {
+      "healthy": "Працює",
+      "degraded": "Уповільнено",
+      "down": "Не працює",
+      "unknown": "Немає даних"
+    },
+    "testsErrorTitle": "Не вдалося отримати результати тестів",
+    "unitHours": "год",
+    "unitMinutes": "хв",
+    "unitSeconds": "с",
+    "uptime": "Аптайм",
+    "verdict": {
+      "healthy": "Усі системи працюють",
+      "degraded": "Є відхилення",
+      "down": "Сервіс недоступний",
+      "unknown": "Статус невідомий"
+    }
   },
   "activity": {
     "experience": "Досвід",
@@ -546,7 +605,8 @@
     "explore": "Досліджуйте світ",
     "yourProgress": "Ваш прогрес",
     "inUzbekistan": "в Узбекистані",
-    "madeWith": "Зроблено з"
+    "madeWith": "Зроблено з",
+    "openInTelegram": "Відкрити в Telegram"
   },
   "welcome": {
     "title": "Ласкаво просимо!",

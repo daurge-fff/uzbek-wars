@@ -7,7 +7,7 @@ interface EmojiProps {
   style?: 'apple' | 'google' | 'twitter' | 'facebook' | 'microsoft';
 }
 
-// Маппинг популярных эмодзи на локальные файлы (не зависят от сети)
+// Maps popular emoji to local files (no network dependency)
 const emojiToLocalFile: Record<string, string> = {
   '🏆': '/emoji-fallback/trophy.png',
   '👤': '/emoji-fallback/user.png',
@@ -67,11 +67,11 @@ const emojiToLocalFile: Record<string, string> = {
 };
 
 /**
- * Эмодзи как картинка с гарантированным откатом.
+ * Emoji rendered as an image with a guaranteed fallback.
  *
- * Порядок: локальный файл → CDN → системный эмодзи текстом. Раньше при пустом
- * значке рендерилась битая картинка (карточка выглядела пустой), а `crossOrigin`
- * ломал загрузку с CDN, поэтому теперь эмодзи никогда не «пропадает».
+ * Order: local file → CDN → system emoji as text. Previously an empty
+ * value rendered a broken image (the card looked empty), and `crossOrigin`
+ * broke CDN loading, so now the emoji never "disappears".
  */
 const Emoji = memo(({ emoji, size = 24, className = '', style = 'apple' }: EmojiProps) => {
   const [failedLocal, setFailedLocal] = useState(false);
@@ -119,7 +119,7 @@ const Emoji = memo(({ emoji, size = 24, className = '', style = 'apple' }: Emoji
     );
   }
 
-  // Последний уровень: системный эмодзи (работает без картинок вообще)
+  // Last level: system emoji (works with no images at all)
   return (
     <span
       role="img"

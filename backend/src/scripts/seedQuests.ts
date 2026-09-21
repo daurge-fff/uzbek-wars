@@ -1,10 +1,10 @@
 /**
- * Накатывает только глобальные квесты.
+ * Applies only the global quests.
  *
- * Запуск: npm run seed:quests --workspace=backend
+ * Run: npm run seed:quests --workspace=backend
  *
- * Операция идемпотентная: квесты обновляются upsert'ом по `id`, никакие другие
- * коллекции (игроки, активности, города, косметика) не затрагиваются.
+ * The operation is idempotent: quests are upserted by `id`, no other
+ * collections (players, activities, cities, cosmetics) are touched.
  */
 
 import mongoose from 'mongoose';

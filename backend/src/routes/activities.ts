@@ -9,6 +9,9 @@
 import { Router, Request, Response } from 'express';
 import { getActivities } from '../services/ActivityService';
 import { logger } from '../utils/logger';
+import { optionalAuth } from '../middleware/auth';
+import { Player } from '../models/Player';
+import { applyActivityTime } from '../services/CharacterBonusService';
 
 const router = Router();
 
@@ -56,13 +59,27 @@ const router = Router();
  *   ]
  * }
  */
-router.get('/activities', (_req: Request, res: Response): void => {
+router.get('/activities', optionalAuth, async (req: Request, res: Response): Promise<void> => {
   try {
     const activities = getActivities();
-    
+
+    // The card must show the time the player will actually wait. Character classes
+    // speed some activities up (e.g. rest 60s -> 54s), and showing the base value
+    // looked like a broken timer.
+    const userId = (req as any).user?.id;
+    const player = userId ? await Player.findOne({ userId }) : null;
+
+    const activitiesWithRealDuration = player
+      ? activities.map((activity) => ({
+          ...activity,
+          baseDuration: activity.duration,
+          duration: applyActivityTime(activity.duration, player.characterId),
+        }))
+      : activities;
+
     res.status(200).json({
-      activities,
-      count: activities.length
+      activities: activitiesWithRealDuration,
+      count: activitiesWithRealDuration.length
     });
   } catch (error) {
     logger.error('Activities endpoint error:', error);

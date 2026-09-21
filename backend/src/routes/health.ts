@@ -1,7 +1,16 @@
 /**
  * Health Check Routes
- * 
- * Provides endpoints for monitoring system health
+ *
+ * Provides endpoints for monitoring system health.
+ *
+ * `GET /api/health` is public (no auth) on purpose: it powers the public
+ * status page at `/health`.
+ *
+ * Response (top-level fields kept for backwards compatibility):
+ *   - status: 'healthy' | 'degraded' | 'down'
+ *   - timestamp: Current server time
+ *   - services: { api, database, bot } with status + real measurements
+ *   - checks: flat list of the same checks, each with id/label/status/detail/latencyMs
  */
 
 import { Router, Request, Response } from 'express';
@@ -11,69 +20,134 @@ import { bot } from '../bot/telegramBot';
 
 const router = Router();
 
+type ServiceState = 'healthy' | 'degraded' | 'down';
+
+interface HealthCheck {
+  id: string;
+  /** Stable English name for API consumers; the UI localises by `id`. */
+  label: string;
+  status: ServiceState;
+  detail: string;
+  /** Measured latency in ms, or null when this check is not a timed round-trip. */
+  latencyMs: number | null;
+}
+
+/** A database answering slower than this is reported as 'degraded'. */
+const SLOW_DATABASE_MS = 750;
+
+const round = (value: number): number => Math.round(value * 10) / 10;
+
+/**
+ * Round-trip time of a real MongoDB ping.
+ * Never throws: an unusable connection is reported as `ok: false`.
+ */
+async function pingDatabase(): Promise<{ ok: boolean; latencyMs: number | null; detail: string }> {
+  if (mongoose.connection.readyState !== 1) {
+    return {
+      ok: false,
+      latencyMs: null,
+      detail: `not connected (readyState ${mongoose.connection.readyState})`
+    };
+  }
+
+  const db = mongoose.connection.db;
+  if (!db) {
+    return { ok: false, latencyMs: null, detail: 'connection has no db handle' };
+  }
+
+  const startedAt = performance.now();
+  try {
+    await db.admin().command({ ping: 1 });
+    return { ok: true, latencyMs: round(performance.now() - startedAt), detail: 'ping ok' };
+  } catch (error) {
+    logger.error('Database ping failed:', error);
+    return { ok: false, latencyMs: null, detail: `ping failed: ${(error as Error).message}` };
+  }
+}
+
 /**
  * GET /api/health
- * 
- * Returns overall system health status
- * 
- * Response:
- *   - status: 'healthy' | 'degraded' | 'down'
- *   - services: Status of each service
- *   - timestamp: Current server time
+ *
+ * Returns overall system health status with measured latencies.
  */
 router.get('/', async (_req: Request, res: Response): Promise<void> => {
   try {
+    const startedAt = performance.now();
+
+    const database = await pingDatabase();
+
+    // Telegram bot: we only know whether the bot instance exists in this
+    // process. No fake latency — a real round-trip to Telegram is not measured.
+    const botRunning = Boolean(bot);
+    const botStatus: ServiceState = botRunning ? 'healthy' : 'down';
+
+    const databaseStatus: ServiceState = !database.ok
+      ? 'down'
+      : (database.latencyMs ?? 0) > SLOW_DATABASE_MS
+        ? 'degraded'
+        : 'healthy';
+
+    const apiStatus: ServiceState = 'healthy';
+    // Time this endpoint spent outside of the database ping.
+    const apiLatencyMs = round(
+      Math.max(0, performance.now() - startedAt - (database.latencyMs ?? 0))
+    );
+
+    const checks: HealthCheck[] = [
+      {
+        id: 'api',
+        label: 'API',
+        status: apiStatus,
+        detail: `uptime ${Math.round(process.uptime())}s`,
+        latencyMs: apiLatencyMs
+      },
+      {
+        id: 'database',
+        label: 'Database',
+        status: databaseStatus,
+        detail: database.detail,
+        latencyMs: database.latencyMs
+      },
+      {
+        id: 'bot',
+        label: 'Telegram bot',
+        status: botStatus,
+        detail: botRunning ? 'running' : 'not running',
+        latencyMs: null
+      }
+    ];
+
+    // 'api' and 'database' are critical; the bot is optional and only degrades.
+    const criticalDown = checks.some(check => check.status === 'down' && check.id !== 'bot');
+    const degraded = checks.some(check => check.status === 'degraded') || botStatus === 'down';
+
+    const overall: ServiceState = criticalDown ? 'down' : degraded ? 'degraded' : 'healthy';
+
     const health = {
-      status: 'healthy' as 'healthy' | 'degraded' | 'down',
+      status: overall,
       timestamp: new Date().toISOString(),
       services: {
         api: {
-          status: 'healthy' as const,
+          status: apiStatus,
           uptime: process.uptime(),
-          memory: process.memoryUsage()
+          memory: process.memoryUsage(),
+          latencyMs: apiLatencyMs
         },
         database: {
-          status: 'unknown' as 'healthy' | 'degraded' | 'down',
-          connected: false
+          status: databaseStatus,
+          connected: database.ok,
+          latencyMs: database.latencyMs
         },
         bot: {
-          status: 'unknown' as 'healthy' | 'degraded' | 'down',
-          running: false
+          status: botStatus,
+          running: botRunning,
+          latencyMs: null
         }
-      }
+      },
+      checks
     };
 
-    // Check MongoDB
-    try {
-      if (mongoose.connection.readyState === 1) {
-        health.services.database.status = 'healthy';
-        health.services.database.connected = true;
-      } else {
-        health.services.database.status = 'down';
-        health.status = 'degraded';
-      }
-    } catch (error) {
-      health.services.database.status = 'down';
-      health.status = 'degraded';
-      logger.error('Database health check failed:', error);
-    }
-
-    // Check Telegram Bot
-    try {
-      if (bot) {
-        health.services.bot.status = 'healthy';
-        health.services.bot.running = true;
-      } else {
-        health.services.bot.status = 'down';
-        // Bot is optional, don't degrade overall status
-      }
-    } catch (error) {
-      health.services.bot.status = 'down';
-      logger.error('Bot health check failed:', error);
-    }
-
-    const statusCode = health.status === 'healthy' ? 200 : 503;
-    res.status(statusCode).json(health);
+    res.status(overall === 'healthy' ? 200 : 503).json(health);
   } catch (error) {
     logger.error('Health check endpoint error:', error);
     res.status(500).json({
@@ -86,7 +160,7 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
 
 /**
  * GET /api/health/ready
- * 
+ *
  * Readiness probe for Kubernetes/Docker
  * Returns 200 if service is ready to accept traffic
  */
@@ -116,7 +190,7 @@ router.get('/ready', async (_req: Request, res: Response): Promise<void> => {
 
 /**
  * GET /api/health/live
- * 
+ *
  * Liveness probe for Kubernetes/Docker
  * Returns 200 if service is alive
  */

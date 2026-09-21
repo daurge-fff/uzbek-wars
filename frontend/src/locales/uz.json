@@ -42,7 +42,9 @@
     "cook_plov": "Osh pishirish",
     "trade_bazaar": "Bozorda savdo qilish",
     "rest": "Dam olish",
-    "eat": "Ovqatlanish"
+    "eat": "Ovqatlanish",
+    "work_shawarma": "Shaurmada ishlash",
+    "pray_namaz": "Namoz o'qish"
   },
   "notifications": {
     "level_up": "Tabriklaymiz! Siz {{level}} darajaga yetdingiz!",
@@ -131,7 +133,14 @@
     "loginError": "Kirish xatosi",
     "confirmLogout": "Chiqishni xohlaysizmi?",
     "loggingOut": "Tizimdan chiqish...",
-    "redirectingHome": "Bosh sahifaga yo'naltirilmoqda..."
+    "redirectingHome": "Bosh sahifaga yo'naltirilmoqda...",
+    "telegramSubtitle": "Telegram orqali kirish avtomatik bajariladi",
+    "telegramSignIn": "Telegram orqali kirish",
+    "telegramOpening": "O'yin ochilmoqda…",
+    "telegramError": "Telegram orqali kirib bo'lmadi. Yana urinib ko'ring.",
+    "telegramNotConfigured": "Serverda Telegram orqali kirish sozlanmagan",
+    "telegramSignedAs": "Telegram: @{{username}}",
+    "telegramHint": "Ism, username va foto Telegram profilingizdan olinadi"
   },
   "cities": {
     "select": "Shaharni tanlang",
@@ -222,7 +231,8 @@
       "accessory": "Aksessuarlar",
       "combat": "⚔️ Jang",
       "backpack": "Ryukzaklar",
-      "equipment": "Jihozlar"
+      "equipment": "Jihozlar",
+      "owned": "Inventar"
     },
     "rarity": {
       "common": "Oddiy",
@@ -242,7 +252,16 @@
     "bonus": "Bonus",
     "yourBalance": "Sizning balansingiz",
     "buyWithSoms": "So'm uchun sotib olish",
-    "buyWithCrystals": "Kristallar uchun sotib olish"
+    "buyWithCrystals": "Kristallar uchun sotib olish",
+    "noBonus": "Bonussiz",
+    "sell": "Sotish",
+    "sellFor": "{{amount}} {{emoji}} ga sotish",
+    "sellConfirm": "«{{name}}» sotilsinmi? Buyum inventardan yo'qoladi.",
+    "sellSuccess": "Sotildi!",
+    "sellFailed": "Buyumni sotib bo'lmadi",
+    "equipFailed": "Buyumni kiyib bo'lmadi",
+    "unequipSuccess": "Buyum yechildi",
+    "unequipFailed": "Buyumni yechib bo'lmadi"
   },
   "inventory": {
     "title": "Inventar",
@@ -405,7 +424,47 @@
     "issuesDetected": "Muammolar aniqlandi",
     "projectReady": "Loyiha ishlashga tayyor",
     "needsAttention": "Dasturchining e'tibori kerak",
-    "checking": "Tekshirilmoqda..."
+    "checking": "Tekshirilmoqda...",
+    "service": {
+      "api": "Backend API",
+      "database": "MongoDB",
+      "bot": "Telegram Bot",
+      "frontend": "Frontend",
+      "tests": "Fon testlari"
+    },
+    "autoRefreshIn": "{{seconds}} s dan keyin avtomatik yangilash",
+    "botNotRunning": "Ishlamayapti",
+    "botRunning": "Ishlayapti",
+    "connected": "Ulanish",
+    "connectedNo": "yo'q",
+    "connectedYes": "bor",
+    "duration": "Davomiyligi",
+    "errorHint": "Quyidagi «ma'lumot yo'q» qiymatlari tekshiruv o'tmaganini bildiradi, nol yuklamani emas.",
+    "errorTitle": "Servislar holatini olish imkonsiz",
+    "frontendDetail": "Sahifa brauzerda chizildi",
+    "lastUpdated": "Yangilandi",
+    "latency": "Javob",
+    "memory": "Xotira",
+    "noTestData": "Testlar haqida ma'lumot yo'q",
+    "retry": "Qayta urinish",
+    "runTests": "Testlarni ishga tushirish",
+    "status": {
+      "healthy": "Ishlayapti",
+      "degraded": "Sekinlashgan",
+      "down": "Ishlamayapti",
+      "unknown": "Ma'lumot yo'q"
+    },
+    "testsErrorTitle": "Test natijalarini olish imkonsiz",
+    "unitHours": "soat",
+    "unitMinutes": "daq",
+    "unitSeconds": "s",
+    "uptime": "Ish vaqti",
+    "verdict": {
+      "healthy": "Barcha tizimlar ishlayapti",
+      "degraded": "Ba'zi muammolar bor",
+      "down": "Servis ishlamayapti",
+      "unknown": "Holat noma'lum"
+    }
   },
   "activity": {
     "experience": "Tajriba",
@@ -546,7 +605,8 @@
     "explore": "Dunyoni kashf eting",
     "yourProgress": "Sizning progressingiz",
     "inUzbekistan": "O'zbekistonda",
-    "madeWith": "Muhabbat bilan yaratildi"
+    "madeWith": "Muhabbat bilan yaratildi",
+    "openInTelegram": "Telegram'da ochish"
   },
   "welcome": {
     "title": "Xush kelibsiz!",

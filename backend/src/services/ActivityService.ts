@@ -109,8 +109,8 @@ export const ACTIVITIES: Activity[] = [
       mood: -5,
       hunger: -10,
     },
-    duration: 120, // 2 минуты
-    cooldown: 60, // 1 минута кулдаун
+    duration: 120, // 2 minutes
+    cooldown: 60, // 1 minute cooldown
     requiredLevel: 1,
   },
   {
@@ -141,8 +141,8 @@ export const ACTIVITIES: Activity[] = [
       probability: 0.3,
       penalty: 300,
     },
-    duration: 180, // 3 минуты
-    cooldown: 300, // 5 минут кулдаун
+    duration: 180, // 3 minutes
+    cooldown: 300, // 5 minutes cooldown
     requiredLevel: 3,
   },
   {
@@ -172,8 +172,8 @@ export const ACTIVITIES: Activity[] = [
       probability: 0.1,
       penalty: 100,
     },
-    duration: 150, // 2.5 минуты
-    cooldown: 120, // 2 минуты кулдаун
+    duration: 150, // 2.5 minutes
+    cooldown: 120, // 2 minutes cooldown
     requiredLevel: 2,
   },
   {
@@ -203,8 +203,8 @@ export const ACTIVITIES: Activity[] = [
       probability: 0.2,
       penalty: 200,
     },
-    duration: 240, // 4 минуты
-    cooldown: 180, // 3 минуты кулдаун
+    duration: 240, // 4 minutes
+    cooldown: 180, // 3 minutes cooldown
     requiredLevel: 4,
   },
   {
@@ -229,8 +229,8 @@ export const ACTIVITIES: Activity[] = [
       energy: 40,
       mood: 15,
     },
-    duration: 60, // 1 минута
-    cooldown: 30, // 30 секунд кулдаун
+    duration: 60, // 1 minute
+    cooldown: 30, // 30 seconds cooldown
     requiredLevel: 1,
   },
   {
@@ -256,10 +256,64 @@ export const ACTIVITIES: Activity[] = [
       health: 10,
       mood: 10,
     },
-    duration: 30, // 30 секунд
-    cooldown: 60, // 1 минута кулдаун
+    duration: 30, // 30 seconds
+    cooldown: 60, // 1 minute cooldown
     requiredLevel: 1,
     cost: 50,
+  },
+  {
+    id: 'work_shawarma',
+    name: {
+      ru: 'Работать в шаурмичной',
+      uz: 'Shaurmada ishlash',
+      uk: 'Працювати в шаурмі',
+      en: 'Work at the shawarma shop',
+    },
+    description: {
+      ru: 'Дядя Нахруз берёт племянника в свою шаурмичную: платит как родственнику, кормит как родному. Немного сомов, немного сытнее и куча историй про «правильный» соус.',
+      uz: "Nahruz amaki jiyanini o'z shaurmasiga oladi: qarindoshga o'xshab to'laydi, o'z bolasidek boqadi. Bir oz so'm, bir oz to'qlik va «to'g'ri» sous haqida ko'p hikoyalar.",
+      uk: 'Дядя Нахруз бере племінника у свою шаурмічну: платить як родичу, годує як рідного. Трохи сомів, трохи ситніше і купа історій про «правильний» соус.',
+      en: "Uncle Nakhruz takes his nephew into the shawarma shop: pays him like family and feeds him like family. A few soms, a bit less hunger and endless stories about the 'right' sauce.",
+    },
+    rewards: {
+      experience: 25,
+      soms: 350,
+    },
+    statModifiers: {
+      hunger: 15,
+      energy: -10,
+      mood: 5,
+    },
+    duration: 90,
+    cooldown: 120,
+    requiredLevel: 5,
+  },
+  {
+    id: 'pray_namaz',
+    name: {
+      ru: 'Читать намаз',
+      uz: "Namoz o'qish",
+      uk: 'Читати намаз',
+      en: 'Read namaz',
+    },
+    description: {
+      ru: 'Дорогое по силам дело: отдаёшь энергию, зато здоровье восстанавливается лучше, чем от отдыха, и мысли встают на место.',
+      uz: "Kuch talab qiladigan ish: energiya ketadi, lekin sog'liq dam olishdan ham yaxshi tiklanadi va fikrlar joyiga tushadi.",
+      uk: 'Справа дорога за силами: віддаєш енергію, зате здоров’я відновлюється краще за відпочинок, і думки стають на місце.',
+      en: 'Costly in effort: it spends energy, but health recovers better than from rest and your thoughts settle.',
+    },
+    rewards: {
+      experience: 30,
+      soms: 0,
+    },
+    statModifiers: {
+      health: 30,
+      energy: -25,
+      mood: 10,
+    },
+    duration: 60,
+    cooldown: 300,
+    requiredLevel: 10,
   },
 ];
 

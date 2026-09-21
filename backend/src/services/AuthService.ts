@@ -11,6 +11,7 @@ import { Player } from '../models/Player';
 import { env } from '../config/environment';
 import { logger } from '../utils/logger';
 import { updateLoginStreak } from './TaskService';
+import { TelegramWebAppUser, getTelegramDisplayName } from './TelegramWebAppService';
 
 // Debug: Log JWT_SECRET status at module load time
 logger.info(`[AuthService] Module loaded - JWT_SECRET type: ${typeof env.JWT_SECRET}, exists: ${!!env.JWT_SECRET}, length: ${env.JWT_SECRET ? env.JWT_SECRET.length : 0}`);
@@ -188,6 +189,114 @@ export async function authenticateWithGoogle(
     throw error;
   }
 }
+
+/**
+ * Authenticates (or registers) a user coming from the Telegram mini app.
+ *
+ * The caller must pass an already verified Telegram user (see TelegramWebAppService):
+ * this function never trusts unvalidated client data. Telegram provides no email, so
+ * mini app accounts get a synthetic, clearly marked email and googleId; the rest of the
+ * profile (name, username, photo, language) is stored and refreshed on every open.
+ *
+ * @param telegramUser - Verified user object from initData
+ * @param ipAddress - Request IP address
+ * @param deviceInfo - Client device info
+ * @param language - Language mapped from the Telegram locale
+ */
+export async function authenticateWithTelegramWebApp(
+  telegramUser: TelegramWebAppUser,
+  ipAddress: string,
+  deviceInfo: DeviceInfo,
+  language: 'ru' | 'uz' | 'uk' | 'en'
+): Promise<AuthResult> {
+  try {
+    const telegramId = String(telegramUser.id);
+    const displayName = getTelegramDisplayName(telegramUser);
+
+    let user = await User.findOne({ telegramId });
+    let isNewUser = false;
+
+    if (!user) {
+      isNewUser = true;
+      user = await User.create({
+        // Synthetic identifiers: both fields are required and unique in the schema
+        googleId: `telegram:${telegramId}`,
+        email: `tg${telegramId}@telegram.miniapp`,
+        displayName,
+        username: telegramUser.username,
+        avatar: telegramUser.photo_url,
+        ipAddress,
+        deviceInfo,
+        language,
+        telegramId,
+        telegramUsername: telegramUser.username,
+        firstName: telegramUser.first_name,
+        lastName: telegramUser.last_name,
+        languageCode: telegramUser.language_code,
+        photoUrl: telegramUser.photo_url,
+        telegramLastLoginAt: new Date(),
+      });
+
+      logger.info(`New user registered via Telegram mini app: ${telegramId}`);
+    } else {
+      // Refresh the Telegram profile and device info on every mini app open
+      user.displayName = displayName;
+      user.username = telegramUser.username;
+      user.avatar = telegramUser.photo_url;
+      user.ipAddress = ipAddress;
+      user.deviceInfo = deviceInfo;
+      user.language = language;
+      user.telegramUsername = telegramUser.username;
+      user.firstName = telegramUser.first_name;
+      user.lastName = telegramUser.last_name;
+      user.languageCode = telegramUser.language_code;
+      user.photoUrl = telegramUser.photo_url;
+      user.telegramLastLoginAt = new Date();
+      await user.save();
+
+      logger.info(`User logged in via Telegram mini app: ${telegramId}`);
+    }
+
+    // A player is created during onboarding, not here
+    const player = await Player.findOne({ userId: user._id });
+    if (player) {
+      await updateLoginStreak(player);
+    }
+
+    const token = generateToken(user._id.toString());
+
+    return {
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        displayName: user.displayName,
+        avatar: user.avatar,
+        language: user.language,
+        telegramId: user.telegramId,
+        telegramUsername: user.telegramUsername,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        photoUrl: user.photoUrl
+      },
+      player: player ? {
+        id: player._id,
+        level: player.level,
+        experience: player.experience,
+        soms: player.soms,
+        characterId: player.characterId,
+        cityId: player.cityId,
+        donationCurrency: player.donationCurrency,
+        stats: player.stats
+      } : null,
+      isNewUser
+    };
+  } catch (error) {
+    logger.error('Telegram mini app authentication error:', error);
+    throw error;
+  }
+}
+
 /**
  * Authenticates developer in development mode
  * 

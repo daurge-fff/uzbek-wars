@@ -6,8 +6,49 @@ import request from 'supertest';
 import { createServer } from '../server';
 import mongoose from 'mongoose';
 
+/**
+ * The route only checks whether a bot instance exists. Tests fake a running instance so
+ * the overall verdict is not permanently "degraded" merely because the bot isn't started.
+ */
+jest.mock('../bot/telegramBot', () => ({ bot: { isRunning: () => true } }));
+
+/**
+ * mongoose exposes `readyState` as a non-configurable getter, so `jest.spyOn` can not
+ * wrap it. Defining an own property shadows the prototype getter; `afterEach` removes it.
+ */
+const setReadyState = (value: number): void => {
+  Object.defineProperty(mongoose.connection, 'readyState', {
+    value,
+    configurable: true,
+    writable: true
+  });
+};
+
+/**
+ * The route pings the real database handle when it looks connected. Tests must not
+ * touch Atlas, so they install a fake handle that answers the ping instantly.
+ */
+const setFakeDb = (): void => {
+  Object.defineProperty(mongoose.connection, 'db', {
+    value: { admin: () => ({ command: jest.fn().mockResolvedValue({ ok: 1 }) }) },
+    configurable: true,
+    writable: true
+  });
+};
+
+/** Removes the own properties installed above so the prototype getters work again */
+const clearConnectionOverrides = (): void => {
+  delete (mongoose.connection as any).readyState;
+  delete (mongoose.connection as any).db;
+};
+
 describe('Health Check Routes', () => {
   const app = createServer();
+
+  afterEach(() => {
+    clearConnectionOverrides();
+    jest.restoreAllMocks();
+  });
 
   describe('GET /api/health', () => {
     it('should return health status', async () => {
@@ -24,8 +65,8 @@ describe('Health Check Routes', () => {
     });
 
     it('should return healthy status when all services are up', async () => {
-      // Mock mongoose connection
-      jest.spyOn(mongoose.connection, 'readyState', 'get').mockReturnValue(1);
+      setReadyState(1);
+      setFakeDb();
 
       const response = await request(app)
         .get('/api/health')
@@ -35,15 +76,15 @@ describe('Health Check Routes', () => {
       expect(response.body.services.database.status).toBe('healthy');
     });
 
-    it('should return degraded status when database is down', async () => {
-      // Mock mongoose connection as disconnected
-      jest.spyOn(mongoose.connection, 'readyState', 'get').mockReturnValue(0);
+    it('should report a down service when the database is unavailable', async () => {
+      // Database down is a critical failure: overall status is `down`, HTTP 503
+      setReadyState(0);
 
       const response = await request(app)
         .get('/api/health')
         .expect(503);
 
-      expect(response.body.status).toBe('degraded');
+      expect(response.body.status).toBe('down');
       expect(response.body.services.database.status).toBe('down');
     });
 
@@ -61,8 +102,7 @@ describe('Health Check Routes', () => {
 
   describe('GET /api/health/ready', () => {
     it('should return ready when database is connected', async () => {
-      jest.spyOn(mongoose.connection, 'readyState', 'get').mockReturnValue(1);
-
+      setReadyState(1);
       const response = await request(app)
         .get('/api/health/ready')
         .expect(200);
@@ -72,7 +112,7 @@ describe('Health Check Routes', () => {
     });
 
     it('should return not ready when database is disconnected', async () => {
-      jest.spyOn(mongoose.connection, 'readyState', 'get').mockReturnValue(0);
+      setReadyState(0);
 
       const response = await request(app)
         .get('/api/health/ready')
@@ -94,7 +134,7 @@ describe('Health Check Routes', () => {
     });
 
     it('should return alive even when database is down', async () => {
-      jest.spyOn(mongoose.connection, 'readyState', 'get').mockReturnValue(0);
+      setReadyState(0);
 
       const response = await request(app)
         .get('/api/health/live')

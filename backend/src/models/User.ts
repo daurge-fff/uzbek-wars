@@ -30,6 +30,12 @@ export interface IUser extends Document {
   deviceInfo: IDeviceInfo;
   telegramId?: string;
   telegramUsername?: string;
+  /** Profile fields coming from the Telegram mini app */
+  firstName?: string;
+  lastName?: string;
+  languageCode?: string;
+  photoUrl?: string;
+  telegramLastLoginAt?: Date;
   isVerified: boolean;
   username?: string;
   createdAt: Date;
@@ -86,6 +92,21 @@ const UserSchema = new Schema<IUser>(
     },
     telegramUsername: {
       type: String,
+    },
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+    languageCode: {
+      type: String,
+    },
+    photoUrl: {
+      type: String,
+    },
+    telegramLastLoginAt: {
+      type: Date,
     },
     isVerified: {
       type: Boolean,

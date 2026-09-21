@@ -14,6 +14,10 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "seed": "tsx --env-file=../.env src/scripts/seed.ts",
     "seed:quests": "tsx --env-file=../.env src/scripts/seedQuests.ts",
+    "setup:bot": "tsx --env-file=../.env src/scripts/setupBot.ts",
+    "seed:container": "tsx src/scripts/seed.ts",
+    "seed:quests:container": "tsx src/scripts/seedQuests.ts",
+    "setup:bot:container": "tsx src/scripts/setupBot.ts",
     "clear-users": "tsx --env-file=../.env src/scripts/clearUsers.ts",
     "bot": "tsx --env-file=../.env src/bot/index.ts",
     "bot:dev": "tsx watch --env-file=../.env src/bot/index.ts"

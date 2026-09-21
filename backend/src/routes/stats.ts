@@ -10,8 +10,8 @@ const router = Router();
  */
 router.get('/app', authenticate, async (req: Request, res: Response) => {
   try {
-    // Middleware кладёт в req.user поле id (id пользователя), а не userId — из-за
-    // этого эндпоинт всегда отвечал 401 и настройки показывали нули.
+    // The middleware puts an `id` field into req.user (the user id), not userId — because of
+    // this the endpoint always returned 401 and the settings showed zeros.
     const userId = (req as any).user?.id;
     
     if (!userId) {

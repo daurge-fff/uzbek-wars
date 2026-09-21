@@ -43,7 +43,7 @@ services:
       backend:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -69,7 +69,7 @@ services:
       - backend
       - frontend
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -78,6 +78,50 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+  # ---------------------------------------------------------------------------
+  # One-off maintenance tasks. They need devDependencies (tsx), so they reuse the
+  # `builder` stage of the backend image.
+  #
+  #   docker compose --profile tools run --rm seeder         # cities/cosmetics/daily tasks
+  #   docker compose --profile tools run --rm quest-seeder   # global quests
+  #   docker compose --profile tools run --rm bot-setup      # Telegram menu button + commands
+  # ---------------------------------------------------------------------------
+  seeder:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      target: builder
+    profiles: ["tools"]
+    env_file:
+      - .env
+    command: ["npm", "run", "seed:container", "--workspace=backend"]
+    networks:
+      - uzbek-wars-network
+
+  quest-seeder:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      target: builder
+    profiles: ["tools"]
+    env_file:
+      - .env
+    command: ["npm", "run", "seed:quests:container", "--workspace=backend"]
+    networks:
+      - uzbek-wars-network
+
+  bot-setup:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      target: builder
+    profiles: ["tools"]
+    env_file:
+      - .env
+    command: ["npm", "run", "setup:bot:container", "--workspace=backend"]
+    networks:
+      - uzbek-wars-network
 
 networks:
   uzbek-wars-network:

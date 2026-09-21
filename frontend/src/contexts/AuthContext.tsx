@@ -8,6 +8,14 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import {
+  getDeviceInfo,
+  getTelegramInitData,
+  getTelegramUser,
+  initTelegramUi,
+  isTelegramMiniApp,
+  TelegramUserProfile,
+} from '../utils/telegram';
 
 interface User {
   id: string;
@@ -51,18 +59,31 @@ interface AuthContextType {
   logout: () => void;
   updatePlayer: (player: Partial<Player>) => void;
   refreshPlayer: () => Promise<void>;
+  /** True when the page is opened inside the Telegram mini app */
+  isTelegram: boolean;
+  /** Telegram profile from initDataUnsafe — display only, never for auth */
+  telegramUser: TelegramUserProfile | null;
+  telegramAuthPending: boolean;
+  telegramAuthError: string | null;
+  /** Signs in with the signed initData string (auto-called on mini app open) */
+  loginWithTelegram: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [player, setPlayer] = useState<Player | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [telegramAuthPending, setTelegramAuthPending] = useState(false);
+  const [telegramAuthError, setTelegramAuthError] = useState<string | null>(null);
   const { i18n } = useTranslation();
+
+  const isTelegram = isTelegramMiniApp();
+  const telegramUser = getTelegramUser();
 
   // Load auth state from localStorage on mount
   useEffect(() => {
@@ -87,6 +108,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setIsLoading(false);
   }, [i18n]);
+
+  /**
+   * Signs in through the Telegram mini app.
+   *
+   * The raw signed initData string is verified on the server with the bot token, and the
+   * backend stores the Telegram profile (id, username, first/last name, photo, language).
+   * Works both for auto-login on open and for the manual retry button.
+   */
+  const loginWithTelegram = async () => {
+    const initData = getTelegramInitData();
+
+    if (!initData) {
+      setTelegramAuthError('NO_INIT_DATA');
+      return;
+    }
+
+    setTelegramAuthPending(true);
+    setTelegramAuthError(null);
+
+    try {
+      const response = await axios.post(`${API_URL}/api/auth/telegram-webapp`, {
+        initData,
+        deviceInfo: getDeviceInfo(),
+      });
+
+      const { token: newToken, user: newUser, player: newPlayer } = response.data;
+      login(newToken, newUser, newPlayer);
+    } catch (error: any) {
+      const code = error?.response?.data?.code || 'AUTH_FAILED';
+      setTelegramAuthError(code);
+      console.error('Telegram mini app login failed:', code, error);
+    } finally {
+      setTelegramAuthPending(false);
+    }
+  };
+
+  // Telegram mini app: prepare the UI and sign in automatically on open
+  useEffect(() => {
+    initTelegramUi();
+
+    const alreadyAuthenticated = Boolean(localStorage.getItem('auth_token'));
+    if (!isTelegram || alreadyAuthenticated || !getTelegramInitData()) {
+      return;
+    }
+
+    void loginWithTelegram();
+    // Runs once on mount: the mini app is opened fresh from Telegram each time
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const login = (newToken: string, newUser: User, newPlayer: Player) => {
     setToken(newToken);
@@ -144,8 +214,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.data.player) {
         const updatedPlayer = {
-          // id = документ Player (а не userId): именно его сравнивают логи боя
-          // и таблица рейтинга, раньше сравнения всегда были ложными
+          // id = the Player document (not userId): that's what the battle logs
+          // and the leaderboard compare, previously the comparisons were always false
           id: response.data.player.id || response.data.player.userId,
           level: response.data.player.level,
           experience: response.data.player.experience,
@@ -155,7 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           donationCurrency: response.data.player.donationCurrency,
           stats: {
             ...response.data.player.stats,
-            // Объединяем боевые статы
+            // Merge combat stats
             ...(response.data.player.combatStats || {})
           }
         };
@@ -184,7 +254,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         updatePlayer,
-        refreshPlayer
+        refreshPlayer,
+        isTelegram,
+        telegramUser,
+        telegramAuthPending,
+        telegramAuthError,
+        loginWithTelegram
       }}
     >
       {children}

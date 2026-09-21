@@ -130,7 +130,7 @@ const statConfig = {
   }
 };
 
-// Эмодзи для активностей
+// Emoji for activities
 const activityImages: Record<string, string> = {
   'work_svyaznoy': '📱',
   'rob': '💰',
@@ -154,7 +154,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
   const [showCombatStats, setShowCombatStats] = useState(false);
   const [isCombatStatsOpen, setIsCombatStatsOpen] = useState(false);
 
-  // Загружаем модификаторы класса при монтировании
+  // Load the class modifiers on mount
   useEffect(() => {
     const fetchModifiers = async () => {
       try {
@@ -179,16 +179,16 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
     fetchModifiers();
   }, [playerState.characterId]);
 
-  // Применяем модификаторы класса к значениям активности
+  // Apply the class modifiers to the activity values
   const applyClassModifiers = (activity: Activity) => {
     if (!activity.rewards) return activity;
 
-    // Если модификаторы не загружены, возвращаем базовые значения
+    // If the modifiers aren't loaded, return the base values
     if (!characterModifiers) return activity;
 
     const modifiedActivity = { ...activity };
 
-    // Применяем бонусы к наградам
+    // Apply the bonuses to the rewards
     if (modifiedActivity.rewards) {
       const expBonus = characterModifiers.experienceBonus || 0;
       const incomeBonus = characterModifiers.incomeBonus || 0;
@@ -199,38 +199,38 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       };
     }
 
-    // Применяем модификаторы к изменениям статов
+    // Apply the modifiers to the stat changes
     if (modifiedActivity.statModifiers) {
       const newModifiers: any = {};
       Object.entries(modifiedActivity.statModifiers).forEach(([key, value]) => {
         const statValue = value as number;
 
-        // Применяем модификаторы класса к статам
+        // Apply the class modifiers to the stats
         if (key === 'mood' && statValue > 0) {
-          // Положительное настроение от работы
+          // Positive mood from work
           const moodBonus = characterModifiers.moodFromWork || 0;
           newModifiers[key] = Math.round(statValue * (1 + moodBonus / 100));
         } else if (key === 'hunger' && statValue > 0) {
-          // Восстановление голода от еды
+          // Hunger restored by food
           const foodBonus = characterModifiers.foodRecovery || 0;
           newModifiers[key] = Math.round(statValue * (1 + foodBonus / 100));
         } else if (key === 'health' && statValue > 0) {
-          // Восстановление здоровья от еды
+          // Health restored by food
           const healthBonus = characterModifiers.healthFromFood || 0;
           newModifiers[key] = Math.round(statValue * (1 + healthBonus / 100));
         } else if (key === 'energy' && statValue > 0) {
-          // Восстановление энергии
+          // Energy restored
           const energyBonus = characterModifiers.energyRecovery || 0;
           newModifiers[key] = Math.round(statValue * (1 + energyBonus / 100));
         } else {
-          // Остальные статы без изменений
+          // Other stats unchanged
           newModifiers[key] = Math.round(statValue);
         }
       });
       modifiedActivity.statModifiers = newModifiers;
     }
 
-    // Применяем модификатор времени
+    // Apply the time modifier
     if (modifiedActivity.duration) {
       const timeMod = characterModifiers.activityDuration || 0;
       modifiedActivity.duration = Math.round((activity.duration || 0) * (1 + timeMod / 100));
@@ -239,7 +239,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
     return modifiedActivity;
   };
 
-  // Блокировка скролла когда открыта модалка
+  // Lock scrolling while the modal is open
   useEffect(() => {
     if (selectedActivity || showLevelWarning) {
       document.body.style.overflow = 'hidden';
@@ -251,7 +251,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
     };
   }, [selectedActivity, showLevelWarning]);
 
-  // Обновление таймера
+  // Timer update
   useEffect(() => {
     if (!currentActivity) {
       setTimeLeft(0);
@@ -259,7 +259,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       return;
     }
 
-    // Проверяем что данные валидные - если нет, просто не запускаем таймер
+    // Check that the data is valid - if not, simply don't start the timer
     if (!currentActivity.startTime || !currentActivity.endTime ||
       isNaN(currentActivity.startTime) || isNaN(currentActivity.endTime)) {
       setTimeLeft(0);
@@ -276,20 +276,20 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
       if (remaining <= 0) {
         setTimeLeft(0);
         setProgress(100);
-        // Награду запрашиваем сразу, как только таймер дошёл до нуля:
-        // любая задержка здесь видна игроку как «активность закончилась, а награду не дали».
+        // We request the reward as soon as the timer reaches zero:
+        // any delay here looks to the player like "the activity ended but the reward wasn't given".
         if (onActivityComplete) {
           onActivityComplete();
         }
-        return false; // Останавливаем таймер
+        return false; // Stop the timer
       } else {
         setTimeLeft(Math.ceil(remaining / 1000));
         setProgress((elapsed / total) * 100);
-        return true; // Продолжаем таймер
+        return true; // Keep the timer running
       }
     };
 
-    // Первое обновление сразу
+    // First update immediately
     if (!updateTimer()) {
       return;
     }
@@ -309,14 +309,14 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Проверяем хватает ли статов для активности
+  // Check whether there are enough stats for the activity
   const checkStatsForActivity = (activity: Activity): { canPerform: boolean; missingStats: string[] } => {
     if (!activity.statModifiers) return { canPerform: true, missingStats: [] };
 
     const missingStats: string[] = [];
 
     Object.entries(activity.statModifiers).forEach(([stat, change]) => {
-      if (change < 0) { // Только негативные изменения (расход статов)
+      if (change < 0) { // Only negative changes (stat consumption)
         const value = playerState.stats[stat as keyof typeof playerState.stats];
         const currentValue = typeof value === 'number' ? value : 0;
         const requiredValue = Math.abs(change);
@@ -334,17 +334,17 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
   };
 
   const handleActivityClick = (activity: Activity) => {
-    // Проверка уровня
+    // Level check
     if (activity.requiredLevel && playerState.level < activity.requiredLevel) {
       setWarningActivity(activity);
       setShowLevelWarning(true);
       return;
     }
 
-    // Проверка статов
+    // Stat check
     const { canPerform, missingStats } = checkStatsForActivity(activity);
     if (!canPerform) {
-      // Трясем все недостающие статы по очереди
+      // Shake all the missing stats one by one
       missingStats.forEach((stat, index) => {
         setTimeout(() => {
           setShakingStat(stat);
@@ -352,7 +352,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
         }, index * 200);
       });
 
-      // Скроллим наверх к статам
+      // Scroll up to the stats
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -368,7 +368,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
   };
 
   const getActivityName = (activity: Activity): string => {
-    // Всегда используем перевод из локалей по ID активности
+    // Always use the translation from the locales by activity ID
     return t(`activities.${activity.id}`);
   };
 
@@ -457,7 +457,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black pb-32">
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        {/* Объединенная карточка профиля и статов */}
+        {/* Combined profile and stats card */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -471,9 +471,9 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
           </div>
 
           <div className="relative z-10">
-            {/* Верхняя часть - профиль */}
+            {/* Top part - profile */}
             <div className="flex items-center gap-4 mb-4">
-              {/* Аватар с XP кольцом */}
+              {/* Avatar with XP ring */}
               <div className="relative flex-shrink-0">
                 <svg className="absolute -inset-2 w-20 h-20 -rotate-90">
                   <circle
@@ -530,7 +530,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 </div>
               </div>
 
-              {/* Инфо и валюта */}
+              {/* Info and currency */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-2">
                   <h2 className="text-xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent text-glow">
@@ -551,7 +551,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 </div>
 
                 <div className="grid grid-cols-2 gap-1.5">
-                  {/* Первая строка - класс и статы */}
+                  {/* First row - class and stats */}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -595,7 +595,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                     )}
                   </motion.button>
 
-                  {/* Вторая строка - город и валюты */}
+                  {/* Second row - city and currencies */}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -635,7 +635,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               </div>
             </div>
 
-            {/* Расходные статы */}
+            {/* Consumable stats */}
             <div className="grid grid-cols-4 gap-3 mt-3 mb-2">
               {(['hunger', 'health', 'mood', 'energy'] as const).map((key, index) => {
                 const value = (playerState.stats as any)?.[key] ?? 100;
@@ -735,7 +735,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                 })}
             </div>
 
-            {/* Боевые статы - расширяемая секция (выползает сверху) */}
+            {/* Combat stats - expandable section (slides out from the top) */}
             <AnimatePresence>
               {playerState.stats.strength !== undefined && isCombatStatsOpen && (
                 <motion.div
@@ -789,7 +789,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
               )}
             </AnimatePresence>
 
-            {/* Drag handle для раскрытия боевых статов (всегда внизу) */}
+            {/* Drag handle to reveal combat stats (always at the bottom) */}
             {playerState.stats.strength !== undefined && (
               <motion.div
                 drag="y"
@@ -800,16 +800,16 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                   const velocity = info.velocity.y;
                   const offset = info.offset.y;
 
-                  // Используем velocity для более естественного поведения
+                  // Use velocity for more natural behavior
                   if (Math.abs(velocity) > 500) {
-                    // Быстрый свайп
+                    // Fast swipe
                     if (velocity > 0) {
-                      setIsCombatStatsOpen(true); // Открыть
+                      setIsCombatStatsOpen(true); // Open
                     } else {
-                      setIsCombatStatsOpen(false); // Закрыть
+                      setIsCombatStatsOpen(false); // Close
                     }
                   } else {
-                    // Медленное перетаскивание - используем порог
+                    // Slow drag - use a threshold
                     if (!isCombatStatsOpen && offset > 30) {
                       setIsCombatStatsOpen(true);
                     } else if (isCombatStatsOpen && offset < -30) {
@@ -828,7 +828,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
           </div>
         </motion.div>
 
-        {/* Current Activity Status - Красивая и компактная */}
+        {/* Current Activity Status - nice and compact */}
         <AnimatePresence>
           {currentActivity && timeLeft > 0 && (
             <motion.div
@@ -903,7 +903,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
           )}
         </AnimatePresence>
 
-        {/* Activities Section - карточки по 2 в ряд */}
+        {/* Activities Section - cards 2 per row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1118,7 +1118,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
         </motion.div>
       </div>
 
-      {/* Activity Confirmation Modal - ПОРТАЛ В ЦЕНТР ЭКРАНА */}
+      {/* Activity Confirmation Modal - PORTAL TO THE CENTER OF THE SCREEN */}
       {createPortal(
         <AnimatePresence>
           {selectedActivity && (() => {
@@ -1281,7 +1281,7 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
         document.body
       )}
 
-      {/* Level Warning Modal - ПОРТАЛ В ЦЕНТР ЭКРАНА */}
+      {/* Level Warning Modal - PORTAL TO THE CENTER OF THE SCREEN */}
       {createPortal(
         <AnimatePresence>
           {showLevelWarning && warningActivity && (
@@ -1366,13 +1366,13 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
         isOpen={showCombatStats}
         onClose={() => setShowCombatStats(false)}
         onStatsUpdated={() => {
-          // Закрываем модалку
+          // Close the modal
           setShowCombatStats(false);
-          // Обновляем данные игрока
+          // Refresh the player data
           if (onRefreshPlayer) {
             onRefreshPlayer();
           }
-          // Небольшая задержка перед открытием панели, чтобы данные успели обновиться
+          // A short delay before opening the panel so the data has time to refresh
           setTimeout(() => {
             setIsCombatStatsOpen(true);
           }, 300);

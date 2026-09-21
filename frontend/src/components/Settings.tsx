@@ -31,10 +31,10 @@ const languageOptions = [
   { code: 'en' as const, name: 'English', flag: '🇬🇧' }
 ];
 
-/** Ключи, отвечающие за вход: сброс настроек не должен разлогинивать игрока */
+/** Login-related keys: resetting settings must not log the player out */
 const AUTH_STORAGE_KEYS = ['auth_token', 'auth_user', 'auth_player'];
 
-/** Единый стиль карточек: без тяжёлых теней и размытия, которые «плыли» при скролле */
+/** Unified card style: no heavy shadows or blur, which "drifted" during scroll */
 const CARD_CLASS = 'bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5';
 const ROW_CLASS = 'w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between';
 
@@ -66,8 +66,8 @@ export const Settings = ({
   };
 
   /**
-   * Сброс настроек: чистим кэш и локальные данные, но сохраняем сессию.
-   * Раньше здесь был localStorage.clear(), который молча разлогинивал игрока.
+   * Settings reset: we clear the cache and local data, but keep the session.
+   * Previously there was a localStorage.clear() here, which silently logged the player out.
    */
   const handleResetApp = async () => {
     if (!window.confirm(t('settings.resetAppConfirm', 'Сбросить настройки и очистить кэш приложения? Вы останетесь в аккаунте.'))) {
@@ -80,7 +80,7 @@ export const Settings = ({
         await Promise.all(cacheNames.map((name) => caches.delete(name)));
       }
     } catch {
-      // Кэш может быть недоступен — это не мешает сбросу
+      // The cache may be unavailable — that doesn't block the reset
     }
 
     Object.keys(localStorage).forEach((key) => {
@@ -102,7 +102,7 @@ export const Settings = ({
           {t('settings.title', 'Настройки')}
         </h1>
 
-        {/* Язык */}
+        {/* Language */}
         <div className={CARD_CLASS}>
           <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">
             {t('settings.language', 'Язык')}
@@ -125,7 +125,7 @@ export const Settings = ({
           </div>
         </div>
 
-        {/* Внешний вид */}
+        {/* Appearance */}
         <div className={CARD_CLASS}>
           <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">
             {t('settings.appearance', 'Внешний вид')}
@@ -152,7 +152,7 @@ export const Settings = ({
           </button>
         </div>
 
-        {/* Звук и уведомления */}
+        {/* Sound and notifications */}
         <div className={CARD_CLASS}>
           <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">
             {t('settings.audio', 'Звук')}
@@ -179,7 +179,7 @@ export const Settings = ({
           </div>
         </div>
 
-        {/* Приложение */}
+        {/* Application */}
         <div className={CARD_CLASS}>
           <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">
             <Emoji emoji="⚙️" size={18} className="inline" /> {t('settings.application', 'Приложение')}
@@ -202,7 +202,7 @@ export const Settings = ({
           </button>
         </div>
 
-        {/* О приложении */}
+        {/* About */}
         <div className={CARD_CLASS}>
           <h2 className="text-base font-bold text-gray-900 dark:text-white mb-4">
             {t('settings.about', 'О приложении')}
@@ -278,7 +278,7 @@ export const Settings = ({
           </div>
         </div>
 
-        {/* Модальное окно разработчика */}
+        {/* Developer modal */}
         {createPortal(
           <AnimatePresence>
             {showDeveloperModal && (

@@ -1,12 +1,12 @@
 /**
- * Глобальные квесты игры.
+ * Global game quests.
  *
- * Вынесены из seed.ts, чтобы их можно было накатывать отдельно
- * (`npm run seed:quests --workspace=backend`) и не трогать остальные данные.
+ * Moved out of seed.ts so they can be applied separately
+ * (`npm run seed:quests --workspace=backend`) without touching the rest of the data.
  *
- * Важно: `steps[].type` должен быть одним из типов, которые реально обновляет
- * TaskService.updateQuestProgress — сейчас это `activity_count` (завершение активностей)
- * и `pvp_win` (победа на арене). Квест с другим типом шага никогда не завершится.
+ * Important: `steps[].type` must be one of the types that
+ * TaskService.updateQuestProgress actually updates — currently `activity_count` (completing activities)
+ * and `pvp_win` (winning in the arena). A quest with any other step type will never complete.
  */
 export interface QuestStep {
     id: string;

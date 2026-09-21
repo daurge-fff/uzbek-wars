@@ -31,7 +31,7 @@ export const LanguageSwitcher = ({
     // Try to save to database if user is authenticated
     if (token && user) {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const API_URL = import.meta.env.VITE_API_URL || '';
         await axios.patch(
           `${API_URL}/api/player/language`,
           { language: lang },

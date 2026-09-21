@@ -64,8 +64,8 @@ router.get(
 
       res.status(200).json({
         player: {
-          // id — идентификатор документа Player (совпадает с id в рейтинге и логах боя),
-          // userId остаётся отдельным полем
+          // id is the Player document identifier (matches the id in the leaderboard and battle logs),
+          // userId stays a separate field
           id: player._id.toString(),
           userId: player.userId,
           characterId: player.characterId,
@@ -204,14 +204,14 @@ router.get(
         return;
       }
 
-      // Проверяем есть ли активная активность
+      // Check whether there is an active activity
       if (player.currentActivity && player.currentActivityEndTime) {
         const now = new Date();
         const endTime = new Date(player.currentActivityEndTime);
         const startTime = player.currentActivityStartTime ? new Date(player.currentActivityStartTime) : new Date(now.getTime() - 60000);
         
         if (endTime > now) {
-          // Активность еще идет
+          // The activity is still running
           res.status(200).json({
             activity: {
               activityId: player.currentActivity,
@@ -221,7 +221,7 @@ router.get(
           });
           return;
         } else {
-          // Активность завершена, очищаем
+          // The activity is finished, clear it
           player.currentActivity = undefined;
           player.currentActivityName = undefined;
           player.currentActivityStartTime = undefined;
@@ -229,7 +229,7 @@ router.get(
           await player.save();
         }
       } else if (player.currentActivity) {
-        // Битые данные - очищаем
+        // Corrupted data - clear it
         logger.warn(`Cleaning up broken activity data for player ${userId}`);
         player.currentActivity = undefined;
         player.currentActivityName = undefined;
@@ -275,7 +275,7 @@ router.post(
       const { ensureValidCharacter } = await import('../services/CharacterService');
       await ensureValidCharacter(player);
 
-      // Проверяем есть ли уже активная активность
+      // Check whether there is already an active activity
       if (player.currentActivity && player.currentActivityEndTime) {
         const now = new Date();
         const endTime = new Date(player.currentActivityEndTime);
@@ -289,7 +289,7 @@ router.post(
         }
       }
 
-      // Импортируем ActivityService для получения информации об активности
+      // Import ActivityService to get information about the activity
       const { getActivityById } = await import('../services/ActivityService');
       const { applyActivityTime } = await import('../services/CharacterBonusService');
       const activity = getActivityById(activityId);
@@ -299,7 +299,7 @@ router.post(
         return;
       }
 
-      // Проверяем уровень
+      // Check the level
       if (player.level < activity.requiredLevel) {
         res.status(400).json({ 
           error: 'Level too low',
@@ -308,16 +308,16 @@ router.post(
         return;
       }
 
-      // Применяем модификатор времени класса к длительности активности
+      // Apply the class time modifier to the activity duration
       const baseDuration = activity.duration;
       const modifiedDuration = applyActivityTime(baseDuration, player.characterId);
       const durationSeconds = modifiedDuration;
       const startTime = new Date();
       const endTime = new Date(startTime.getTime() + durationSeconds * 1000);
 
-      // Сохраняем активность (только ID, название берется на фронте из локалей)
+      // Save the activity (ID only, the name is taken on the frontend from the locales)
       player.currentActivity = activityId;
-      player.currentActivityName = undefined; // Не сохраняем название, используем только ID
+      player.currentActivityName = undefined; // Don't save the name, use only the ID
       player.currentActivityStartTime = startTime;
       player.currentActivityEndTime = endTime;
       await player.save();
@@ -354,7 +354,7 @@ router.post(
         return;
       }
 
-      // Проверяем есть ли активная активность
+      // Check whether there is an active activity
       if (!player.currentActivity || !player.currentActivityEndTime) {
         res.status(400).json({ error: 'No active activity' });
         return;
@@ -363,7 +363,7 @@ router.post(
       const now = new Date();
       const endTime = new Date(player.currentActivityEndTime);
 
-      // Проверяем завершилась ли активность
+      // Check whether the activity has finished
       if (endTime > now) {
         res.status(400).json({ 
           error: 'Activity not finished',
@@ -372,7 +372,7 @@ router.post(
         return;
       }
 
-      // Импортируем ActivityService для получения наград
+      // Import ActivityService to get the rewards
       const { getActivityById } = await import('../services/ActivityService');
       const { processLevelUp } = await import('../services/ProgressionService');
       const { updatePlayerStats } = await import('../services/StatsService');
@@ -380,7 +380,7 @@ router.post(
       const activity = getActivityById(player.currentActivity);
       
       if (!activity) {
-        // Активность не найдена, просто очищаем
+        // Activity not found, just clear it
         player.currentActivity = undefined;
         player.currentActivityName = undefined;
         player.currentActivityStartTime = undefined;
@@ -391,41 +391,41 @@ router.post(
         return;
       }
 
-      // Применяем награды
+      // Apply the rewards
       let experienceGained = activity.rewards.experience;
       let somsGained = activity.rewards.soms;
       let penaltyApplied = false;
 
-      // Проверяем риски
+      // Check the risks
       if (activity.risks && Math.random() < activity.risks.probability) {
         somsGained -= activity.risks.penalty;
         penaltyApplied = true;
       }
 
-      // Применяем изменения статов
+      // Apply the stat changes
       updatePlayerStats(player, activity.statModifiers);
 
-      // Логируем статы до и после
+      // Log the stats before and after
       logger.info(
         `Stats after activity ${activity.id}: ` +
         `hunger=${player.stats.hunger}, health=${player.stats.health}, ` +
         `mood=${player.stats.mood}, energy=${player.stats.energy}`
       );
 
-      // Добавляем награды
+      // Add the rewards
       player.experience += experienceGained;
       player.soms = Math.max(0, player.soms + somsGained);
 
-      // Вычитаем стоимость если есть
+      // Subtract the cost if there is one
       if (activity.cost) {
         player.soms = Math.max(0, player.soms - activity.cost);
       }
 
-      // Проверяем повышение уровня
+      // Check for a level up
       const levelsGained = processLevelUp(player);
       const leveledUp = levelsGained > 0;
 
-      // Очищаем текущую активность
+      // Clear the current activity
       player.currentActivity = undefined;
       player.currentActivityName = undefined;
       player.currentActivityStartTime = undefined;
@@ -459,8 +459,8 @@ router.post(
 
       // Track daily tasks and quests for the completed activity.
       // Runs after the response: rewards are already saved, and these extra DB reads/writes
-      // must not delay the credits the player sees. Игрока перечитываем, чтобы не
-      // перезаписать устаревшим документом чужие изменения (уровни, статы).
+      // must not delay the credits the player sees. We re-read the player so we don't
+      // overwrite someone else's changes (levels, stats) with a stale document.
       void Promise.resolve()
         .then(async () => {
           const TaskService = await import('../services/TaskService');
@@ -497,7 +497,7 @@ router.post(
         return;
       }
 
-      // Очищаем текущую активность
+      // Clear the current activity
       player.currentActivity = undefined;
       player.currentActivityName = undefined;
       player.currentActivityStartTime = undefined;

@@ -10,9 +10,10 @@ import { ThemeToggle } from './ThemeToggle';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { createPortal } from 'react-dom';
 import { GoogleLoginButton } from './GoogleLoginButton';
+import { getBotLink } from '../utils/telegram';
 import Emoji from './Emoji';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 // Функция для форматирования больших чисел
 const formatNumber = (num: number): string => {
@@ -488,7 +489,17 @@ function PhoneMockup({ onNavigate }: { onNavigate: (path: string) => void }) {
 
 export function HomePage() {
   const navigate = useNavigate();
-  const { isAuthenticated, user, player, login } = useAuth();
+  const {
+    isAuthenticated,
+    user,
+    player,
+    login,
+    isTelegram,
+    telegramUser,
+    telegramAuthPending,
+    telegramAuthError,
+    loginWithTelegram,
+  } = useAuth();
   const { t, i18n } = useTranslation();
   const [randomEmoji, setRandomEmoji] = useState('🎮');
 
@@ -536,6 +547,23 @@ export function HomePage() {
     }
     navigate(path);
   };
+
+  /**
+   * The mini app signs in automatically, so route the player as soon as the session
+   * appears — same rule the Google handler uses (onboarding when there is no character).
+   */
+  useEffect(() => {
+    if (!isTelegram || !isAuthenticated || !user) return;
+
+    const needsOnboarding =
+      !player ||
+      !player.characterId ||
+      !player.cityId ||
+      player.characterId === 'default' ||
+      player.cityId === 'default';
+
+    navigate(needsOnboarding ? '/onboarding' : '/dashboard');
+  }, [isTelegram, isAuthenticated, player, user, navigate]);
 
   const handleGoogleLogin = async (idToken: string) => {
     try {
@@ -705,6 +733,25 @@ export function HomePage() {
             />
           </motion.div>
 
+          {/* Promote the Telegram mini app to website visitors (hidden inside Telegram) */}
+          {!isTelegram && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8 flex justify-center"
+            >
+              <a
+                href={getBotLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#2AABEE] text-white font-bold text-sm"
+              >
+                <Emoji emoji="✈️" size={18} />
+                {t('home.openInTelegram', 'Открыть в Telegram')}
+              </a>
+            </motion.div>
+          )}
+
           {/* Auth Section */}
           {!isAuthenticated ? (
             <motion.div
@@ -728,9 +775,38 @@ export function HomePage() {
                     {t('app.startAdventure', 'Начать приключение')}
                   </h2>
                   <p className="text-gray-600 dark:text-gray-300 mb-4 text-base">
-                    {t('auth.loginToPlay', 'Войдите чтобы начать играть')}
+                    {isTelegram
+                      ? t('auth.telegramSubtitle', 'Вход через Telegram выполняется автоматически')
+                      : t('auth.loginToPlay', 'Войдите чтобы начать играть')}
                   </p>
-                  <GoogleLoginButton onSuccess={handleGoogleLogin} />
+                  {isTelegram ? (
+                    <div className="space-y-3">
+                      <button
+                        type="button"
+                        onClick={() => void loginWithTelegram()}
+                        disabled={telegramAuthPending}
+                        className="w-full py-3 rounded-2xl bg-[#2AABEE] text-white font-black disabled:opacity-60"
+                      >
+                        {telegramAuthPending
+                          ? t('auth.telegramOpening', 'Открываем игру…')
+                          : t('auth.telegramSignIn', 'Войти через Telegram')}
+                      </button>
+                      {telegramAuthError && (
+                        <p className="text-xs text-red-600 dark:text-red-400">
+                          {telegramAuthError === 'TELEGRAM_NOT_CONFIGURED'
+                            ? t('auth.telegramNotConfigured', 'Вход через Telegram не настроен на сервере')
+                            : t('auth.telegramError', 'Не удалось войти через Telegram. Попробуйте ещё раз.')}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {telegramUser?.username
+                          ? t('auth.telegramSignedAs', 'Telegram: @{{username}}', { username: telegramUser.username })
+                          : t('auth.telegramHint', 'Имя, username и фото берём из вашего Telegram-профиля')}
+                      </p>
+                    </div>
+                  ) : (
+                    <GoogleLoginButton onSuccess={handleGoogleLogin} />
+                  )}
                 </div>
               </div>
             </motion.div>

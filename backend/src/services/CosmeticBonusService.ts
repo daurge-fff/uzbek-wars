@@ -1,5 +1,6 @@
 import { IPlayer } from '../models/Player';
 import { CosmeticItem } from '../models/CosmeticItem';
+import { getShopItem, getShopItemStats } from '../data/shopCatalog';
 
 interface CosmeticBonus {
   type: 'xp' | 'soms' | 'health' | 'hunger' | 'mood' | 'energy' | 'strength' | 'defense' | 'agility' | 'stamina' | 'intelligence' | 'luck';
@@ -26,8 +27,10 @@ export class CosmeticBonusService {
 
     const items = await CosmeticItem.find({ itemId: { $in: equippedItemIds } });
     const bonuses: CosmeticBonus[] = [];
+    const foundInDatabase = new Set<string>();
 
     items.forEach(item => {
+      foundInDatabase.add(item.itemId);
       // Background and some items still use legacy hardcoded bonuses or bonus field
       if (item.bonus) {
         if (item.bonus.inventorySlots) bonuses.push({ type: 'xp', value: 0 }); // Just placeholder
@@ -53,7 +56,46 @@ export class CosmeticBonusService {
       }
     });
 
+    // Shop items live in the static catalog, not in the collection: without this the
+    // gear bought in the shop gave no bonus at all.
+    equippedItemIds
+      .filter((id) => !foundInDatabase.has(id))
+      .forEach((id) => {
+        const stats = getShopItemStats(id);
+        (Object.keys(stats) as Array<keyof typeof stats>).forEach((stat) => {
+          if (stats[stat]) {
+            bonuses.push({ type: stat as CosmeticBonus['type'], value: stats[stat] });
+          }
+        });
+
+        const bonus = getShopItem(id)?.bonus;
+        if (bonus && (bonus.type === 'soms' || bonus.type === 'xp')) {
+          bonuses.push({ type: bonus.type, value: bonus.value });
+        }
+      });
+
     return bonuses;
+  }
+
+  /**
+   * Effective combat stats = player's own stats + equipment bonus.
+   *
+   * Base stats are never mutated: unequipping or selling an item only removes the
+   * bonus on top, so inventory changes can not damage player progress.
+   */
+  static async getEffectiveCombatStats(player: IPlayer) {
+    const base = (player.combatStats || {}) as any;
+    const bonus = await this.getTotalEquipmentStats(player);
+
+    return {
+      strength: (base.strength || 0) + bonus.strength,
+      defense: (base.defense || 0) + bonus.defense,
+      agility: (base.agility || 0) + bonus.agility,
+      stamina: (base.stamina || 0) + bonus.stamina,
+      intelligence: (base.intelligence || 0) + bonus.intelligence,
+      luck: (base.luck || 0) + bonus.luck,
+      statPoints: base.statPoints || 0,
+    };
   }
 
   /**

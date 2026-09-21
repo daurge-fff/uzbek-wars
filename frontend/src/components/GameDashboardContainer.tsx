@@ -17,8 +17,8 @@ export const GameDashboardContainer = () => {
   const [currentActivity, setCurrentActivity] = useState<any>(null);
   const [cooldownInfo, setCooldownInfo] = useState<{ activityName: string; seconds: number } | null>(null);
 
-  // Актуальные значения для интервальной проверки: раньше замыкание первого рендера
-  // видело currentActivity = null, и запасной поллинг вообще не мог завершить активность.
+  // Current values for the interval check: previously the first render's closure
+  // saw currentActivity = null, and the fallback polling could never finish the activity.
   const currentActivityRef = useRef<any>(null);
   const completeActivityRef = useRef<() => Promise<void>>(async () => {});
 
@@ -26,18 +26,18 @@ export const GameDashboardContainer = () => {
     currentActivityRef.current = currentActivity;
   }, [currentActivity]);
 
-  // Логируем изменения статов для отладки
+  // Log the stat changes for debugging
   useEffect(() => {
     if (player?.stats) {
       // Stats updated
     }
   }, [player?.stats]);
 
-  // Очищаем битые данные при монтировании
+  // Clear corrupted data on mount
   useEffect(() => {
     setCurrentActivity(null);
 
-    // Очищаем из localStorage если там что-то есть
+    // Clear it from localStorage if there is anything there
     try {
       localStorage.removeItem('currentActivity');
       sessionStorage.removeItem('currentActivity');
@@ -52,19 +52,19 @@ export const GameDashboardContainer = () => {
       return;
     }
 
-    // Загружаем данные
+    // Load the data
     loadActivities();
     loadCurrentActivity();
-    refreshPlayer();  // Обновляем данные игрока включая боевые статы
+    refreshPlayer();  // Refresh the player data including combat stats
 
-    // Проверяем активность каждые 5 секунд
+    // Check the activity every 5 seconds
     const interval = setInterval(checkActivityCompletion, 5000);
     return () => clearInterval(interval);
   }, [isAuthenticated]);
 
   const loadActivities = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const API_URL = import.meta.env.VITE_API_URL || '';
       const response = await axios.get(`${API_URL}/api/activities`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -83,7 +83,7 @@ export const GameDashboardContainer = () => {
 
   const loadCurrentActivity = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const API_URL = import.meta.env.VITE_API_URL || '';
       const response = await axios.get(`${API_URL}/api/player/current-activity`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -91,12 +91,12 @@ export const GameDashboardContainer = () => {
       if (response.data.activity) {
         const activity = response.data.activity;
 
-        // Проверяем что все данные валидные
+        // Check that all the data is valid
         const startTime = activity.startTime;
         const endTime = activity.endTime;
 
         if (!endTime || isNaN(endTime) || !startTime || isNaN(startTime) || endTime <= Date.now()) {
-          // Битые данные или активность уже завершена - очищаем на сервере
+          // Corrupted data or the activity is already finished - clear it on the server
           await axios.post(`${API_URL}/api/player/cancel-activity`, {}, {
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -104,7 +104,7 @@ export const GameDashboardContainer = () => {
           return;
         }
 
-        // Преобразуем данные с сервера в нужный формат
+        // Convert the server data into the required format
         setCurrentActivity({
           activityId: activity.activityId || activity.id,
           startTime: startTime,
@@ -114,7 +114,7 @@ export const GameDashboardContainer = () => {
         setCurrentActivity(null);
       }
     } catch (error) {
-      // Нет текущей активности - это нормально
+      // No current activity - that's normal
       setCurrentActivity(null);
     }
   };
@@ -122,28 +122,28 @@ export const GameDashboardContainer = () => {
   const checkActivityCompletion = async () => {
     const activity = currentActivityRef.current;
 
-    // Проверяем валидность данных
+    // Check the validity of the data
     if (!activity || !activity.endTime || isNaN(activity.endTime)) {
       return;
     }
 
     const now = Date.now();
     if (now >= activity.endTime) {
-      // Активность завершена, получаем награды
+      // The activity is finished, get the rewards
       await completeActivityRef.current();
     }
   };
 
   const completeActivity = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const API_URL = import.meta.env.VITE_API_URL || '';
       const response = await axios.post(
         `${API_URL}/api/player/complete-activity`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Обновляем данные игрока напрямую из ответа (без перезагрузки!)
+      // Update the player data directly from the response (no reload!)
       if (response.data.player) {
         updatePlayer({
           level: response.data.player.level,
@@ -153,10 +153,10 @@ export const GameDashboardContainer = () => {
         });
       }
 
-      // Очищаем текущую активность
+      // Clear the current activity
       setCurrentActivity(null);
 
-      // Показываем тост с результатами
+      // Show the toast with the results
       if (response.data.leveledUp) {
         toast.success(
           t('notifications.levelUpNotification', {
@@ -176,25 +176,25 @@ export const GameDashboardContainer = () => {
         );
       }
 
-      // Если был штраф, показываем предупреждение
+      // If there was a penalty, show a warning
       if (response.data.penaltyApplied) {
         toast.error(t('notifications.penaltyApplied'), { duration: 2000 });
       }
     } catch (error: any) {
       console.error('Failed to complete activity:', error);
-      // Если активность не найдена, просто очищаем
+      // If the activity isn't found, just clear it
       if (error.response?.status === 404 || error.response?.status === 400) {
         setCurrentActivity(null);
       }
     }
   };
 
-  // Интервал должен звать самую свежую версию completeActivity (там зависят t и токен)
+  // The interval must call the freshest version of completeActivity (t and the token depend on it)
   completeActivityRef.current = completeActivity;
 
   const handleActivitySelect = async (activityId: string) => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const API_URL = import.meta.env.VITE_API_URL || '';
       const response = await axios.post(
         `${API_URL}/api/player/perform-activity`,
         { activityId },
@@ -205,30 +205,30 @@ export const GameDashboardContainer = () => {
       const endTime = response.data.endTime;
       const durationSeconds = response.data.durationSeconds || 60;
 
-      // Вычисляем startTime на основе endTime и duration
+      // Compute startTime from endTime and duration
       const startTime = endTime - (durationSeconds * 1000);
 
-      // Переводим название активности на текущий язык
+      // Translate the activity name into the current language
       const translatedActivityName = t(`activities.${activityId}`);
       toast.success(t('notifications.activityStarted', { activity: translatedActivityName }));
 
-      // Обновляем текущую активность
+      // Update the current activity
       setCurrentActivity({
         activityId,
         startTime,
         endTime
       });
 
-      // Прокручиваем страницу наверх чтобы было видно карточку активности
+      // Scroll the page to the top so the activity card is visible
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      // Перезагружаем активности
+      // Reload the activities
       loadActivities();
     } catch (error: any) {
       console.error('Activity failed:', error);
       const message = error.response?.data?.message || error.response?.data?.error || 'Ошибка выполнения активности';
 
-      // Проверяем если это кулдаун
+      // Check whether this is a cooldown
       if (message.includes('cooldown') || message.includes('Wait')) {
         const match = message.match(/Wait (\d+) seconds/);
         if (match) {
@@ -263,7 +263,7 @@ export const GameDashboardContainer = () => {
     return null;
   }
 
-  // Если статов нет, используем дефолтные значения
+  // If there are no stats, use the default values
   const playerState = {
     characterId: player.characterId,
     cityId: player.cityId,
@@ -279,7 +279,7 @@ export const GameDashboardContainer = () => {
         mood: 100,
         energy: 100
       }),
-      // Добавляем боевые статы если они есть
+      // Add the combat stats if they exist
       strength: player.stats?.strength,
       defense: player.stats?.defense,
       agility: player.stats?.agility,
@@ -303,7 +303,7 @@ export const GameDashboardContainer = () => {
         onRefreshPlayer={refreshPlayer}
       />
 
-      {/* Cooldown Modal - красивое окно с обратным отсчетом */}
+      {/* Cooldown Modal - a nice window with a countdown */}
       {createPortal(
         <AnimatePresence>
           {cooldownInfo && (
@@ -332,7 +332,7 @@ export const GameDashboardContainer = () => {
   );
 };
 
-// Компонент с обратным отсчетом
+// Countdown component
 const CooldownModalContent = ({ activityName, initialSeconds, onClose }: { activityName: string; initialSeconds: number; onClose: () => void }) => {
   const [seconds, setSeconds] = useState(initialSeconds);
 
@@ -346,7 +346,7 @@ const CooldownModalContent = ({ activityName, initialSeconds, onClose }: { activ
       setSeconds(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          setTimeout(onClose, 300); // Небольшая задержка перед закрытием
+          setTimeout(onClose, 300); // A short delay before closing
           return 0;
         }
         return prev - 1;

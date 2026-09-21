@@ -2,73 +2,12 @@ import { Router, Request, Response } from 'express';
 import { authenticate } from '../middleware/auth';
 import { Player } from '../models/Player';
 import * as CosmeticService from '../services/CosmeticService';
+import { CosmeticBonusService } from '../services/CosmeticBonusService';
+import { SHOP_CATALOG } from '../data/shopCatalog';
 
 const router = Router();
 
-// Cosmetic items catalog with bonuses and stats
-const COSMETIC_ITEMS = [
-  {
-    id: '1',
-    type: 'clothing',
-    slot: 'head',
-    rarity: 'common',
-    priceSoms: 500,
-    priceCrystals: 10,
-    stats: { defense: 2 }
-  },
-  {
-    id: '2',
-    type: 'clothing',
-    slot: 'head',
-    rarity: 'legendary',
-    priceSoms: 50000,
-    priceCrystals: 500,
-    stats: { defense: 10, luck: 5 }
-  },
-  {
-    id: '10',
-    type: 'equipment',
-    slot: 'weapon',
-    rarity: 'common',
-    priceSoms: 1000,
-    priceCrystals: 20,
-    stats: { strength: 5 }
-  },
-  {
-    id: '11',
-    type: 'equipment',
-    slot: 'weapon',
-    rarity: 'epic',
-    priceSoms: 15000,
-    priceCrystals: 300,
-    stats: { strength: 25, agility: 5 }
-  },
-  {
-    id: '12',
-    type: 'clothing',
-    slot: 'body',
-    rarity: 'rare',
-    priceSoms: 5000,
-    priceCrystals: 100,
-    stats: { defense: 15, stamina: 10 }
-  },
-  {
-    id: '3',
-    type: 'background',
-    rarity: 'epic',
-    priceSoms: 10000,
-    priceCrystals: 200,
-    bonus: { type: 'mood', value: 10 }
-  },
-  {
-    id: '4',
-    type: 'accessory',
-    rarity: 'rare',
-    priceSoms: 2000,
-    priceCrystals: 50,
-    bonus: { type: 'soms', value: 10 }
-  }
-];
+// Shop catalog is the single source of truth for the shop and for equipping
 
 /**
  * GET /api/cosmetics
@@ -82,7 +21,7 @@ router.get('/', authenticate, async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Player not found' });
     }
 
-    const items = COSMETIC_ITEMS.map(item => ({
+    const items = SHOP_CATALOG.map(item => ({
       ...item,
       owned: [
         ...(player.cosmetics?.clothing || []),
@@ -121,7 +60,7 @@ router.post('/purchase', authenticate, async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid request' });
     }
 
-    const item = COSMETIC_ITEMS.find(i => i.id === itemId);
+    const item = SHOP_CATALOG.find(i => i.id === itemId);
     if (!item) {
       return res.status(404).json({ error: 'Item not found' });
     }
@@ -131,11 +70,13 @@ router.post('/purchase', authenticate, async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Player not found' });
     }
 
-    // Check if already owned
+    // Check if already owned (every inventory list counts)
     const allOwned = [
       ...(player.cosmetics?.clothing || []),
       ...(player.cosmetics?.backgrounds || []),
-      ...(player.cosmetics?.accessories || [])
+      ...(player.cosmetics?.accessories || []),
+      ...(player.cosmetics?.backpacks || []),
+      ...(player.cosmetics?.equipment || [])
     ];
 
     if (allOwned.includes(itemId)) {
@@ -164,7 +105,8 @@ router.post('/purchase', authenticate, async (req: Request, res: Response) => {
         backgrounds: [],
         accessories: [],
         backpacks: [],
-        consumables: []
+        consumables: [],
+        equipment: []
       };
     }
 
@@ -174,6 +116,11 @@ router.post('/purchase', authenticate, async (req: Request, res: Response) => {
       player.cosmetics.backgrounds.push(itemId);
     } else if (item.type === 'accessory') {
       player.cosmetics.accessories.push(itemId);
+    } else if (item.type === 'equipment') {
+      if (!player.cosmetics.equipment) player.cosmetics.equipment = [];
+      player.cosmetics.equipment.push(itemId);
+    } else if (item.type === 'backpack') {
+      player.cosmetics.backpacks.push(itemId);
     }
 
     await player.save();
@@ -231,29 +178,83 @@ router.post('/equip', authenticate, async (req: Request, res: Response) => {
  */
 router.post('/unequip', authenticate, async (req: Request, res: Response) => {
   try {
-    const { type } = req.body; // type of slot to unequip
+    // The frontend sends the item it wants to take off; `type` is kept for older clients
+    const { itemId, type } = req.body;
     const player = await Player.findOne({ userId: (req as any).user!.id });
 
     if (!player) {
       return res.status(404).json({ error: 'Player not found' });
     }
 
-    const result = await CosmeticService.unequipCosmetic(player._id.toString(), type);
+    if (!itemId && !type) {
+      return res.status(400).json({ error: 'itemId is required' });
+    }
+
+    const result = await CosmeticService.unequipCosmetic(player._id.toString(), itemId || type);
 
     if (!result.success) {
       return res.status(400).json({ error: result.error });
     }
 
     const updatedPlayer = await Player.findById(player._id);
+    const equipmentBonus = updatedPlayer
+      ? await CosmeticBonusService.getTotalEquipmentStats(updatedPlayer)
+      : null;
 
     return res.json({
       success: true,
       cosmetics: updatedPlayer?.cosmetics,
-      combatStats: updatedPlayer?.combatStats
+      combatStats: updatedPlayer?.combatStats,
+      equipmentBonus
     });
   } catch (error) {
     console.error('Error unequipping cosmetic:', error);
     return res.status(500).json({ error: 'Failed to unequip item' });
+  }
+});
+
+/**
+ * POST /api/cosmetics/sell
+ * Sell an owned item back for part of its price
+ */
+router.post('/sell', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { itemId } = req.body;
+    const player = await Player.findOne({ userId: (req as any).user!.id });
+
+    if (!player) {
+      return res.status(404).json({ error: 'Player not found' });
+    }
+
+    if (!itemId) {
+      return res.status(400).json({ error: 'itemId is required' });
+    }
+
+    const result = await CosmeticService.sellCosmetic(player._id.toString(), itemId);
+
+    if (!result.success) {
+      return res.status(400).json({ error: result.error });
+    }
+
+    const updatedPlayer = await Player.findById(player._id);
+    const equipmentBonus = updatedPlayer
+      ? await CosmeticBonusService.getTotalEquipmentStats(updatedPlayer)
+      : null;
+
+    return res.json({
+      success: true,
+      refund: result.refund,
+      player: {
+        soms: updatedPlayer?.soms,
+        donationCurrency: updatedPlayer?.donationCurrency,
+        cosmetics: updatedPlayer?.cosmetics,
+        combatStats: updatedPlayer?.combatStats
+      },
+      equipmentBonus
+    });
+  } catch (error) {
+    console.error('Error selling cosmetic:', error);
+    return res.status(500).json({ error: 'Failed to sell item' });
   }
 });
 

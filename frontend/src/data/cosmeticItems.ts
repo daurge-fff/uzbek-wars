@@ -402,7 +402,7 @@ export const cosmeticItems = [
       description: { ru: '+8 ко всем боевым статам', en: '+8 all combat stats', uz: '+8 barcha jangovar statlar', uk: '+8 до всіх бойових статів' }
     }
   },
-  // === Снаряжение из API-каталога (id совпадают с backend/src/routes/cosmetics.ts) ===
+  // === Equipment from the API catalog (ids match backend/src/routes/cosmetics.ts) ===
   {
     id: '10',
     name: { ru: 'Кинжал базара', en: 'Bazaar Dagger', uz: 'Bozor xanjari', uk: 'Кинджал базару' },

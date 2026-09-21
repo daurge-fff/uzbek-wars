@@ -1,11 +1,11 @@
 import { cosmeticItems as localCatalog } from '../data/cosmeticItems';
 
 /**
- * Каталог картинок предметов.
+ * Catalog of item images.
  *
- * Кладём файлы в frontend/public/assets/cosmetics/<id>.png — они раздаются как
- * /assets/cosmetics/<id>.png. Если файла нет, витрина откатывается на эмодзи,
- * поэтому карточка никогда не остаётся пустой.
+ * Files go into frontend/public/assets/cosmetics/<id>.png — they are served as
+ * /assets/cosmetics/<id>.png. If the file is missing, the store falls back to the emoji,
+ * so a card never stays empty.
  */
 export const COSMETIC_IMAGE_DIR = '/assets/cosmetics';
 
@@ -26,12 +26,12 @@ export interface CosmeticDisplayFields {
 }
 
 /**
- * Дополняет предмет из API данными витрины.
+ * Enriches an API item with store data.
  *
- * `GET /api/cosmetics` отдаёт только цену, редкость и статы — ни названия,
- * ни иконки, из-за этого карточки магазина были пустыми. Название и эмодзи
- * берём из локального каталога по id, а всё «игровое» (цена, владение,
- * экипировка, боевые статы) остаётся из API.
+ * `GET /api/cosmetics` returns only the price, rarity and stats — no names
+ * and no icons, which is why the shop cards were empty. The name and emoji
+ * come from the local catalog by id, while everything "gameplay" (price,
+ * ownership, equipment, combat stats) stays from the API.
  */
 export function mergeCosmeticItems<T extends { id: string; imageSrc?: string }>(
     apiItems: T[]

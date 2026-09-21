@@ -49,7 +49,7 @@ const queryClient = new QueryClient({
   }
 });
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 function LogoutPage() {
   const { logout } = useAuth();
@@ -450,6 +450,44 @@ const CosmeticShopWithData = () => {
     }
   };
 
+  const handleUnequip = async (id: string) => {
+    try {
+      await axios.post(
+        `${API_URL}/api/cosmetics/unequip`,
+        { itemId: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setItems(prev => prev.map(i => (i.id === id ? { ...i, equipped: false } : i)));
+      await refreshPlayer();
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Unequip failed');
+    }
+  };
+
+  /** Sell an owned item back for part of its price */
+  const handleSell = async (id: string) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/cosmetics/sell`,
+        { itemId: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.player) {
+        updatePlayer({
+          soms: response.data.player.soms,
+          donationCurrency: response.data.player.donationCurrency
+        });
+      }
+
+      setItems(prev => prev.map(i => (i.id === id ? { ...i, owned: false, equipped: false } : i)));
+      await refreshPlayer();
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Sell failed');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black">
@@ -465,6 +503,8 @@ const CosmeticShopWithData = () => {
       playerSoms={player?.soms || 0}
       onPurchase={handlePurchase}
       onEquip={handleEquip}
+      onUnequip={handleUnequip}
+      onSell={handleSell}
     />
   );
 };
@@ -537,6 +577,22 @@ const InventoryWithData = () => {
     }
   };
 
+  /** Sell an owned item back for part of its price */
+  const handleSell = async (id: string) => {
+    try {
+      await axios.post(
+        `${API_URL}/api/cosmetics/sell`,
+        { itemId: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setItems(prev => prev.map(i => (i.id === id ? { ...i, owned: false, equipped: false } : i)));
+      await refreshPlayer();
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Sell failed');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black">
@@ -550,6 +606,7 @@ const InventoryWithData = () => {
       items={items}
       onEquip={handleEquip}
       onUnequip={handleUnequip}
+      onSell={handleSell}
     />
   );
 };
@@ -675,7 +732,7 @@ const SettingsWithI18n = () => {
       if (!token) return;
 
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const API_URL = import.meta.env.VITE_API_URL || '';
         const response = await axios.get(`${API_URL}/api/stats/app`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -697,7 +754,7 @@ const SettingsWithI18n = () => {
     // Save to backend
     if (token) {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const API_URL = import.meta.env.VITE_API_URL || '';
         await axios.patch(
           `${API_URL}/api/player/language`,
           { language: lang },

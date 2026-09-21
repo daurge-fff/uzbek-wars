@@ -11,7 +11,8 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
-import { authenticateWithGoogle, authenticateDevLogin, detectTwinks } from '../services/AuthService';
+import { authenticateWithGoogle, authenticateDevLogin, authenticateWithTelegramWebApp, detectTwinks } from '../services/AuthService';
+import { validateInitData, mapTelegramLanguage } from '../services/TelegramWebAppService';
 import { logger } from '../utils/logger';
 import { createVerificationSession } from '../bot/telegramBot';
 import { User } from '../models/User';
@@ -391,5 +392,78 @@ router.post(
     });
   }
 });
+
+/**
+ * POST /api/auth/telegram-webapp
+ *
+ * Signs in a player who opened the game as a Telegram mini app.
+ *
+ * The client posts the raw `initData` string from the Telegram WebApp SDK; the server
+ * verifies its signature with the bot token and only then trusts telegram id, username,
+ * first/last name, photo and language code. Those values are stored on the user, so the
+ * site can later show "signed in with Telegram" data as well.
+ *
+ * Response mirrors POST /api/auth/google: { token, user, player, isNewUser }
+ */
+router.post(
+  '/telegram-webapp',
+  rateLimit(30, 60000),
+  [body('initData').isString().notEmpty().withMessage('initData is required')],
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          error: 'Validation failed',
+          code: 'VALIDATION_ERROR',
+          details: errors.array()
+        });
+        return;
+      }
+
+      const botToken = process.env.TELEGRAM_BOT_TOKEN || '';
+      if (!botToken) {
+        logger.error('TELEGRAM_BOT_TOKEN is not configured - mini app login unavailable');
+        res.status(503).json({
+          error: 'Telegram mini app login is not configured on this server',
+          code: 'TELEGRAM_NOT_CONFIGURED'
+        });
+        return;
+      }
+
+      const validation = validateInitData(req.body.initData, botToken);
+      if (!validation.ok || !validation.user) {
+        logger.warn(`Rejected Telegram init data: ${validation.error}`);
+        res.status(401).json({
+          error: 'Invalid Telegram init data',
+          code: validation.error || 'INVALID_INIT_DATA'
+        });
+        return;
+      }
+
+      const telegramUser = validation.user;
+      const deviceInfo = {
+        userAgent: req.body?.deviceInfo?.userAgent || String(req.headers['user-agent'] || 'telegram-webapp'),
+        platform: req.body?.deviceInfo?.platform || 'telegram',
+        deviceId: req.body?.deviceInfo?.deviceId || `tg-${telegramUser.id}`
+      };
+      const forwardedFor = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+      const ipAddress = forwardedFor || req.ip || 'unknown';
+
+      const result = await authenticateWithTelegramWebApp(
+        telegramUser,
+        ipAddress,
+        deviceInfo,
+        mapTelegramLanguage(telegramUser.language_code)
+      );
+
+      logger.info(`Telegram mini app login: id=${telegramUser.id} username=${telegramUser.username || '-'} new=${result.isNewUser}`);
+      res.json(result);
+    } catch (error) {
+      logger.error('Telegram mini app auth error:', error);
+      res.status(500).json({ error: 'Authentication failed' });
+    }
+  }
+);
 
 export default router;

@@ -15,6 +15,66 @@ let bot: TelegramBot | null = null;
 
 export { bot };
 
+/**
+ * Public HTTPS URL of the mini app.
+ * Telegram only accepts HTTPS web_app URLs, so this must be the real public address.
+ */
+export const getWebAppUrl = (): string => {
+  const url = process.env.TELEGRAM_WEBAPP_URL || process.env.FRONTEND_URL || 'https://uzbekwars.top';
+  return url.replace(/\/+$/, '');
+};
+
+/**
+ * Registers the mini app menu button and the bot command list via the Bot API.
+ * Called on bot start and by `npm run setup:bot`; failures are reported, never fatal.
+ */
+export const configureWebApp = async (
+  botToken: string = process.env.TELEGRAM_BOT_TOKEN || ''
+): Promise<{ ok: boolean; url: string; error?: string }> => {
+  const url = getWebAppUrl();
+
+  if (!botToken) {
+    return { ok: false, url, error: 'TELEGRAM_BOT_TOKEN is not set' };
+  }
+
+  const call = async (method: string, payload: Record<string, unknown>) => {
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/${method}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data: any = await response.json();
+    if (!data?.ok) {
+      throw new Error(`${method} failed: ${data?.description || response.status}`);
+    }
+    return data;
+  };
+
+  try {
+    // Menu button opens the game as a mini app
+    await call('setChatMenuButton', {
+      menu_button: { type: 'web_app', text: 'Играть', web_app: { url } }
+    });
+
+    // Commands shown in the Telegram UI
+    await call('setMyCommands', {
+      commands: [
+        { command: 'play', description: '🎮 Играть' },
+        { command: 'start', description: 'Начать' },
+        { command: 'help', description: 'Помощь' },
+        { command: 'stats', description: 'Статистика' }
+      ]
+    });
+
+    logger.info(`Telegram mini app menu button set to ${url}`);
+    return { ok: true, url };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    logger.error('Failed to configure Telegram mini app menu button:', message);
+    return { ok: false, url, error: message };
+  }
+};
+
 interface VerificationSession {
   userId: string;
   code: string;
@@ -58,6 +118,9 @@ export const initBot = () => {
   }
 
   bot = new TelegramBot(BOT_TOKEN, { polling: true });
+
+  // Mini app entry point: menu button + commands (non-fatal if Telegram is unreachable)
+  void configureWebApp(BOT_TOKEN);
 
   // Handle /start command with verification code
   bot.onText(/\/start (.+)/, async (msg, match) => {
@@ -120,15 +183,30 @@ export const initBot = () => {
     bot.sendMessage(
       chatId,
       '👋 *Добро пожаловать в Узбек Варс!*\n\n' +
-      'Этот бот используется для верификации аккаунтов.\n\n' +
+      'Это и игра в Telegram, и бот для верификации аккаунтов.\n\n' +
+      '🎮 Нажми кнопку ниже, чтобы играть прямо в Telegram.\n\n' +
       '🔒 Чтобы верифицировать аккаунт:\n' +
       '1. Откройте игру\n' +
       '2. Перейдите в профиль\n' +
       '3. Нажмите "Верифицировать"\n' +
-      '4. Вы будете перенаправлены сюда\n\n' +
-      '🎮 Играть: https://uzbekwars.top',
-      { parse_mode: 'Markdown' }
+      '4. Вы будете перенаправлены сюда',
+      {
+        parse_mode: 'Markdown',
+        reply_markup: {
+          inline_keyboard: [[{ text: '🎮 Играть в Uzbek Wars', web_app: { url: getWebAppUrl() } }]]
+        }
+      }
     );
+  });
+
+  // Handle /play - open the mini app
+  bot.onText(/\/play/, (msg) => {
+    if (!bot) return;
+    bot.sendMessage(msg.chat.id, '🎮 Погнали! Открываю арену и базар…', {
+      reply_markup: {
+        inline_keyboard: [[{ text: '🎮 Играть в Uzbek Wars', web_app: { url: getWebAppUrl() } }]]
+      }
+    });
   });
 
   // Handle /help

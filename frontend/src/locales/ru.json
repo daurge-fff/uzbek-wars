@@ -42,7 +42,9 @@
     "cook_plov": "Готовить плов",
     "trade_bazaar": "Торговать на базаре",
     "rest": "Отдохнуть",
-    "eat": "Поесть"
+    "eat": "Поесть",
+    "work_shawarma": "Работать в шаурмичной",
+    "pray_namaz": "Читать намаз"
   },
   "notifications": {
     "level_up": "Поздравляем! Вы достигли уровня {{level}}!",
@@ -130,7 +132,14 @@
     "loginToPlay": "Войдите чтобы начать играть",
     "loginError": "Ошибка входа",
     "loggingOut": "Выход из системы...",
-    "redirectingHome": "Перенаправление на главную..."
+    "redirectingHome": "Перенаправление на главную...",
+    "telegramSubtitle": "Вход через Telegram выполняется автоматически",
+    "telegramSignIn": "Войти через Telegram",
+    "telegramOpening": "Открываем игру…",
+    "telegramError": "Не удалось войти через Telegram. Попробуйте ещё раз.",
+    "telegramNotConfigured": "Вход через Telegram не настроен на сервере",
+    "telegramSignedAs": "Telegram: @{{username}}",
+    "telegramHint": "Имя, username и фото берём из вашего Telegram-профиля"
   },
   "cities": {
     "select": "Выберите город",
@@ -187,7 +196,8 @@
       "accessory": "Аксессуары",
       "equipment": "Снаряжение",
       "backpack": "Рюкзаки",
-      "combat": "⚔️ Бой"
+      "combat": "⚔️ Бой",
+      "owned": "Инвентарь"
     },
     "rarity": {
       "common": "Обычный",
@@ -207,7 +217,16 @@
     "bonus": "Бонус",
     "yourBalance": "Ваш баланс",
     "buyWithSoms": "Купить за сомы",
-    "buyWithCrystals": "Купить за кристаллы"
+    "buyWithCrystals": "Купить за кристаллы",
+    "noBonus": "Без бонусов",
+    "sell": "Продать",
+    "sellFor": "Продать за {{amount}} {{emoji}}",
+    "sellConfirm": "Продать «{{name}}»? Предмет исчезнет из инвентаря.",
+    "sellSuccess": "Продано!",
+    "sellFailed": "Не удалось продать предмет",
+    "equipFailed": "Не удалось надеть предмет",
+    "unequipSuccess": "Предмет снят",
+    "unequipFailed": "Не удалось снять предмет"
   },
   "inventory": {
     "title": "Инвентарь",
@@ -393,7 +412,47 @@
     "issuesDetected": "Обнаружены проблемы",
     "projectReady": "Проект готов к работе",
     "needsAttention": "Требуется внимание разработчиков",
-    "checking": "Проверка..."
+    "checking": "Проверка...",
+    "service": {
+      "api": "Backend API",
+      "database": "MongoDB",
+      "bot": "Telegram Bot",
+      "frontend": "Frontend",
+      "tests": "Фоновые тесты"
+    },
+    "autoRefreshIn": "Автообновление через {{seconds}} с",
+    "botNotRunning": "Не запущен",
+    "botRunning": "Запущен",
+    "connected": "Подключение",
+    "connectedNo": "нет",
+    "connectedYes": "есть",
+    "duration": "Длительность",
+    "errorHint": "Значения «нет данных» ниже означают, что проверка не прошла, а не нулевую нагрузку.",
+    "errorTitle": "Не удалось получить статус сервисов",
+    "frontendDetail": "Страница отрисована в браузере",
+    "lastUpdated": "Обновлено",
+    "latency": "Отклик",
+    "memory": "Память",
+    "noTestData": "Нет данных о тестах",
+    "retry": "Повторить",
+    "runTests": "Запустить тесты",
+    "status": {
+      "healthy": "Работает",
+      "degraded": "Замедлено",
+      "down": "Не работает",
+      "unknown": "Нет данных"
+    },
+    "testsErrorTitle": "Не удалось получить результаты тестов",
+    "unitHours": "ч",
+    "unitMinutes": "мин",
+    "unitSeconds": "с",
+    "uptime": "Аптайм",
+    "verdict": {
+      "healthy": "Все системы работают",
+      "degraded": "Есть отклонения",
+      "down": "Сервис недоступен",
+      "unknown": "Статус неизвестен"
+    }
   },
   "activity": {
     "experience": "Опыт",
@@ -507,7 +566,8 @@
     "explore": "Исследуй мир",
     "yourProgress": "Ваш прогресс",
     "madeWith": "Сделано с",
-    "inUzbekistan": "в Узбекистане"
+    "inUzbekistan": "в Узбекистане",
+    "openInTelegram": "Открыть в Telegram"
   },
   "leaderboard": {
     "title": "Рейтинги",

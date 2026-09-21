@@ -1,12 +1,12 @@
 /**
  * Arena battle log regression tests
  *
- * Проверяем, что лог боя отдаёт здоровье в ролях бойцов (challenger/opponent)
- * и что полоски HP на клиенте не могут «прыгать»: HP каждого бойца обязано
- * монотонно убывать от начала боя к концу.
+ * We check that the battle log returns health in fighter roles (challenger/opponent)
+ * and that the HP bars on the client can't "jump": each fighter's HP must
+ * decrease monotonically from the start of the fight to the end.
  *
- * Раньше фронт сравнивал attackerId с id игрока, а события dodge/block записывались
- * с attackerId защищающегося — из-за этого здоровье прыгало между бойцами.
+ * Previously the frontend compared attackerId with the player's id, while dodge/block events
+ * were recorded with the defender's attackerId — which made the health jump between fighters.
  */
 
 jest.mock('../utils/logger', () => ({
@@ -86,12 +86,12 @@ function assertHpInvariants(log: BattleEvent[], challengerMax: number, opponentM
         expect(typeof event.challengerHealth).toBe('number');
         expect(typeof event.opponentHealth).toBe('number');
 
-        // HP никогда не больше максимума
+        // HP is never greater than the maximum
         expect(event.challengerHealth!).toBeLessThanOrEqual(challengerMax);
         expect(event.opponentHealth!).toBeLessThanOrEqual(opponentMax);
 
-        // Второе дыхание (heal) — единственное событие, которое поднимает здоровье,
-        // и только своему бойцу. Всё остальное здоровье только уменьшает.
+        // Second wind (heal) is the only event that raises health,
+        // and only for its own fighter. Everything else only decreases health.
         const healedIsChallenger = event.type === 'heal' && event.attackerId === CHALLENGER_ID;
         const healedIsOpponent = event.type === 'heal' && event.attackerId !== CHALLENGER_ID;
 
@@ -100,7 +100,7 @@ function assertHpInvariants(log: BattleEvent[], challengerMax: number, opponentM
         if (healedIsChallenger) expect(event.challengerHealth!).toBeGreaterThanOrEqual(prevChallenger);
         if (healedIsOpponent) expect(event.opponentHealth!).toBeGreaterThanOrEqual(prevOpponent);
 
-        // Значения должны совпадать с HP того, кто бьёт, без перестановок
+        // The values must match the HP of the one who strikes, with no swaps
         const challengerIsStriker = event.attackerId === CHALLENGER_ID;
         expect(event.challengerHealth).toBe(
             challengerIsStriker ? event.attackerHealth : event.defenderHealth
@@ -128,7 +128,7 @@ describe('ArenaService battle log', () => {
                 result.opponentMaxHealth
             );
 
-            // Бой заканчивается смертью одного из бойцов
+            // The fight ends with the death of one of the fighters
             const finish = result.matchLog[result.matchLog.length - 1];
             expect(finish.type).toBe('finish');
             const loserIsChallenger = result.winnerId.toString() === OPPONENT_ID;
@@ -168,7 +168,7 @@ describe('ArenaService battle log', () => {
 
         expect(challengerPoisoned.challengerHealth).toBe(90);
         expect(challengerPoisoned.opponentHealth).toBe(100);
-        // stun_skip бьёт противник, поэтому его HP остаётся первым
+        // stun_skip is struck by the opponent, so its HP stays first
         expect(opponentStunned.challengerHealth).toBe(90);
         expect(opponentStunned.opponentHealth).toBe(100);
     });

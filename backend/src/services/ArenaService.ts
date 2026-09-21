@@ -2,6 +2,7 @@ import { Player, IPlayer } from '../models/Player';
 import { ArenaMatch } from '../models/ArenaMatch';
 import { logger } from '../utils/logger';
 import { processLevelUp } from './ProgressionService';
+import { CosmeticBonusService } from './CosmeticBonusService';
 import * as AchievementService from './AchievementService';
 import * as TaskService from './TaskService';
 
@@ -15,7 +16,7 @@ interface DifficultyConfig {
     somsCost: number;
     rewardMultiplier: number;
     xpMultiplier: number;
-    /** Потолок раундов: не даём бою закончиться за 4-5 ходов */
+    /** Round cap: don't let a fight end in 4-5 moves */
     maxTurns: number;
 }
 
@@ -52,23 +53,23 @@ const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
     },
 };
 
-/** Максимум ударов в одной серии (первый удар + комбо) */
+/** Maximum hits in one series (first hit + combo) */
 const MAX_COMBO_HITS = 3;
 
 /**
- * Боец внутри одного боя: эффективные статы, здоровье и состояния.
- * Объект живёт только в рамках startFight, в БД не сохраняется.
+ * A fighter inside a single fight: effective stats, health and statuses.
+ * The object lives only within startFight and is never saved to the DB.
  */
 interface BattleFighter {
     id: string;
     name: string;
-    /** Эффективные статы (у соперника уже умножены на сложность боя) */
+    /** Effective stats (the opponent's are already multiplied by the fight difficulty) */
     stats: Record<string, number | undefined>;
     maxHP: number;
     hp: number;
     stun: number;
     poison: { turns: number; damage: number } | null;
-    /** Второе дыхание (выносливость) срабатывает один раз за бой */
+    /** Second wind (stamina) triggers once per fight */
     secondWindUsed: boolean;
     damageDealt: number;
 }
@@ -98,9 +99,9 @@ export interface BattleEvent {
     attackerMaxHealth: number;
     defenderMaxHealth: number;
     /**
-     * Здоровье бойцов, приведённое к ролям (challenger/opponent), а не к "кто бьёт":
-     * attacker/defender меняют смысл в зависимости от хода, из-за этого полоски HP
-     * на фронте прыгали между бойцами.
+     * Fighter health mapped to roles (challenger/opponent) rather than to "who strikes":
+     * attacker/defender change meaning depending on the turn, which made the HP bars
+     * on the frontend jump between fighters.
      */
     challengerHealth?: number;
     challengerMaxHealth?: number;
@@ -171,17 +172,22 @@ export async function startFight(
         // Deduct soms
         challenger.soms = Math.max(0, challenger.soms - config.somsCost);
 
+        // Effective stats = own stats + equipment bonus. Gear has to matter in battle,
+        // and the player's base stats stay untouched when items are sold or taken off.
+        const challengerEffectiveStats = await CosmeticBonusService.getEffectiveCombatStats(challenger);
+        const opponentEffectiveStats = await CosmeticBonusService.getEffectiveCombatStats(opponent);
+
         // Apply difficulty multipliers to opponent stats
-        const opponentStats = applyDifficultyMultiplier(opponent.combatStats, config.statMultiplier);
+        const opponentStats = applyDifficultyMultiplier(opponentEffectiveStats, config.statMultiplier);
 
         // HP from stamina
-        const maxChallengerHP = calculateMaxHP(challenger.combatStats);
+        const maxChallengerHP = calculateMaxHP(challengerEffectiveStats);
         const maxOpponentHP = calculateMaxHP(opponentStats);
 
         const challengerFighter: BattleFighter = {
             id: challenger._id.toString(),
             name: challengerName,
-            stats: (challenger.combatStats || {}) as any,
+            stats: challengerEffectiveStats as any,
             maxHP: maxChallengerHP,
             hp: maxChallengerHP,
             stun: 0,
@@ -212,11 +218,11 @@ export async function startFight(
         };
 
         while (challengerFighter.hp > 0 && opponentFighter.hp > 0 && turn <= config.maxTurns) {
-            // === Ход претендента ===
+            // === Challenger's turn ===
             resolveTurn(challengerFighter, opponentFighter, turn, events, counters);
 
-            // Ход мог закончиться смертью любого из бойцов: противника добили,
-            // либо претендент погиб от контрудара
+            // The turn could end with either fighter dead: the opponent was finished off,
+            // or the challenger died from a counterattack
             if (opponentFighter.hp <= 0 || challengerFighter.hp <= 0) {
                 const challengerWon = opponentFighter.hp <= 0;
                 winnerId = challengerWon ? challenger._id : opponent._id;
@@ -224,7 +230,7 @@ export async function startFight(
                 break;
             }
 
-            // === Ответный ход противника ===
+            // === Opponent's counter turn ===
             resolveTurn(opponentFighter, challengerFighter, turn, events, counters);
 
             if (challengerFighter.hp <= 0 || opponentFighter.hp <= 0) {
@@ -237,7 +243,7 @@ export async function startFight(
             turn++;
         }
 
-        // Determine winner by HP if timeout (сравниваем долю здоровья, а не абсолют)
+        // Determine winner by HP if timeout (compare the health fraction, not the absolute value)
         if (!winnerId) {
             const challengerShare = challengerFighter.hp / challengerFighter.maxHP;
             const opponentShare = opponentFighter.hp / opponentFighter.maxHP;
@@ -271,18 +277,14 @@ export async function startFight(
         processLevelUp(challenger);
         await challenger.save();
 
-        if (isChallengerWinner) {
-            await AchievementService.trackProgress(challengerId, 'arena_warrior_1', 1);
-        }
+        // Daily task, quest and achievement tracking runs in the background.
+        // Awaiting these extra round-trips used to keep the fight response busy for seconds,
+        // so the client sat on "preparing battle" instead of showing the fight.
+        void trackArenaProgress(challenger._id.toString(), isChallengerWinner).catch((error) => {
+            logger.error('Error tracking arena progress:', error);
+        });
 
-        // Track daily task progress for arena fights
-        await TaskService.updateTaskProgress(challenger, 'pvp_battle', 1);
-        if (isChallengerWinner) {
-            await TaskService.updateTaskProgress(challenger, 'pvp_win', 1);
-            await TaskService.updateQuestProgress(challenger, 'pvp_win', 1);
-        }
-
-        // Приводим здоровье в логе к ролям бойцов (challenger/opponent).
+        // Map the health in the log to fighter roles (challenger/opponent).
         const normalizedEvents = toRoleBasedLog(events, challenger._id.toString());
 
         const stats = {
@@ -337,11 +339,32 @@ export async function startFight(
 }
 
 /**
- * Мягкий шанс от значения стата: base + weight * stat / (stat + scale), с потолком cap.
+ * Tracks arena daily tasks, quests and achievements for a finished fight.
  *
- * Раньше шансы считались как stat / 15 (или stat / 25) с жёстким потолком, поэтому
- * 4 и 10 очков в стате давали почти одинаковый результат, а вложение статов
- * не ощущалось. Здесь отдача растёт с каждым очком, но с убыванием.
+ * Re-reads the player so the updates work on the freshly saved document instead of a
+ * stale one, and runs detached from the HTTP response.
+ */
+async function trackArenaProgress(challengerId: string, isChallengerWinner: boolean): Promise<void> {
+    const freshPlayer = await Player.findById(challengerId);
+    if (!freshPlayer) return;
+
+    if (isChallengerWinner) {
+        await AchievementService.trackProgress(challengerId, 'arena_warrior_1', 1);
+    }
+
+    await TaskService.updateTaskProgress(freshPlayer, 'pvp_battle', 1);
+    if (isChallengerWinner) {
+        await TaskService.updateTaskProgress(freshPlayer, 'pvp_win', 1);
+        await TaskService.updateQuestProgress(freshPlayer, 'pvp_win', 1);
+    }
+}
+
+/**
+ * Soft chance from a stat value: base + weight * stat / (stat + scale), capped at cap.
+ *
+ * Previously chances were computed as stat / 15 (or stat / 25) with a hard cap, so
+ * 4 and 10 points in a stat gave almost the same result, and investing in stats
+ * wasn't felt. Here the return grows with every point, but with diminishing returns.
  */
 function statChance(stat: number, scale: number, weight: number, base: number, cap: number): number {
     const value = Math.max(0, stat || 0);
@@ -349,7 +372,7 @@ function statChance(stat: number, scale: number, weight: number, base: number, c
     return Math.min(cap, base + weight * soft);
 }
 
-/** Доля урона, которую гасит защита (0..0.7) */
+/** Fraction of damage absorbed by defense (0..0.7) */
 function mitigation(defense: number): number {
     const def = Math.max(0, defense || 0);
     return Math.min(0.7, def / (def + 28));
@@ -360,12 +383,12 @@ function calculateMaxHP(combatStats: any): number {
     return Math.floor(80 + stamina * 20);
 }
 
-/** Урон яда: часть максимального здоровья жертвы + вклад интеллекта отравителя */
+/** Poison damage: part of the victim's max health + the poisoner's intellect contribution */
 function poisonTickDamage(defenderMaxHP: number, attackerIntelligence: number): number {
     return Math.max(2, Math.floor(defenderMaxHP * 0.03) + Math.floor((attackerIntelligence || 0) * 0.7));
 }
 
-/** Шанс оглушить: растёт от силы, крит добавляет сверху */
+/** Stun chance: grows with strength, a crit adds on top */
 function stunChance(attackerStats: Record<string, number | undefined>, isCrit: boolean): number {
     const chance = statChance(attackerStats.strength ?? 1, 45, 0.10, 0.02, 0.15) + (isCrit ? 0.10 : 0);
     return Math.min(0.35, chance);
@@ -392,8 +415,8 @@ interface AttackRoll {
 }
 
 /**
- * Один бросок атаки. Порядок: промах → уклонение → крит → блок.
- * Крит пробивает блок, блок гасит 60% урона, защита сокращает урон постоянно.
+ * A single attack roll. Order: miss → dodge → crit → block.
+ * A crit pierces the block, the block absorbs 60% of the damage, and defense reduces damage permanently.
  */
 function rollAttack(attackerStats: any, defenderStats: any, comboLevel = 0): AttackRoll {
     const str = attackerStats?.strength ?? 1;
@@ -418,7 +441,7 @@ function rollAttack(attackerStats: any, defenderStats: any, comboLevel = 0): Att
     const critChance = statChance(agi, 40, 0.35, 0.05, 0.45) + statChance(luck, 25, 0.06, 0, 0.10);
     const isCrit = Math.random() < critChance;
 
-    // Крит ломает защиту, обычный удар может быть заблокирован
+    // A crit breaks through defense, a normal hit can be blocked
     const isBlock = !isCrit && Math.random() < statChance(def, 40, 0.30, 0.02, 0.35);
 
     const baseDamage = 4 + str * 1.5 + int * 0.8;
@@ -454,12 +477,12 @@ function pushEvent(
 }
 
 /**
- * Один ход бойца: тик яда, второе дыхание, серия ударов с эффектами и контрудар.
+ * A single fighter's turn: poison tick, second wind, a series of hits with effects, and a counterattack.
  *
- * Все случайные события считаются от реальных статов бойцов: сила даёт урон и
- * оглушение, защита — снижение урона и блок, ловкость — криты, уклонение, комбо и
- * контрудар, выносливость — здоровье и второе дыхание, интеллект — силу крита и яд,
- * удача — криты, уклонение и второе дыхание.
+ * All random events are computed from the fighters' real stats: strength gives damage and
+ * stun, defense — damage reduction and block, agility — crits, dodge, combo and
+ * counterattack, stamina — health and second wind, intellect — crit power and poison,
+ * luck — crits, dodge and second wind.
  */
 function resolveTurn(
     attacker: BattleFighter,
@@ -468,14 +491,14 @@ function resolveTurn(
     events: BattleEvent[],
     counters: BattleCounters
 ): void {
-    // Оглушение: ход пропущен
+    // Stun: the turn is skipped
     if (attacker.stun > 0) {
         pushEvent(events, 'stun_skip', turn, attacker, defender, 0);
         attacker.stun--;
         return;
     }
 
-    // Яд тикает в начале хода
+    // Poison ticks at the start of the turn
     if (attacker.poison) {
         const tickDamage = attacker.poison.damage;
         attacker.hp = Math.max(1, attacker.hp - tickDamage);
@@ -484,7 +507,7 @@ function resolveTurn(
         pushEvent(events, 'poison_tick', turn, attacker, defender, tickDamage);
     }
 
-    // Второе дыхание (выносливость + удача): один раз за бой при низком здоровье
+    // Second wind (stamina + luck): once per fight at low health
     if (!attacker.secondWindUsed && attacker.hp / attacker.maxHP <= 0.35) {
         const stamina = attacker.stats.stamina ?? 5;
         const luck = attacker.stats.luck ?? 0;
@@ -497,7 +520,7 @@ function resolveTurn(
         }
     }
 
-    // Серия ударов: попадание может продолжиться комбо
+    // Hit series: a hit may continue as a combo
     let turnDamage = 0;
     for (let comboLevel = 1; comboLevel <= MAX_COMBO_HITS; comboLevel++) {
         const hit = rollAttack(attacker.stats, defender.stats, comboLevel);
@@ -527,13 +550,13 @@ function resolveTurn(
 
         if (defender.hp <= 0) break;
 
-        // Оглушение (сила)
+        // Stun (strength)
         if (defender.stun === 0 && Math.random() < stunChance(attacker.stats, hit.isCrit)) {
             defender.stun = 1;
             pushEvent(events, 'stun', turn, attacker, defender, 0);
         }
 
-        // Яд (интеллект)
+        // Poison (intellect)
         const poisonChance = statChance(attacker.stats.intelligence ?? 1, 35, 0.30, 0.02, 0.35);
         if (!defender.poison && Math.random() < poisonChance) {
             defender.poison = {
@@ -545,7 +568,7 @@ function resolveTurn(
 
         if (comboLevel >= MAX_COMBO_HITS) break;
 
-        // Комбо (ловкость)
+        // Combo (agility)
         if (Math.random() >= statChance(attacker.stats.agility ?? 1, 45, 0.28, 0.04, 0.35)) break;
         counters.combos++;
         pushEvent(events, 'combo', turn, attacker, defender, 0);
@@ -553,15 +576,15 @@ function resolveTurn(
 
     attacker.damageDealt += turnDamage;
 
-    // Контрудар (ловкость защищающегося). Мёртвый не бьёт в ответ, иначе лог боя
-    // заканчивался событием counter вместо finish.
+    // Counterattack (the defender's agility). The dead don't strike back, otherwise the battle log
+    // ended with a counter event instead of finish.
     if (defender.hp > 0 && attacker.hp > 0) {
         const counterChance = statChance(defender.stats.agility ?? 1, 40, 0.30, 0.03, 0.40);
         if (Math.random() < counterChance) {
             const counterDamage = calculateCounterDamage(defender.stats, Math.max(3, turnDamage));
             attacker.hp = Math.max(0, attacker.hp - counterDamage);
             defender.damageDealt += counterDamage;
-            // Контрудар наносит защищающийся, поэтому attacker/defender меняются местами
+            // The counterattack is dealt by the defender, so attacker/defender swap places
             pushEvent(events, 'counter', turn, defender, attacker, counterDamage);
         }
     }
@@ -596,11 +619,11 @@ function createEvent(
 }
 
 /**
- * Приводит здоровье в логе боя к ролям бойцов (challenger/opponent).
+ * Maps the health in the battle log to fighter roles (challenger/opponent).
  *
- * В событиях поля attacker/defender зависят от того, кто бьёт в этом ходу, поэтому
- * клиент не мог однозначно понять, чья полоска здоровья, и HP «прыгал» между бойцами.
- * Ожидает, что attackerId в событии — тот, кто бьёт (striker).
+ * In the events, the attacker/defender fields depend on who strikes during that turn, so
+ * the client couldn't tell which health bar was whose, and HP "jumped" between fighters.
+ * Expects the attackerId in an event to be the one who strikes (the striker).
  */
 export function toRoleBasedLog(events: BattleEvent[], challengerId: string): BattleEvent[] {
     return events.map((event) => {

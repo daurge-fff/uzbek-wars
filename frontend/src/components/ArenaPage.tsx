@@ -29,7 +29,7 @@ interface MatchEvent {
     defenderHealth: number;
     attackerMaxHealth: number;
     defenderMaxHealth: number;
-    /** HP в ролях бойцов — не зависят от того, кто бьёт */
+    /** HP in fighter roles — independent of who strikes */
     challengerHealth?: number;
     challengerMaxHealth?: number;
     opponentHealth?: number;
@@ -74,7 +74,7 @@ export const ArenaPage = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
-            const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/arena/opponents`, {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/arena/opponents`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setOpponents(response.data.opponents);
@@ -91,7 +91,7 @@ export const ArenaPage = () => {
         setMatchResult(null);
         try {
             const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
-            const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/arena/fight`,
+            const response = await axios.post(`${import.meta.env.VITE_API_URL || ''}/api/arena/fight`,
                 { opponentId, difficulty: selectedDifficulty },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -100,8 +100,8 @@ export const ArenaPage = () => {
             setMatchResult(data);
 
             // Animate battle log
-            // Бой стал длиннее (больше ходов и событий), поэтому шаг анимации меньше,
-            // иначе просмотр боя занимал бы десятки секунд
+            // The fight got longer (more turns and events), so the animation step is smaller,
+            // otherwise watching the fight would take dozens of seconds
             const log = data.matchLog || [];
             for (let i = 0; i < log.length; i++) {
                 setCurrentLogIndex(i);
@@ -184,9 +184,9 @@ export const ArenaPage = () => {
         const challengerName = matchResult?.challengerName || t('arena.you', 'Вы');
         const opponentNameVal = matchResult?.opponentName || t('arena.opponent', 'Соперник');
 
-        // HP берём в ролях бойцов (challenger/opponent): бой всегда начинает игрок,
-        // поэтому слева он, справа — противник. Поля attacker*/defender* меняют смысл
-        // каждый ход, из-за этого полоски здоровья прыгали между бойцами.
+        // We take HP in fighter roles (challenger/opponent): the player always starts the fight,
+        // so he is on the left and the opponent on the right. The attacker*/defender* fields change meaning
+        // every turn, which made the health bars jump between fighters.
         const playerHP = currentEvent?.challengerHealth ?? challengerMax;
         const opponentHPVal = currentEvent?.opponentHealth ?? opponentMax;
 
@@ -194,21 +194,21 @@ export const ArenaPage = () => {
         const opponentPercent = Math.max(0, Math.min(100, Math.round((opponentHPVal / opponentMax) * 100)));
 
         return (
-            <div className="min-h-screen bg-gradient-to-b from-gray-950 via-black to-gray-900 flex flex-col items-center justify-center p-4 text-center">
+            <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-gray-100 dark:from-gray-950 dark:via-black dark:to-gray-900 flex flex-col items-center justify-center p-4 text-center">
                 <div className="w-full max-w-sm mb-6 space-y-4">
-                    <div className="flex items-center justify-between gap-4 bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl">
+                    <div className="flex items-center justify-between gap-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-4">
                         <div className="flex-1 text-left">
                             <div className="text-xs text-indigo-400 font-bold truncate">
                                 {challengerName}
                             </div>
-                            <div className="h-3 w-full bg-gray-800 rounded-full overflow-hidden mt-1.5 border border-white/10">
+                            <div className="h-3 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mt-1.5 border border-gray-300 dark:border-white/10">
                                 <motion.div
                                     animate={{ width: `${challengerPercent}%` }}
                                     transition={{ duration: 0.3 }}
                                     className={`h-full rounded-full ${challengerPercent > 40 ? 'bg-gradient-to-r from-green-500 to-emerald-400' : 'bg-gradient-to-r from-red-600 to-orange-500'}`}
                                 />
                             </div>
-                            <div className="text-[10px] text-gray-400 mt-0.5 font-mono">{Math.round(playerHP)} / {challengerMax} HP</div>
+                            <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 font-mono">{Math.round(playerHP)} / {challengerMax} HP</div>
                         </div>
 
                         <div className="text-xl font-black text-red-500 animate-pulse">VS</div>
@@ -217,14 +217,14 @@ export const ArenaPage = () => {
                             <div className="text-xs text-red-400 font-bold truncate">
                                 {opponentNameVal}
                             </div>
-                            <div className="h-3 w-full bg-gray-800 rounded-full overflow-hidden mt-1.5 border border-white/10">
+                            <div className="h-3 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mt-1.5 border border-gray-300 dark:border-white/10">
                                 <motion.div
                                     animate={{ width: `${opponentPercent}%` }}
                                     transition={{ duration: 0.3 }}
                                     className={`h-full rounded-full ${opponentPercent > 40 ? 'bg-gradient-to-r from-green-500 to-emerald-400' : 'bg-gradient-to-r from-red-600 to-orange-500'}`}
                                 />
                             </div>
-                            <div className="text-[10px] text-gray-400 mt-0.5 font-mono">{Math.round(opponentHPVal)} / {opponentMax} HP</div>
+                            <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 font-mono">{Math.round(opponentHPVal)} / {opponentMax} HP</div>
                         </div>
                     </div>
                 </div>
@@ -242,18 +242,18 @@ export const ArenaPage = () => {
                 </motion.div>
 
                 <div className="max-w-xs w-full">
-                    <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-widest animate-pulse">
+                    <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-4 uppercase tracking-widest animate-pulse">
                         {t('arena.fighting', 'ИДЕТ БИТВА...')}
                     </h2>
 
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 min-h-24 flex items-center justify-center">
+                    <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-4 min-h-24 flex items-center justify-center">
                         <AnimatePresence mode="wait">
                             <motion.p
                                 key={currentLogIndex}
                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                                className="text-gray-200 font-medium text-sm leading-relaxed"
+                                className="text-gray-800 dark:text-gray-200 font-medium text-sm leading-relaxed"
                             >
                                 {currentEvent ? `${getEventEmoji(currentEvent.type)} ${getEventMessage(currentEvent)}` : t('arena.preparing', 'Бойцы выходят на арену...')}
                             </motion.p>
@@ -265,7 +265,7 @@ export const ArenaPage = () => {
                             setFighting(false);
                             if (refreshPlayer) refreshPlayer();
                         }}
-                        className="mt-6 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/20 transition-all cursor-pointer shadow-md"
+                        className="mt-6 px-5 py-2.5 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white text-xs font-bold rounded-xl border border-gray-200 dark:border-white/20 transition-all cursor-pointer shadow-md"
                     >
                         {t('arena.skipFight', 'Пропустить анимацию ⏩')}
                     </button>
@@ -277,7 +277,7 @@ export const ArenaPage = () => {
     // === LOADING STATE (fighting but no result yet) ===
     if (fighting && !matchResult) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-gray-950 via-black to-gray-900 flex flex-col items-center justify-center p-4 text-center">
+            <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-gray-100 dark:from-gray-950 dark:via-black dark:to-gray-900 flex flex-col items-center justify-center p-4 text-center">
                 <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
@@ -285,7 +285,7 @@ export const ArenaPage = () => {
                 >
                     <Emoji emoji="🌀" size={48} />
                 </motion.div>
-                <p className="text-gray-400 text-sm font-bold">{t('arena.loading', 'Подготовка боя...')}</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm font-bold">{t('arena.loading', 'Подготовка боя...')}</p>
             </div>
         );
     }
@@ -299,7 +299,7 @@ export const ArenaPage = () => {
         const diffConfig = DIFFICULTY_INFO[matchResult.difficulty || 'medium'];
 
         return (
-            <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-4 pb-32">
+            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black p-4 pb-32">
                 <div className="max-w-md mx-auto">
                     <div className="flex justify-end mb-2">
                         <button
@@ -309,7 +309,7 @@ export const ArenaPage = () => {
                                 fetchOpponents();
                                 if (refreshPlayer) refreshPlayer();
                             }}
-                            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center font-bold text-lg cursor-pointer transition-colors"
+                            className="w-10 h-10 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white flex items-center justify-center font-bold text-lg cursor-pointer transition-colors"
                         >
                             ✕
                         </button>
@@ -389,7 +389,7 @@ export const ArenaPage = () => {
 
                     <button
                         onClick={() => setShowLog(!showLog)}
-                        className="w-full py-4 rounded-2xl bg-white/10 text-white font-bold mb-4 border border-white/20"
+                        className="w-full py-4 rounded-2xl bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white font-bold mb-4 border border-gray-200 dark:border-white/20"
                     >
                         {showLog ? t('arena.hideLog', 'Скрыть лог боя') : t('arena.showLog', 'Показать лог боя')}
                     </button>
@@ -402,9 +402,9 @@ export const ArenaPage = () => {
                                 exit={{ height: 0, opacity: 0 }}
                                 className="overflow-hidden mb-6"
                             >
-                                <div className="bg-white/5 rounded-2xl p-4 font-mono text-sm text-gray-300">
+                                <div className="bg-gray-100 dark:bg-white/5 rounded-2xl p-4 font-mono text-sm text-gray-700 dark:text-gray-300">
                                     {matchResult.matchLog.map((entry, i) => (
-                                        <div key={i} className="mb-2 border-b border-white/10 pb-1 flex items-start gap-2">
+                                        <div key={i} className="mb-2 border-b border-gray-200 dark:border-white/10 pb-1 flex items-start gap-2">
                                             <span className="text-gray-500 shrink-0">[{entry.turn}]</span>
                                             <span className="shrink-0">{getEventEmoji(entry.type)}</span>
                                             <span>{getEventMessage(entry)}</span>

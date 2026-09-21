@@ -42,7 +42,9 @@
     "cook_plov": "Cook Plov",
     "trade_bazaar": "Trade at Bazaar",
     "rest": "Rest",
-    "eat": "Eat"
+    "eat": "Eat",
+    "work_shawarma": "Work at the shawarma shop",
+    "pray_namaz": "Read namaz"
   },
   "notifications": {
     "level_up": "Congratulations! You reached level {{level}}!",
@@ -99,7 +101,14 @@
     "userInfoError": "Failed to get user information",
     "tokenError": "Token error",
     "oauthError": "OAuth error",
-    "confirmLogout": "Are you sure you want to log out?"
+    "confirmLogout": "Are you sure you want to log out?",
+    "telegramSubtitle": "Signing in through Telegram happens automatically",
+    "telegramSignIn": "Sign in with Telegram",
+    "telegramOpening": "Opening the game…",
+    "telegramError": "Could not sign in with Telegram. Please try again.",
+    "telegramNotConfigured": "Telegram sign-in is not configured on this server",
+    "telegramSignedAs": "Telegram: @{{username}}",
+    "telegramHint": "Name, username and photo come from your Telegram profile"
   },
   "cities": {
     "select": "Select City",
@@ -190,7 +199,8 @@
       "accessory": "Accessories",
       "combat": "⚔️ Combat",
       "backpack": "Backpacks",
-      "equipment": "Equipment"
+      "equipment": "Equipment",
+      "owned": "Inventory"
     },
     "rarity": {
       "common": "Common",
@@ -210,7 +220,16 @@
     "bonus": "Bonus",
     "yourBalance": "Your balance",
     "buyWithSoms": "Buy with soms",
-    "buyWithCrystals": "Buy with crystals"
+    "buyWithCrystals": "Buy with crystals",
+    "noBonus": "No bonuses",
+    "sell": "Sell",
+    "sellFor": "Sell for {{amount}} {{emoji}}",
+    "sellConfirm": "Sell “{{name}}”? The item will be removed from your inventory.",
+    "sellSuccess": "Sold!",
+    "sellFailed": "Could not sell the item",
+    "equipFailed": "Could not equip the item",
+    "unequipSuccess": "Item removed",
+    "unequipFailed": "Could not remove the item"
   },
   "inventory": {
     "title": "Inventory",
@@ -373,7 +392,47 @@
     "issuesDetected": "Issues detected",
     "projectReady": "Project ready to work",
     "needsAttention": "Needs developer attention",
-    "checking": "Checking..."
+    "checking": "Checking...",
+    "service": {
+      "api": "Backend API",
+      "database": "MongoDB",
+      "bot": "Telegram Bot",
+      "frontend": "Frontend",
+      "tests": "Background tests"
+    },
+    "autoRefreshIn": "Auto refresh in {{seconds}}s",
+    "botNotRunning": "Not running",
+    "botRunning": "Running",
+    "connected": "Connection",
+    "connectedNo": "no",
+    "connectedYes": "yes",
+    "duration": "Duration",
+    "errorHint": "“No data” values below mean the check did not pass, not zero load.",
+    "errorTitle": "Could not fetch service status",
+    "frontendDetail": "Page rendered in the browser",
+    "lastUpdated": "Updated",
+    "latency": "Latency",
+    "memory": "Memory",
+    "noTestData": "No test data",
+    "retry": "Retry",
+    "runTests": "Run tests",
+    "status": {
+      "healthy": "Healthy",
+      "degraded": "Degraded",
+      "down": "Down",
+      "unknown": "Unknown"
+    },
+    "testsErrorTitle": "Could not fetch test results",
+    "unitHours": "h",
+    "unitMinutes": "min",
+    "unitSeconds": "s",
+    "uptime": "Uptime",
+    "verdict": {
+      "healthy": "All systems operational",
+      "degraded": "Some issues",
+      "down": "Service unavailable",
+      "unknown": "Status unknown"
+    }
   },
   "activity": {
     "experience": "Experience",
@@ -552,7 +611,8 @@
     "explore": "Explore the World",
     "yourProgress": "Your Progress",
     "madeWith": "Made with",
-    "inUzbekistan": "in Uzbekistan"
+    "inUzbekistan": "in Uzbekistan",
+    "openInTelegram": "Open in Telegram"
   },
   "welcome": {
     "title": "Welcome!",

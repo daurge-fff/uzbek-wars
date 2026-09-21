@@ -3,9 +3,9 @@ import { describe, it, expect } from 'vitest';
 import Emoji from './Emoji';
 
 /**
- * Контракт Emoji: сначала локальный файл (если эмодзи есть в маппинге),
- * потом CDN, и только если оба недоступны — системный эмодзи текстом.
- * Тесты фиксируют именно этот порядок: карточки не должны оставаться пустыми.
+ * Emoji contract: local file first (if the emoji is in the mapping),
+ * then the CDN, and only if both are unavailable — the system emoji as text.
+ * The tests pin exactly this order: cards must never stay empty.
  */
 describe('Emoji Component', () => {
   it('uses a local file when the emoji is mapped', () => {

@@ -108,7 +108,7 @@ const CosmeticItemSchema = new Schema<ICosmeticItem>({
   },
   type: {
     type: String,
-    enum: ['clothing', 'background', 'backpack', 'consumable'],
+    enum: ['clothing', 'background', 'backpack', 'consumable', 'equipment'],
     required: true,
   },
   slot: {

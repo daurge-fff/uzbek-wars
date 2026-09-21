@@ -2,19 +2,19 @@ import { useState } from 'react';
 import Emoji from './Emoji';
 
 interface CosmeticIconProps {
-    /** Эмодзи-заглушка, если картинки нет */
+    /** Emoji fallback when there is no image */
     emoji?: string;
-    /** Путь к картинке предмета (/assets/cosmetics/<id>.png) */
+    /** Path to the item image (/assets/cosmetics/<id>.png) */
     imageSrc?: string;
     size?: number;
     className?: string;
 }
 
 /**
- * Иконка косметического предмета: сначала картинка, затем эмодзи.
+ * Cosmetic item icon: image first, then emoji.
  *
- * Раньше витрина показывала только эмодзи из API, которого там не было,
- * поэтому карточки выглядели пустыми.
+ * Previously the store showed only the emoji from the API, which wasn't there,
+ * so the cards looked empty.
  */
 export const CosmeticIcon = ({ emoji, imageSrc, size = 48, className = '' }: CosmeticIconProps) => {
     const [failed, setFailed] = useState(false);

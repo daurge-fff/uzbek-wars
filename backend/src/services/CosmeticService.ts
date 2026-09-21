@@ -16,6 +16,61 @@ import { logger } from '../utils/logger';
 import { applyShopDiscount } from './CharacterBonusService';
 import { calculateCombatPower } from './CombatStatsService';
 import { CosmeticBonusService } from './CosmeticBonusService';
+import { getShopItem, getSellRefund } from '../data/shopCatalog';
+
+/**
+ * Item shape used by equip/unequip/sell. Shop items come from the static catalog,
+ * seeded items come from the `CosmeticItem` collection; both satisfy this shape.
+ */
+export interface ResolvedCosmetic {
+  itemId: string;
+  type: string;
+  slot?: string;
+  rarity: string;
+  name?: any;
+  stats?: Record<string, number | undefined>;
+  bonus?: any;
+  price?: number;
+  priceSoms?: number;
+  priceCrystals?: number;
+}
+
+/** Every list of owned items, regardless of the item type */
+function getOwnedLists(player: any): string[][] {
+  const cosmetics = player.cosmetics || {};
+  return [
+    cosmetics.clothing || [],
+    cosmetics.backgrounds || [],
+    cosmetics.accessories || [],
+    cosmetics.backpacks || [],
+    cosmetics.equipment || [],
+    cosmetics.consumables || [],
+  ];
+}
+
+/** True when the player owns the item in any of the inventory lists */
+export function isItemOwned(player: any, itemId: string): boolean {
+  return getOwnedLists(player).some((list) => list.includes(itemId));
+}
+
+/** Removes the item from every owned list */
+function removeFromOwned(player: any, itemId: string): void {
+  getOwnedLists(player).forEach((list) => {
+    const index = list.indexOf(itemId);
+    if (index >= 0) list.splice(index, 1);
+  });
+}
+
+/**
+ * Recomputes combat power from base stats + equipment bonus.
+ *
+ * Base `combatStats` are never modified by equipment: bonuses are added on the fly,
+ * so unequipping or selling an item can not corrupt the player's own stats.
+ */
+async function recalculateCombatPower(player: any): Promise<void> {
+  const effective = await CosmeticBonusService.getEffectiveCombatStats(player);
+  player.combatStats.combatPower = calculateCombatPower(effective);
+}
 
 /**
  * Cosmetic purchase result
@@ -71,9 +126,32 @@ export async function getAllCosmetics(
  * @param itemId - Cosmetic item ID
  * @returns Cosmetic item or null
  */
-export async function getCosmeticById(itemId: string) {
+/**
+ * Looks up a cosmetic item.
+ *
+ * Shop items live in the static shop catalog while seeded items live in the
+ * `CosmeticItem` collection. Equipping used to look in the collection only, so every
+ * item bought in the shop was reported as "not owned" and could never be worn.
+ */
+export async function getCosmeticById(itemId: string): Promise<ResolvedCosmetic | null> {
   try {
-    return await CosmeticItem.findOne({ itemId });
+    const dbItem = await CosmeticItem.findOne({ itemId });
+    if (dbItem) return dbItem as unknown as ResolvedCosmetic;
+
+    const catalogItem = getShopItem(itemId);
+    if (!catalogItem) return null;
+
+    return {
+      itemId: catalogItem.id,
+      type: catalogItem.type,
+      slot: catalogItem.slot,
+      rarity: catalogItem.rarity,
+      name: catalogItem.name,
+      stats: catalogItem.stats as Record<string, number | undefined> | undefined,
+      bonus: catalogItem.bonus,
+      priceSoms: catalogItem.priceSoms,
+      priceCrystals: catalogItem.priceCrystals,
+    };
   } catch (error) {
     logger.error('Error getting cosmetic by ID:', error);
     return null;
@@ -135,7 +213,8 @@ export async function purchaseCosmetic(
     }
 
     // Apply character class discount
-    const finalPrice = applyShopDiscount(cosmetic.price, player.characterId);
+    const basePrice = cosmetic.price ?? cosmetic.priceSoms ?? cosmetic.priceCrystals ?? 0;
+    const finalPrice = applyShopDiscount(basePrice, player.characterId);
 
     // Check if player has enough currency
     if (player.donationCurrency < finalPrice) {
@@ -152,8 +231,15 @@ export async function purchaseCosmetic(
     // Add item to collection
     if (cosmetic.type === 'clothing') {
       player.cosmetics.clothing.push(itemId);
-    } else {
+    } else if (cosmetic.type === 'background') {
       player.cosmetics.backgrounds.push(itemId);
+    } else if (cosmetic.type === 'accessory') {
+      player.cosmetics.accessories.push(itemId);
+    } else if (cosmetic.type === 'equipment') {
+      if (!player.cosmetics.equipment) player.cosmetics.equipment = [];
+      player.cosmetics.equipment.push(itemId);
+    } else if (cosmetic.type === 'backpack') {
+      player.cosmetics.backpacks.push(itemId);
     }
 
     await player.save();
@@ -169,7 +255,7 @@ export async function purchaseCosmetic(
       success: true,
       item: {
         id: cosmetic.itemId,
-        name: cosmetic.name.en,
+        name: cosmetic.name?.en ?? cosmetic.itemId,
         type: cosmetic.type,
         rarity: cosmetic.rarity
       },
@@ -218,32 +304,32 @@ export async function equipCosmetic(
       };
     }
 
-    // Check if player owns the item
-    const ownedItems = cosmetic.type === 'clothing'
-      ? player.cosmetics.clothing
-      : player.cosmetics.backgrounds;
-
-    const ownsItem = ownedItems.includes(itemId);
-    if (!ownsItem) {
+    // Check ownership across all inventory lists (clothing/backgrounds/accessories/equipment/...)
+    if (!isItemOwned(player, itemId)) {
       return {
         success: false,
         error: 'Item not owned'
       };
     }
 
-    // Equip item based on type and slot
-    if (cosmetic.type === 'clothing' || cosmetic.type === 'equipment') {
-      const slot = cosmetic.slot;
+    // Equip item into its slot
+    const type = String(cosmetic.type);
+    const slot = String(cosmetic.slot || '');
+
+    if (type === 'clothing' || type === 'equipment') {
       if (slot === 'head') player.cosmetics.equippedHead = itemId;
       else if (slot === 'body') player.cosmetics.equippedBody = itemId;
       else if (slot === 'feet') player.cosmetics.equippedFeet = itemId;
+      else if (slot === 'weapon') player.cosmetics.equippedWeapon = itemId;
       else if (slot === 'backpack') player.cosmetics.activeBackpack = itemId;
       else if (slot === 'accessory') player.cosmetics.equippedAccessory = itemId;
       else player.cosmetics.activeClothing = itemId; // Fallback
-    } else if (cosmetic.type === 'background') {
+    } else if (type === 'background') {
       player.cosmetics.activeBackground = itemId;
-    } else if (cosmetic.type === 'backpack') {
+    } else if (type === 'backpack') {
       player.cosmetics.activeBackpack = itemId;
+    } else if (type === 'accessory') {
+      player.cosmetics.equippedAccessory = itemId;
     } else {
       return {
         success: false,
@@ -252,21 +338,7 @@ export async function equipCosmetic(
     }
 
     // Recalculate combat power after equipment change
-    const equipmentStats = await CosmeticBonusService.getTotalEquipmentStats(player);
-    const baseStats = player.combatStats;
-    const combinedStats = {
-      strength: baseStats.strength + equipmentStats.strength,
-      defense: baseStats.defense + equipmentStats.defense,
-      agility: baseStats.agility + equipmentStats.agility,
-      stamina: baseStats.stamina + equipmentStats.stamina,
-      intelligence: baseStats.intelligence + equipmentStats.intelligence,
-      luck: baseStats.luck + equipmentStats.luck,
-      statPoints: baseStats.statPoints
-    };
-
-    player.combatStats.combatPower = calculateCombatPower(combinedStats);
-
-    await player.save();
+    await recalculateCombatPower(player);
 
     logger.info(`Item equipped and power recalculated`, {
       playerId,
@@ -283,15 +355,18 @@ export async function equipCosmetic(
 }
 
 /**
- * Unequips a cosmetic item
- * 
+ * Unequips a cosmetic item.
+ *
+ * Accepts an item id (preferred) or a legacy slot type. Clears every slot that holds
+ * the item, so the frontend can simply send the item it wants to take off.
+ *
  * @param playerId - Player's database ID
- * @param type - Cosmetic type (clothing/background)
+ * @param itemIdOrType - Item id, or a legacy type name (clothing/background/...)
  * @returns Success status
  */
 export async function unequipCosmetic(
   playerId: string,
-  type: 'clothing' | 'background'
+  itemIdOrType: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const player = await Player.findById(playerId);
@@ -302,44 +377,63 @@ export async function unequipCosmetic(
       };
     }
 
-    if (type === 'clothing') {
-      player.cosmetics.activeClothing = undefined;
-      player.cosmetics.equippedHead = undefined;
-      player.cosmetics.equippedBody = undefined;
-      player.cosmetics.equippedFeet = undefined;
-    } else if (type === 'background') {
-      player.cosmetics.activeBackground = undefined;
-    } else if ((type as string) === 'accessory') {
-      player.cosmetics.equippedAccessory = undefined;
-    } else if ((type as string) === 'backpack') {
-      player.cosmetics.activeBackpack = undefined;
+    const legacyTypes = ['clothing', 'background', 'accessory', 'backpack', 'equipment'];
+    const cosmetics: any = player.cosmetics;
+
+    if (legacyTypes.includes(itemIdOrType)) {
+      // Legacy call: clear the slots that belong to a whole category
+      if (itemIdOrType === 'clothing' || itemIdOrType === 'equipment') {
+        cosmetics.activeClothing = undefined;
+        cosmetics.equippedHead = undefined;
+        cosmetics.equippedBody = undefined;
+        cosmetics.equippedFeet = undefined;
+        cosmetics.equippedWeapon = undefined;
+        cosmetics.equippedAccessory = undefined;
+      } else if (itemIdOrType === 'background') {
+        cosmetics.activeBackground = undefined;
+      } else if (itemIdOrType === 'accessory') {
+        cosmetics.equippedAccessory = undefined;
+        cosmetics.activeAccessory = undefined;
+      } else if (itemIdOrType === 'backpack') {
+        cosmetics.activeBackpack = undefined;
+      }
     } else {
-      return {
-        success: false,
-        error: 'Invalid cosmetic type'
-      };
+      // Preferred call: drop this exact item from any slot that references it
+      const slotFields = [
+        'activeClothing',
+        'activeBackground',
+        'activeAccessory',
+        'activeBackpack',
+        'equippedHead',
+        'equippedBody',
+        'equippedFeet',
+        'equippedWeapon',
+        'equippedAccessory',
+      ];
+
+      let cleared = false;
+      slotFields.forEach((field) => {
+        if (cosmetics[field] === itemIdOrType) {
+          cosmetics[field] = undefined;
+          cleared = true;
+        }
+      });
+
+      if (!cleared) {
+        return {
+          success: false,
+          error: 'Item is not equipped'
+        };
+      }
     }
 
     // Recalculate combat power after equipment change
-    const equipmentStats = await CosmeticBonusService.getTotalEquipmentStats(player);
-    const baseStats = player.combatStats;
-    const combinedStats = {
-      strength: baseStats.strength + equipmentStats.strength,
-      defense: baseStats.defense + equipmentStats.defense,
-      agility: baseStats.agility + equipmentStats.agility,
-      stamina: baseStats.stamina + equipmentStats.stamina,
-      intelligence: baseStats.intelligence + equipmentStats.intelligence,
-      luck: baseStats.luck + equipmentStats.luck,
-      statPoints: baseStats.statPoints
-    };
-
-    player.combatStats.combatPower = calculateCombatPower(combinedStats);
-
+    await recalculateCombatPower(player);
     await player.save();
 
     logger.info(`Cosmetic unequipped`, {
       playerId,
-      type
+      itemIdOrType
     });
 
     return { success: true };
@@ -443,4 +537,72 @@ export async function getCosmeticsByType(
   type: 'clothing' | 'background'
 ): Promise<any[]> {
   return getAllCosmetics(type);
+}
+
+/**
+ * Sells an owned item back to the shop for part of its price.
+ *
+ * Removes the item from every owned list and clears any slot that referenced it.
+ * Base stats are never touched: equipment bonuses are computed on the fly, so
+ * selling or unequipping can not corrupt the player's own stats.
+ *
+ * @param playerId - Player's database ID
+ * @param itemId - Item to sell
+ * @returns Refund details
+ */
+export async function sellCosmetic(
+  playerId: string,
+  itemId: string
+): Promise<{ success: boolean; error?: string; refund?: { currency: 'soms' | 'crystals'; amount: number } }> {
+  try {
+    const player = await Player.findById(playerId);
+    if (!player) {
+      return { success: false, error: 'Player not found' };
+    }
+
+    if (!isItemOwned(player, itemId)) {
+      return { success: false, error: 'Item not owned' };
+    }
+
+    const refund = getSellRefund(itemId);
+    if (!refund) {
+      return { success: false, error: 'Item cannot be sold' };
+    }
+
+    removeFromOwned(player, itemId);
+
+    const cosmetics: any = player.cosmetics;
+    const slotFields = [
+      'activeClothing',
+      'activeBackground',
+      'activeAccessory',
+      'activeBackpack',
+      'equippedHead',
+      'equippedBody',
+      'equippedFeet',
+      'equippedWeapon',
+      'equippedAccessory',
+    ];
+    slotFields.forEach((field) => {
+      if (cosmetics[field] === itemId) {
+        cosmetics[field] = undefined;
+      }
+    });
+
+    if (refund.currency === 'soms') {
+      player.soms += refund.amount;
+    } else {
+      player.donationCurrency = (player.donationCurrency || 0) + refund.amount;
+    }
+
+    await recalculateCombatPower(player);
+    await player.save();
+
+    logger.info(`Cosmetic sold`, { playerId, itemId, refund });
+
+    return { success: true, refund };
+  } catch (error) {
+    logger.error('Error selling cosmetic:', error);
+    throw error;
+  }
 }

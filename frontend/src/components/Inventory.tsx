@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import Emoji from './Emoji';
 import CosmeticIcon from './CosmeticIcon';
 import { mergeCosmeticItems } from '../utils/cosmetics';
@@ -14,11 +15,14 @@ interface CosmeticItem {
   type: CosmeticType;
   rarity: CosmeticRarity;
   icon: string;
+  /** Item art at /assets/cosmetics/<id>.png — falls back to the emoji above */
   imageSrc?: string;
   owned: boolean;
   equipped: boolean;
+  priceSoms?: number;
+  priceCrystals?: number;
   bonus?: {
-    type: 'xp' | 'soms' | 'stats';
+    type: 'xp' | 'soms' | 'stats' | 'combat' | 'mood' | 'health' | 'hunger' | 'energy';
     value: number;
     description: string | { ru: string; en: string; uz: string; uk: string };
   };
@@ -36,39 +40,39 @@ interface InventoryProps {
   items: CosmeticItem[];
   onEquip: (itemId: string) => Promise<void>;
   onUnequip: (itemId: string) => Promise<void>;
+  onSell?: (itemId: string) => Promise<void>;
 }
 
-const rarityColors = {
-  common: 'from-gray-400 to-gray-500',
-  rare: 'from-blue-400 to-blue-600',
-  epic: 'from-purple-400 to-purple-600',
-  legendary: 'from-yellow-400 to-orange-500'
+const rarityBorder: Record<CosmeticRarity, string> = {
+  common: '#d1d5db',
+  rare: '#60a5fa',
+  epic: '#c084fc',
+  legendary: '#fbbf24'
 };
 
-const rarityBorders = {
-  common: 'border-gray-300 dark:border-gray-600',
-  rare: 'border-blue-400 dark:border-blue-500',
-  epic: 'border-purple-400 dark:border-purple-500',
-  legendary: 'border-yellow-400 dark:border-orange-500'
+const rarityText: Record<CosmeticRarity, string> = {
+  common: 'text-gray-600 dark:text-gray-300',
+  rare: 'text-blue-600 dark:text-blue-400',
+  epic: 'text-purple-600 dark:text-purple-400',
+  legendary: 'text-yellow-600 dark:text-yellow-400'
 };
 
-const typeEmojis: Record<CosmeticType, string> = {
-  clothing: '👕',
-  background: '🖼️',
-  accessory: '✨',
-  equipment: '⚔️',
-  backpack: '🎒'
-};
+const STAT_ROWS: Array<{ key: keyof NonNullable<CosmeticItem['stats']>; emoji: string; className: string }> = [
+  { key: 'strength', emoji: '⚔️', className: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' },
+  { key: 'defense', emoji: '🛡️', className: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' },
+  { key: 'agility', emoji: '💨', className: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' },
+  { key: 'stamina', emoji: '❤️', className: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' },
+  { key: 'intelligence', emoji: '🧠', className: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' },
+  { key: 'luck', emoji: '🍀', className: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' }
+];
 
-export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
+export const Inventory = ({ items, onEquip, onUnequip, onSell }: InventoryProps) => {
   const { t, i18n } = useTranslation();
   const [filter, setFilter] = useState<CosmeticType | 'all'>('all');
   const [loading, setLoading] = useState<string | null>(null);
 
-  const ownedItems = mergeCosmeticItems(items ? items.filter(item => item.owned) : []);
-  const filteredItems = filter === 'all'
-    ? ownedItems
-    : ownedItems.filter(item => item.type === filter);
+  const ownedItems = mergeCosmeticItems(items ? items.filter((item) => item.owned) : []) as CosmeticItem[];
+  const filteredItems = filter === 'all' ? ownedItems : ownedItems.filter((item) => item.type === filter);
 
   const getItemName = (item: CosmeticItem): string => {
     if (typeof item.name === 'object') {
@@ -78,16 +82,6 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
   };
 
   const getBonusDescription = (item: CosmeticItem): string => {
-    if (item.stats) {
-      const stats = [];
-      if (item.stats.strength) stats.push(`${t('stats.strength', 'Сила')}: +${item.stats.strength}`);
-      if (item.stats.defense) stats.push(`${t('stats.defense', 'Защита')}: +${item.stats.defense}`);
-      if (item.stats.agility) stats.push(`${t('stats.agility', 'Ловкость')}: +${item.stats.agility}`);
-      if (item.stats.stamina) stats.push(`${t('stats.stamina', 'Выносливость')}: +${item.stats.stamina}`);
-      if (item.stats.intelligence) stats.push(`${t('stats.intelligence', 'Интеллект')}: +${item.stats.intelligence}`);
-      if (item.stats.luck) stats.push(`${t('stats.luck', 'Удача')}: +${item.stats.luck}`);
-      if (stats.length > 0) return stats.join(', ');
-    }
     if (!item.bonus) return '';
     if (typeof item.bonus.description === 'object') {
       return item.bonus.description[i18n.language as keyof typeof item.bonus.description] || item.bonus.description.ru;
@@ -95,217 +89,148 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
     return item.bonus.description;
   };
 
-  const handleToggleEquip = async (item: CosmeticItem) => {
-    setLoading(item.id);
+  const sellAmount = (item: CosmeticItem): { emoji: string; amount: number } | null => {
+    if (item.priceSoms) return { emoji: '💰', amount: Math.floor(item.priceSoms * 0.5) };
+    if (item.priceCrystals) return { emoji: '💎', amount: Math.floor(item.priceCrystals * 0.5) };
+    return null;
+  };
+
+  const runAction = async (itemId: string, action: () => Promise<void>, successText: string, errorText: string) => {
+    setLoading(itemId);
     try {
-      if (item.equipped) {
-        await onUnequip(item.id);
-      } else {
-        await onEquip(item.id);
-      }
+      await action();
+      toast.success(successText);
+    } catch {
+      toast.error(errorText);
     } finally {
       setLoading(null);
     }
   };
 
-  const equippedItems = ownedItems.filter(item => item.equipped);
+  const handleSell = (item: CosmeticItem) => {
+    if (!onSell) return;
+    if (!window.confirm(t('cosmetic.sellConfirm', 'Продать «{{name}}»? Предмет исчезнет из инвентаря.', { name: getItemName(item) }))) {
+      return;
+    }
+    return runAction(item.id, () => onSell(item.id), t('cosmetic.sellSuccess', 'Продано!'), t('cosmetic.sellFailed', 'Не удалось продать предмет'));
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black p-4 pb-32">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 p-4 pb-32">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-sm p-6 mb-6 border border-white/50 dark:border-gray-700/50">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
-              {t('inventory.title', 'Инвентарь')}
-            </h1>
+        <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-5">
+          {t('inventory.title', 'Инвентарь')}
+        </h1>
 
-            {/* Items Count */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full text-white font-black shadow-lg text-sm">
-              <Emoji emoji="📦" size={16} />
-              <span>{ownedItems.length}</span>
-            </div>
-          </div>
-
-          {/* Currently Equipped */}
-          {equippedItems.length > 0 && (
-            <div className="mb-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl border border-green-200 dark:border-green-800">
-              <h2 className="text-sm font-black text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                <Emoji emoji="✨" size={18} />
-                {t('inventory.equipped', 'Надето')}
-              </h2>
-              <div className="flex gap-2 flex-wrap">
-                {equippedItems.map(item => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border-2 shadow-md text-xs font-bold relative overflow-hidden"
-                    style={{
-                      borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' :
-                        rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
-                          rarityBorders[item.rarity].includes('purple-400') ? '#c084fc' : '#fbbf24'
-                    }}
-                  >
-                    {item.rarity === 'legendary' && (
-                      <div className="absolute inset-0 z-0 pointer-events-none">
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
-                      </div>
-                    )}
-                    <CosmeticIcon emoji={item.icon} imageSrc={item.imageSrc} size={18} />
-                    <span className="text-gray-900 dark:text-white relative z-10">{getItemName(item)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Filters */}
-          <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            {(['all', 'clothing', 'background', 'equipment', 'accessory', 'backpack'] as const).map((type) => (
-              <motion.button
-                key={type}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setFilter(type)}
-                className={`px-3 py-1.5 rounded-full font-bold whitespace-nowrap transition-all text-xs ${filter === type
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                  }`}
-              >
-                {t(`cosmetic.filter.${type}`)}
-              </motion.button>
-            ))}
-          </div>
+        {/* Filters: natural width, horizontal scroll */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 mb-5">
+          {(['all', 'clothing', 'equipment', 'accessory', 'background', 'backpack'] as const).map((type) => (
+            <button
+              key={type}
+              onClick={() => setFilter(type)}
+              className={`shrink-0 px-4 py-2 rounded-full font-bold text-xs whitespace-nowrap transition-colors ${
+                filter === type
+                  ? 'bg-indigo-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+              }`}
+            >
+              {t(`cosmetic.filter.${type}`)}
+            </button>
+          ))}
         </div>
 
-        {/* Items Grid */}
         {filteredItems.length === 0 ? (
           <div className="text-center py-20">
-            <div className="mb-4"><Emoji emoji="🛍️" size={72} /></div>
-            <p className="text-xl font-bold text-gray-600 dark:text-gray-400">
-              {t('inventory.empty', 'Инвентарь пуст')}
-            </p>
-            <p className="text-gray-500 dark:text-gray-500 mt-2">
-              {t('inventory.emptyHint', 'Купите предметы в магазине')}
-            </p>
+            <div className="mb-4"><Emoji emoji="📦" size={72} /></div>
+            <p className="text-xl font-bold text-gray-600 dark:text-gray-400">{t('inventory.empty')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{t('inventory.emptyHint')}</p>
           </div>
         ) : (
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
-            {filteredItems.map((item, index) => {
-              const isThirdItem = filteredItems.length === 3 && index === 2;
+            {filteredItems.map((item) => {
+              const refund = sellAmount(item);
               return (
-                <div
+                <motion.div
                   key={item.id}
-                  className={`${isThirdItem ? 'col-span-2 lg:col-span-1' : ''}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col h-full bg-white dark:bg-gray-900 rounded-2xl p-3 border-2"
+                  style={{ borderColor: rarityBorder[item.rarity] }}
                 >
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-4 border-2 relative overflow-hidden w-full"
-                    style={{
-                      borderColor: rarityBorders[item.rarity].includes('gray-300') ? '#d1d5db' :
-                        rarityBorders[item.rarity].includes('blue-400') ? '#60a5fa' :
-                          rarityBorders[item.rarity].includes('purple-400') ? '#c084fc' : '#fbbf24'
-                    }}
-                  >
-                    {/* Rarity Badge */}
-                    <div className="absolute top-2 right-2 z-10">
-                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r text-white shadow-lg uppercase tracking-wide ${item.rarity === 'legendary' ? 'text-glow-gold' : ''}`}
-                        style={{
-                          backgroundImage: `linear-gradient(to right, ${rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
-                            rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
-                              rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
-                            })`
-                        }}>
-                        {t(`cosmetic.rarity.${item.rarity}`)}
-                      </span>
-                    </div>
-
-                    {/* Type Emoji */}
-                    <div className="absolute top-2 left-2 z-10">
-                      <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center">
-                        <Emoji emoji={typeEmojis[item.type]} size={20} />
-                      </div>
-                    </div>
-
-                    {/* Equipped Badge */}
+                  <div className="flex items-center gap-1.5 mb-2 min-h-[22px]">
+                    <span className={`px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-black uppercase ${rarityText[item.rarity]}`}>
+                      {t(`cosmetic.rarity.${item.rarity}`)}
+                    </span>
                     {item.equipped && (
-                      <div className="absolute top-11 left-2 z-10">
-                        <div className="w-6 h-6 rounded-full bg-green-500 shadow-lg flex items-center justify-center">
-                          <Emoji emoji="✅" size={14} />
-                        </div>
-                      </div>
+                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-[10px] font-black text-green-700 dark:text-green-400">
+                        <Emoji emoji="✅" size={12} /> {t('inventory.equipped')}
+                      </span>
                     )}
+                  </div>
 
-                    {/* Item Icon */}
-                    <div className="w-full aspect-square max-h-64 rounded-2xl bg-gradient-to-br flex items-center justify-center text-6xl mb-3 shadow-inner relative overflow-hidden mx-auto"
-                      style={{
-                        backgroundImage: `linear-gradient(to bottom right, ${rarityColors[item.rarity].includes('gray') ? '#9ca3af, #6b7280' :
-                          rarityColors[item.rarity].includes('blue') ? '#60a5fa, #2563eb' :
-                            rarityColors[item.rarity].includes('purple') ? '#c084fc, #9333ea' : '#fbbf24, #f97316'
-                          })`
-                      }}>
-                      {item.rarity === 'legendary' && (
-                        <div className="absolute inset-0 z-0 pointer-events-none">
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
-                        </div>
-                      )}
-                      <motion.div
-                        animate={{ rotate: item.equipped ? [0, 5, -5, 0] : 0 }}
-                        transition={{ duration: 0.5, repeat: item.equipped ? Infinity : 0, repeatDelay: 2 }}
-                        className="relative z-10"
-                      >
-                        <CosmeticIcon emoji={item.icon} imageSrc={item.imageSrc} size={72} />
-                      </motion.div>
-                      {item.equipped && (
-                        <div className="absolute inset-0 bg-gradient-to-t from-green-500/30 to-transparent" />
-                      )}
-                    </div>
+                  <div className="w-full aspect-square rounded-xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center mb-3 overflow-hidden">
+                    <CosmeticIcon emoji={item.icon} imageSrc={item.imageSrc} size={96} />
+                  </div>
 
-                    {/* Item Name */}
-                    <h3 className="font-black text-gray-900 dark:text-white text-base mb-3 text-center line-clamp-2 min-h-[2.5rem]">
-                      {getItemName(item)}
-                    </h3>
+                  <h3 className="font-black text-gray-900 dark:text-white text-sm text-center line-clamp-2 min-h-[2.5rem] mb-2">
+                    {getItemName(item)}
+                  </h3>
 
-                    {/* Bonus Display */}
-                    {(item.bonus || item.stats) && (
-                      <div className="mb-3 px-3 py-1.5 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/40 dark:to-purple-900/40 rounded-xl border border-indigo-100 dark:border-indigo-800 shadow-sm">
-                        <div className="flex flex-wrap justify-center gap-2">
-                          {item.stats && Object.entries(item.stats).map(([stat, val]) => (
-                            <div key={stat} className="flex items-center gap-1 bg-white/50 dark:bg-black/20 px-1.5 py-0.5 rounded-lg border border-indigo-200/50 dark:border-indigo-700/50">
-                              <span className="text-[10px] uppercase font-black text-indigo-600 dark:text-indigo-400">
-                                {t(`stats.${stat}`)}
-                              </span>
-                              <span className="text-[10px] font-black text-gray-900 dark:text-white">
-                                +{val}
-                              </span>
-                            </div>
-                          ))}
-                          {item.bonus && (
-                            <p className="text-[10px] text-center font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-tight w-full mt-1">
-                              {getBonusDescription(item)}
-                            </p>
-                          )}
-                        </div>
+                  {/* Fixed-height bonus block keeps all cards the same height */}
+                  <div className="min-h-[3.5rem] mb-3">
+                    {item.stats && Object.keys(item.stats).length > 0 ? (
+                      <div className="flex flex-wrap gap-1 justify-center">
+                        {STAT_ROWS.map(({ key, emoji, className }) =>
+                          item.stats?.[key] ? (
+                            <span key={key} className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${className}`}>
+                              {emoji}+{item.stats[key]}
+                            </span>
+                          ) : null
+                        )}
                       </div>
+                    ) : item.bonus ? (
+                      <p className="text-[11px] font-bold text-center text-emerald-600 dark:text-emerald-400">
+                        {getBonusDescription(item)}
+                      </p>
+                    ) : (
+                      <p className="text-[11px] text-center text-gray-400">{t('cosmetic.noBonus', 'Без бонусов')}</p>
                     )}
+                  </div>
 
-                    {/* Equip/Unequip Button */}
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleToggleEquip(item)}
+                  <div className="mt-auto space-y-2">
+                    <button
+                      onClick={() =>
+                        runAction(
+                          item.id,
+                          () => (item.equipped ? onUnequip(item.id) : onEquip(item.id)),
+                          item.equipped ? t('cosmetic.unequipSuccess', 'Предмет снят') : t('cosmetic.equipSuccess'),
+                          item.equipped ? t('cosmetic.unequipFailed', 'Не удалось снять предмет') : t('cosmetic.equipFailed', 'Не удалось надеть предмет')
+                        )
+                      }
                       disabled={loading === item.id}
-                      className={`w-full py-3 rounded-xl font-black text-sm transition-all ${item.equipped
-                        ? 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg'
-                        : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg'
-                        }`}
+                      className={`w-full py-2.5 rounded-xl font-black text-xs transition-colors ${
+                        item.equipped
+                          ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                          : 'bg-indigo-500 text-white'
+                      }`}
                     >
-                      {item.equipped ? <><Emoji emoji="✅" size={14} className="mr-1" /> {t('cosmetic.equipped')}</> : t('cosmetic.equip')}
-                    </motion.button>
-                  </motion.div>
-                </div>
-              )
+                      {item.equipped ? t('inventory.unequip', 'Снять') : t('inventory.equip', 'Надеть')}
+                    </button>
+
+                    {onSell && (
+                      <button
+                        onClick={() => handleSell(item)}
+                        disabled={loading === item.id}
+                        className="w-full py-2 rounded-xl font-bold text-[11px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+                      >
+                        {refund
+                          ? t('cosmetic.sellFor', 'Продать за {{amount}} {{emoji}}', { amount: refund.amount.toLocaleString(), emoji: refund.emoji })
+                          : t('cosmetic.sell', 'Продать')}
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              );
             })}
           </div>
         )}
@@ -313,3 +238,5 @@ export const Inventory = ({ items, onEquip, onUnequip }: InventoryProps) => {
     </div>
   );
 };
+
+export default Inventory;

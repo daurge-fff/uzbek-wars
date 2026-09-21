@@ -1,12 +1,12 @@
 /**
  * Arena balance / stat-sensitivity tests
  *
- * Доказывают две вещи, которые нельзя проверить руками без живого боя:
- *  1) бой длится достаточно долго и в нём есть события (не 4-5 ходов подряд);
- *  2) каждое вложение в боевой стат реально меняет исход, а не тонет в потолках.
+ * They prove two things that can't be checked by hand without a live fight:
+ *  1) a fight lasts long enough and contains events (not 4-5 turns in a row);
+ *  2) every point invested in a combat stat actually changes the outcome instead of drowning in caps.
  *
- * Модели замоканы, БД не трогается. Math.random заменяется детерминированным
- * генератором, поэтому результаты воспроизводимы и тест не флакает.
+ * Models are mocked, the DB isn't touched. Math.random is replaced with a deterministic
+ * generator, so the results are reproducible and the test doesn't flake.
  */
 
 jest.mock('../utils/logger', () => ({
@@ -53,7 +53,7 @@ type StatLine = {
     luck: number;
 };
 
-/** Билд German GPT на 8 уровне без вложенных очков — «база» для сравнения */
+/** German GPT build at level 8 with no invested points — the "baseline" for comparison */
 const NO_INVESTMENT: StatLine = {
     strength: 10,
     defense: 1,
@@ -63,7 +63,7 @@ const NO_INVESTMENT: StatLine = {
     luck: 0,
 };
 
-/** Типичный соперник того же уровня из матчмейкинга */
+/** A typical opponent of the same level from matchmaking */
 const MID_OPPONENT: StatLine = {
     strength: 11,
     defense: 6,
@@ -73,7 +73,7 @@ const MID_OPPONENT: StatLine = {
     luck: 1,
 };
 
-/** Слабый бот вроде Alisher (Bot) из живого лога: бьёт на ~14 урона */
+/** A weak bot like Alisher (Bot) from a live log: hits for ~14 damage */
 const WEAK_BOT: StatLine = {
     strength: 5,
     defense: 5,
@@ -100,7 +100,7 @@ function makePlayer(id: string, stats: StatLine, level = 8) {
     };
 }
 
-/** Детерминированный ГПСЧ вместо Math.random, чтобы тест не флакал */
+/** A deterministic PRNG instead of Math.random so the test doesn't flake */
 function seedRandom(seed: number) {
     let state = seed >>> 0;
     return () => {
@@ -113,12 +113,12 @@ interface SimResult {
     winRate: number;
     avgTurns: number;
     avgDamageDealt: number;
-    /** Максимальное здоровье претендента в бою (зависит от выносливости) */
+    /** The challenger's max health in the fight (depends on stamina) */
     avgMaxHealth: number;
     counts: Record<string, number>;
-    /** События, где бьёт претендент */
+    /** Events where the challenger strikes */
     challengerEvents: Record<string, number>;
-    /** События, где бьёт противник */
+    /** Events where the opponent strikes */
     opponentEvents: Record<string, number>;
     battles: number;
 }
@@ -179,14 +179,14 @@ async function simulate(
 
 const perBattle = (result: SimResult, type: string) => (result.counts[type] ?? 0) / result.battles;
 
-/** Сколько раз я сделал событие type (attackerId = я) */
+/** How many times I produced an event of type (attackerId = me) */
 const myPerBattle = (result: SimResult, type: string) => (result.challengerEvents[type] ?? 0) / result.battles;
-/** Сколько раз событие type сделал противник (для уклонений/блоков это мои защиты) */
+/** How many times the opponent produced an event of type (for dodges/blocks these are my defenses) */
 const theirPerBattle = (result: SimResult, type: string) => (result.opponentEvents[type] ?? 0) / result.battles;
 
 /**
- * Шансы считаем на попадание, а не на бой: сила/выносливость укорачивают бой,
- * и абсолютное число событий падает вместе с длиной боя — метрика вводила бы в заблуждение.
+ * We measure chances per hit, not per fight: strength/stamina shorten the fight,
+ * and the absolute number of events drops with the fight length — the metric would be misleading.
  */
 const landedAttacks = (result: SimResult) => result.challengerEvents.attack ?? 0;
 const theirLandedAttacks = (result: SimResult) => result.opponentEvents.attack ?? 0;
@@ -203,11 +203,11 @@ describe('Arena balance: бой должен быть длинным, а ста�
             `события=${JSON.stringify(result.counts)}`
         );
 
-        // Раньше бой заканчивался за 5-7 ходов — это и делало его «слишком простым»
+        // Previously a fight ended in 5-7 turns — that's what made it "too easy"
         expect(result.avgTurns).toBeGreaterThanOrEqual(8);
         expect(result.avgTurns).toBeLessThanOrEqual(45);
 
-        // В бою реально должны случаться разные события, а не только «удар-удар»
+        // Different events must actually happen in a fight, not just "hit-hit"
         expect(perBattle(result, 'attack')).toBeGreaterThan(1);
         expect(perBattle(result, 'crit') + perBattle(result, 'dodge') + perBattle(result, 'block')).toBeGreaterThan(1);
     });
@@ -250,34 +250,34 @@ describe('Arena balance: бой должен быть длинным, а ста�
 
         const base = await simulate(NO_INVESTMENT, MID_OPPONENT, 'medium', 400, 777);
 
-        // Ловкость → мои криты и мои уклонения (шанс на попадание)
+        // Agility → my crits and my dodges (chance per hit)
         const agility = await simulate(invested('agility', 25), MID_OPPONENT, 'medium', 400, 777);
         expect(myRate(agility, 'crit')).toBeGreaterThan(myRate(base, 'crit'));
         expect(myDefenseRate(agility, 'dodge')).toBeGreaterThan(myDefenseRate(base, 'dodge'));
 
-        // Интеллект → я накладываю яд, соперник теряет здоровье от яда
+        // Intellect → I apply poison, the opponent loses health to poison
         const intelligence = await simulate(invested('intelligence', 25), MID_OPPONENT, 'medium', 400, 777);
         expect(myRate(intelligence, 'poison')).toBeGreaterThan(myRate(base, 'poison'));
         expect(theirPerBattle(intelligence, 'poison_tick')).toBeGreaterThan(theirPerBattle(base, 'poison_tick'));
 
-        // Сила → мои оглушения и мой урон
+        // Strength → my stuns and my damage
         const strength = await simulate(invested('strength', 25), MID_OPPONENT, 'medium', 400, 777);
         expect(myRate(strength, 'stun')).toBeGreaterThan(myRate(base, 'stun'));
         expect(strength.avgDamageDealt).toBeGreaterThan(base.avgDamageDealt);
 
-        // Выносливость → больше здоровья и срабатывающее второе дыхание
+        // Stamina → more health and a triggering second wind
         const stamina = await simulate(invested('stamina', 25), MID_OPPONENT, 'medium', 400, 777);
         const shortFight = await simulate(NO_INVESTMENT, MID_OPPONENT, 'hard', 400, 777);
         expect(stamina.avgMaxHealth).toBeGreaterThan(base.avgMaxHealth);
         expect(stamina.counts.heal ?? 0).toBeGreaterThan(0);
-        // На сложном бою без вложений второе дыхание срабатывает заметно реже
+        // In a hard fight without investments, second wind triggers noticeably less often
         expect(myPerBattle(stamina, 'heal')).toBeGreaterThan(myPerBattle(shortFight, 'heal'));
 
-        // Защита → я чаще блокирую удары соперника
+        // Defense → I block the opponent's hits more often
         const defense = await simulate(invested('defense', 25), MID_OPPONENT, 'medium', 400, 777);
         expect(myDefenseRate(defense, 'block')).toBeGreaterThan(myDefenseRate(base, 'block'));
 
-        // Удача → мои криты
+        // Luck → my crits
         const luck = await simulate(invested('luck', 40), MID_OPPONENT, 'medium', 400, 777);
         expect(myRate(luck, 'crit')).toBeGreaterThan(myRate(base, 'crit'));
 

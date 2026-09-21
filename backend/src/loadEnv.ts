@@ -13,6 +13,10 @@ const rootEnvPath = path.join(__dirname, '../../.env');
 if (fs.existsSync(rootEnvPath)) {
   dotenv.config({ path: rootEnvPath });
   console.log(`✅ Loaded .env from: ${rootEnvPath}`);
+} else if (Object.keys(process.env).some((key) => key === 'MONGODB_URI' || key === 'JWT_SECRET')) {
+  // Container deployments inject the variables through the environment (compose env_file),
+  // so a missing .env file is expected and not an error.
+  console.log('ℹ️ No .env file found — using environment variables from the container');
 } else {
   console.error(`❌ .env file not found at: ${rootEnvPath}`);
 }

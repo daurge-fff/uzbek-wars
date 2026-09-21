@@ -57,7 +57,8 @@ describe('CosmeticShop', () => {
       />
     );
 
-    const backgroundFilter = screen.getByText('Backgrounds');
+    // The item cards also render a type chip, so target the filter button explicitly
+    const backgroundFilter = screen.getByRole('button', { name: 'Backgrounds' });
     fireEvent.click(backgroundFilter);
 
     expect(screen.getByText('Registan')).toBeInTheDocument();

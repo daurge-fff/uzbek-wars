@@ -36,6 +36,8 @@ export interface IPlayerCosmetics {
   accessories: string[];
   backpacks: string[];
   consumables: string[];
+  /** Purchased equipment (weapons and other stat gear) */
+  equipment?: string[];
   activeClothing?: string;
   activeBackground?: string;
   activeAccessory?: string;
@@ -221,6 +223,7 @@ const PlayerSchema = new Schema<IPlayer>(
       accessories: [{ type: String }],
       backpacks: [{ type: String }],
       consumables: [{ type: String }],
+      equipment: [{ type: String }],
       activeClothing: { type: String },
       activeBackground: { type: String },
       activeAccessory: { type: String },
