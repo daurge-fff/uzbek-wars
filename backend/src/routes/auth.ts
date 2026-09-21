@@ -11,10 +11,10 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
-import { authenticateWithGoogle, authenticateDevLogin, authenticateWithTelegramWebApp, detectTwinks } from '../services/AuthService';
+import { authenticateWithGoogle, authenticateDevLogin, authenticateWithTelegramWebApp, detectTwinks, linkTelegramToUser, linkGoogleToUser } from '../services/AuthService';
 import { validateInitData, mapTelegramLanguage } from '../services/TelegramWebAppService';
 import { logger } from '../utils/logger';
-import { createVerificationSession } from '../bot/telegramBot';
+import { createVerificationSession, verificationSessions } from '../bot/telegramBot';
 import { User } from '../models/User';
 import { authenticate } from '../middleware/auth';
 import { validateUsernameCheck, rateLimit } from '../middleware/validation';
@@ -462,6 +462,152 @@ router.post(
     } catch (error) {
       logger.error('Telegram mini app auth error:', error);
       res.status(500).json({ error: 'Authentication failed' });
+    }
+  }
+);
+
+// ─── Account Linking ────────────────────────────────────────────
+
+/**
+ * POST /api/auth/link/request-code
+ * Generates a verification code for linking Telegram to the current Google account.
+ * The user opens https://t.me/uzbekwars_bot/UzbekWars?startapp=link_<CODE>
+ */
+router.post(
+  '/link/request-code',
+  authenticate,
+  rateLimit(5, 60000),
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userId = (req as any).user.id;
+      const code = createVerificationSession(userId);
+      res.status(200).json({ code, expiresIn: 300 });
+    } catch (error) {
+      logger.error('Failed to generate linking code:', error);
+      res.status(500).json({ error: 'Failed to generate code' });
+    }
+  }
+);
+
+/**
+ * POST /api/auth/link/verify
+ * Called from the Telegram mini app when opened with startapp=link_<CODE>.
+ * Links the Telegram account to the user who generated the code.
+ */
+router.post(
+  '/link/verify',
+  rateLimit(10, 60000),
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { code, initData } = req.body;
+      if (!code || !initData) {
+        res.status(400).json({ error: 'code and initData are required' });
+        return;
+      }
+
+      // Verify the Telegram identity
+      const botToken = process.env.TELEGRAM_BOT_TOKEN || '';
+      if (!botToken) {
+        res.status(503).json({ error: 'Telegram not configured' });
+        return;
+      }
+
+      const validation = validateInitData(initData, botToken);
+      if (!validation.ok || !validation.user) {
+        res.status(401).json({ error: 'Invalid Telegram init data', code: validation.error });
+        return;
+      }
+
+      // Look up the verification session (created by /api/auth/link/request-code)
+      const session = verificationSessions.get(code);
+      if (!session) {
+        res.status(400).json({ error: 'Invalid or expired code' });
+        return;
+      }
+
+      const result = await linkTelegramToUser(
+        session.userId,
+        String(validation.user.id),
+        validation.user
+      );
+
+      // Clean up the session
+      verificationSessions.delete(code);
+
+      logger.info(`Telegram linked to user ${session.userId} via code${result.bonusAwarded ? ' + bonus' : ''}`);
+      res.status(200).json({ ok: true, bonusAwarded: result.bonusAwarded });
+    } catch (error: any) {
+      logger.error('Telegram link verify error:', error);
+      res.status(400).json({ error: error.message || 'Linking failed' });
+    }
+  }
+);
+
+/**
+ * POST /api/auth/link/google
+ * Called from the Telegram mini app to link a Google account.
+ * Accepts the same Google pseudo-ID-token as POST /api/auth/google,
+ * but links to the existing Telegram user instead of creating a new one.
+ */
+router.post(
+  '/link/google',
+  rateLimit(5, 60000),
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { idToken, initData } = req.body;
+      if (!idToken || !initData) {
+        res.status(400).json({ error: 'idToken and initData are required' });
+        return;
+      }
+
+      // Verify Telegram identity
+      const botToken = process.env.TELEGRAM_BOT_TOKEN || '';
+      if (!botToken) {
+        res.status(503).json({ error: 'Telegram not configured' });
+        return;
+      }
+
+      const tgValidation = validateInitData(initData, botToken);
+      if (!tgValidation.ok || !tgValidation.user) {
+        res.status(401).json({ error: 'Invalid Telegram init data' });
+        return;
+      }
+
+      // Find the Telegram user
+      const telegramId = String(tgValidation.user.id);
+      const user = await User.findOne({ telegramId });
+      if (!user) {
+        res.status(404).json({ error: 'Telegram user not found. Please login first.' });
+        return;
+      }
+
+      // Verify Google token
+      const profile = await verifyGoogleToken(idToken);
+      if (!profile) {
+        res.status(401).json({ error: 'Invalid Google token' });
+        return;
+      }
+
+      // Check if this Google account is already linked to someone else
+      const existingGoogleUser = await User.findOne({ googleId: profile.id });
+      if (existingGoogleUser && existingGoogleUser._id.toString() !== user._id.toString()) {
+        res.status(409).json({ error: 'This Google account is already linked to another user' });
+        return;
+      }
+
+      const result = await linkGoogleToUser(
+        user._id.toString(),
+        profile.id,
+        profile.email,
+        profile.displayName,
+        profile.avatar
+      );
+
+      logger.info(`Google linked to user ${user._id}${result.bonusAwarded ? ' + bonus' : ''}`);
+      res.status(200).json({ ok: true, bonusAwarded: result.bonusAwarded });
+    } catch (error: any) {
+      logger.error('Google link error:', error);
+      res.status(400).json({ error: error.message || 'Linking failed' });
     }
   }
 );

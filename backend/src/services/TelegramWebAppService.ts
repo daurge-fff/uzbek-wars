@@ -12,6 +12,7 @@
  */
 
 import crypto from 'crypto';
+import { logger } from '../utils/logger';
 
 export interface TelegramWebAppUser {
     id: number;
@@ -27,6 +28,7 @@ export interface InitDataValidationResult {
     ok: boolean;
     user?: TelegramWebAppUser;
     authDate?: number;
+    startParam?: string;
     /** Machine-readable reason, safe to expose as an error code */
     error?: 'MISSING_DATA' | 'MISSING_TOKEN' | 'MISSING_HASH' | 'INVALID_HASH' | 'MISSING_AUTH_DATE' | 'EXPIRED' | 'INVALID_USER' | 'MISSING_USER';
 }
@@ -36,24 +38,17 @@ export const DEFAULT_MAX_AUTH_AGE_SECONDS = 24 * 60 * 60;
 
 /**
  * Builds the newline-joined, alphabetically sorted `key=value` payload that Telegram signs.
- * `hash` and the newer `signature` field are excluded, as the docs require.
+ * `hash` is excluded; `signature` and all other fields are included.
+ * Values are URL-decoded (as Telegram signs the decoded form).
  */
 export function buildDataCheckString(initData: string): string {
     const params = new URLSearchParams(initData);
     const pairs: string[] = [];
-
     params.forEach((value, key) => {
-        if (key === 'hash' || key === 'signature') return;
+        if (key === 'hash') return;
         pairs.push(`${key}=${value}`);
     });
-
     return pairs.sort().join('\n');
-}
-
-/** Computes the expected HMAC-SHA256 hash of the initData payload */
-export function computeInitDataHash(initData: string, botToken: string): string {
-    const secretKey = crypto.createHmac('sha256', 'WebAppData').update(botToken).digest();
-    return crypto.createHmac('sha256', secretKey).update(buildDataCheckString(initData)).digest('hex');
 }
 
 /** Constant-time comparison that also tolerates malformed hex */
@@ -66,6 +61,12 @@ function hashesMatch(provided: string, expected: string): boolean {
     } catch {
         return false;
     }
+}
+
+/** Computes the expected HMAC-SHA256 hash of the initData payload */
+export function computeInitDataHash(initData: string, botToken: string): string {
+    const secretKey = crypto.createHmac('sha256', 'WebAppData').update(botToken).digest();
+    return crypto.createHmac('sha256', secretKey).update(buildDataCheckString(initData)).digest('hex');
 }
 
 /**
@@ -84,7 +85,9 @@ export function validateInitData(
     const providedHash = params.get('hash');
     if (!providedHash) return { ok: false, error: 'MISSING_HASH' };
 
-    if (!hashesMatch(providedHash, computeInitDataHash(initData, botToken))) {
+    const expectedHash = computeInitDataHash(initData, botToken);
+    if (!hashesMatch(providedHash, expectedHash)) {
+        logger.warn(`[TelegramAuth] INVALID_HASH`);
         return { ok: false, error: 'INVALID_HASH' };
     }
 
@@ -107,7 +110,9 @@ export function validateInitData(
 
     if (!user || typeof user.id !== 'number') return { ok: false, error: 'MISSING_USER' };
 
-    return { ok: true, user, authDate };
+    const startParam = params.get('startapp') || undefined;
+
+    return { ok: true, user, authDate, startParam };
 }
 
 /**

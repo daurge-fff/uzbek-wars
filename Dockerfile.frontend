@@ -13,7 +13,7 @@ COPY package.json package-lock.json ./
 COPY frontend/package.json ./frontend/
 COPY backend/package.json ./backend/
 
-RUN npm ci && npm cache clean --force
+RUN npm ci --ignore-scripts && npm cache clean --force
 
 COPY frontend/ ./frontend/
 

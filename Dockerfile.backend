@@ -5,8 +5,7 @@
 # from the root and builds the `backend` workspace.
 #
 # Stages:
-#   builder  - full deps (tsc is a devDependency) -> backend/dist
-#   prod-deps- production dependencies only
+#   builder  - full deps (tsc is a devDependency) -> backend/dist -> prune to prod
 #   runtime  - the actual image, also used by `docker compose --profile tools` for
 #              one-off tasks (seeds, bot setup) through the `builder` stage
 
@@ -19,22 +18,15 @@ COPY package.json package-lock.json ./
 COPY backend/package.json ./backend/
 COPY frontend/package.json ./frontend/
 
-RUN npm ci && npm cache clean --force
+RUN npm ci --ignore-scripts && npm cache clean --force
 
 COPY backend/ ./backend/
 
 # TypeScript build -> /app/backend/dist
 RUN npm run build --workspace=backend
 
-FROM node:20-alpine AS prod-deps
-
-WORKDIR /app
-
-COPY package.json package-lock.json ./
-COPY backend/package.json ./backend/
-COPY frontend/package.json ./frontend/
-
-RUN npm ci --omit=dev --workspace=backend && npm cache clean --force
+# Prune devDependencies and the frontend workspace – much faster than a second npm ci
+RUN npm prune --omit=dev && npm cache clean --force
 
 FROM node:20-alpine AS runtime
 
@@ -45,7 +37,7 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
 # Production dependencies + compiled output
-COPY --from=prod-deps --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/backend/dist ./backend/dist
 COPY --from=builder --chown=nodejs:nodejs /app/backend/package.json ./backend/package.json
 COPY --chown=nodejs:nodejs package.json package-lock.json ./

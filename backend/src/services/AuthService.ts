@@ -130,11 +130,11 @@ export async function authenticateWithGoogle(
         googleId: profile.id,
         email: profile.email,
         displayName: profile.displayName,
-        googleName: profile.displayName, // Сохраняем оригинальное имя из Google
+        googleName: profile.displayName,
         avatar: profile.avatar,
         ipAddress,
         deviceInfo,
-        language: 'ru' // Default language
+        language: 'ru'
       });
 
       logger.info(`New user registered via Google: ${user.email}`);
@@ -170,7 +170,8 @@ export async function authenticateWithGoogle(
         email: user.email,
         displayName: user.displayName,
         avatar: user.avatar,
-        language: user.language
+        language: user.language,
+        ...getLinkingStatus(user),
       },
       player: player ? {
         id: player._id,
@@ -217,9 +218,9 @@ export async function authenticateWithTelegramWebApp(
     let isNewUser = false;
 
     if (!user) {
+      // Create new Telegram-native user
       isNewUser = true;
       user = await User.create({
-        // Synthetic identifiers: both fields are required and unique in the schema
         googleId: `telegram:${telegramId}`,
         email: `tg${telegramId}@telegram.miniapp`,
         displayName,
@@ -277,7 +278,8 @@ export async function authenticateWithTelegramWebApp(
         telegramUsername: user.telegramUsername,
         firstName: user.firstName,
         lastName: user.lastName,
-        photoUrl: user.photoUrl
+        photoUrl: user.photoUrl,
+        ...getLinkingStatus(user),
       },
       player: player ? {
         id: player._id,
@@ -448,4 +450,100 @@ export async function detectTwinks(userId: string): Promise<boolean> {
     logger.error('Twin detection error:', error);
     return false;
   }
+}
+
+const LINKING_BONUS_XP = 500;
+const LINKING_BONUS_CRYSTALS = 100;
+
+/**
+ * Links a Telegram account to an existing Google-authenticated user.
+ * Called from POST /api/auth/link/verify after the user opens the mini app
+ * with a verification code in startapp.
+ */
+export async function linkTelegramToUser(
+  userId: string,
+  telegramId: string,
+  telegramUser: { username?: string; first_name?: string; last_name?: string; language_code?: string; photo_url?: string }
+): Promise<{ bonusAwarded: boolean }> {
+  const user = await User.findById(userId);
+  if (!user) throw new Error('User not found');
+  if (user.telegramId) throw new Error('Telegram account already linked');
+
+  user.telegramId = telegramId;
+  user.telegramUsername = telegramUser.username;
+  user.firstName = telegramUser.first_name;
+  user.lastName = telegramUser.last_name;
+  user.languageCode = telegramUser.language_code;
+  user.photoUrl = telegramUser.photo_url;
+  user.telegramLastLoginAt = new Date();
+  await user.save();
+
+  logger.info(`Linked Telegram ${telegramId} to user ${userId}`);
+
+  return await awardLinkingBonus(userId);
+}
+
+/**
+ * Links a Google account to an existing Telegram-authenticated user.
+ * Called from POST /api/auth/link/google after Google OAuth completes.
+ */
+export async function linkGoogleToUser(
+  userId: string,
+  googleId: string,
+  email: string,
+  displayName: string,
+  avatar?: string
+): Promise<{ bonusAwarded: boolean }> {
+  const user = await User.findById(userId);
+  if (!user) throw new Error('User not found');
+  if (user.googleId && !user.googleId.startsWith('telegram:')) throw new Error('Google account already linked');
+
+  user.googleId = googleId;
+  user.email = email;
+  user.googleName = displayName;
+  if (avatar) user.avatar = avatar;
+  await user.save();
+
+  logger.info(`Linked Google ${googleId} to user ${userId}`);
+
+  return await awardLinkingBonus(userId);
+}
+
+/**
+ * Awards a one-time bonus when both Google and Telegram are linked.
+ * Returns whether the bonus was actually awarded (not already claimed).
+ */
+async function awardLinkingBonus(userId: string): Promise<{ bonusAwarded: boolean }> {
+  const user = await User.findById(userId);
+  if (!user) return { bonusAwarded: false };
+
+  const hasGoogle = !!user.googleId && !user.googleId.startsWith('telegram:');
+  const hasTelegram = !!user.telegramId;
+
+  if (!hasGoogle || !hasTelegram) return { bonusAwarded: false };
+
+  const player = await Player.findOne({ userId });
+  if (!player) return { bonusAwarded: false };
+
+  // Check if bonus already claimed (store flag on player stats)
+  if ((player as any).linkingBonusClaimed) return { bonusAwarded: false };
+
+  player.experience += LINKING_BONUS_XP;
+  player.donationCurrency += LINKING_BONUS_CRYSTALS;
+  (player as any).linkingBonusClaimed = true;
+  await player.save();
+
+  logger.info(`Awarded linking bonus to user ${userId}: +${LINKING_BONUS_XP} XP, +${LINKING_BONUS_CRYSTALS} crystals`);
+
+  return { bonusAwarded: true };
+}
+
+/**
+ * Returns linking status for a user.
+ */
+export function getLinkingStatus(user: any): { hasGoogle: boolean; hasTelegram: boolean } {
+  return {
+    hasGoogle: !!user.googleId && !user.googleId.startsWith('telegram:'),
+    hasTelegram: !!user.telegramId,
+  };
 }

@@ -1,9 +1,12 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { createPortal } from 'react-dom';
+import axios from 'axios';
 import Emoji from './Emoji';
+import { useAuth } from '../contexts/AuthContext';
+import { getTelegramInitData } from '../utils/telegram';
 
 interface SettingsProps {
   currentLanguage: 'ru' | 'uz' | 'uk' | 'en';
@@ -51,8 +54,125 @@ export const Settings = ({
 }: SettingsProps) => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
+  const { user, token, login, isTelegram } = useAuth();
   const [showDeveloperModal, setShowDeveloperModal] = useState(false);
   const [resetDone, setResetDone] = useState(false);
+  const [linkingCode, setLinkingCode] = useState<string | null>(null);
+  const [linkingLoading, setLinkingLoading] = useState(false);
+  const [linkingError, setLinkingError] = useState<string | null>(null);
+  const [linkingBonus, setLinkingBonus] = useState<boolean | null>(null);
+
+  const API_URL = import.meta.env.VITE_API_URL || '';
+
+  const handleRequestLinkCode = useCallback(async () => {
+    if (!token) return;
+    setLinkingLoading(true);
+    setLinkingError(null);
+    try {
+      const res = await axios.post(`${API_URL}/api/auth/link/request-code`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setLinkingCode(res.data.code);
+    } catch (err: any) {
+      setLinkingError(err.response?.data?.error || 'Failed to generate code');
+    } finally {
+      setLinkingLoading(false);
+    }
+  }, [token, API_URL]);
+
+  const handleLinkTelegram = useCallback(async () => {
+    if (!linkingCode) return;
+    const telegramUrl = `https://t.me/uzbekwars_bot/UzbekWars?startapp=link_${linkingCode}`;
+    window.open(telegramUrl, '_blank');
+  }, [linkingCode]);
+
+  const handleLinkGoogle = useCallback(async () => {
+    if (!token || !isTelegram) return;
+    setLinkingLoading(true);
+    setLinkingError(null);
+
+    try {
+      const initData = getTelegramInitData();
+      if (!initData) {
+        setLinkingError('No Telegram init data');
+        setLinkingLoading(false);
+        return;
+      }
+
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+      if (!clientId) {
+        setLinkingError('Google client ID not configured');
+        setLinkingLoading(false);
+        return;
+      }
+
+      // Ensure GSI script is loaded
+      if (!window.google?.accounts?.oauth2) {
+        await new Promise<void>((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://accounts.google.com/gsi/client';
+          script.async = true;
+          script.defer = true;
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error('Failed to load Google script'));
+          document.body.appendChild(script);
+        });
+      }
+
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'email profile openid',
+        callback: async (response: any) => {
+          if (response.access_token) {
+            try {
+              const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${response.access_token}` }
+              });
+              const userInfo = await userInfoRes.json();
+              const pseudoIdToken = btoa(JSON.stringify({
+                sub: userInfo.sub,
+                email: userInfo.email,
+                name: userInfo.name,
+                picture: userInfo.picture,
+                email_verified: userInfo.email_verified,
+              }));
+
+              const res = await axios.post(`${API_URL}/api/auth/link/google`, {
+                idToken: pseudoIdToken,
+                initData,
+              }, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              setLinkingBonus(res.data.bonusAwarded);
+              if (user) {
+                login(token, { ...user, hasGoogle: true } as any, user as any);
+              }
+            } catch (err: any) {
+              setLinkingError(err.response?.data?.error || 'Failed to link Google');
+            } finally {
+              setLinkingLoading(false);
+            }
+          } else if (response.error) {
+            setLinkingLoading(false);
+            if (response.error !== 'popup_closed') {
+              setLinkingError('Google OAuth error');
+            }
+          }
+        },
+        error_callback: (error: any) => {
+          setLinkingLoading(false);
+          if (error.type !== 'popup_closed') {
+            setLinkingError('Google OAuth error');
+          }
+        }
+      });
+
+      client.requestAccessToken({ prompt: 'select_account' });
+    } catch (err: any) {
+      setLinkingError(err.message || 'Failed to link Google');
+      setLinkingLoading(false);
+    }
+  }, [token, isTelegram, API_URL, user, login]);
 
   const formatUptime = (seconds: number) => {
     const days = Math.floor(seconds / 86400);
@@ -122,6 +242,107 @@ export const Settings = ({
                 <span className="text-sm">{lang.name}</span>
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Account linking */}
+        <div className={CARD_CLASS}>
+          <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">
+            {t('settings.account', 'Аккаунт')}
+          </h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+            {t('settings.accountHint', 'Свяжите Telegram и Google для защиты аккаунта и получения бонуса')}
+          </p>
+
+          <div className="space-y-3">
+            {/* Google status */}
+            <div className={ROW_CLASS}>
+              <span className="flex items-center gap-3">
+                <Emoji emoji="🔵" size={22} />
+                <span>
+                  <span className="block font-bold text-gray-900 dark:text-white text-sm">Google</span>
+                  <span className="block text-xs text-gray-500 dark:text-gray-400">
+                    {user?.hasGoogle
+                      ? (user.email || t('settings.linked', 'Привязан'))
+                      : t('settings.notLinked', 'Не привязан')
+                    }
+                  </span>
+                </span>
+              </span>
+              {user?.hasGoogle ? (
+                <span className="text-green-500 font-bold text-sm">✓</span>
+              ) : isTelegram ? (
+                <button
+                  onClick={handleLinkGoogle}
+                  disabled={linkingLoading}
+                  className="px-3 py-1.5 bg-indigo-500 text-white text-xs font-bold rounded-lg disabled:opacity-50"
+                >
+                  {linkingLoading ? '...' : t('settings.link', 'Привязать')}
+                </button>
+              ) : (
+                <span className="text-xs text-gray-400">{t('settings.loginViaTelegram', 'Войдите через Telegram')}</span>
+              )}
+            </div>
+
+            {/* Telegram status */}
+            <div className={ROW_CLASS}>
+              <span className="flex items-center gap-3">
+                <Emoji emoji="✈️" size={22} />
+                <span>
+                  <span className="block font-bold text-gray-900 dark:text-white text-sm">Telegram</span>
+                  <span className="block text-xs text-gray-500 dark:text-gray-400">
+                    {user?.hasTelegram
+                      ? (user.telegramUsername ? `@${user.telegramUsername}` : t('settings.linked', 'Привязан'))
+                      : t('settings.notLinked', 'Не привязан')
+                    }
+                  </span>
+                </span>
+              </span>
+              {user?.hasTelegram ? (
+                <span className="text-green-500 font-bold text-sm">✓</span>
+              ) : (
+                <button
+                  onClick={handleRequestLinkCode}
+                  disabled={linkingLoading}
+                  className="px-3 py-1.5 bg-sky-500 text-white text-xs font-bold rounded-lg disabled:opacity-50"
+                >
+                  {linkingLoading ? '...' : t('settings.link', 'Привязать')}
+                </button>
+              )}
+            </div>
+
+            {/* Linking code flow (Telegram → browser link) */}
+            {linkingCode && !user?.hasTelegram && (
+              <div className="p-3 bg-sky-50 dark:bg-sky-900/20 rounded-xl border border-sky-200 dark:border-sky-800">
+                <p className="text-xs text-sky-700 dark:text-sky-300 mb-2 font-semibold">
+                  {t('settings.openTelegramLink', 'Откройте Telegram по ссылке:')}
+                </p>
+                <button
+                  onClick={handleLinkTelegram}
+                  className="w-full py-2 bg-sky-500 text-white text-sm font-bold rounded-lg"
+                >
+                  {t('settings.openInTelegram', 'Открыть в Telegram')}
+                </button>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1.5 text-center">
+                  {t('settings.linkCodeExpires', 'Код действителен 5 минут')}
+                </p>
+              </div>
+            )}
+
+            {/* Bonus badge */}
+            {linkingBonus && (
+              <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 text-center">
+                <Emoji emoji="🎉" size={20} />
+                <p className="text-sm font-bold text-amber-700 dark:text-amber-300 mt-1">
+                  {t('settings.bonusAwarded', '+500 XP и +100 кристаллов за привязку!')}
+                </p>
+              </div>
+            )}
+
+            {/* Error */}
+            {linkingError && (
+              <p className="text-xs text-red-500 text-center">{linkingError}</p>
+            )}
           </div>
         </div>
 

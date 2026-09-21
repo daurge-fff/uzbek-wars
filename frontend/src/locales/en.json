@@ -358,7 +358,17 @@
     "thankYou": "Thank you for using Uzbek Wars!",
     "starOnGithub": "If you like the game - give us a ⭐ on GitHub",
     "resetAppConfirm": "Reset settings and clear the app cache? You will stay signed in.",
-    "resetAppDone": "Done"
+    "resetAppDone": "Done",
+    "account": "Account",
+    "accountHint": "Link Telegram and Google to protect your account and get a bonus",
+    "linked": "Linked",
+    "notLinked": "Not linked",
+    "link": "Link",
+    "loginViaTelegram": "Log in via Telegram",
+    "openTelegramLink": "Open Telegram via the link:",
+    "openInTelegram": "Open in Telegram",
+    "linkCodeExpires": "Code is valid for 5 minutes",
+    "bonusAwarded": "+500 XP and +100 crystals for linking!"
   },
   "language": {
     "select": "Select Language",

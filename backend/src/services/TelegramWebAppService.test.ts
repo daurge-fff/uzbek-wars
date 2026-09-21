@@ -19,17 +19,21 @@ const BOT_TOKEN = '123456:TEST-BOT-TOKEN-for-unit-tests';
 
 /** Signs fields the way Telegram signs initData */
 function signInitData(fields: Record<string, string>, botToken = BOT_TOKEN): string {
-    const params = new URLSearchParams(fields);
-    const dataCheckString = [...params.entries()]
+    // Telegram signs decoded key=value pairs (URLSearchParams semantics).
+    // hash is excluded from the data_check_string.
+    const pairs = Object.entries(fields)
         .map(([key, value]) => `${key}=${value}`)
-        .sort()
-        .join('\n');
+        .sort();
+    const dataCheckString = pairs.join('\n');
 
     const secretKey = crypto.createHmac('sha256', 'WebAppData').update(botToken).digest();
     const hash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
 
-    params.append('hash', hash);
-    return params.toString();
+    const urlParams = Object.entries(fields)
+        .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+        .sort();
+    const allPairs = [...urlParams, `hash=${hash}`];
+    return allPairs.join('&');
 }
 
 const TELEGRAM_USER = {
@@ -115,13 +119,14 @@ describe('TelegramWebAppService.validateInitData', () => {
         expect(validateInitData(userWithoutId, BOT_TOKEN).error).toBe('MISSING_USER');
     });
 
-    it('ignores the hash and signature fields when building the signed payload', () => {
+    it('includes signature in data_check_string but excludes hash', () => {
         const signed = validInitData();
         const withSignature = `${signed}&signature=not-a-real-signature`;
 
-        // The signature field is Ed25519 and not part of the HMAC data check string
-        expect(buildDataCheckString(withSignature)).not.toContain('signature=');
-        expect(validateInitData(withSignature, BOT_TOKEN).ok).toBe(true);
+        // signature IS included in the data check string
+        expect(buildDataCheckString(withSignature)).toContain('signature=');
+        // hash is still excluded
+        expect(buildDataCheckString(withSignature)).not.toContain('hash=');
     });
 
     it('computes the documented hash for a known payload', () => {
@@ -129,6 +134,22 @@ describe('TelegramWebAppService.validateInitData', () => {
         const hash = new URLSearchParams(initData).get('hash');
 
         expect(computeInitDataHash(initData, BOT_TOKEN)).toBe(hash);
+    });
+
+    it('returns startParam when startapp is present in initData', () => {
+        const initData = validInitData({ startapp: 'link_ABC123' });
+        const result = validateInitData(initData, BOT_TOKEN);
+
+        expect(result.ok).toBe(true);
+        expect(result.startParam).toBe('link_ABC123');
+    });
+
+    it('returns undefined startParam when startapp is absent', () => {
+        const initData = validInitData();
+        const result = validateInitData(initData, BOT_TOKEN);
+
+        expect(result.ok).toBe(true);
+        expect(result.startParam).toBeUndefined();
     });
 });
 

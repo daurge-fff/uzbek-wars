@@ -390,7 +390,17 @@
     "thankYou": "Дякуємо за використання Uzbek Wars!",
     "starOnGithub": "Якщо подобається гра - поставте ⭐ на GitHub",
     "resetAppConfirm": "Скинути налаштування та очистити кеш застосунку? Ви залишитесь в акаунті.",
-    "resetAppDone": "Готово"
+    "resetAppDone": "Готово",
+    "account": "Акаунт",
+    "accountHint": "Зв'яжіть Telegram і Google для захисту акаунту та отримання бонусу",
+    "linked": "Прив'язано",
+    "notLinked": "Не прив'язано",
+    "link": "Прив'язати",
+    "loginViaTelegram": "Увійдіть через Telegram",
+    "openTelegramLink": "Відкрийте Telegram за посиланням:",
+    "openInTelegram": "Відкрити в Telegram",
+    "linkCodeExpires": "Код дійсний 5 хвилин",
+    "bonusAwarded": "+500 XP та +100 кристалів за прив'язку!"
   },
   "language": {
     "select": "Оберіть мову",

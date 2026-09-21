@@ -97,6 +97,7 @@ export interface IPlayer extends Document {
     completed: boolean;
   }>;
   completedQuests: string[]; // Quest IDs
+  linkingBonusClaimed: boolean;
 }
 
 /**
@@ -299,6 +300,10 @@ const PlayerSchema = new Schema<IPlayer>(
     completedQuests: [{
       type: String,
     }],
+    linkingBonusClaimed: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true, // Automatically manage createdAt and updatedAt

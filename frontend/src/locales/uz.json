@@ -390,7 +390,17 @@
     "thankYou": "Uzbek Wars'dan foydalanganingiz uchun rahmat!",
     "starOnGithub": "Agar o'yin yoqsa - GitHub'da ⭐ qo'ying",
     "resetAppConfirm": "Sozlamalarni tiklab, ilova keshini tozalaymizmi? Akkaunt saqlanadi.",
-    "resetAppDone": "Tayyor"
+    "resetAppDone": "Tayyor",
+    "account": "Hisob",
+    "accountHint": "Telegram va Google-ni bog'lang, akkauntni himoya qiling va bonus oling",
+    "linked": "Bog'langan",
+    "notLinked": "Bog'lanmagan",
+    "link": "Bog'lash",
+    "loginViaTelegram": "Telegram orqali kiring",
+    "openTelegramLink": "Telegram-ni havola orqali oching:",
+    "openInTelegram": "Telegram-da ochish",
+    "linkCodeExpires": "Kod 5 daqiqa amal qiladi",
+    "bonusAwarded": "+500 XP va +100 kristall bog'lash uchun!"
   },
   "language": {
     "select": "Tilni tanlang",

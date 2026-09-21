@@ -33,6 +33,7 @@ interface TelegramWebAppLike {
     setBackgroundColor?: (color: string) => void;
     onEvent?: (event: string, handler: () => void) => void;
     openTelegramLink?: (url: string) => void;
+    startParam?: string;
 }
 
 /** Returns the Telegram WebApp object, or null when not running inside Telegram */
@@ -61,6 +62,11 @@ export function getTelegramInitData(): string {
 /** Telegram profile for display only — never use it for authentication */
 export function getTelegramUser(): TelegramUserProfile | null {
     return getTelegramWebApp()?.initDataUnsafe?.user ?? null;
+}
+
+/** startapp parameter from Telegram (e.g. "link_ABC123") */
+export function getStartParam(): string | null {
+    return getTelegramWebApp()?.startParam || null;
 }
 
 /** Applies Telegram-specific UI defaults: full height, no accidental swipe-to-close */

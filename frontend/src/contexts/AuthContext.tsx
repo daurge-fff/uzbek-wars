@@ -14,6 +14,7 @@ import {
   getTelegramUser,
   initTelegramUi,
   isTelegramMiniApp,
+  getStartParam,
   TelegramUserProfile,
 } from '../utils/telegram';
 
@@ -23,6 +24,13 @@ interface User {
   displayName: string;
   avatar: string;
   language: string;
+  hasGoogle?: boolean;
+  hasTelegram?: boolean;
+  telegramId?: string;
+  telegramUsername?: string;
+  firstName?: string;
+  lastName?: string;
+  photoUrl?: string;
 }
 
 interface Player {
@@ -135,6 +143,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const { token: newToken, user: newUser, player: newPlayer } = response.data;
       login(newToken, newUser, newPlayer);
+
+      // Handle start_param for account linking (e.g. "link_ABC123")
+      const startParam = getStartParam();
+      if (startParam?.startsWith('link_')) {
+        const code = startParam.slice(5);
+        try {
+          const linkRes = await axios.post(`${API_URL}/api/auth/link/verify`, {
+            code,
+            initData,
+          }, {
+            headers: { Authorization: `Bearer ${newToken}` }
+          });
+          if (linkRes.data.bonusAwarded) {
+            login(newToken, { ...newUser, hasTelegram: true }, newPlayer);
+          }
+        } catch (err: any) {
+          console.error('Link verify failed:', err.response?.data?.error || err.message);
+        }
+      }
     } catch (error: any) {
       const code = error?.response?.data?.code || 'AUTH_FAILED';
       setTelegramAuthError(code);

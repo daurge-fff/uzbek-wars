@@ -83,6 +83,9 @@ interface VerificationSession {
 
 const verificationSessions = new Map<string, VerificationSession>();
 
+/** Exported for use by auth linking endpoints */
+export { verificationSessions };
+
 // Clean up old sessions (older than 5 minutes)
 setInterval(() => {
   const now = Date.now();
