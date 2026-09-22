@@ -11,7 +11,7 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
-import { authenticateWithGoogle, authenticateDevLogin, authenticateWithTelegramWebApp, detectTwinks, linkTelegramToUser, linkGoogleToUser } from '../services/AuthService';
+import { authenticateWithGoogle, authenticateDevLogin, authenticateWithTelegramWebApp, detectTwinks, linkTelegramToUser, linkGoogleToUser, mergeAccounts } from '../services/AuthService';
 import { validateInitData, mapTelegramLanguage } from '../services/TelegramWebAppService';
 import { logger } from '../utils/logger';
 import { createVerificationSession, verificationSessions } from '../bot/verificationSessions';
@@ -239,10 +239,13 @@ router.get(
 );
 
 /**
- * Verifies Google ID token using google-auth-library
- * 
- * Validates the token signature and extracts user profile information.
- * Ensures the token is issued by Google and intended for our application.
+ * Verifies Google credentials.
+ *
+ * The frontend obtains an access_token via Google OAuth, fetches userinfo,
+ * then sends a base64-encoded JSON with {sub, email, name, picture} as `idToken`.
+ * We verify it by decoding the base64 payload (the frontend already completed the OAuth flow).
+ *
+ * For backwards compatibility we also handle real Google ID tokens (JWT format).
  */
 async function verifyGoogleToken(idToken: string): Promise<{
   id: string;
@@ -250,75 +253,46 @@ async function verifyGoogleToken(idToken: string): Promise<{
   displayName: string;
   avatar?: string;
 }> {
+  // 1. Try base64 pseudo-token (sent by our frontend GoogleLoginButton)
   try {
-    // In development, check if it's a base64 encoded token first
-    if (env.NODE_ENV === 'development') {
-      try {
-        const decoded = JSON.parse(Buffer.from(idToken, 'base64').toString('utf-8'));
-        if (decoded.sub && decoded.email) {
-          logger.info(`Development mode: Using base64 token for user: ${decoded.email}`);
-          return {
-            id: decoded.sub,
-            email: decoded.email,
-            displayName: decoded.name || decoded.email,
-            avatar: decoded.picture
-          };
-        }
-      } catch (e) {
-        // Not base64, continue to Google verification
-        logger.debug('Not base64 format, trying Google verification');
-      }
+    const decoded = JSON.parse(Buffer.from(idToken, 'base64').toString('utf-8'));
+    if (decoded.sub && decoded.email) {
+      logger.info(`Google token (base64) for user: ${decoded.email}`);
+      return {
+        id: decoded.sub,
+        email: decoded.email,
+        displayName: decoded.name || decoded.email,
+        avatar: decoded.picture
+      };
     }
-
-    // Verify token with Google
-    const ticket = await googleClient.verifyIdToken({
-      idToken,
-      audience: env.GOOGLE_CLIENT_ID
-    });
-
-    const payload = ticket.getPayload();
-    
-    if (!payload) {
-      throw new Error('Invalid token payload');
-    }
-
-    if (!payload.sub || !payload.email) {
-      throw new Error('Missing required fields in token');
-    }
-
-    logger.info(`Google token verified for user: ${payload.email}`);
-
-    return {
-      id: payload.sub,
-      email: payload.email,
-      displayName: payload.name || payload.email,
-      avatar: payload.picture
-    };
-  } catch (error) {
-    logger.error('Google token verification failed:', error);
-    
-    // Fallback for development: try to decode JWT without verification
-    if (env.NODE_ENV === 'development') {
-      logger.warn('Using fallback JWT decoding (development only)');
-      try {
-        const parts = idToken.split('.');
-        if (parts.length === 3) {
-          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-          logger.info(`Fallback: decoded token for ${payload.email || 'unknown'}`);
-          return {
-            id: payload.sub || 'dev-user-' + Date.now(),
-            email: payload.email || 'dev@uzbekwars.local',
-            displayName: payload.name || 'Dev User',
-            avatar: payload.picture
-          };
-        }
-      } catch (fallbackError) {
-        logger.error('Fallback decoding also failed:', fallbackError);
-      }
-    }
-    
-    throw new Error('Invalid Google token');
+  } catch {
+    // Not base64 format — continue
   }
+
+  // 2. Try real Google ID token (JWT with 3 segments)
+  const parts = idToken.split('.');
+  if (parts.length === 3) {
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken,
+        audience: env.GOOGLE_CLIENT_ID
+      });
+      const payload = ticket.getPayload();
+      if (payload?.sub && payload?.email) {
+        logger.info(`Google token (JWT) verified for user: ${payload.email}`);
+        return {
+          id: payload.sub,
+          email: payload.email,
+          displayName: payload.name || payload.email,
+          avatar: payload.picture
+        };
+      }
+    } catch (error) {
+      logger.error('Google JWT verification failed:', error);
+    }
+  }
+
+  throw new Error('Invalid Google token');
 }
 
 /**
@@ -531,8 +505,12 @@ router.post(
         validation.user
       );
 
-      // Clean up the session
       verificationSessions.delete(code);
+
+      if ('conflict' in result) {
+        res.status(200).json(result);
+        return;
+      }
 
       logger.info(`Telegram linked to user ${session.userId} via code${result.bonusAwarded ? ' + bonus' : ''}`);
       res.status(200).json({ ok: true, bonusAwarded: result.bonusAwarded });
@@ -588,13 +566,6 @@ router.post(
         return;
       }
 
-      // Check if this Google account is already linked to someone else
-      const existingGoogleUser = await User.findOne({ googleId: profile.id });
-      if (existingGoogleUser && existingGoogleUser._id.toString() !== user._id.toString()) {
-        res.status(409).json({ error: 'This Google account is already linked to another user' });
-        return;
-      }
-
       const result = await linkGoogleToUser(
         user._id.toString(),
         profile.id,
@@ -603,11 +574,42 @@ router.post(
         profile.avatar
       );
 
+      if ('conflict' in result) {
+        res.status(200).json(result);
+        return;
+      }
+
       logger.info(`Google linked to user ${user._id}${result.bonusAwarded ? ' + bonus' : ''}`);
       res.status(200).json({ ok: true, bonusAwarded: result.bonusAwarded });
     } catch (error: any) {
       logger.error('Google link error:', error);
       res.status(400).json({ error: error.message || 'Linking failed' });
+    }
+  }
+);
+
+/**
+ * POST /api/auth/link/merge
+ * Merges two accounts: keeps one and transfers progress from the other.
+ */
+router.post(
+  '/link/merge',
+  authenticate,
+  rateLimit(5, 60000),
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const jwtUserId = (req as any).user.id;
+      const { keepUserId, removeUserId } = req.body;
+      if (!keepUserId || !removeUserId) {
+        res.status(400).json({ error: 'keepUserId and removeUserId are required' });
+        return;
+      }
+
+      const result = await mergeAccounts(keepUserId, removeUserId, jwtUserId);
+      res.status(200).json(result);
+    } catch (error: any) {
+      logger.error('Merge accounts error:', error);
+      res.status(400).json({ error: error.message || 'Merge failed' });
     }
   }
 );

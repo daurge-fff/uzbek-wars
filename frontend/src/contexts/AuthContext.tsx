@@ -57,6 +57,13 @@ interface Player {
   };
 }
 
+export interface LinkingConflict {
+  conflict: true;
+  keepUser: { id: string; displayName: string; level: number; experience: number; soms: number; crystals: number; avatar: string };
+  removeUser: { id: string; displayName: string; level: number; experience: number; soms: number; crystals: number; avatar: string };
+  suggestedKeep: string;
+}
+
 interface AuthContextType {
   user: User | null;
   player: Player | null;
@@ -75,6 +82,9 @@ interface AuthContextType {
   telegramAuthError: string | null;
   /** Signs in with the signed initData string (auto-called on mini app open) */
   loginWithTelegram: () => Promise<void>;
+  linkingConflict: LinkingConflict | null;
+  setLinkingConflict: (c: LinkingConflict | null) => void;
+  mergeAccounts: (keepId: string, removeId: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -88,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [telegramAuthPending, setTelegramAuthPending] = useState(false);
   const [telegramAuthError, setTelegramAuthError] = useState<string | null>(null);
+  const [linkingConflictState, setLinkingConflictState] = useState<LinkingConflict | null>(null);
   const { i18n } = useTranslation();
 
   const isTelegram = isTelegramMiniApp();
@@ -155,7 +166,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }, {
             headers: { Authorization: `Bearer ${newToken}` }
           });
-          if (linkRes.data.bonusAwarded) {
+          if (linkRes.data.conflict) {
+            setLinkingConflictState(linkRes.data);
+          } else if (linkRes.data.bonusAwarded) {
             login(newToken, { ...newUser, hasTelegram: true }, newPlayer);
           }
         } catch (err: any) {
@@ -270,6 +283,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const mergeAccountsHandler = async (keepId: string, removeId: string) => {
+    if (!token) return;
+    const res = await axios.post(`${API_URL}/api/auth/link/merge`, {
+      keepUserId: keepId,
+      removeUserId: removeId,
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setLinkingConflictState(null);
+    if (res.data.bonusAwarded && user) {
+      login(token, { ...user, hasGoogle: true, hasTelegram: true } as any, user as any);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -286,7 +313,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         telegramUser,
         telegramAuthPending,
         telegramAuthError,
-        loginWithTelegram
+        loginWithTelegram,
+        linkingConflict: linkingConflictState,
+        setLinkingConflict: setLinkingConflictState,
+        mergeAccounts: mergeAccountsHandler,
       }}
     >
       {children}

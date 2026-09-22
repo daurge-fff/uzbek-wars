@@ -400,7 +400,13 @@
     "openTelegramLink": "Telegram-ni havola orqali oching:",
     "openInTelegram": "Telegram-da ochish",
     "linkCodeExpires": "Kod 5 daqiqa amal qiladi",
-    "bonusAwarded": "+500 XP va +100 kristall bog'lash uchun!"
+    "bonusAwarded": "+500 XP va +100 kristall bog'lash uchun!",
+    "conflictTitle": "Akkaunt konflikti aniqlandi",
+    "conflictHint": "Bu kirish bilan allaqachon akkaunt mavjud. Qaysi birini saqlashni tanlang:",
+    "suggested": "Tavsiya etiladi",
+    "level": "Dar.",
+    "mergeHint": "Ma'lumotlar birlashtiriladi: resurslar va statlar maksimum bo'yicha olinadi.",
+    "mergeConfirm": "Akkauntlarni birlashtirish?"
   },
   "language": {
     "select": "Tilni tanlang",

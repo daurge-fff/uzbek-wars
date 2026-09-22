@@ -455,19 +455,31 @@ export async function detectTwinks(userId: string): Promise<boolean> {
 const LINKING_BONUS_XP = 500;
 const LINKING_BONUS_CRYSTALS = 100;
 
+interface LinkingConflict {
+  conflict: true;
+  keepUser: { id: string; displayName: string; level: number; experience: number; soms: number; crystals: number; avatar: string };
+  removeUser: { id: string; displayName: string; level: number; experience: number; soms: number; crystals: number; avatar: string };
+  suggestedKeep: string;
+}
+
 /**
  * Links a Telegram account to an existing Google-authenticated user.
- * Called from POST /api/auth/link/verify after the user opens the mini app
- * with a verification code in startapp.
+ * If the Telegram ID already belongs to another user, returns a conflict
+ * so the frontend can show a merge dialog.
  */
 export async function linkTelegramToUser(
   userId: string,
   telegramId: string,
   telegramUser: { username?: string; first_name?: string; last_name?: string; language_code?: string; photo_url?: string }
-): Promise<{ bonusAwarded: boolean }> {
+): Promise<{ bonusAwarded: boolean } | LinkingConflict> {
   const user = await User.findById(userId);
   if (!user) throw new Error('User not found');
   if (user.telegramId) throw new Error('Telegram account already linked');
+
+  const existingTgOwner = await User.findOne({ telegramId, _id: { $ne: userId } });
+  if (existingTgOwner) {
+    return await buildConflictResponse(userId, existingTgOwner._id.toString());
+  }
 
   user.telegramId = telegramId;
   user.telegramUsername = telegramUser.username;
@@ -479,13 +491,12 @@ export async function linkTelegramToUser(
   await user.save();
 
   logger.info(`Linked Telegram ${telegramId} to user ${userId}`);
-
   return await awardLinkingBonus(userId);
 }
 
 /**
  * Links a Google account to an existing Telegram-authenticated user.
- * Called from POST /api/auth/link/google after Google OAuth completes.
+ * If the Google ID already belongs to another user, returns a conflict.
  */
 export async function linkGoogleToUser(
   userId: string,
@@ -493,10 +504,15 @@ export async function linkGoogleToUser(
   email: string,
   displayName: string,
   avatar?: string
-): Promise<{ bonusAwarded: boolean }> {
+): Promise<{ bonusAwarded: boolean } | LinkingConflict> {
   const user = await User.findById(userId);
   if (!user) throw new Error('User not found');
   if (user.googleId && !user.googleId.startsWith('telegram:')) throw new Error('Google account already linked');
+
+  const existingGoogleOwner = await User.findOne({ googleId, _id: { $ne: userId } });
+  if (existingGoogleOwner) {
+    return await buildConflictResponse(userId, existingGoogleOwner._id.toString());
+  }
 
   user.googleId = googleId;
   user.email = email;
@@ -505,13 +521,130 @@ export async function linkGoogleToUser(
   await user.save();
 
   logger.info(`Linked Google ${googleId} to user ${userId}`);
-
   return await awardLinkingBonus(userId);
+}
+
+async function buildConflictResponse(userId1: string, userId2: string): Promise<LinkingConflict> {
+  const [p1, p2] = await Promise.all([
+    Player.findOne({ userId: userId1 }),
+    Player.findOne({ userId: userId2 }),
+  ]);
+  const [u1, u2] = await Promise.all([
+    User.findById(userId1).lean(),
+    User.findById(userId2).lean(),
+  ]);
+  if (!u1 || !u2) throw new Error('User not found for conflict');
+
+  const info = (u: any, p: any) => ({
+    id: u._id.toString(),
+    displayName: u.displayName,
+    level: p?.level ?? 1,
+    experience: p?.experience ?? 0,
+    soms: p?.soms ?? 0,
+    crystals: p?.donationCurrency ?? 0,
+    avatar: u.avatar || '',
+  });
+
+  const keepId = (p1?.level ?? 0) <= (p2?.level ?? 0) ? userId1 : userId2;
+
+  return {
+    conflict: true,
+    keepUser: info(keepId === userId1 ? u1 : u2, keepId === userId1 ? p1 : p2),
+    removeUser: info(keepId === userId1 ? u2 : u1, keepId === userId1 ? p2 : p1),
+    suggestedKeep: keepId,
+  };
+}
+
+/**
+ * Merges two accounts: keeps `keepUserId`, transfers progress from `removeUserId`,
+ * then deletes the removed account.
+ */
+export async function mergeAccounts(
+  keepUserId: string,
+  removeUserId: string,
+  jwtUserId: string
+): Promise<{ merged: true; bonusAwarded: boolean }> {
+  if (keepUserId !== jwtUserId && removeUserId !== jwtUserId) {
+    throw new Error('You can only merge your own accounts');
+  }
+  if (keepUserId === removeUserId) {
+    throw new Error('Cannot merge an account with itself');
+  }
+
+  const [keepUser, removeUser] = await Promise.all([
+    User.findById(keepUserId),
+    User.findById(removeUserId),
+  ]);
+  if (!keepUser || !removeUser) throw new Error('User not found');
+
+  const [keepPlayer, removePlayer] = await Promise.all([
+    Player.findOne({ userId: keepUserId }),
+    Player.findOne({ userId: removeUserId }),
+  ]);
+
+  if (keepPlayer && removePlayer) {
+    keepPlayer.experience = Math.max(keepPlayer.experience, removePlayer.experience) + (keepPlayer.experience !== removePlayer.experience ? Math.min(removePlayer.experience, LINKING_BONUS_XP) : 0);
+    keepPlayer.level = Math.max(keepPlayer.level, removePlayer.level);
+    keepPlayer.soms = Math.max(keepPlayer.soms, removePlayer.soms);
+    keepPlayer.donationCurrency = Math.max(keepPlayer.donationCurrency, removePlayer.donationCurrency);
+
+    if (keepPlayer.stats && removePlayer.stats) {
+      keepPlayer.stats.health = Math.max(keepPlayer.stats.health ?? 100, removePlayer.stats.health ?? 100);
+      keepPlayer.stats.energy = Math.max(keepPlayer.stats.energy ?? 100, removePlayer.stats.energy ?? 100);
+    }
+
+    const kc = keepPlayer.combatStats;
+    const rc = removePlayer.combatStats;
+    if (kc && rc) {
+      kc.strength = Math.max(kc.strength ?? 0, rc.strength ?? 0);
+      kc.defense = Math.max(kc.defense ?? 0, rc.defense ?? 0);
+      kc.agility = Math.max(kc.agility ?? 0, rc.agility ?? 0);
+      kc.stamina = Math.max(kc.stamina ?? 0, rc.stamina ?? 0);
+      kc.intelligence = Math.max(kc.intelligence ?? 0, rc.intelligence ?? 0);
+      kc.luck = Math.max(kc.luck ?? 0, rc.luck ?? 0);
+    }
+
+    await keepPlayer.save();
+  }
+
+  if (!keepUser.telegramId && removeUser.telegramId) {
+    keepUser.telegramId = removeUser.telegramId;
+    keepUser.telegramUsername = removeUser.telegramUsername;
+    keepUser.firstName = removeUser.firstName;
+    keepUser.lastName = removeUser.lastName;
+    keepUser.photoUrl = removeUser.photoUrl;
+    keepUser.telegramLastLoginAt = removeUser.telegramLastLoginAt;
+  }
+  if ((!keepUser.googleId || keepUser.googleId.startsWith('telegram:')) && removeUser.googleId && !removeUser.googleId.startsWith('telegram:')) {
+    keepUser.googleId = removeUser.googleId;
+    keepUser.email = removeUser.email;
+    keepUser.googleName = removeUser.googleName;
+  }
+  await keepUser.save();
+
+  if (removePlayer) {
+    await Player.deleteOne({ _id: removePlayer._id });
+  }
+  await User.deleteOne({ _id: removeUserId });
+
+  logger.info(`Merged accounts: kept ${keepUserId}, removed ${removeUserId}`);
+
+  const bonus = await awardLinkingBonus(keepUserId);
+  return { merged: true as const, bonusAwarded: bonus.bonusAwarded };
+}
+
+/**
+ * Returns linking status for a user.
+ */
+export function getLinkingStatus(user: any): { hasGoogle: boolean; hasTelegram: boolean } {
+  return {
+    hasGoogle: !!user.googleId && !user.googleId.startsWith('telegram:'),
+    hasTelegram: !!user.telegramId,
+  };
 }
 
 /**
  * Awards a one-time bonus when both Google and Telegram are linked.
- * Returns whether the bonus was actually awarded (not already claimed).
  */
 async function awardLinkingBonus(userId: string): Promise<{ bonusAwarded: boolean }> {
   const user = await User.findById(userId);
@@ -525,7 +658,6 @@ async function awardLinkingBonus(userId: string): Promise<{ bonusAwarded: boolea
   const player = await Player.findOne({ userId });
   if (!player) return { bonusAwarded: false };
 
-  // Check if bonus already claimed (store flag on player stats)
   if ((player as any).linkingBonusClaimed) return { bonusAwarded: false };
 
   player.experience += LINKING_BONUS_XP;
@@ -534,16 +666,5 @@ async function awardLinkingBonus(userId: string): Promise<{ bonusAwarded: boolea
   await player.save();
 
   logger.info(`Awarded linking bonus to user ${userId}: +${LINKING_BONUS_XP} XP, +${LINKING_BONUS_CRYSTALS} crystals`);
-
   return { bonusAwarded: true };
-}
-
-/**
- * Returns linking status for a user.
- */
-export function getLinkingStatus(user: any): { hasGoogle: boolean; hasTelegram: boolean } {
-  return {
-    hasGoogle: !!user.googleId && !user.googleId.startsWith('telegram:'),
-    hasTelegram: !!user.telegramId,
-  };
 }

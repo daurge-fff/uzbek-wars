@@ -368,7 +368,13 @@
     "openTelegramLink": "Open Telegram via the link:",
     "openInTelegram": "Open in Telegram",
     "linkCodeExpires": "Code is valid for 5 minutes",
-    "bonusAwarded": "+500 XP and +100 crystals for linking!"
+    "bonusAwarded": "+500 XP and +100 crystals for linking!",
+    "conflictTitle": "Account conflict detected",
+    "conflictHint": "You already have an account with this login. Choose which one to keep:",
+    "suggested": "Recommended",
+    "level": "Lv.",
+    "mergeHint": "Data will be merged: resources and stats take the maximum.",
+    "mergeConfirm": "Merge accounts?"
   },
   "language": {
     "select": "Select Language",
