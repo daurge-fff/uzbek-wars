@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { createPortal } from 'react-dom';
 import axios from 'axios';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -691,6 +692,163 @@ const PlayerProfileWithData = () => {
   );
 };
 
+function GoogleOAuthRedirectHandler() {
+  const { token, login, isTelegram } = useAuth();
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.substring(1));
+    const accessToken = params.get('access_token');
+
+    if (!accessToken) return;
+
+    const pendingLink = localStorage.getItem('pendingGoogleLink');
+    if (!pendingLink || !token) {
+      window.location.hash = '';
+      return;
+    }
+
+    localStorage.removeItem('pendingGoogleLink');
+
+    (async () => {
+      try {
+        const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        const userInfo = await userInfoRes.json();
+        const pseudoIdToken = btoa(JSON.stringify({
+          sub: userInfo.sub,
+          email: userInfo.email,
+          name: userInfo.name,
+          picture: userInfo.picture,
+          email_verified: userInfo.email_verified,
+        }));
+
+        const API_URL = import.meta.env.VITE_API_URL || '';
+        const initData = isTelegram ? (window as any).Telegram?.WebApp?.initData || '' : '';
+        await axios.post(`${API_URL}/api/auth/link/google`, {
+          idToken: pseudoIdToken,
+          initData,
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const storedUser = localStorage.getItem('auth_user');
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          login(token, { ...user, hasGoogle: true }, JSON.parse(localStorage.getItem('auth_player') || '{}'));
+        }
+      } catch (err) {
+        console.error('Google link redirect failed:', err);
+      } finally {
+        window.location.hash = '';
+        window.location.search = '';
+      }
+    })();
+  }, []);
+
+  return null;
+}
+
+function GlobalConflictModal() {
+  const { linkingConflict, setLinkingConflict, mergeAccounts } = useAuth();
+  const { t } = useTranslation();
+  const [merging, setMerging] = useState(false);
+
+  if (!linkingConflict) return null;
+
+  const handleMerge = async (keepId: string, removeId: string) => {
+    setMerging(true);
+    try {
+      await mergeAccounts(keepId, removeId);
+      setLinkingConflict(null);
+    } catch {
+    } finally {
+      setMerging(false);
+    }
+  };
+
+  return createPortal(
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/60 z-[200]"
+        onClick={() => !merging && setLinkingConflict(null)}
+      />
+      <div className="fixed inset-0 flex items-center justify-center z-[201] pointer-events-none p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="w-full max-w-[420px] pointer-events-auto"
+        >
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
+            <div className="text-center mb-4">
+              <Emoji emoji="⚠️" size={48} />
+              <h2 className="text-xl font-black text-gray-900 dark:text-white mt-3 mb-1">
+                {t('settings.conflictTitle', 'Обнаружен конфликт аккаунтов')}
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('settings.conflictHint', 'У вас уже есть аккаунт с этим входом. Выберите, какой оставить:')}
+              </p>
+            </div>
+
+            <div className="space-y-3 mb-4">
+              {[linkingConflict.keepUser, linkingConflict.removeUser].map((acc) => (
+                <button
+                  key={acc.id}
+                  onClick={() => handleMerge(
+                    acc.id === linkingConflict.suggestedKeep ? acc.id : linkingConflict.suggestedKeep,
+                    acc.id === linkingConflict.suggestedKeep ? (acc.id === linkingConflict.keepUser.id ? linkingConflict.removeUser.id : linkingConflict.keepUser.id) : acc.id
+                  )}
+                  disabled={merging}
+                  className={`w-full p-4 rounded-xl border-2 text-left transition-all disabled:opacity-50 ${
+                    acc.id === linkingConflict.suggestedKeep
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+                      : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Emoji emoji={acc.id === linkingConflict.suggestedKeep ? '⭐' : '👤'} size={24} />
+                    <div className="flex-1 min-w-0">
+                      <span className="block font-bold text-gray-900 dark:text-white text-sm truncate">
+                        {acc.displayName}
+                      </span>
+                      <span className="block text-xs text-gray-500 dark:text-gray-400">
+                        {t('settings.level', 'Ур.')} {acc.level} • {acc.soms} {t('common.currency', 'сом')} • {acc.crystals} 💎
+                      </span>
+                    </div>
+                    {acc.id === linkingConflict.suggestedKeep && (
+                      <span className="text-xs font-bold text-indigo-500 bg-indigo-100 dark:bg-indigo-900 px-2 py-1 rounded-lg shrink-0">
+                        {t('settings.suggested', 'Рекомендуется')}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 text-center mb-3">
+              {t('settings.mergeHint', 'Данные будут объединены: ресурсы и статы берутся по максимуму.')}
+            </p>
+
+            <button
+              onClick={() => setLinkingConflict(null)}
+              disabled={merging}
+              className="w-full py-3 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-xl border border-gray-200 dark:border-gray-700"
+            >
+              {merging ? '...' : t('ui.close')}
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>,
+    document.body
+  );
+}
+
 function App() {
   return (
     <ThemeProvider>
@@ -699,6 +857,8 @@ function App() {
           <BrowserRouter>
             <AnimatedRoutes />
             <BottomNavBar />
+            <GlobalConflictModal />
+            <GoogleOAuthRedirectHandler />
           </BrowserRouter>
 
           <Toaster

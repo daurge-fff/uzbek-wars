@@ -54,7 +54,7 @@ export const Settings = ({
 }: SettingsProps) => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  const { user, token, login, isTelegram, linkingConflict, setLinkingConflict, mergeAccounts } = useAuth();
+  const { user, token, login, isTelegram, setLinkingConflict } = useAuth();
   const [showDeveloperModal, setShowDeveloperModal] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const [linkingCode, setLinkingCode] = useState<string | null>(null);
@@ -63,19 +63,6 @@ export const Settings = ({
   const [linkingBonus, setLinkingBonus] = useState<boolean | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || '';
-
-  const handleMerge = useCallback(async (keepId: string, removeId: string) => {
-    setLinkingLoading(true);
-    setLinkingError(null);
-    try {
-      await mergeAccounts(keepId, removeId);
-      setLinkingBonus(true);
-    } catch (err: any) {
-      setLinkingError(err.response?.data?.error || 'Merge failed');
-    } finally {
-      setLinkingLoading(false);
-    }
-  }, [mergeAccounts]);
 
   const handleRequestLinkCode = useCallback(async () => {
     if (!token) return;
@@ -100,18 +87,11 @@ export const Settings = ({
   }, [linkingCode]);
 
   const handleLinkGoogle = useCallback(async () => {
-    if (!token || !isTelegram) return;
+    if (!token) return;
     setLinkingLoading(true);
     setLinkingError(null);
 
     try {
-      const initData = getTelegramInitData();
-      if (!initData) {
-        setLinkingError('No Telegram init data');
-        setLinkingLoading(false);
-        return;
-      }
-
       const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
       if (!clientId) {
         setLinkingError('Google client ID not configured');
@@ -119,7 +99,18 @@ export const Settings = ({
         return;
       }
 
-      // Ensure GSI script is loaded
+      if (isTelegram) {
+        // In Telegram WebView, GSI popup can't postMessage back.
+        // Use redirect flow: save state, redirect to Google, handle on return.
+        localStorage.setItem('pendingGoogleLink', token);
+        const redirectUri = window.location.origin;
+        const scope = 'email profile openid';
+        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}&prompt=select_account`;
+        window.location.href = authUrl;
+        return;
+      }
+
+      // Browser: use GSI popup (works fine outside WebView)
       if (!window.google?.accounts?.oauth2) {
         await new Promise<void>((resolve, reject) => {
           const script = document.createElement('script');
@@ -131,6 +122,8 @@ export const Settings = ({
           document.body.appendChild(script);
         });
       }
+
+      const initData = getTelegramInitData();
 
       const client = window.google.accounts.oauth2.initTokenClient({
         client_id: clientId,
@@ -189,7 +182,7 @@ export const Settings = ({
       setLinkingError(err.message || 'Failed to link Google');
       setLinkingLoading(false);
     }
-  }, [token, isTelegram, API_URL, user, login]);
+  }, [token, isTelegram, API_URL, user, login, setLinkingConflict]);
 
   const formatUptime = (seconds: number) => {
     const days = Math.floor(seconds / 86400);
@@ -590,90 +583,6 @@ export const Settings = ({
 
                       <button
                         onClick={() => setShowDeveloperModal(false)}
-                        className="w-full py-3 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-xl border border-gray-200 dark:border-gray-700"
-                      >
-                        {t('ui.close')}
-                      </button>
-                    </div>
-                  </motion.div>
-                </div>
-              </>
-            )}
-          </AnimatePresence>,
-          document.body
-        )}
-
-        {/* Conflict resolution modal */}
-        {createPortal(
-          <AnimatePresence>
-            {linkingConflict && (
-              <>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="fixed inset-0 bg-black/60 z-[100]"
-                />
-                <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="w-full max-w-[420px] pointer-events-auto"
-                  >
-                    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
-                      <div className="text-center mb-4">
-                        <Emoji emoji="⚠️" size={48} />
-                        <h2 className="text-xl font-black text-gray-900 dark:text-white mt-3 mb-1">
-                          {t('settings.conflictTitle', 'Обнаружен конфликт аккаунтов')}
-                        </h2>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {t('settings.conflictHint', 'У вас уже есть аккаунт с этим входом. Выберите, какой оставить:')}
-                        </p>
-                      </div>
-
-                      <div className="space-y-3 mb-4">
-                        {[linkingConflict.keepUser, linkingConflict.removeUser].map((acc) => (
-                          <button
-                            key={acc.id}
-                            onClick={() => handleMerge(
-                              acc.id === linkingConflict.suggestedKeep ? acc.id : linkingConflict.suggestedKeep,
-                              acc.id === linkingConflict.suggestedKeep ? (acc.id === linkingConflict.keepUser.id ? linkingConflict.removeUser.id : linkingConflict.keepUser.id) : acc.id
-                            )}
-                            disabled={linkingLoading}
-                            className={`w-full p-4 rounded-xl border-2 text-left transition-all disabled:opacity-50 ${
-                              acc.id === linkingConflict.suggestedKeep
-                                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
-                                : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <Emoji emoji={acc.id === linkingConflict.suggestedKeep ? '⭐' : '👤'} size={24} />
-                              <div className="flex-1 min-w-0">
-                                <span className="block font-bold text-gray-900 dark:text-white text-sm truncate">
-                                  {acc.displayName}
-                                </span>
-                                <span className="block text-xs text-gray-500 dark:text-gray-400">
-                                  {t('settings.level', 'Ур.')} {acc.level} • {acc.soms} {t('common.currency', 'сом')} • {acc.crystals} 💎
-                                </span>
-                              </div>
-                              {acc.id === linkingConflict.suggestedKeep && (
-                                <span className="text-xs font-bold text-indigo-500 bg-indigo-100 dark:bg-indigo-900 px-2 py-1 rounded-lg">
-                                  {t('settings.suggested', 'Рекомендуется')}
-                                </span>
-                              )}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500 text-center mb-3">
-                        {t('settings.mergeHint', 'Данные будут объединены: ресурсы и статы берутся по максимуму.')}
-                      </p>
-
-                      <button
-                        onClick={() => setLinkingConflict(null)}
-                        disabled={linkingLoading}
                         className="w-full py-3 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-xl border border-gray-200 dark:border-gray-700"
                       >
                         {t('ui.close')}
