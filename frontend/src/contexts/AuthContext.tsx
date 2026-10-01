@@ -74,6 +74,7 @@ interface AuthContextType {
   logout: () => void;
   updatePlayer: (player: Partial<Player>) => void;
   refreshPlayer: () => Promise<void>;
+  refreshUser: () => Promise<void>;
   /** True when the page is opened inside the Telegram mini app */
   isTelegram: boolean;
   /** Telegram profile from initDataUnsafe — display only, never for auth */
@@ -129,6 +130,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [i18n]);
 
   /**
+   * Handles a `startapp=link_<CODE>` deep link. Links the Telegram identity to whoever
+   * generated the code, then re-authenticates so the mini app holds the merged session.
+   * Works regardless of whether the mini app was already signed in.
+   */
+  const handleLinkStartParam = async () => {
+    const startParam = getStartParam();
+    if (!startParam?.startsWith('link_')) return;
+
+    const code = startParam.slice(5);
+    const initData = getTelegramInitData();
+    if (!initData) return;
+
+    try {
+      const linkRes = await axios.post(`${API_URL}/api/auth/link/verify`, {
+        code,
+        initData,
+      });
+
+      if (linkRes.data.conflict) {
+        setLinkingConflictState(linkRes.data);
+        return;
+      }
+
+      // The Telegram account was folded into the linked user. Re-authenticate so the
+      // mini app now holds the merged account's session (and correct flags).
+      const relogin = await axios.post(`${API_URL}/api/auth/telegram-webapp`, {
+        initData,
+        deviceInfo: getDeviceInfo(),
+      });
+      login(relogin.data.token, relogin.data.user, relogin.data.player);
+    } catch (err: any) {
+      console.error('Link verify failed:', err.response?.data?.error || err.message);
+    }
+  };
+
+  /**
    * Signs in through the Telegram mini app.
    *
    * The raw signed initData string is verified on the server with the bot token, and the
@@ -156,25 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login(newToken, newUser, newPlayer);
 
       // Handle start_param for account linking (e.g. "link_ABC123")
-      const startParam = getStartParam();
-      if (startParam?.startsWith('link_')) {
-        const code = startParam.slice(5);
-        try {
-          const linkRes = await axios.post(`${API_URL}/api/auth/link/verify`, {
-            code,
-            initData,
-          }, {
-            headers: { Authorization: `Bearer ${newToken}` }
-          });
-          if (linkRes.data.conflict) {
-            setLinkingConflictState(linkRes.data);
-          } else if (linkRes.data.bonusAwarded) {
-            login(newToken, { ...newUser, hasTelegram: true }, newPlayer);
-          }
-        } catch (err: any) {
-          console.error('Link verify failed:', err.response?.data?.error || err.message);
-        }
-      }
+      await handleLinkStartParam();
     } catch (error: any) {
       const code = error?.response?.data?.code || 'AUTH_FAILED';
       setTelegramAuthError(code);
@@ -188,8 +207,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     initTelegramUi();
 
+    if (!isTelegram || !getTelegramInitData()) {
+      return;
+    }
+
     const alreadyAuthenticated = Boolean(localStorage.getItem('auth_token'));
-    if (!isTelegram || alreadyAuthenticated || !getTelegramInitData()) {
+    if (alreadyAuthenticated) {
+      // Already signed in, but the mini app may have been opened with a linking code.
+      void handleLinkStartParam();
       return;
     }
 
@@ -292,8 +317,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       headers: { Authorization: `Bearer ${token}` }
     });
     setLinkingConflictState(null);
+
+    // After a merge in the Telegram mini app, re-authenticate so the session points at
+    // the kept account instead of a possibly-deleted one.
+    const initData = getTelegramInitData();
+    if (isTelegram && initData) {
+      const relogin = await axios.post(`${API_URL}/api/auth/telegram-webapp`, {
+        initData,
+        deviceInfo: getDeviceInfo(),
+      });
+      login(relogin.data.token, relogin.data.user, relogin.data.player);
+      return;
+    }
+
     if (res.data.bonusAwarded && user) {
       login(token, { ...user, hasGoogle: true, hasTelegram: true } as any, user as any);
+    }
+  };
+
+  /**
+   * Re-fetches the current user's profile and linking status from the server.
+   * Used by the settings screen so the Google/Telegram "linked" checkmarks update
+   * after a cross-app link finishes in the other context.
+   */
+  const refreshUser = async () => {
+    if (!token) return;
+
+    try {
+      const response = await axios.get(`${API_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const freshUser = response.data.user;
+      const storedUser = JSON.parse(localStorage.getItem('auth_user') || '{}');
+      const merged = { ...storedUser, ...freshUser };
+      setUser(merged);
+      localStorage.setItem('auth_user', JSON.stringify(merged));
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
     }
   };
 
@@ -309,6 +370,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         updatePlayer,
         refreshPlayer,
+        refreshUser,
         isTelegram,
         telegramUser,
         telegramAuthPending,

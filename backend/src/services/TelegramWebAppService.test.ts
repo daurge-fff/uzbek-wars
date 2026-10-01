@@ -136,15 +136,15 @@ describe('TelegramWebAppService.validateInitData', () => {
         expect(computeInitDataHash(initData, BOT_TOKEN)).toBe(hash);
     });
 
-    it('returns startParam when startapp is present in initData', () => {
-        const initData = validInitData({ startapp: 'link_ABC123' });
+    it('returns startParam when start_param is present in initData', () => {
+        const initData = validInitData({ start_param: 'link_ABC123' });
         const result = validateInitData(initData, BOT_TOKEN);
 
         expect(result.ok).toBe(true);
         expect(result.startParam).toBe('link_ABC123');
     });
 
-    it('returns undefined startParam when startapp is absent', () => {
+    it('returns undefined startParam when start_param is absent', () => {
         const initData = validInitData();
         const result = validateInitData(initData, BOT_TOKEN);
 

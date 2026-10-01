@@ -37,6 +37,7 @@ services:
       dockerfile: Dockerfile.frontend
       args:
         - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+        - VITE_GOOGLE_REDIRECT_URI=${VITE_GOOGLE_REDIRECT_URI}
     container_name: uzbek-wars-frontend
     restart: unless-stopped
     networks:

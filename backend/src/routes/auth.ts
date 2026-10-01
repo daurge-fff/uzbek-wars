@@ -11,12 +11,12 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
-import { authenticateWithGoogle, authenticateDevLogin, authenticateWithTelegramWebApp, detectTwinks, linkTelegramToUser, linkGoogleToUser, mergeAccounts } from '../services/AuthService';
+import { authenticateWithGoogle, authenticateDevLogin, authenticateWithTelegramWebApp, detectTwinks, linkTelegramToUser, linkGoogleToUser, mergeAccounts, getLinkingStatus } from '../services/AuthService';
 import { validateInitData, mapTelegramLanguage } from '../services/TelegramWebAppService';
 import { logger } from '../utils/logger';
 import { createVerificationSession, verificationSessions } from '../bot/verificationSessions';
 import { User } from '../models/User';
-import { authenticate } from '../middleware/auth';
+import { authenticate, authenticateUser } from '../middleware/auth';
 import { validateUsernameCheck, rateLimit } from '../middleware/validation';
 import { env } from '../config/environment';
 
@@ -436,6 +436,43 @@ router.post(
     } catch (error) {
       logger.error('Telegram mini app auth error:', error);
       res.status(500).json({ error: 'Authentication failed' });
+    }
+  }
+);
+
+/**
+ * GET /api/auth/me
+ *
+ * Returns the current user's profile and account linking status. The settings screen
+ * calls this to refresh the Google/Telegram "linked" checkmarks after a cross-app link
+ * completes (the linking itself happens in the other app/context).
+ */
+router.get(
+  '/me',
+  authenticateUser,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const user = await User.findById((req as any).user.id);
+      if (!user) {
+        res.status(404).json({ error: 'User not found', code: 'USER_NOT_FOUND' });
+        return;
+      }
+
+      res.status(200).json({
+        user: {
+          id: user._id,
+          email: user.email,
+          displayName: user.displayName,
+          avatar: user.avatar,
+          language: user.language,
+          telegramId: user.telegramId,
+          telegramUsername: user.telegramUsername,
+          ...getLinkingStatus(user),
+        },
+      });
+    } catch (error) {
+      logger.error('Load user error:', error);
+      res.status(500).json({ error: 'Failed to load user', code: 'USER_LOAD_FAILED' });
     }
   }
 );

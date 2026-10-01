@@ -66,6 +66,6 @@ describe('GameDashboard', () => {
       />
     );
     
-    expect(screen.getByText(mockPlayerState.soms.toLocaleString())).toBeDefined();
+    expect(screen.getByText('1.3K')).toBeDefined();
   });
 });

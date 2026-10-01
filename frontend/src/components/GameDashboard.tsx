@@ -140,6 +140,14 @@ const activityImages: Record<string, string> = {
   'eat': '🍽️'
 };
 
+// Compact number formatting so currency values fit inside the small header cards on
+// narrow phones (e.g. 12.5K instead of 12,500).
+const formatCompact = (num: number): string => {
+  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+  return String(num);
+};
+
 export const GameDashboard = ({ playerState, activities, onActivitySelect, userAvatar, currentActivity, onActivityComplete, onRefreshPlayer }: GameDashboardProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -615,8 +623,8 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-yellow-400/30 to-orange-500/30 border border-yellow-400/50 shadow-sm hover:shadow-md transition-all flex-1"
                     >
                       <Emoji emoji="💰" size={16} />
-                      <span className="text-gray-900 dark:text-white font-black text-[11px] whitespace-nowrap">
-                        {playerState.soms.toLocaleString()}
+                      <span className="text-gray-900 dark:text-white font-black text-[10px] whitespace-nowrap">
+                        {formatCompact(playerState.soms)}
                       </span>
                     </motion.button>
 
@@ -626,8 +634,8 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                       className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gradient-to-r from-cyan-400/30 to-blue-500/30 border border-cyan-400/50 shadow-sm hover:shadow-md transition-all"
                     >
                       <Emoji emoji="💎" size={16} />
-                      <span className="text-gray-900 dark:text-white font-black text-[11px]">
-                        {playerState.donationCurrency}
+                      <span className="text-gray-900 dark:text-white font-black text-[10px]">
+                        {formatCompact(playerState.donationCurrency)}
                       </span>
                     </motion.button>
                   </div>

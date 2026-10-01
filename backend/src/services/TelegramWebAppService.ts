@@ -110,7 +110,7 @@ export function validateInitData(
 
     if (!user || typeof user.id !== 'number') return { ok: false, error: 'MISSING_USER' };
 
-    const startParam = params.get('startapp') || undefined;
+    const startParam = params.get('start_param') || undefined;
 
     return { ok: true, user, authDate, startParam };
 }

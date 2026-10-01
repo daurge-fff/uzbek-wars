@@ -478,7 +478,14 @@ export async function linkTelegramToUser(
 
   const existingTgOwner = await User.findOne({ telegramId, _id: { $ne: userId } });
   if (existingTgOwner) {
-    return await buildConflictResponse(userId, existingTgOwner._id.toString());
+    // If the Telegram ID belongs to a fresh account with no player yet (it was just
+    // auto-created when the mini app opened the linking link), fold it into the current
+    // user instead of forcing a merge dialog over an empty shell.
+    const ownerPlayer = await Player.findOne({ userId: existingTgOwner._id });
+    if (ownerPlayer) {
+      return await buildConflictResponse(userId, existingTgOwner._id.toString());
+    }
+    await User.deleteOne({ _id: existingTgOwner._id });
   }
 
   user.telegramId = telegramId;
@@ -511,7 +518,13 @@ export async function linkGoogleToUser(
 
   const existingGoogleOwner = await User.findOne({ googleId, _id: { $ne: userId } });
   if (existingGoogleOwner) {
-    return await buildConflictResponse(userId, existingGoogleOwner._id.toString());
+    // A Google account with no player yet is an empty shell (registered but never
+    // onboarded) — fold it into the current user instead of showing a merge dialog.
+    const ownerPlayer = await Player.findOne({ userId: existingGoogleOwner._id });
+    if (ownerPlayer) {
+      return await buildConflictResponse(userId, existingGoogleOwner._id.toString());
+    }
+    await User.deleteOne({ _id: existingGoogleOwner._id });
   }
 
   user.googleId = googleId;

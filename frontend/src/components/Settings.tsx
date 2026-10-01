@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { createPortal } from 'react-dom';
@@ -54,7 +54,7 @@ export const Settings = ({
 }: SettingsProps) => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  const { user, token, login, isTelegram, setLinkingConflict } = useAuth();
+  const { user, token, login, isTelegram, setLinkingConflict, refreshUser } = useAuth();
   const [showDeveloperModal, setShowDeveloperModal] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const [linkingCode, setLinkingCode] = useState<string | null>(null);
@@ -63,6 +63,18 @@ export const Settings = ({
   const [linkingBonus, setLinkingBonus] = useState<boolean | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || '';
+
+  // Refresh the linking checkmarks when the user (re)opens settings, including when they
+  // come back from Telegram/Google after linking the other account.
+  useEffect(() => {
+    void refreshUser();
+  }, [refreshUser]);
+
+  useEffect(() => {
+    const onFocus = () => void refreshUser();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [refreshUser]);
 
   const handleRequestLinkCode = useCallback(async () => {
     if (!token) return;
@@ -102,8 +114,10 @@ export const Settings = ({
       if (isTelegram) {
         // In Telegram WebView, GSI popup can't postMessage back.
         // Use redirect flow: save state, redirect to Google, handle on return.
+        // The redirect URI must exactly match an "Authorized redirect URI" in the
+        // Google Cloud console for this client id.
         localStorage.setItem('pendingGoogleLink', token);
-        const redirectUri = window.location.origin;
+        const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || window.location.origin;
         const scope = 'email profile openid';
         const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}&prompt=select_account`;
         window.location.href = authUrl;

@@ -21,7 +21,7 @@ export interface TelegramUserProfile {
 
 interface TelegramWebAppLike {
     initData?: string;
-    initDataUnsafe?: { user?: TelegramUserProfile };
+    initDataUnsafe?: { user?: TelegramUserProfile; start_param?: string };
     platform?: string;
     version?: string;
     colorScheme?: 'light' | 'dark';
@@ -33,7 +33,6 @@ interface TelegramWebAppLike {
     setBackgroundColor?: (color: string) => void;
     onEvent?: (event: string, handler: () => void) => void;
     openTelegramLink?: (url: string) => void;
-    startParam?: string;
 }
 
 /** Returns the Telegram WebApp object, or null when not running inside Telegram */
@@ -64,9 +63,26 @@ export function getTelegramUser(): TelegramUserProfile | null {
     return getTelegramWebApp()?.initDataUnsafe?.user ?? null;
 }
 
-/** startapp parameter from Telegram (e.g. "link_ABC123") */
+/**
+ * startapp parameter from Telegram (e.g. "link_ABC123").
+ *
+ * Telegram exposes it as `start_param` (snake_case) inside `initDataUnsafe` and as a
+ * `start_param=...` pair inside the signed `initData` string. There is no top-level
+ * `startParam` property on the WebApp object, so we read both reliable sources.
+ */
 export function getStartParam(): string | null {
-    return getTelegramWebApp()?.startParam || null;
+    const app = getTelegramWebApp();
+    if (!app) return null;
+
+    const unsafe = app.initDataUnsafe as { start_param?: string } | undefined;
+    if (unsafe?.start_param) return unsafe.start_param;
+
+    const initData = app.initData || '';
+    if (initData) {
+        return new URLSearchParams(initData).get('start_param');
+    }
+
+    return null;
 }
 
 /** Applies Telegram-specific UI defaults: full height, no accidental swipe-to-close */

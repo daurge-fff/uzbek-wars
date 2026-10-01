@@ -693,18 +693,29 @@ const PlayerProfileWithData = () => {
 };
 
 function GoogleOAuthRedirectHandler() {
-  const { token, login, isTelegram } = useAuth();
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.substring(1));
     const accessToken = params.get('access_token');
 
-    if (!accessToken) return;
+    if (!accessToken) {
+      if (params.get('error')) {
+        window.location.hash = '';
+        navigate('/', { replace: true });
+      }
+      return;
+    }
 
+    // Read the session from localStorage, not from context state: this effect runs on
+    // mount (before AuthProvider has rehydrated `token`), so context state is still null.
     const pendingLink = localStorage.getItem('pendingGoogleLink');
+    const token = localStorage.getItem('auth_token');
     if (!pendingLink || !token) {
       window.location.hash = '';
+      navigate('/', { replace: true });
       return;
     }
 
@@ -725,27 +736,37 @@ function GoogleOAuthRedirectHandler() {
         }));
 
         const API_URL = import.meta.env.VITE_API_URL || '';
-        const initData = isTelegram ? (window as any).Telegram?.WebApp?.initData || '' : '';
-        await axios.post(`${API_URL}/api/auth/link/google`, {
+        const initData = (window as any).Telegram?.WebApp?.initData || '';
+        const res = await axios.post(`${API_URL}/api/auth/link/google`, {
           idToken: pseudoIdToken,
           initData,
         }, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
+        if (res.data.conflict) {
+          window.location.hash = '';
+          window.location.search = '';
+          navigate('/', { replace: true });
+          return;
+        }
+
         const storedUser = localStorage.getItem('auth_user');
+        const storedPlayer = localStorage.getItem('auth_player');
         if (storedUser) {
           const user = JSON.parse(storedUser);
-          login(token, { ...user, hasGoogle: true }, JSON.parse(localStorage.getItem('auth_player') || '{}'));
+          login(token, { ...user, hasGoogle: true }, storedPlayer ? JSON.parse(storedPlayer) : null);
         }
       } catch (err) {
         console.error('Google link redirect failed:', err);
       } finally {
         window.location.hash = '';
         window.location.search = '';
+        navigate('/', { replace: true });
       }
     })();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [login, navigate]);
 
   return null;
 }
