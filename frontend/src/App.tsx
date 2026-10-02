@@ -8,37 +8,46 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import toast, { Toaster } from 'react-hot-toast';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import axios from 'axios';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { PreferencesProvider, usePreferences } from './contexts/PreferencesContext';
 import { HomePage } from './components/HomePage';
-import { GameDashboardContainer } from './components/GameDashboardContainer';
-import { DonationModal } from './components/DonationModal';
-import { CosmeticShop } from './components/CosmeticShop';
-import { Inventory } from './components/Inventory';
-import { Leaderboard } from './components/Leaderboard';
-import { ReferralPanel } from './components/ReferralPanel';
-import { PlayerProfile } from './components/PlayerProfile';
-import { TasksPage } from './components/TasksPage';
-import { Settings } from './components/Settings';
-import { HealthCheck } from './components/HealthCheck';
-import { ReferralLanding } from './components/ReferralLanding';
-import { TermsOfService } from './components/TermsOfService';
-import { PrivacyPolicy } from './components/PrivacyPolicy';
 import Emoji from './components/Emoji';
-import { OnboardingFlow } from './components/OnboardingFlow';
 import { BottomNavBar } from './components/BottomNavBar';
-import ClassHall from './components/ClassHall';
-import CityMigration from './components/CityMigration';
-import { ArenaPage } from './components/ArenaPage';
-import { AchievementsPage } from './components/AchievementsPage';
-import { CraftingPage } from './components/CraftingPage';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { OfflineBanner } from './components/OfflineBanner';
+import { ScrollToTop } from './components/ScrollToTop';
+import { TelegramBackButton } from './components/TelegramBackButton';
+import LoadingScreen from './components/LoadingScreen';
 import { cosmeticItems } from './data/cosmeticItems';
+
+// Route-level code splitting: keeps the initial bundle small so the game opens fast on
+// mobile. HomePage stays eager (first paint); every other screen loads on demand.
+const OnboardingFlow = lazy(() => import('./components/OnboardingFlow').then(m => ({ default: m.OnboardingFlow })));
+const GameDashboardContainer = lazy(() => import('./components/GameDashboardContainer').then(m => ({ default: m.GameDashboardContainer })));
+const DonationModal = lazy(() => import('./components/DonationModal').then(m => ({ default: m.DonationModal })));
+const CosmeticShop = lazy(() => import('./components/CosmeticShop').then(m => ({ default: m.CosmeticShop })));
+const Inventory = lazy(() => import('./components/Inventory').then(m => ({ default: m.Inventory })));
+const Leaderboard = lazy(() => import('./components/Leaderboard').then(m => ({ default: m.Leaderboard })));
+const ReferralPanel = lazy(() => import('./components/ReferralPanel').then(m => ({ default: m.ReferralPanel })));
+const PlayerProfile = lazy(() => import('./components/PlayerProfile').then(m => ({ default: m.PlayerProfile })));
+const TasksPage = lazy(() => import('./components/TasksPage').then(m => ({ default: m.TasksPage })));
+const Settings = lazy(() => import('./components/Settings').then(m => ({ default: m.Settings })));
+const HealthCheck = lazy(() => import('./components/HealthCheck').then(m => ({ default: m.HealthCheck })));
+const ReferralLanding = lazy(() => import('./components/ReferralLanding').then(m => ({ default: m.ReferralLanding })));
+const TermsOfService = lazy(() => import('./components/TermsOfService').then(m => ({ default: m.TermsOfService })));
+const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
+const ClassHall = lazy(() => import('./components/ClassHall'));
+const CityMigration = lazy(() => import('./components/CityMigration'));
+const ArenaPage = lazy(() => import('./components/ArenaPage').then(m => ({ default: m.ArenaPage })));
+const AchievementsPage = lazy(() => import('./components/AchievementsPage').then(m => ({ default: m.AchievementsPage })));
+const CraftingPage = lazy(() => import('./components/CraftingPage').then(m => ({ default: m.CraftingPage })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -874,33 +883,63 @@ function GlobalConflictModal() {
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <AnimatedRoutes />
-            <BottomNavBar />
-            <GlobalConflictModal />
-            <GoogleOAuthRedirectHandler />
-          </BrowserRouter>
+    <ErrorBoundary>
+      <MotionConfig reducedMotion="user">
+        <ThemeProvider>
+          <PreferencesProvider>
+            <AuthProvider>
+              <QueryClientProvider client={queryClient}>
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <TelegramBackButton />
+                  <Suspense fallback={<LoadingScreen />}>
+                    <AnimatedRoutes />
+                  </Suspense>
+                  <BottomNavBar />
+                  <GlobalConflictModal />
+                  <GoogleOAuthRedirectHandler />
+                  <OfflineBanner />
+                </BrowserRouter>
 
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(10px)',
-                color: '#2C1810',
-                borderRadius: '16px',
-                border: '1px solid rgba(0,0,0,0.05)',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-              }
-            }}
-          />
-        </QueryClientProvider>
-      </AuthProvider>
-    </ThemeProvider>
+                <AppToaster />
+              </QueryClientProvider>
+            </AuthProvider>
+          </PreferencesProvider>
+        </ThemeProvider>
+      </MotionConfig>
+    </ErrorBoundary>
+  );
+}
+
+/** Toast styling that follows the app theme (light/dark). */
+function AppToaster() {
+  const { theme } = useTheme();
+  const dark = theme === 'dark';
+
+  return (
+    <Toaster
+      position="top-center"
+      toastOptions={{
+        duration: 3000,
+        style: dark
+          ? {
+              background: 'rgba(17, 24, 39, 0.95)',
+              backdropFilter: 'blur(10px)',
+              color: '#f9fafb',
+              borderRadius: '16px',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+            }
+          : {
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              color: '#2C1810',
+              borderRadius: '16px',
+              border: '1px solid rgba(0,0,0,0.05)',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+            }
+      }}
+    />
   );
 }
 
@@ -908,6 +947,7 @@ function App() {
 const SettingsWithI18n = () => {
   const { i18n } = useTranslation();
   const { player, token, user } = useAuth();
+  const { sound, music, notifications, togglePreference } = usePreferences();
   const [appStats, setAppStats] = useState<any>(null);
 
   useEffect(() => {
@@ -959,12 +999,12 @@ const SettingsWithI18n = () => {
     <Settings
       currentLanguage={i18n.language as 'ru' | 'uz' | 'uk' | 'en'}
       onLanguageChange={handleLanguageChange}
-      soundEnabled={true}
-      onSoundToggle={() => console.log('Toggle sound')}
-      musicEnabled={true}
-      onMusicToggle={() => console.log('Toggle music')}
-      notificationsEnabled={false}
-      onNotificationsToggle={() => console.log('Toggle notifications')}
+      soundEnabled={sound}
+      onSoundToggle={() => togglePreference('sound')}
+      musicEnabled={music}
+      onMusicToggle={() => togglePreference('music')}
+      notificationsEnabled={notifications}
+      onNotificationsToggle={() => togglePreference('notifications')}
       appStats={appStats}
     />
   );

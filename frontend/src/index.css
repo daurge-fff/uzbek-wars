@@ -23,8 +23,9 @@ body {
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Prevent zoom on input focus on iOS */
-    touch-action: manipulation;
+    /* Prevent zoom on input focus on iOS and disable pinch-zoom in WebViews that ignore
+       `user-scalable=no` (panning still works) */
+    touch-action: pan-x pan-y;
   }
   
   body {
@@ -234,4 +235,16 @@ body {
 .overflow-x-auto {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Respect the OS "reduce motion" setting: keep the UI functional but calm */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

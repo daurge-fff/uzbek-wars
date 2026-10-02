@@ -5,6 +5,7 @@ import axios from 'axios';
 import Emoji from './Emoji';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
+import { useFeedback } from '../contexts/PreferencesContext';
 
 interface Opponent {
     _id: string;
@@ -47,6 +48,7 @@ const DIFFICULTY_INFO: Record<Difficulty, { color: string; bgColor: string; emoj
 export const ArenaPage = () => {
     const { t } = useTranslation();
     const { player, refreshPlayer } = useAuth();
+    const feedback = useFeedback();
     const [opponents, setOpponents] = useState<Opponent[]>([]);
     const [loading, setLoading] = useState(true);
     const [fighting, setFighting] = useState(false);
@@ -79,6 +81,7 @@ export const ArenaPage = () => {
             });
             setOpponents(response.data.opponents);
         } catch (error) {
+            feedback.error();
             toast.error(t('arena.errorFetch', 'Ошибка при поиске противников'));
         } finally {
             setLoading(false);
@@ -98,6 +101,7 @@ export const ArenaPage = () => {
 
             const data = response.data;
             setMatchResult(data);
+            feedback.sound('battle');
 
             // Animate battle log
             // The fight got longer (more turns and events), so the animation step is smaller,
@@ -109,6 +113,11 @@ export const ArenaPage = () => {
             }
 
             setFighting(false);
+            if (data.isWinner) {
+                feedback.success();
+            } else {
+                feedback.warning();
+            }
             if (refreshPlayer) {
                 refreshPlayer();
             }
@@ -121,6 +130,7 @@ export const ArenaPage = () => {
             } else {
                 toast.error(t('arena.errorFight', 'Ошибка во время боя'));
             }
+            feedback.error();
             setFighting(false);
         }
     };
@@ -510,6 +520,22 @@ export const ArenaPage = () => {
                             <Emoji emoji="🌀" size={48} />
                         </motion.div>
                     </div>
+                ) : opponents.length === 0 ? (
+                    <div className="text-center py-16">
+                        <div className="text-5xl mb-3">🔍</div>
+                        <p className="text-gray-600 dark:text-gray-300 font-black mb-1">
+                            {t('arena.noOpponents', 'Противники не найдены')}
+                        </p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+                            {t('arena.noOpponentsHint', 'Загляните позже — соперники появятся')}
+                        </p>
+                        <button
+                            onClick={() => { feedback.tap(); fetchOpponents(); }}
+                            className="px-6 py-2.5 rounded-xl bg-indigo-500 text-white font-bold text-sm active:scale-95 transition-transform"
+                        >
+                            {t('arena.refresh', 'Обновить')}
+                        </button>
+                    </div>
                 ) : (
                     <div className="grid gap-4">
                         {opponents.map((opp) => (
@@ -537,7 +563,7 @@ export const ArenaPage = () => {
                                     </div>
                                 </div>
                                 <button
-                                    onClick={() => handleFight(opp._id)}
+                                    onClick={() => { feedback.tap(); handleFight(opp._id); }}
                                     className={`relative overflow-hidden w-full py-3 bg-gradient-to-r ${diffInfo.bgColor} text-white font-black rounded-xl hover:shadow-xl active:scale-95 transition-all text-sm`}
                                 >
                                     <div className="absolute inset-0 z-0 pointer-events-none">

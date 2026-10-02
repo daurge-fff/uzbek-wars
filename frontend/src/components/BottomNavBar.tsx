@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Emoji from './Emoji';
+import { useFeedback } from '../contexts/PreferencesContext';
 
 interface NavItem {
   id: string;
@@ -13,6 +14,7 @@ export const BottomNavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeIndex, setActiveIndex] = useState(0);
+  const feedback = useFeedback();
 
   const navItems: NavItem[] = [
     { id: 'arena', icon: '⚔️', path: '/arena' },
@@ -30,6 +32,8 @@ export const BottomNavBar = () => {
   }, [location.pathname]);
 
   const handleNavClick = (item: NavItem, index: number) => {
+    if (index === activeIndex) return;
+    feedback.selection();
     setActiveIndex(index);
     navigate(item.path);
   };
@@ -45,7 +49,10 @@ export const BottomNavBar = () => {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 pb-6 pointer-events-none">
+    <div
+      className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none"
+      style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))' }}
+    >
       <div className="max-w-sm mx-auto px-8">
         <motion.div
           initial={{ y: 100, opacity: 0 }}

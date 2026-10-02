@@ -14,6 +14,7 @@ import { render } from '@testing-library/react';
 import type { RenderOptions } from '@testing-library/react';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { AuthProvider } from '../contexts/AuthContext';
+import { PreferencesProvider } from '../contexts/PreferencesContext';
 
 export interface ProviderOptions {
   /** Initial history entry for the MemoryRouter. */
@@ -24,9 +25,11 @@ function createWrapper({ initialEntries = ['/'] }: ProviderOptions = {}) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <ThemeProvider>
-        <AuthProvider>
-          <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
-        </AuthProvider>
+        <PreferencesProvider>
+          <AuthProvider>
+            <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
+          </AuthProvider>
+        </PreferencesProvider>
       </ThemeProvider>
     );
   };

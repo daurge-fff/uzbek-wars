@@ -8,6 +8,7 @@ import Emoji from './Emoji';
 import { useAuth } from '../contexts/AuthContext';
 import { getTelegramInitData } from '../utils/telegram';
 import { APP_VERSION } from '../version';
+import { useFeedback } from '../contexts/PreferencesContext';
 
 interface SettingsProps {
   currentLanguage: 'ru' | 'uz' | 'uk' | 'en';
@@ -56,6 +57,7 @@ export const Settings = ({
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const { user, token, login, isTelegram, setLinkingConflict, refreshUser } = useAuth();
+  const feedback = useFeedback();
   const [showDeveloperModal, setShowDeveloperModal] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const [linkingCode, setLinkingCode] = useState<string | null>(null);
@@ -241,7 +243,7 @@ export const Settings = ({
   const statsValue = (value?: number) => (appStats ? String(value ?? 0) : '—');
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 p-4 pb-32">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 p-4 pb-32 overflow-x-hidden">
       <div className="max-w-2xl mx-auto space-y-4">
         <h1 className="text-3xl font-black text-gray-900 dark:text-white">
           {t('settings.title', 'Настройки')}
@@ -256,7 +258,7 @@ export const Settings = ({
             {languageOptions.map((lang) => (
               <button
                 key={lang.code}
-                onClick={() => onLanguageChange(lang.code)}
+                onClick={() => { feedback.selection(); onLanguageChange(lang.code); }}
                 className={`p-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 ${
                   currentLanguage === lang.code
                     ? 'bg-indigo-500 text-white'
@@ -377,7 +379,7 @@ export const Settings = ({
             {t('settings.appearance', 'Внешний вид')}
           </h2>
           <button
-            onClick={toggleTheme}
+            onClick={() => { feedback.tap(); toggleTheme(); }}
             className={ROW_CLASS}
           >
             <span className="flex items-center gap-3">
@@ -408,19 +410,19 @@ export const Settings = ({
               icon={<Emoji emoji="🔊" size={22} />}
               label={t('settings.soundEffects', 'Звуковые эффекты')}
               enabled={soundEnabled}
-              onToggle={onSoundToggle}
+              onToggle={() => { feedback.selection(); onSoundToggle(); }}
             />
             <ToggleButton
               icon={<Emoji emoji="🎵" size={22} />}
               label={t('settings.music', 'Музыка')}
               enabled={musicEnabled}
-              onToggle={onMusicToggle}
+              onToggle={() => { feedback.selection(); onMusicToggle(); }}
             />
             <ToggleButton
               icon={<Emoji emoji="🔔" size={22} />}
               label={t('settings.pushNotifications', 'Push-уведомления')}
               enabled={notificationsEnabled}
-              onToggle={onNotificationsToggle}
+              onToggle={() => { feedback.selection(); onNotificationsToggle(); }}
             />
           </div>
         </div>

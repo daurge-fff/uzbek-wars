@@ -19,20 +19,51 @@ export interface TelegramUserProfile {
     is_premium?: boolean;
 }
 
+export type HapticImpactStyle = 'light' | 'medium' | 'heavy' | 'rigid' | 'soft';
+export type HapticNotificationType = 'error' | 'success' | 'warning';
+
+interface TelegramSafeAreaInset {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+}
+
 interface TelegramWebAppLike {
     initData?: string;
     initDataUnsafe?: { user?: TelegramUserProfile; start_param?: string };
     platform?: string;
     version?: string;
     colorScheme?: 'light' | 'dark';
+    themeParams?: Record<string, string>;
     isExpanded?: boolean;
+    viewportHeight?: number;
+    viewportStableHeight?: number;
+    safeAreaInset?: TelegramSafeAreaInset;
+    contentSafeAreaInset?: TelegramSafeAreaInset;
+    HapticFeedback?: {
+        impactOccurred?: (style: HapticImpactStyle) => void;
+        notificationOccurred?: (type: HapticNotificationType) => void;
+        selectionChanged?: () => void;
+    };
+    BackButton?: {
+        isVisible?: boolean;
+        show?: () => void;
+        hide?: () => void;
+        onClick?: (cb: () => void) => void;
+        offClick?: (cb: () => void) => void;
+    };
+    isVersionAtLeast?: (version: string) => boolean;
     ready?: () => void;
     expand?: () => void;
     disableVerticalSwipes?: () => void;
     setHeaderColor?: (color: string) => void;
     setBackgroundColor?: (color: string) => void;
+    setBottomBarColor?: (color: string) => void;
     onEvent?: (event: string, handler: () => void) => void;
+    offEvent?: (event: string, handler: () => void) => void;
     openTelegramLink?: (url: string) => void;
+    openLink?: (url: string, options?: Record<string, unknown>) => void;
 }
 
 /** Returns the Telegram WebApp object, or null when not running inside Telegram */
@@ -85,6 +116,98 @@ export function getStartParam(): string | null {
     return null;
 }
 
+/** Telegram's current color scheme, or null outside Telegram */
+export function getTelegramColorScheme(): 'light' | 'dark' | null {
+    const scheme = getTelegramWebApp()?.colorScheme;
+    return scheme === 'dark' || scheme === 'light' ? scheme : null;
+}
+
+/** Subscribe to Telegram theme changes; returns an unsubscribe function */
+export function onTelegramThemeChange(handler: (scheme: 'light' | 'dark') => void): () => void {
+    const app = getTelegramWebApp();
+    if (!app?.onEvent) return () => {};
+
+    const wrapped = () => {
+        const scheme = app.colorScheme;
+        if (scheme === 'dark' || scheme === 'light') handler(scheme);
+    };
+
+    app.onEvent('themeChanged', wrapped);
+    return () => app.offEvent?.('themeChanged', wrapped);
+}
+
+/** Paints the Telegram chrome (header / background / bottom bar) to match the app theme */
+export function applyTelegramChrome(theme: 'light' | 'dark'): void {
+    const app = getTelegramWebApp();
+    if (!app) return;
+
+    const bg = theme === 'dark' ? '#000000' : '#ffffff';
+    try {
+        app.setHeaderColor?.(bg);
+        app.setBackgroundColor?.(bg);
+        app.setBottomBarColor?.(bg);
+    } catch {
+        // Older SDK versions may not support every method — chrome is cosmetic
+    }
+}
+
+/**
+ * Writes Telegram's safe-area insets to CSS custom properties so the layout can respect
+ * the notch and the home indicator:
+ *   --tg-safe-top / -bottom / -left / -right   (device safe area)
+ *   --tg-content-top / -bottom                 (Telegram UI overlap)
+ */
+export function applyTelegramInsets(): void {
+    if (typeof document === 'undefined') return;
+    const app = getTelegramWebApp();
+    const root = document.documentElement;
+
+    const safe = app?.safeAreaInset;
+    if (safe) {
+        root.style.setProperty('--tg-safe-top', `${safe.top}px`);
+        root.style.setProperty('--tg-safe-bottom', `${safe.bottom}px`);
+        root.style.setProperty('--tg-safe-left', `${safe.left}px`);
+        root.style.setProperty('--tg-safe-right', `${safe.right}px`);
+    }
+
+    const content = app?.contentSafeAreaInset;
+    if (content) {
+        root.style.setProperty('--tg-content-top', `${content.top}px`);
+        root.style.setProperty('--tg-content-bottom', `${content.bottom}px`);
+    }
+}
+
+/**
+ * Shows or hides the native Telegram back button and wires it to a handler.
+ * Pass `null` to hide it. Outside Telegram this is a no-op.
+ */
+let currentBackHandler: (() => void) | null = null;
+
+export function setTelegramBackButton(handler: (() => void) | null): void {
+    const app = getTelegramWebApp();
+    if (!app?.BackButton) return;
+
+    try {
+        // Always remove the previous handler — `onClick` stacks callbacks, and stacked
+        // handlers would call navigate(-1) several times per tap.
+        if (currentBackHandler) {
+            app.BackButton.offClick?.(currentBackHandler);
+            currentBackHandler = null;
+        }
+
+        if (!handler) {
+            app.BackButton.hide?.();
+            return;
+        }
+
+        app.BackButton.onClick?.(handler);
+        currentBackHandler = handler;
+        app.BackButton.show?.();
+    } catch {
+        // Back button support varies between SDK versions
+    }
+}
+
 /** Applies Telegram-specific UI defaults: full height, no accidental swipe-to-close */
 export function initTelegramUi(): void {
     const app = getTelegramWebApp();
@@ -94,13 +217,9 @@ export function initTelegramUi(): void {
         app.ready?.();
         app.expand?.();
         app.disableVerticalSwipes?.();
-        if (app.colorScheme === 'dark') {
-            app.setHeaderColor?.('#0b0b0f');
-            app.setBackgroundColor?.('#0b0b0f');
-        } else {
-            app.setHeaderColor?.('#ffffff');
-            app.setBackgroundColor?.('#ffffff');
-        }
+        const scheme = app.colorScheme === 'dark' ? 'dark' : 'light';
+        applyTelegramChrome(scheme);
+        applyTelegramInsets();
     } catch {
         // Older SDK versions may not expose every method — UI defaults are optional
     }

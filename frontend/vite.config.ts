@@ -20,9 +20,12 @@ export default defineConfig({
         short_name: 'Uzbek Wars',
         description: 'Mobile-first PWA game with Uzbek cultural aesthetics',
         background_color: '#ffffff',
+        theme_color: '#6366f1',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',
+        categories: ['games', 'entertainment'],
+        lang: 'ru',
         icons: [
           {
             src: '/icons/icon-192x192.png',

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import Emoji from './Emoji';
+import LoadingScreen from './LoadingScreen';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -99,7 +100,7 @@ export const TasksPage = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-white">Loading...</div>;
+    if (loading) return <LoadingScreen label={t('common.loading', 'Загрузка…')} />;
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white p-6 pb-24">

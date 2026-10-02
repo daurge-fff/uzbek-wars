@@ -6,6 +6,7 @@ import { PurchaseConfirmModal } from './PurchaseConfirmModal';
 import Emoji from './Emoji';
 import CosmeticIcon from './CosmeticIcon';
 import { mergeCosmeticItems } from '../utils/cosmetics';
+import { useFeedback } from '../contexts/PreferencesContext';
 
 type CosmeticType = 'clothing' | 'background' | 'accessory' | 'equipment' | 'backpack' | 'combat';
 
@@ -86,6 +87,7 @@ const STAT_ROWS: Array<{ key: keyof NonNullable<CosmeticItem['stats']>; emoji: s
 
 export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, onEquip, onUnequip, onSell }: CosmeticShopProps) => {
   const { t, i18n } = useTranslation();
+  const feedback = useFeedback();
   const [filter, setFilter] = useState<ShopFilter>('all');
   const [loading, setLoading] = useState<string | null>(null);
   const [purchaseModal, setPurchaseModal] = useState<{ isOpen: boolean; item: CosmeticItem | null }>({ isOpen: false, item: null });
@@ -123,9 +125,11 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
     setLoading(itemId);
     try {
       await onPurchase(itemId, currency);
+      feedback.success();
       toast.success(t('cosmetic.purchaseSuccess'));
       setPurchaseModal({ isOpen: false, item: null });
     } catch {
+      feedback.error();
       toast.error(currency === 'soms' ? t('cosmetic.notEnoughSoms') : t('cosmetic.notEnoughCrystals'));
     } finally {
       setLoading(null);
@@ -136,8 +140,10 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
     setLoading(itemId);
     try {
       await onEquip(itemId);
+      feedback.success();
       toast.success(t('cosmetic.equipSuccess'));
     } catch {
+      feedback.error();
       toast.error(t('cosmetic.equipFailed', 'Не удалось надеть предмет'));
     } finally {
       setLoading(null);
@@ -149,8 +155,10 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
     setLoading(itemId);
     try {
       await onUnequip(itemId);
+      feedback.tap();
       toast.success(t('cosmetic.unequipSuccess', 'Предмет снят'));
     } catch {
+      feedback.error();
       toast.error(t('cosmetic.unequipFailed', 'Не удалось снять предмет'));
     } finally {
       setLoading(null);
@@ -165,8 +173,10 @@ export const CosmeticShop = ({ items, playerCrystals, playerSoms, onPurchase, on
     setLoading(item.id);
     try {
       await onSell(item.id);
+      feedback.sound('coin');
       toast.success(t('cosmetic.sellSuccess', 'Продано!'));
     } catch {
+      feedback.error();
       toast.error(t('cosmetic.sellFailed', 'Не удалось продать предмет'));
     } finally {
       setLoading(null);

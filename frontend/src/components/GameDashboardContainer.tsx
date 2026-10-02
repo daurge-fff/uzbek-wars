@@ -7,15 +7,20 @@ import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useFeedback } from '../contexts/PreferencesContext';
+import LoadingScreen from './LoadingScreen';
+import { LevelUpModal } from './LevelUpModal';
 
 export const GameDashboardContainer = () => {
   const { t } = useTranslation();
   const { player, token, isAuthenticated, user, updatePlayer, refreshPlayer } = useAuth();
   const navigate = useNavigate();
+  const feedback = useFeedback();
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentActivity, setCurrentActivity] = useState<any>(null);
   const [cooldownInfo, setCooldownInfo] = useState<{ activityName: string; seconds: number } | null>(null);
+  const [levelUpInfo, setLevelUpInfo] = useState<{ level: number; statPoints?: number } | null>(null);
 
   // Current values for the interval check: previously the first render's closure
   // saw currentActivity = null, and the fallback polling could never finish the activity.
@@ -170,6 +175,12 @@ export const GameDashboardContainer = () => {
 
       // Show the toast with the results
       if (response.data.leveledUp) {
+        feedback.sound('levelup');
+        feedback.success();
+        setLevelUpInfo({
+          level: response.data.newLevel ?? response.data.player?.level ?? 1,
+          statPoints: response.data.player?.stats?.statPoints
+        });
         toast.success(
           t('notifications.levelUpNotification', {
             level: response.data.newLevel,
@@ -179,6 +190,7 @@ export const GameDashboardContainer = () => {
           { duration: 4000 }
         );
       } else {
+        feedback.sound('coin');
         toast.success(
           t('notifications.activityCompleted', {
             exp: response.data.experienceGained,
@@ -190,6 +202,7 @@ export const GameDashboardContainer = () => {
 
       // If there was a penalty, show a warning
       if (response.data.penaltyApplied) {
+        feedback.warning();
         toast.error(t('notifications.penaltyApplied'), { duration: 2000 });
       }
     } catch (error: any) {
@@ -230,6 +243,7 @@ export const GameDashboardContainer = () => {
         startTime,
         endTime
       });
+      feedback.tap();
 
       // Scroll the page to the top so the activity card is visible
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -245,6 +259,7 @@ export const GameDashboardContainer = () => {
         const match = message.match(/Wait (\d+) seconds/);
         if (match) {
           const seconds = parseInt(match[1]);
+          feedback.warning();
           setCooldownInfo({
             activityName: t(`activities.${activityId}`),
             seconds
@@ -253,22 +268,13 @@ export const GameDashboardContainer = () => {
         }
       }
 
+      feedback.error();
       toast.error(message);
     }
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:bg-black dark:from-black dark:via-black dark:to-black flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className="text-6xl"
-        >
-          ⏳
-        </motion.div>
-      </div>
-    );
+    return <LoadingScreen label={t('common.loading', 'Загрузка…')} />;
   }
 
   if (!player) {
@@ -340,6 +346,13 @@ export const GameDashboardContainer = () => {
         </AnimatePresence>,
         document.body
       )}
+
+      <LevelUpModal
+        isOpen={!!levelUpInfo}
+        onClose={() => setLevelUpInfo(null)}
+        level={levelUpInfo?.level ?? 1}
+        statPoints={levelUpInfo?.statPoints}
+      />
     </>
   );
 };
