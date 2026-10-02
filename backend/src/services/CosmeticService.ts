@@ -339,6 +339,7 @@ export async function equipCosmetic(
 
     // Recalculate combat power after equipment change
     await recalculateCombatPower(player);
+    await player.save();
 
     logger.info(`Item equipped and power recalculated`, {
       playerId,

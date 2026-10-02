@@ -1,4 +1,5 @@
 import { Player } from '../models/Player';
+import { APP_VERSION } from '../config/version';
 
 export class StatsOnlineService {
   /**
@@ -62,7 +63,7 @@ export class StatsOnlineService {
       onlinePlayersTotal: totalOnline,
       onlinePlayersCity: playerCityId ? (cityStats[playerCityId] || 0) : 0,
       cityName: playerCityId || 'unknown',
-      version: '1.2.1'
+      version: APP_VERSION
     };
   }
 }

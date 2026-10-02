@@ -7,6 +7,7 @@ import axios from 'axios';
 import Emoji from './Emoji';
 import { useAuth } from '../contexts/AuthContext';
 import { getTelegramInitData } from '../utils/telegram';
+import { APP_VERSION } from '../version';
 
 interface SettingsProps {
   currentLanguage: 'ru' | 'uz' | 'uk' | 'en';
@@ -481,7 +482,7 @@ export const Settings = ({
           <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
             <div className="flex justify-between">
               <span>{t('settings.version')}:</span>
-              <span className="font-bold text-gray-900 dark:text-white">{appStats?.version || '1.2.1'}</span>
+              <span className="font-bold text-gray-900 dark:text-white">{appStats?.version || APP_VERSION}</span>
             </div>
             <div className="flex justify-between items-center">
               <span>{t('settings.license')}:</span>

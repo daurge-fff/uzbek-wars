@@ -26,6 +26,18 @@ export const GameDashboardContainer = () => {
     currentActivityRef.current = currentActivity;
   }, [currentActivity]);
 
+  // Accounts created by login but not onboarded carry the `default` sentinel; send them
+  // through onboarding before they can reach the dashboard.
+  useEffect(() => {
+    if (
+      player &&
+      (!player.characterId || player.characterId === 'default' ||
+        !player.cityId || player.cityId === 'default')
+    ) {
+      navigate('/onboarding');
+    }
+  }, [player, navigate]);
+
   // Log the stat changes for debugging
   useEffect(() => {
     if (player?.stats) {

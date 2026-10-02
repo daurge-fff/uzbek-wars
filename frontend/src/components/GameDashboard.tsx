@@ -137,7 +137,9 @@ const activityImages: Record<string, string> = {
   'cook_plov': '🍛',
   'trade_bazaar': '🏪',
   'rest': '😴',
-  'eat': '🍽️'
+  'eat': '🍽️',
+  'work_shawarma': '🌯',
+  'pray_namaz': '🕌'
 };
 
 // Compact number formatting so currency values fit inside the small header cards on
@@ -710,13 +712,13 @@ export const GameDashboard = ({ playerState, activities, onActivitySelect, userA
                         </div>
 
                         <div className="text-center w-full">
-                          <div className={`text-lg font-black mb-0.5 ${value >= 70 ? 'text-green-600 dark:text-green-400' :
+                          <div className={`text-base leading-none font-black mb-0.5 ${value >= 70 ? 'text-green-600 dark:text-green-400' :
                             value >= 40 ? 'text-yellow-600 dark:text-yellow-400' :
                               'text-red-600 dark:text-red-400'
                             }`}>
                             {value}%
                           </div>
-                          <div className="text-[10px] text-gray-600 dark:text-gray-400 font-bold">
+                          <div className="text-[9px] leading-tight text-gray-600 dark:text-gray-400 font-bold break-words">
                             {t(config.labelKey)}
                           </div>
                         </div>

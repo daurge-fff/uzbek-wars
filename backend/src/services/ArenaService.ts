@@ -119,7 +119,7 @@ export async function findOpponents(playerId: string, limit: number = 3): Promis
         const player = await Player.findById(playerId);
         if (!player) throw new Error('Player not found');
 
-        const power = player.combatStats.combatPower || 10;
+        const power = player.combatStats?.combatPower || 10;
 
         // Wider range for matchmaking: +/- 40%
         const minPower = power * 0.6;

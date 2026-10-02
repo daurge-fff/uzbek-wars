@@ -1,6 +1,6 @@
 {
   "name": "@uzbek-wars/frontend",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "description": "Frontend PWA for Uzbek Wars game",
   "type": "module",
   "scripts": {

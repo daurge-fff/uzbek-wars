@@ -101,6 +101,43 @@ async function generateReferralCode(): Promise<string> {
 }
 
 /**
+ * Ensures a Player document exists for the user.
+ *
+ * Accounts are created on login but the real character/city are chosen during onboarding.
+ * Previously no Player existed at all until onboarding, which made every route that uses
+ * the strict `authenticate` middleware (arena, tasks, stats, cosmetics) return 404 for a
+ * freshly registered account. We now create a placeholder with the `default` sentinel —
+ * onboarding treats `characterId === 'default'` as "needs onboarding" and fills it in.
+ */
+async function ensurePlayerForUser(userId: any): Promise<any> {
+  let player = await Player.findOne({ userId });
+  if (player) return player;
+
+  try {
+    const referralCode = await generateReferralCode();
+    player = await Player.create({
+      userId,
+      characterId: 'default',
+      cityId: 'default',
+      level: 1,
+      experience: 0,
+      soms: 100,
+      donationCurrency: 0,
+      referralCode,
+      lastActivityTime: new Date(),
+      lastLoginDate: new Date(),
+    });
+    logger.info(`Placeholder player created for user: ${userId}`);
+  } catch (error) {
+    // Race: another request created it first — just load it
+    player = await Player.findOne({ userId });
+    if (!player) throw error;
+  }
+
+  return player;
+}
+
+/**
  * Authenticates user via Google OAuth
  * 
  * Creates new user if first login, otherwise loads existing user.
@@ -147,18 +184,9 @@ export async function authenticateWithGoogle(
       logger.info(`User logged in via Google: ${user.email}`);
     }
 
-    // Check for existing player
-    let player = await Player.findOne({ userId: user._id });
-
-    if (player) {
-      // Update login streak
-      await updateLoginStreak(player);
-    }
-
-    // Don't create player automatically - let them complete onboarding first
-    if (!player && isNewUser) {
-      logger.info(`New user registered, player will be created during onboarding: ${user.email}`);
-    }
+    // Ensure a player exists (placeholder until onboarding) and update the login streak
+    const player = await ensurePlayerForUser(user._id);
+    await updateLoginStreak(player);
 
     // Generate JWT token
     const token = generateToken(user._id.toString());
@@ -258,11 +286,9 @@ export async function authenticateWithTelegramWebApp(
       logger.info(`User logged in via Telegram mini app: ${telegramId}`);
     }
 
-    // A player is created during onboarding, not here
-    const player = await Player.findOne({ userId: user._id });
-    if (player) {
-      await updateLoginStreak(player);
-    }
+    // Ensure a player exists (placeholder until onboarding) and update the login streak
+    const player = await ensurePlayerForUser(user._id);
+    await updateLoginStreak(player);
 
     const token = generateToken(user._id.toString());
 
@@ -558,7 +584,15 @@ async function buildConflictResponse(userId1: string, userId2: string): Promise<
     avatar: u.avatar || '',
   });
 
-  const keepId = (p1?.level ?? 0) <= (p2?.level ?? 0) ? userId1 : userId2;
+  // Recommend keeping the account with the most progress (level first, then XP, soms,
+  // crystals). The old comparison kept the *lower* level, which suggested the wrong one.
+  const progressScore = (p: any) =>
+    (p?.level ?? 0) * 1e12 +
+    (p?.experience ?? 0) * 1e6 +
+    (p?.soms ?? 0) * 1e2 +
+    (p?.donationCurrency ?? 0);
+
+  const keepId = progressScore(p1) >= progressScore(p2) ? userId1 : userId2;
 
   return {
     conflict: true,

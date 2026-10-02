@@ -7,8 +7,8 @@
  */
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'react-hot-toast';
-import { useState, useEffect } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -693,28 +693,31 @@ const PlayerProfileWithData = () => {
 };
 
 function GoogleOAuthRedirectHandler() {
-  const { login } = useAuth();
+  const { login, setLinkingConflict } = useAuth();
   const navigate = useNavigate();
+  const handledRef = useRef(false);
 
   useEffect(() => {
+    if (handledRef.current) return;
+
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.substring(1));
     const accessToken = params.get('access_token');
 
     if (!accessToken) {
       if (params.get('error')) {
-        window.location.hash = '';
+        handledRef.current = true;
         navigate('/', { replace: true });
       }
       return;
     }
+    handledRef.current = true;
 
     // Read the session from localStorage, not from context state: this effect runs on
     // mount (before AuthProvider has rehydrated `token`), so context state is still null.
     const pendingLink = localStorage.getItem('pendingGoogleLink');
     const token = localStorage.getItem('auth_token');
     if (!pendingLink || !token) {
-      window.location.hash = '';
       navigate('/', { replace: true });
       return;
     }
@@ -745,28 +748,25 @@ function GoogleOAuthRedirectHandler() {
         });
 
         if (res.data.conflict) {
-          window.location.hash = '';
-          window.location.search = '';
-          navigate('/', { replace: true });
-          return;
-        }
-
-        const storedUser = localStorage.getItem('auth_user');
-        const storedPlayer = localStorage.getItem('auth_player');
-        if (storedUser) {
-          const user = JSON.parse(storedUser);
-          login(token, { ...user, hasGoogle: true }, storedPlayer ? JSON.parse(storedPlayer) : null);
+          // Show the merge dialog instead of silently dropping the result
+          setLinkingConflict(res.data);
+        } else {
+          const storedUser = localStorage.getItem('auth_user');
+          const storedPlayer = localStorage.getItem('auth_player');
+          if (storedUser) {
+            const user = JSON.parse(storedUser);
+            login(token, { ...user, hasGoogle: true }, storedPlayer ? JSON.parse(storedPlayer) : null);
+          }
         }
       } catch (err) {
         console.error('Google link redirect failed:', err);
       } finally {
-        window.location.hash = '';
-        window.location.search = '';
+        // navigate() replaces the whole location (path/search/hash), so the access_token
+        // is removed from the URL without the extra reloads that location.search = '' caused.
         navigate('/', { replace: true });
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [login, navigate]);
+  }, [login, navigate, setLinkingConflict]);
 
   return null;
 }
@@ -783,11 +783,16 @@ function GlobalConflictModal() {
     try {
       await mergeAccounts(keepId, removeId);
       setLinkingConflict(null);
-    } catch {
+      toast.success(t('settings.mergeDone', 'Аккаунты объединены'));
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error || t('settings.mergeFailed', 'Не удалось объединить аккаунты'));
     } finally {
       setMerging(false);
     }
   };
+
+  const otherId = (accId: string) =>
+    accId === linkingConflict.keepUser.id ? linkingConflict.removeUser.id : linkingConflict.keepUser.id;
 
   return createPortal(
     <AnimatePresence>
@@ -812,7 +817,7 @@ function GlobalConflictModal() {
                 {t('settings.conflictTitle', 'Обнаружен конфликт аккаунтов')}
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {t('settings.conflictHint', 'У вас уже есть аккаунт с этим входом. Выберите, какой оставить:')}
+                {t('settings.conflictHint', 'У вас уже есть аккаунт с этим входом. Нажмите на аккаунт, который хотите оставить:')}
               </p>
             </div>
 
@@ -820,10 +825,7 @@ function GlobalConflictModal() {
               {[linkingConflict.keepUser, linkingConflict.removeUser].map((acc) => (
                 <button
                   key={acc.id}
-                  onClick={() => handleMerge(
-                    acc.id === linkingConflict.suggestedKeep ? acc.id : linkingConflict.suggestedKeep,
-                    acc.id === linkingConflict.suggestedKeep ? (acc.id === linkingConflict.keepUser.id ? linkingConflict.removeUser.id : linkingConflict.keepUser.id) : acc.id
-                  )}
+                  onClick={() => !merging && handleMerge(acc.id, otherId(acc.id))}
                   disabled={merging}
                   className={`w-full p-4 rounded-xl border-2 text-left transition-all disabled:opacity-50 ${
                     acc.id === linkingConflict.suggestedKeep
